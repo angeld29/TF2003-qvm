@@ -781,7 +781,7 @@ int ClassIsRestricted( int tno, int pc )
 	if ( !tno )
 		return 0;
 
-	max = GetSVInfokeyInt( li_classrestricted[pc][0], li_classrestricted[pc][1], 0 );
+	max = GetSVInfokeyInt( li_classrestricted[pc-1][0], li_classrestricted[pc-1][1], 0 );
 
 	if ( max > 0 )
 	{
