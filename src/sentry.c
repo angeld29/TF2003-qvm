@@ -453,9 +453,8 @@ void Sentry_Die(  )
 	}
 }
 
-void FireSentryBullets( int shotcount, gedict_t * targ, float spread_x, float spread_y, float spread_z )
+void FireSentryBulletsNEW( int shotcount, gedict_t * targ, float spread_x, float spread_y, float spread_z )
 {
-	//vec3_t  end,direction;
 	vec3_t  src;
 	vec3_t  dst;
 	vec3_t  dir,  tmp, norm_dir;
@@ -468,7 +467,10 @@ void FireSentryBullets( int shotcount, gedict_t * targ, float spread_x, float sp
 
 	normalize(dir,norm_dir);
 	
-	if( vlen(dir) > 100 )
+	//чтобы не попадять в подставку
+	traceline( PASSVEC3( src ), PASSVEC3( dst ), 0, self );
+	
+	if( (PROG_TO_EDICT(g_globalvars.trace_ent) == self->trigger_field) && vlen(dir) > 100 )
 	{
 		 VectorScale(norm_dir, 60, tmp);
 		 VectorAdd(src,tmp,src);
@@ -477,16 +479,18 @@ void FireSentryBullets( int shotcount, gedict_t * targ, float spread_x, float sp
 	ClearMultiDamage(  );
 	traceline( PASSVEC3( src ), PASSVEC3( dst ), 0, self );
 
-	if(g_globalvars.trace_fraction == 1)
-		return;
-
 	VectorScale( norm_dir, 4, puff_org );
 	VectorSubtract( g_globalvars.trace_endpos, puff_org, puff_org );
 
-
 	for (  ; shotcount > 0  ; shotcount-- )
 	{
-		TraceAttack( 4, norm_dir );
+	        // для каждого выстрела определяем trace_ent trace_endpos
+	        // т.к.выстрелы могут убрать препятствия
+	        traceline( PASSVEC3( src ), PASSVEC3( dst ), 0, self );
+
+	        // TraceAttack требует нормализованый вектор для корректного определения blood_org
+	        if(g_globalvars.trace_fraction != 1)
+	        	TraceAttack( 4, norm_dir ); 
 	}
 	ApplyMultiDamage(  );
 	Multi_Finish(  );
@@ -558,7 +562,9 @@ void    FireSentryLighting( gedict_t * targ )
                 	VectorSubtract( dst, src, dir );
 
                 	normalize(dir,norm_dir);
-                	if( vlen(dir) > 100 )
+                	traceline( PASSVEC3( src ), PASSVEC3( dst ), 0, self );
+
+               		if( (PROG_TO_EDICT(g_globalvars.trace_ent) == self->trigger_field) && vlen(dir) > 100 )
                 	{
                 		 VectorScale(norm_dir, 60, tmp);
                 		 VectorAdd(src,tmp,src);
@@ -695,46 +701,43 @@ int Sentry_Fire(  )
 		if ( self->s.v.ammo_rockets == 10 )
 			G_sprint( self->real_owner, 2, "Sentry Gun is low on rockets.\n" );
 	}
-	if ( tg_data.sg_fire_type != TG_SG_FIRE_LIGHTING )
-	{
-		self->s.v.ammo_shells -= 1;
-		if ( self->s.v.ammo_shells < 0 )
-		{
-			self->s.v.ammo_shells = 0;
-			return 0;
-		}
-		Sentry_MuzzleFlash(  );
-		sound( self, 1, "weapons/sniper.wav", 1, 1 );
-	}
-	tf_data.deathmsg = 27;
 	if ( tg_data.sg_fire_type == TG_SG_FIRE_LIGHTING )
 	{
 		FireSentryLighting( PROG_TO_EDICT(self->s.v.enemy) );
-	} else
-	{
-	        switch(tf_data.sg_sfire)
-	        {
-	        	case SG_SFIRE_281:
-	        		FireBullets( 4, dir, 0.1, 0.1, 0 );
-	        		break;
-	        	case SG_SFIRE_MTFL1:
-				VectorCopy( self->s.v.angles, self->s.v.v_angle );
-				FireBullets( 4, dir, 0.1, 0.1, 0 );
-	        		break;
-	        	case SG_SFIRE_MTFL2:
-				VectorCopy( self->s.v.angles, self->s.v.v_angle );
-				FireSentryBulletsMTFL2( 4, enemy, 0.1, 0.1, 0 );
-				break;
-	        	case SG_SFIRE_NEW:
-				VectorCopy( self->s.v.angles, self->s.v.v_angle );
-				FireSentryBullets( 4, enemy, 0.1, 0.1, 0 );
-				break;
-	        		
-	        	default:
-	        		G_Error("Unknown SG TYPE\n");
-	        
-	        }
+		return 1;
 	}
+	tf_data.deathmsg = 27;
+
+	self->s.v.ammo_shells -= 1;
+	if ( self->s.v.ammo_shells < 0 )
+	{
+		self->s.v.ammo_shells = 0;
+		return 0;
+	}
+	Sentry_MuzzleFlash(  );
+	sound( self, 1, "weapons/sniper.wav", 1, 1 );
+
+        switch(tf_data.sg_sfire)
+        {
+        	
+        	case SG_SFIRE_MTFL1:
+			VectorCopy( self->s.v.angles, self->s.v.v_angle );
+		case SG_SFIRE_281:
+			FireBullets( 4, dir, 0.1, 0.1, 0 );
+        		break;
+        	case SG_SFIRE_MTFL2:
+			VectorCopy( self->s.v.angles, self->s.v.v_angle );
+			FireSentryBulletsMTFL2( 4, enemy, 0.1, 0.1, 0 );
+			break;
+        	case SG_SFIRE_NEW:
+			VectorCopy( self->s.v.angles, self->s.v.v_angle );
+			FireSentryBulletsNEW( 4, enemy, 0.1, 0.1, 0 );
+			break;
+        		
+        	default:
+        		G_Error("Unknown SG TYPE\n");
+        
+        }
 //////
 	if ( !self->s.v.ammo_shells && g_random(  ) < 0.1 )
 		G_sprint( self->real_owner, 2, "Sentry Gun is out of shells.\n" );

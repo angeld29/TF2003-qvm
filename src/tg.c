@@ -163,3 +163,91 @@ void TG_LoadSettings()
        		tg_data.tg_sbar = 0;
 
 }
+
+void TG_Cmd()
+{
+        char    cmd_command[50];
+        char    st[50];
+        int argc;
+
+
+	if( !tg_data.tg_enabled )
+	{
+		G_sprint(self, 2, "Training Ground mode not active\n");
+		return;
+	
+	}
+	argc = trap_CmdArgc();
+	if(argc<2)
+		return;
+
+        trap_CmdArgv( 1, cmd_command, sizeof( cmd_command ) );
+        if(!strcmp(cmd_command,"sgppl"))
+        {
+                if(argc<3)
+                {
+                	G_sprint(self, 2, "sgppl %d\n",tf_data.sgppl);
+                	return;
+                }
+                	
+                trap_CmdArgv( 2, st, sizeof( st ) );
+                tf_data.sgppl = atoi(st);
+                if( tf_data.sgppl < 0)
+                	tf_data.sgppl = 0;
+                return;
+        }
+
+        if(!strcmp(cmd_command,"sg_fire"))
+        {
+                if(argc<3)
+                {
+                	G_sprint(self, 2, "SG_Fire %s\n",(!tg_data.sg_disable_fire)?"On":"Off");
+                	return;
+                }
+                	
+                trap_CmdArgv( 2, st, sizeof( st ) );
+          	if ( !strcmp( st, "off" ) )
+          		tg_data.sg_disable_fire = 1;
+          	else
+          		tg_data.sg_disable_fire = 0;
+                return;
+        }
+        if(!strcmp(cmd_command,"sg_find"))
+        {
+                if(argc<3)
+                {
+                	G_sprint(self, 2, "SG_Find \n");
+                	return;
+                }
+                	
+                trap_CmdArgv( 2, st, sizeof( st ) );
+          	if ( !strcmp( st, "all" ) )
+          		tg_data.sg_allow_find = TG_SG_FIND_IGNORE_OFF;
+          	else if( !strcmp( st, "self" ) )
+          		tg_data.sg_allow_find = TG_SG_FIND_IGNORE_OWNER;
+          		else if( !strcmp( st, "no" ) )
+          				tg_data.sg_allow_find = TG_SG_FIND_IGNORE_ALL;
+          			else
+          				tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
+                return;
+        }
+
+        if(!strcmp(cmd_command,"sg_fire_type"))
+        {
+                if(argc<3)
+                {
+                	G_sprint(self, 2, "sg_fire_type \n");
+                	return;
+                }
+                	
+                trap_CmdArgv( 2, st, sizeof( st ) );
+        	if ( !strcmp( st, "nodmg" ) )
+        		tg_data.sg_fire_type = TG_SG_FIRE_LIGHTING;
+        	else if( !strcmp( st, "bullets" ) )
+        			tg_data.sg_fire_type = TG_SG_FIRE_BULLETS;
+       		else
+        			tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;
+                return;
+        }
+
+};

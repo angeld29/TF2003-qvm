@@ -175,8 +175,8 @@ void FlashGrenadeExplode(  )
 	{
 		if ( strneq( te->s.v.classname, "player" ) )
 			continue;
-		if ( te->s.v.health <= 0 )
-			continue;
+
+
 		traceline( PASSVEC3( self->s.v.origin ), PASSVEC3( te->s.v.origin ), 1, self );
 		if ( g_globalvars.trace_fraction != 1 )
 			continue;
@@ -187,6 +187,9 @@ void FlashGrenadeExplode(  )
 			tf_data.deathmsg = 35;
 			TF_T_Damage( te, self, owner, 60, 2, 16 | 4 );
 		}
+		if ( te->s.v.health <= 0 )
+			continue;
+
 		if ( tg_data.gren_effect == TG_GREN_EFFECT_OFF )
 			continue;
 

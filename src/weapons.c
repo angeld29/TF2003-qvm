@@ -806,19 +806,21 @@ BULLETS
 TraceAttack
 ================
 */
+// dir must be normalized
 void TraceAttack( float damage, vec3_t dir )
 {
 
-	vec3_t  vel, org, tmp;
+	//vec3_t  vel;
+	vec3_t  	org, tmp;
 
-	VectorScale( g_globalvars.v_up, crandom(  ), tmp );
+/*	VectorScale( g_globalvars.v_up, crandom(  ), tmp );
 	VectorAdd( dir, tmp, vel );
 	VectorScale( g_globalvars.v_right, crandom(  ), tmp );
 	VectorAdd( vel, tmp, vel );
 	VectorNormalize( vel );
 	VectorScale( g_globalvars.trace_plane_normal, 2, tmp );
 	VectorAdd( vel, tmp, vel );
-	VectorScale( vel, 200, vel );
+	VectorScale( vel, 200, vel );*/
 	/*vel = normalize(dir + v_up*crandom() + v_right*crandom());
 	   vel = vel + 2*trace_plane_normal;
 	   vel = vel * 200; */

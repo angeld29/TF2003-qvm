@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.3 2004-09-19 21:18:27 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.4 2004-09-20 06:43:57 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -29,6 +29,7 @@ extern void trap_CmdArgv( int arg, char *valbuff, int sizebuff );
 
 void    ClientKill(  );
 void Test();
+void TG_Cmd();
 qboolean ClientCommand(  )
 {
 	char    cmd_command[1024];
@@ -46,6 +47,12 @@ qboolean ClientCommand(  )
 	     //Test();
 	     return true;
 	}
+	if ( !strcmp( cmd_command, "tg" ) )
+	{
+	     TG_Cmd();
+	     return true;
+	}
+
 	//G_Printf("ClientCommand %s\n",cmd_command);
 	return false;
 }
