@@ -16,7 +16,7 @@ void TeamFortress_DetonatePipebombs(  )
 {
 	gedict_t *e;
 
-	for ( e = world; (e = find( e, FOFS( s.v.classname ), "pipebomb" )); )
+	for ( e = world; (e = trap_find( e, FOFS( s.v.classname ), "pipebomb" )); )
 	{
 		if ( e->s.v.owner == EDICT_TO_PROG( self ) )
 			e->s.v.nextthink = g_globalvars.time;
@@ -108,7 +108,7 @@ void Detpack_SetClip(  )
 	gedict_t *te;
 //	gedict_t *pl;
 
-	for ( te = world; (te = find( te, FOFS( s.v.classname ), "detpack" )); )
+	for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "detpack" )); )
 	{
 	        switch(tg_data.detpack_clip)
 	        {
@@ -195,7 +195,7 @@ void TeamFortress_SetDetpack( float timer )
 	}
         if( !tg_data.tg_enabled )
         {
-        	for ( te = world; (te = find( te, FOFS( s.v.classname ), "detpack" )); )
+        	for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "detpack" )); )
         	{
         		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
         		{
@@ -236,7 +236,7 @@ void TeamFortress_DetpackStop(  )
 {
 	gedict_t *detpack_timer;
 
-	for ( detpack_timer = world; (detpack_timer = find( detpack_timer, FOFS( s.v.netname ), "detpack_timer" )); )
+	for ( detpack_timer = world; (detpack_timer = trap_find( detpack_timer, FOFS( s.v.netname ), "detpack_timer" )); )
 	{
 		if ( detpack_timer->s.v.owner == EDICT_TO_PROG( self ) )
 			break;

@@ -287,7 +287,7 @@ void TeamFortress_EngineerBuild(  )
 	    G_sprint( self, 2, "You stop building.\n" );
 	    self->tfstate = self->tfstate - ( self->tfstate & TFSTATE_CANT_MOVE );
 	    TeamFortress_SetSpeed( self );
-	    for ( te = world; (te = find( te, FOFS( s.v.netname ), "build_timer" )); )
+	    for ( te = world; (te = trap_find( te, FOFS( s.v.netname ), "build_timer" )); )
 	    {
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
@@ -806,7 +806,7 @@ void DestroyBuilding( gedict_t * eng, char *bld )
     gedict_t *oldself;
     float pos;
 
-    for ( te = world; (te = find( te, FOFS( s.v.classname ), bld )); )
+    for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), bld )); )
     {
 	if ( te->real_owner == eng )
 	{
@@ -856,7 +856,7 @@ void Eng_SGUp(  )
     gedict_t *sg;
 //    int numupg = 0;
 
-    for ( sg = world; (sg = find( sg, FOFS( s.v.classname ), "building_sentrygun" )); )
+    for ( sg = world; (sg = trap_find( sg, FOFS( s.v.classname ), "building_sentrygun" )); )
     {
 	if ( sg->s.v.weapon == 3 && sg->s.v.ammo_shells == 144 && sg->s.v.ammo_rockets == 20
 	     && sg->s.v.health == sg->s.v.max_health )
@@ -882,7 +882,7 @@ void Eng_DispLoad(  )
     gedict_t *disp;
     float power;
 
-    for ( disp = world; (disp = find( disp, FOFS( s.v.classname ), "building_dispenser" )); )
+    for ( disp = world; (disp = trap_find( disp, FOFS( s.v.classname ), "building_dispenser" )); )
     {
 	disp->s.v.ammo_cells = disp->s.v.ammo_cells + 20;
 	disp->s.v.ammo_rockets = disp->s.v.ammo_rockets + 15;
@@ -905,7 +905,7 @@ void Eng_DispUnload(  )
     gedict_t *disp;
     float power;
 
-    for ( disp = world; (disp = find( disp, FOFS( s.v.classname ), "building_dispenser" )); )
+    for ( disp = world; (disp = trap_find( disp, FOFS( s.v.classname ), "building_dispenser" )); )
     {
 	disp->s.v.ammo_cells = disp->s.v.ammo_cells - 20;
 	disp->s.v.ammo_rockets = disp->s.v.ammo_rockets - 15;
@@ -927,7 +927,7 @@ void Eng_SGReload(  )
 {
     gedict_t *sg;
 
-    for ( sg = world; (sg = find( sg, FOFS( s.v.classname ), "building_sentrygun" )); )
+    for ( sg = world; (sg = trap_find( sg, FOFS( s.v.classname ), "building_sentrygun" )); )
     {
 	if ( sg->s.v.ammo_shells == sg->maxammo_shells && sg->s.v.ammo_rockets == sg->maxammo_rockets
 	     && sg->s.v.health == sg->s.v.max_health )

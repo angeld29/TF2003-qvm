@@ -440,7 +440,7 @@ void teleport_touch(  )
 	//put a tfog where the player was
 	spawn_tfog( other->s.v.origin );
 
-	t = find( world, FOFS( s.v.targetname ), self->s.v.target );
+	t = trap_find( world, FOFS( s.v.targetname ), self->s.v.target );
 	if ( !t )
 		G_Error( "couldn't find target" );
 

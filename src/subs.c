@@ -243,7 +243,7 @@ void SUB_UseTargets(  )
 		t = world;
 		do
 		{
-			t = find( t, FOFS( s.v.targetname ), self->killtarget );
+			t = trap_find( t, FOFS( s.v.targetname ), self->killtarget );
 			if ( !t )
 				return;
 			ent_remove( t );
@@ -260,7 +260,7 @@ void SUB_UseTargets(  )
 		do
 		{
 
-			t = find( t, FOFS( s.v.targetname ), self->s.v.target );
+			t = trap_find( t, FOFS( s.v.targetname ), self->s.v.target );
 			if ( !t )
 			{
 				return;

@@ -428,7 +428,7 @@ void LinkDoors(  )
 		if ( strneq( self->s.v.message, "" ) )
 			starte->s.v.message = self->s.v.message;
 
-		t = find( t, FOFS( s.v.classname ), self->s.v.classname );
+		t = trap_find( t, FOFS( s.v.classname ), self->s.v.classname );
 
 		if ( !t )
 		{

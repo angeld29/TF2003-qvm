@@ -165,7 +165,7 @@ void TeamFortress_HelpMap(  )
 {
 	gedict_t *te;
 
-	te = find( world, FOFS( s.v.classname ), "info_tfdetect" );
+	te = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
 	if ( te )
 	{
 		if ( te->non_team_broadcast )

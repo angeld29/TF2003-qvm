@@ -289,7 +289,7 @@ void TeamFortress_TeamIncreaseScore( int tno, int scoretoadd )
 	if ( ( tf_data.toggleflags & 128 ) || ( tf_data.toggleflags & 2048 ) )
 	{
 		
-		for ( e = world; ( e = find( e, FOFS( s.v.classname ), "player" ) ) ; )
+		for ( e = world; ( e = trap_find( e, FOFS( s.v.classname ), "player" ) ) ; )
 		{
 			if ( e->team_no == tno )
 				e->s.v.frags = TeamFortress_TeamGetScore( tno );
@@ -325,7 +325,7 @@ int TeamFortress_TeamGetNoPlayers( int tno )
 	int     size_team = 0;
 	gedict_t *search;
 
-	for ( search = world; ( search = find( search, FOFS( s.v.classname ), "player" ) ); )
+	for ( search = world; ( search = trap_find( search, FOFS( s.v.classname ), "player" ) ); )
 	{
 		if ( search->team_no == tno )
 			size_team++;
@@ -338,7 +338,7 @@ int TeamFortress_GetNoPlayers(  )
 	int     nump = 0;
 	gedict_t *search;
 
-	for ( search = world;( search = find( search, FOFS( s.v.classname ), "player" ) ) ; )
+	for ( search = world;( search = trap_find( search, FOFS( s.v.classname ), "player" ) ) ; )
 		nump++;
 	return nump;
 }
@@ -457,7 +457,7 @@ void TeamFortress_TeamShowMemberClasses( gedict_t * Player )
 
 	found = 0;
 
-	for ( e = world; ( e = find( e, FOFS( s.v.classname ), "player" ) ); )
+	for ( e = world; ( e = trap_find( e, FOFS( s.v.classname ), "player" ) ); )
 	{
 		if ( ( e->team_no == Player->team_no || !e->team_no ) && e != Player )
 		{
@@ -483,7 +483,7 @@ void TeamFortress_TeamShowMemberClasses_New( gedict_t * Player )
 	gedict_t*	e,*te;
 	int	found = 0;
 	stf = GetInfokeyInt( self, "s", NULL, 0 );
-	for(e= world; (e = find( e, FOFS( s.v.classname ), "player" )); )
+	for(e= world; (e = trap_find( e, FOFS( s.v.classname ), "player" )); )
 	{
 		if ( ( e->team_no == Player->team_no || !e->team_no ) && e != Player )
 		{
@@ -524,7 +524,7 @@ void TeamFortress_TeamShowMemberClasses_New( gedict_t * Player )
 
 					if((e->playerclass == PC_DEMOMAN) && ((stf & TF_STATUS_DETPACK_MASK) !=0))
 					{
-						for(te= world; (te = find( te, FOFS( s.v.classname ), "detpack" )); )
+						for(te= world; (te = trap_find( te, FOFS( s.v.classname ), "detpack" )); )
 						{
 							if (te->s.v.owner == EDICT_TO_PROG(e))
 							{
@@ -538,7 +538,7 @@ void TeamFortress_TeamShowMemberClasses_New( gedict_t * Player )
 
 						if( e->has_sentry)
 						{
-							for(te= world; (te = find( te, FOFS( s.v.classname ), "building_sentrygun" )); )
+							for(te= world; (te = trap_find( te, FOFS( s.v.classname ), "building_sentrygun" )); )
 							{
 								if (te->real_owner == e)
 								{
@@ -785,7 +785,7 @@ int ClassIsRestricted( int tno, int pc )
 
 	if ( max > 0 )
 	{
-	        for ( te = world; ( te = find( te, FOFS( s.v.classname ), "player" ) ); )
+	        for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "player" ) ); )
 		{
 			if ( te->team_no == tno )
 			{
@@ -818,7 +818,7 @@ void teamsprint( int tno, gedict_t * ignore, char *st )
 	if ( !tno )
 		return;
 
-	for ( te = world;( te = find( te, FOFS( s.v.classname ), "player" ) ) ; )
+	for ( te = world;( te = trap_find( te, FOFS( s.v.classname ), "player" ) ) ; )
 	{
 		if ( te->team_no == tno && te != ignore )
 			G_sprint( te, 2, st );

@@ -104,7 +104,7 @@ void RemoveOldFlare( int tno )
 	index = num_team_flares[tno];
 	index = index - 9 / number_of_teams;
 
-	old = find( world, FOFS( mdl ), "flare" );
+	old = trap_find( world, FOFS( mdl ), "flare" );
 	while ( index > 0 )
 	{
 		if ( !old )
@@ -122,6 +122,6 @@ void RemoveOldFlare( int tno )
 			old->s.v.nextthink = g_globalvars.time + 0.1;
 			index -= 1;
 		}
-		old = find( old, FOFS( mdl ), "flare" );
+		old = trap_find( old, FOFS( mdl ), "flare" );
 	}
 }

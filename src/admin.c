@@ -34,7 +34,7 @@ void Admin_CycleKick(  )
 	}
 	if ( !self->admin_use )
 		self->admin_use = world;
-	for ( ; ( self->admin_use = find( self->admin_use, FOFS( s.v.classname ), "player" ) ); )
+	for ( ; ( self->admin_use = trap_find( self->admin_use, FOFS( s.v.classname ), "player" ) ); )
 	{
 		if ( !self->admin_use->s.v.netname || self->admin_use == self )
 			continue;
@@ -67,7 +67,7 @@ void CeaseFire_think(  )
 	{
 		tf_data.cease_fire = 0;
 		G_bprint( 2, "RESUME FIRE\n" );
-		for ( te = world; (te = find( te, FOFS( s.v.classname ), "player" )); )
+		for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
 		{
 			G_centerprint( te, "RESUME FIRE\n" );
 			te->tfstate = te->tfstate - ( te->tfstate & TFSTATE_CANT_MOVE );
@@ -81,7 +81,7 @@ void CeaseFire_think(  )
 		dremove( self );
 		return;
 	}
-	for ( te = world; (te = find( te, FOFS( s.v.classname ), "player" )); )
+	for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
 	{
 		G_centerprint( te, "CEASE FIRE\n" );
 	}
@@ -96,7 +96,7 @@ void Admin_CeaseFire(  )
 	{
 		tf_data.cease_fire = 1;
 		G_bprint( 2, "CEASE FIRE\n" );
-		for ( te = world; (te = find( te, FOFS( s.v.classname ), "player" )); )
+		for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
 		{
 			G_centerprint( te, "CEASE FIRE\n" );
 			te->tfstate = te->tfstate | TFSTATE_CANT_MOVE;
@@ -108,12 +108,12 @@ void Admin_CeaseFire(  )
 		te->s.v.nextthink = g_globalvars.time + 5;
 	} else
 	{
-		te = find( world, FOFS( s.v.classname ), "ceasefire" );
+		te = trap_find( world, FOFS( s.v.classname ), "ceasefire" );
 		if ( te )
 			dremove( te );
 		tf_data.cease_fire = 0;
 		G_bprint( 2, "RESUME FIRE\n" );
-		for ( te = world; (te = find( te, FOFS( s.v.classname ), "player" )); )
+		for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
 		{
 
 			G_centerprint( te, "RESUME FIRE\n" );
@@ -140,7 +140,7 @@ void CheckAutoKick( gedict_t * p )
 			if ( p->teamkills == tf_data.autokick_kills - 1 )
 				G_sprint( p, 2, "Kill one more teammate, and you're outta here.\n" );
 			rnum = 0;
-			for ( te = world; (te = find( te, FOFS( s.v.classname ), "ak_timer" )); )
+			for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "ak_timer" )); )
 			{
 				if ( te->s.v.owner == EDICT_TO_PROG( p ) )
 				{

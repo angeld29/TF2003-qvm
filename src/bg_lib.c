@@ -234,13 +234,13 @@ char *strcpy( char *strDestination, const char *strSource ) {
 }
 
 
-int strcmp( const char *string1, const char *string2 ) {
+/*int strcmp( const char *string1, const char *string2 ) {
 	while ( *string1 == *string2 && *string1 && *string2 ) {
 		string1++;
 		string2++;
 	}
 	return *string1 - *string2;
-}
+}*/
 
 
 char *strchr( const char *string, int c ) {

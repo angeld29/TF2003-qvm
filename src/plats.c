@@ -322,7 +322,7 @@ void train_next(  )
 	gedict_t *targ;
 	vec3_t  tmpv;
 
-	targ = find( world, FOFS( s.v.targetname ), self->s.v.target );
+	targ = trap_find( world, FOFS( s.v.targetname ), self->s.v.target );
 	if ( !targ )
 		G_Error( "train_next: no next target" );
 
@@ -345,7 +345,7 @@ void func_train_find(  )
 {
 	gedict_t *targ;
 
-	targ = find( world, FOFS( s.v.targetname ), self->s.v.target );
+	targ = trap_find( world, FOFS( s.v.targetname ), self->s.v.target );
 	if ( !targ )
 		G_Error( "func_train_find: no next target" );
 

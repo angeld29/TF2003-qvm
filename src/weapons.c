@@ -281,7 +281,7 @@ void W_FireMedikit(  )
 			if ( ( trace_ent->team_no == self->team_no && self->team_no ) || coop )
 			{
 				healam = WEAP_MEDIKIT_HEAL;
-				for ( te=world ; (te = find( te, FOFS( s.v.classname ), "timer" ));)
+				for ( te=world ; (te = trap_find( te, FOFS( s.v.classname ), "timer" ));)
 				{
 					if ( te->s.v.owner != g_globalvars.trace_ent )
 						continue;
@@ -299,7 +299,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->tfstate & TFSTATE_HALLUCINATING )
 				{
-				    for ( te=world ; (te = find( te, FOFS( s.v.classname ), "timer" ));)
+				    for ( te=world ; (te = trap_find( te, FOFS( s.v.classname ), "timer" ));)
 					{
 						if ( te->s.v.owner != g_globalvars.trace_ent )
 							continue;
@@ -324,7 +324,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->tfstate & TFSTATE_TRANQUILISED )
 				{
-				    for ( te=world ; (te = find( te, FOFS( s.v.classname ), "timer" ));)
+				    for ( te=world ; (te = trap_find( te, FOFS( s.v.classname ), "timer" ));)
 					{
 						if ( te->s.v.owner != g_globalvars.trace_ent )
 							continue;
@@ -346,7 +346,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->FlashTime > 0 )
 				{
-				    for ( te=world ; (te = find( te, FOFS( s.v.netname ), "flashtimer" ));)
+				    for ( te=world ; (te = trap_find( te, FOFS( s.v.netname ), "flashtimer" ));)
 					{
 						if ( te->s.v.owner != g_globalvars.trace_ent )
 							continue;
@@ -1348,12 +1348,12 @@ int CountPlayerPipebombs( gedict_t * player )
 	int     num_pipes;
 
 	num_pipes = 0;
-	old = find( world, FOFS( s.v.classname ), "pipebomb" );
+	old = trap_find( world, FOFS( s.v.classname ), "pipebomb" );
 	while ( old )
 	{
 		if ( old->s.v.owner == EDICT_TO_PROG( player ) )
 			num_pipes++;
-		old = find( old, FOFS( s.v.classname ), "pipebomb" );
+		old = trap_find( old, FOFS( s.v.classname ), "pipebomb" );
 	}
 	return num_pipes;
 }
@@ -1371,7 +1371,7 @@ void ExplodeOldPipebomb( int tno, int extra )
 			index = index - 1;
 	} else
 		index = num_team_pipebombs[0] - MAX_WORLD_PIPEBOMBS;
-	old = find( world, FOFS( s.v.classname ), "pipebomb" );
+	old = trap_find( world, FOFS( s.v.classname ), "pipebomb" );
 	while ( index > 0 )
 	{
 		if ( !old )
@@ -1388,7 +1388,7 @@ void ExplodeOldPipebomb( int tno, int extra )
 			old->s.v.nextthink = g_globalvars.time + 0.5;
 			index = index - 1;
 		}
-		old = find( old, FOFS( s.v.classname ), "pipebomb" );
+		old = trap_find( old, FOFS( s.v.classname ), "pipebomb" );
 	}
 }
 
@@ -1449,12 +1449,12 @@ void GrenadeExplode(  )
 	{
 		self->no_active_nail_grens = 0;
 		PROG_TO_EDICT( self->s.v.owner )->no_active_nail_grens -= 1;
-		te = find( world, FOFS( s.v.classname ), "grenade" );
+		te = trap_find( world, FOFS( s.v.classname ), "grenade" );
 		while ( te )
 		{
 			if ( te->s.v.owner == self->s.v.owner && te->no_active_nail_grens )
 				te->no_active_nail_grens -= 1;
-			te = find( te, FOFS( s.v.classname ), "grenade" );
+			te = trap_find( te, FOFS( s.v.classname ), "grenade" );
 		}
 	}
 	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );

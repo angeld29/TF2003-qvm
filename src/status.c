@@ -107,8 +107,8 @@ void RefreshStatusBar( gedict_t * pl )
 			} else
 			{
 				for ( te =
-				      find( world, FOFS( s.v.classname ), "detpack" ); te;
-				      te = find( te, FOFS( s.v.classname ), "detpack" ) )
+				      trap_find( world, FOFS( s.v.classname ), "detpack" ); te;
+				      te = trap_find( te, FOFS( s.v.classname ), "detpack" ) )
 				{
 					if ( te->s.v.owner != EDICT_TO_PROG( self ) )
 						continue;
@@ -299,7 +299,7 @@ char   *SentryInfoToSBar( gedict_t * pl, char *str )
 {
 	gedict_t *te;
 
-	for ( te = world; (te = find( te, FOFS( s.v.classname ), "building_sentrygun" )); )
+	for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "building_sentrygun" )); )
 	{
 		if ( te->real_owner != pl )
 			continue;
@@ -334,7 +334,7 @@ char   *DispHealthToSbar( gedict_t * pl, char *str )
 {
 	gedict_t *te;
 
-	for ( te = world; (te = find( te, FOFS( s.v.classname ), "building_dispenser" )); )
+	for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "building_dispenser" )); )
 	{
 		if ( te->real_owner != pl )
 			continue;

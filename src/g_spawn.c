@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_spawn.c,v 1.3 2004-10-03 10:37:14 AngelD Exp $
+ *  $Id: g_spawn.c,v 1.4 2004-12-09 14:34:22 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -283,7 +283,7 @@ field_t         fields[] = {
         {"increase_team4",		FOFS( increase_team4 ),			F_INT},
         {"all_active",			FOFS( all_active ),			F_INT},
         {"item_list",			FOFS( item_list ),			F_INT},
-        {"delay_time",			FOFS( delay_time ),			F_INT},
+        {"delay_time",			FOFS( delay_time ),			F_FLOAT},
         {"dont_do_triggerwork",		FOFS( dont_do_triggerwork ),		F_INT},
 //float
         {"healamount",			FOFS( healamount ),			F_FLOAT},

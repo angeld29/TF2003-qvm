@@ -75,3 +75,10 @@ equ     trap_cvar_string	 -68
 
 equ     trap_Map_Extension	 -69
 
+equ     strcmp	 		 -70
+equ     strncmp	 		 -71
+equ     stricmp	 		 -72
+equ     strnicmp		 -73
+
+equ     trap_find		 -74
+

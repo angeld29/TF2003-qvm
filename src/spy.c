@@ -932,7 +932,7 @@ void TeamFortress_SpyFeignDeath( int issilent )
 			return;
 		}
 		te = world;
-		for( te = world; ( te = find( te, FOFS( s.v.classname ), "item_tfgoal" ) ) ;)
+		for( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" ) ) ;)
 		{
 			if ( te->s.v.owner != EDICT_TO_PROG( self ) )
 				continue;
@@ -1033,7 +1033,7 @@ void TeamFortress_SpyCalcName( gedict_t * spy )
 	spy->undercover_name = NULL;
 	if ( spy->undercover_team )
 	{
-		for ( te = world; (te = find( te, FOFS( s.v.classname ), "player" )); )
+		for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
 		{
 			if ( te->team_no == spy->undercover_team && te->s.v.skin == spy->undercover_skin )
 			{
@@ -1044,7 +1044,7 @@ void TeamFortress_SpyCalcName( gedict_t * spy )
 		if ( !spy->undercover_name )
 		{
 
-			for ( te = world; (te = find( te, FOFS( s.v.classname ), "player" )); )
+			for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
 			{
 				if ( te->team_no == spy->undercover_team )
 				{
@@ -1220,7 +1220,7 @@ void GasGrenadeMakeGas(  )
 			TF_T_Damage( te, world, PROG_TO_EDICT( self->s.v.owner ), 10, 1 | 2, 0 );
 			if ( te->tfstate & TFSTATE_HALLUCINATING )
 			{
-				for ( timer = world; (timer = find( timer, FOFS( s.v.classname ), "timer" )); )
+				for ( timer = world; (timer = trap_find( timer, FOFS( s.v.classname ), "timer" )); )
 				{
 					if ( PROG_TO_EDICT( timer->s.v.owner ) != te )
 						continue;
@@ -1439,7 +1439,8 @@ void HallucinationTimer(  )
 
 	if(!( tf_data.new_gas & GAS_MASK_ALLSPYS ) && g_random()< SETGAS_TIMER_THINK)
 		SetGasSkins(owner);
-                self->s.v.nextthink = g_globalvars.time + 0.5;
+//?????
+//        	self->s.v.nextthink = g_globalvars.time + 0.5;
 
 	if ( g_random(  ) < 0.5 )
 		KickPlayer( -10, owner );
@@ -1510,7 +1511,7 @@ void T_TranqDartTouch(  )
 			if ( other->tfstate & TFSTATE_TRANQUILISED )
 			{
 
-				for ( timer = world; (timer = find( timer, FOFS( s.v.classname ), "timer" )); )
+				for ( timer = world; (timer = trap_find( timer, FOFS( s.v.classname ), "timer" )); )
 				{
 					if ( PROG_TO_EDICT( timer->s.v.owner ) != other )
 						continue;
@@ -1621,7 +1622,7 @@ void ResetGasSkins( gedict_t*pl)
 	if( !pl->has_fake_gas_setinfo )
 		return;
 
-	for( te = world; (te = find( te, FOFS( s.v.classname), "player" ));)
+	for( te = world; (te = trap_find( te, FOFS( s.v.classname), "player" ));)
 	{
 		if( te->has_disconnected )
 			continue;
@@ -1680,7 +1681,7 @@ void SetGasSkins( gedict_t*pl)
 		return;
 
 	pl->has_fake_gas_setinfo = 1;
-	for( te = world; (te = find( te, FOFS( s.v.classname), "player" ));)
+	for( te = world; (te = trap_find( te, FOFS( s.v.classname), "player" ));)
 	{
 
 		entnum = NUM_FOR_EDICT(te) - 1;

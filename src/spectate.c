@@ -43,9 +43,9 @@ void SpectatorImpulseCommand(  )
 		// note that if the spectator is tracking, this doesn't do
 		// much
 		goal = PROG_TO_EDICT( self->s.v.goalentity );
-		goal = find( goal, FOFS( s.v.classname ), "info_player_deathmatch" );
+		goal = trap_find( goal, FOFS( s.v.classname ), "info_player_deathmatch" );
 		if ( !goal )
-			goal = find( world, FOFS( s.v.classname ), "info_player_deathmatch" );
+			goal = trap_find( world, FOFS( s.v.classname ), "info_player_deathmatch" );
 		if ( goal )
 		{
 			setorigin( self, PASSVEC3( goal->s.v.origin ) );

@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.h,v 1.5 2004-09-16 13:06:04 AngelD Exp $
+ *  $Id: g_syscalls.h,v 1.6 2004-12-09 14:34:22 AngelD Exp $
  */
 
 int     trap_GetApiVersion(  );
@@ -56,6 +56,9 @@ void    trap_lightstyle( int style, char *val );
 int     trap_checkbottom( int edn );
 int     trap_pointcontents( float origin_x, float origin_y, float origin_z );
 int     trap_nextent( int n );
+//int 	trap_find( int n,int fofs, char*str );
+gedict_t*	trap_find( gedict_t* ent,int fofs, char*str );
+
 void    trap_makestatic( int edn );
 void    trap_setspawnparam( int edn );
 void    trap_changelevel( char *name );

@@ -50,7 +50,7 @@ void player_touch(  )
 					       && PROG_TO_EDICT( self->s.v.owner )->team_no ) )
 					{
 						found = 0;
-						te = find( world, FOFS( s.v.classname ), "timer" );
+						te = trap_find( world, FOFS( s.v.classname ), "timer" );
 						while ( te && !found )
 						{
 							if ( PROG_TO_EDICT( te->s.v.owner ) == self
@@ -60,7 +60,7 @@ void player_touch(  )
 								break;
 							     }
 							else
-								te = find( te, FOFS( s.v.classname ), "timer" );
+								te = trap_find( te, FOFS( s.v.classname ), "timer" );
 						}
 						if(!te)
 						{
@@ -1537,7 +1537,7 @@ void PlayerDie(  )
 	self->imp3 = 0;
 	self->imp4 = 0;
 
-	for(te = world; (te = find( te, FOFS( s.v.classname ), "primer" ));)
+	for(te = world; (te = trap_find( te, FOFS( s.v.classname ), "primer" ));)
 	{
 		if(te->s.v.owner == EDICT_TO_PROG( self ))
 			break;
@@ -1561,7 +1561,7 @@ void PlayerDie(  )
 	self->s.v.modelindex = modelindex_player;
 	if ( ( self->tfstate & TFSTATE_INFECTED ) && self == PROG_TO_EDICT( self->s.v.enemy ) )
 	{
-		te = find( world, FOFS( s.v.classname ), "timer" );
+		te = trap_find( world, FOFS( s.v.classname ), "timer" );
 		while ( te )
 		{
 			if ( PROG_TO_EDICT( te->s.v.owner ) == self && te->s.v.think == ( func_t ) BioInfection_Decay )
@@ -1569,7 +1569,7 @@ void PlayerDie(  )
 				logfrag( PROG_TO_EDICT( te->s.v.enemy ), self );
 				TF_AddFrags( PROG_TO_EDICT( te->s.v.enemy ), 1 );
 			}
-			te = find( te, FOFS( s.v.classname ), "timer" );
+			te = trap_find( te, FOFS( s.v.classname ), "timer" );
 		}
 	}
 	TeamFortress_RemoveTimers(  );

@@ -463,12 +463,12 @@ gedict_t *Finditem( int ino )
 {
 	gedict_t *tg;
 
-	tg = find( world, FOFS( s.v.classname ), "item_tfgoal" );
+	tg = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
 	while ( tg )
 	{
 		if ( tg->goal_no == ino )
 			return tg;
-		tg = find( tg, FOFS( s.v.classname ), "item_tfgoal" );
+		tg = trap_find( tg, FOFS( s.v.classname ), "item_tfgoal" );
 	}
 	G_dprint( "Could not find an item with a goal_no of %d.\n", ino );
 	return world;
@@ -478,12 +478,12 @@ gedict_t *Findgoal( int gno )
 {
 	gedict_t *tg;
 
-	tg = find( world, FOFS( s.v.classname ), "info_tfgoal" );
+	tg = trap_find( world, FOFS( s.v.classname ), "info_tfgoal" );
 	while ( tg )
 	{
 		if ( tg->goal_no == gno )
 			return tg;
-		tg = find( tg, FOFS( s.v.classname ), "info_tfgoal" );
+		tg = trap_find( tg, FOFS( s.v.classname ), "info_tfgoal" );
 	}
 	G_dprint( "Could not find a goal with a goal_no of %d.\n", gno );
 	return NULL;
@@ -493,12 +493,12 @@ gedict_t *Findteamspawn( int gno )
 {
 	gedict_t *tg;
 
-	tg = find( world, FOFS( s.v.classname ), "info_player_teamspawn" );
+	tg = trap_find( world, FOFS( s.v.classname ), "info_player_teamspawn" );
 	while ( tg )
 	{
 		if ( tg->goal_no == gno )
 			return tg;
-		tg = find( tg, FOFS( s.v.classname ), "info_player_teamspawn" );
+		tg = trap_find( tg, FOFS( s.v.classname ), "info_player_teamspawn" );
 	}
 	G_dprint( "Could not find a Teamspawn with a goal_no of %d.\n", gno );
 	return NULL;
@@ -651,7 +651,7 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 			bound_other_ammo( Player );
 			if ( Player->tfstate & TFSTATE_GRENPRIMED )
 			{
-				te = find( world, FOFS( s.v.classname ), "primer" );
+				te = trap_find( world, FOFS( s.v.classname ), "primer" );
 				while ( te )
 				{
 					if ( te->s.v.owner == EDICT_TO_PROG( Player ) )
@@ -679,7 +679,7 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 						}
 						te = NULL;
 					} else
-						te = find( te, FOFS( s.v.classname ), "primer" );
+						te = trap_find( te, FOFS( s.v.classname ), "primer" );
 				}
 			}
 			if ( !tf_data.disable_powerups && ( Goal->invincible_finished > 0 ) )
@@ -758,16 +758,16 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 	}
 	if ( Goal->remove_item_group )
 	{
-		te = find( world, FOFS( s.v.classname ), "item_tfgoal" );
+		te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
 		while ( te )
 		{
 			if ( te->group_no == Goal->remove_item_group && te->s.v.owner == EDICT_TO_PROG( AP ) )
 			{
 				oldte = te;
-				te = find( te, FOFS( s.v.classname ), "item_tfgoal" );
+				te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 				tfgoalitem_RemoveFromPlayer( oldte, Player, 1 );
 			} else
-				te = find( te, FOFS( s.v.classname ), "item_tfgoal" );
+				te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 		}
 	}
 	if ( Goal->display_item_status1 )
@@ -847,7 +847,7 @@ void RemoveResults( gedict_t * Goal, gedict_t * Player )
 	bound_other_ammo( Player );
 	if ( Player->tfstate & TFSTATE_GRENPRIMED )
 	{
-		te = find( world, FOFS( s.v.classname ), "primer" );
+		te = trap_find( world, FOFS( s.v.classname ), "primer" );
 		while ( te )
 		{
 			if ( te->s.v.owner == EDICT_TO_PROG( Player ) )
@@ -870,14 +870,14 @@ void RemoveResults( gedict_t * Goal, gedict_t * Player )
 				}
 				te = NULL;
 			} else
-				te = find( te, FOFS( s.v.classname ), "primer" );
+				te = trap_find( te, FOFS( s.v.classname ), "primer" );
 		}
 	}
 	puinvin = 0;
 	puinvis = 0;
 	puquad = 0;
 	purad = 0;
-	te = find( world, FOFS( s.v.classname ), "item_tfgoal" );
+	te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
 	while ( te )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( Player ) && te != Goal )
@@ -891,7 +891,7 @@ void RemoveResults( gedict_t * Goal, gedict_t * Player )
 			if ( te->radsuit_finished > 0 )
 				purad = 1;
 		}
-		te = find( te, FOFS( s.v.classname ), "item_tfgoal" );
+		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 	}
 	if ( !tf_data.disable_powerups && Goal->invincible_finished > 0 && !puinvin )
 	{
@@ -972,7 +972,7 @@ int APMeetsCriteria( gedict_t * Goal, gedict_t * AP )
 	}
 	if ( Goal->if_group_is_active )
 	{
-		te = find( world, FOFS( s.v.classname ), "info_tfgoal" );
+		te = trap_find( world, FOFS( s.v.classname ), "info_tfgoal" );
 		while ( te )
 		{
 			if ( te->group_no == Goal->if_group_is_active )
@@ -980,12 +980,12 @@ int APMeetsCriteria( gedict_t * Goal, gedict_t * AP )
 				if ( te->goal_state != 1 )
 					return 0;
 			}
-			te = find( te, FOFS( s.v.classname ), "info_tfgoal" );
+			te = trap_find( te, FOFS( s.v.classname ), "info_tfgoal" );
 		}
 	}
 	if ( Goal->if_group_is_inactive )
 	{
-		te = find( world, FOFS( s.v.classname ), "info_tfgoal" );
+		te = trap_find( world, FOFS( s.v.classname ), "info_tfgoal" );
 		while ( te )
 		{
 			if ( te->group_no == Goal->if_group_is_inactive )
@@ -993,12 +993,12 @@ int APMeetsCriteria( gedict_t * Goal, gedict_t * AP )
 				if ( te->goal_state != 2 )
 					return 0;
 			}
-			te = find( te, FOFS( s.v.classname ), "info_tfgoal" );
+			te = trap_find( te, FOFS( s.v.classname ), "info_tfgoal" );
 		}
 	}
 	if ( Goal->if_group_is_removed )
 	{
-		te = find( world, FOFS( s.v.classname ), "info_tfgoal" );
+		te = trap_find( world, FOFS( s.v.classname ), "info_tfgoal" );
 		while ( te )
 		{
 			if ( te->group_no == Goal->if_group_is_removed )
@@ -1006,7 +1006,7 @@ int APMeetsCriteria( gedict_t * Goal, gedict_t * AP )
 				if ( te->goal_state != 3 )
 					return 0;
 			}
-			te = find( te, FOFS( s.v.classname ), "info_tfgoal" );
+			te = trap_find( te, FOFS( s.v.classname ), "info_tfgoal" );
 		}
 	}
 	if ( Goal->if_item_has_moved )
@@ -1032,25 +1032,25 @@ int APMeetsCriteria( gedict_t * Goal, gedict_t * AP )
 		gotone = 0;
 		if ( Goal->has_item_from_group )
 		{
-			te = find( world, FOFS( s.v.classname ), "item_tfgoal" );
+			te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
 			while ( te && !gotone )
 			{
 				if ( te->group_no == Goal->has_item_from_group && te->s.v.owner == EDICT_TO_PROG( AP ) )
 					gotone = 1;
-				te = find( te, FOFS( s.v.classname ), "item_tfgoal" );
+				te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 			}
 			if ( !gotone )
 				return 0;
 		}
 		if ( Goal->hasnt_item_from_group )
 		{
-			te = find( world, FOFS( s.v.classname ), "item_tfgoal" );
+			te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
 			while ( te && !gotone )
 			{
 				if ( te->group_no == Goal->hasnt_item_from_group
 				     && te->s.v.owner == EDICT_TO_PROG( AP ) )
 					return 0;
-				te = find( te, FOFS( s.v.classname ), "item_tfgoal" );
+				te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 			}
 		}
 	}
@@ -1228,7 +1228,7 @@ void DoGroupWork( gedict_t * Goal, gedict_t * AP )
 		} else
 		{
 			allset = 1;
-			tg = find( world, FOFS( s.v.classname ), "info_tfgoal" );
+			tg = trap_find( world, FOFS( s.v.classname ), "info_tfgoal" );
 			while ( tg )
 			{
 				if ( tg->group_no == Goal->all_active )
@@ -1236,7 +1236,7 @@ void DoGroupWork( gedict_t * Goal, gedict_t * AP )
 					if ( tg->goal_state != 1 )
 						allset = 0;
 				}
-				tg = find( tg, FOFS( s.v.classname ), "info_tfgoal" );
+				tg = trap_find( tg, FOFS( s.v.classname ), "info_tfgoal" );
 			}
 			if ( allset )
 			{
@@ -1248,47 +1248,47 @@ void DoGroupWork( gedict_t * Goal, gedict_t * AP )
 	}
 	if ( Goal->activate_group_no )
 	{
-		tg = find( world, FOFS( s.v.classname ), "info_tfgoal" );
+		tg = trap_find( world, FOFS( s.v.classname ), "info_tfgoal" );
 		while ( tg )
 		{
 			if ( tg->group_no == Goal->activate_group_no )
 				DoResults( tg, AP, 0 );
-			tg = find( tg, FOFS( s.v.classname ), "info_tfgoal" );
+			tg = trap_find( tg, FOFS( s.v.classname ), "info_tfgoal" );
 		}
 	}
 	if ( Goal->inactivate_group_no )
 	{
-		tg = find( world, FOFS( s.v.classname ), "info_tfgoal" );
+		tg = trap_find( world, FOFS( s.v.classname ), "info_tfgoal" );
 		while ( tg )
 		{
 			if ( tg->group_no == Goal->inactivate_group_no )
 				InactivateGoal( tg );
-			tg = find( tg, FOFS( s.v.classname ), "info_tfgoal" );
+			tg = trap_find( tg, FOFS( s.v.classname ), "info_tfgoal" );
 		}
 	}
 	if ( Goal->remove_group_no )
 	{
-		tg = find( world, FOFS( s.v.classname ), "info_tfgoal" );
+		tg = trap_find( world, FOFS( s.v.classname ), "info_tfgoal" );
 		while ( tg )
 		{
 			if ( tg->group_no == Goal->remove_group_no )
 				RemoveGoal( tg );
-			tg = find( tg, FOFS( s.v.classname ), "info_tfgoal" );
+			tg = trap_find( tg, FOFS( s.v.classname ), "info_tfgoal" );
 		}
 	}
 	if ( Goal->restore_group_no )
 	{
-		tg = find( world, FOFS( s.v.classname ), "info_tfgoal" );
+		tg = trap_find( world, FOFS( s.v.classname ), "info_tfgoal" );
 		while ( tg )
 		{
 			if ( tg->group_no == Goal->restore_group_no )
 				RestoreGoal( tg );
-			tg = find( tg, FOFS( s.v.classname ), "info_tfgoal" );
+			tg = trap_find( tg, FOFS( s.v.classname ), "info_tfgoal" );
 		}
 	}
 	if ( Goal->remove_spawngroup )
 	{
-		tg = find( world, FOFS( s.v.classname ), "info_player_teamspawn" );
+		tg = trap_find( world, FOFS( s.v.classname ), "info_player_teamspawn" );
 		while ( tg )
 		{
 			if ( tg->group_no == Goal->remove_spawngroup )
@@ -1296,12 +1296,12 @@ void DoGroupWork( gedict_t * Goal, gedict_t * AP )
 				tg->goal_state = 3;
 				tg->team_str_home = "";
 			}
-			tg = find( tg, FOFS( s.v.classname ), "info_player_teamspawn" );
+			tg = trap_find( tg, FOFS( s.v.classname ), "info_player_teamspawn" );
 		}
 	}
 	if ( Goal->restore_spawngroup )
 	{
-		tg = find( world, FOFS( s.v.classname ), "info_player_teamspawn" );
+		tg = trap_find( world, FOFS( s.v.classname ), "info_player_teamspawn" );
 		while ( tg )
 		{
 			if ( tg->group_no == Goal->restore_spawngroup )
@@ -1309,7 +1309,7 @@ void DoGroupWork( gedict_t * Goal, gedict_t * AP )
 				tg->goal_state = 2;
 				tg->team_str_home = team_spawn_str[tg->team_no];
 			}
-			tg = find( tg, FOFS( s.v.classname ), "info_player_teamspawn" );
+			tg = trap_find( tg, FOFS( s.v.classname ), "info_player_teamspawn" );
 		}
 	}
 }
@@ -1327,7 +1327,7 @@ void DoItemGroupWork( gedict_t * Item, gedict_t * AP )
 		{
 			G_dprint( "GoalItem %d has a .distance specified, but no .pain_finished\n", Item->goal_no );
 		}
-		tg = find( world, FOFS( s.v.classname ), "item_tfgoal" );
+		tg = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
 		while ( tg )
 		{
 			if ( tg->group_no == Item->distance )
@@ -1335,7 +1335,7 @@ void DoItemGroupWork( gedict_t * Item, gedict_t * AP )
 				if ( tg->goal_state != 1 )
 					allcarried = 0;
 			}
-			tg = find( tg, FOFS( s.v.classname ), "item_tfgoal" );
+			tg = trap_find( tg, FOFS( s.v.classname ), "item_tfgoal" );
 		}
 		if ( allcarried == 1 )
 		{
@@ -1352,7 +1352,7 @@ void DoItemGroupWork( gedict_t * Item, gedict_t * AP )
 			G_dprint( "GoalItem %d has a ->speed  specified, but no .attack_finished\n", Item->goal_no );
 		}
 		carrier = world;
-		tg = find( world, FOFS( s.v.classname ), "item_tfgoal" );
+		tg = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
 		while ( tg )
 		{
 			if ( tg->group_no == Item->speed )
@@ -1370,7 +1370,7 @@ void DoItemGroupWork( gedict_t * Item, gedict_t * AP )
 					}
 				}
 			}
-			tg = find( tg, FOFS( s.v.classname ), "item_tfgoal" );
+			tg = trap_find( tg, FOFS( s.v.classname ), "item_tfgoal" );
 		}
 		if ( allcarried == 1 )
 		{
@@ -1390,7 +1390,7 @@ void DoTriggerWork( gedict_t * Goal, gedict_t * AP )
 		t = world;
 		do
 		{
-			t = find( t, FOFS( s.v.targetname ), Goal->killtarget );
+			t = trap_find( t, FOFS( s.v.targetname ), Goal->killtarget );
 			if ( t )
 				ent_remove( t );
 		}
@@ -1402,7 +1402,7 @@ void DoTriggerWork( gedict_t * Goal, gedict_t * AP )
 		activator = AP;
 		do
 		{
-			t = find( t, FOFS( s.v.targetname ), Goal->s.v.target );
+			t = trap_find( t, FOFS( s.v.targetname ), Goal->s.v.target );
 			if ( !t )
 				return;
 			stemp = self;
@@ -1482,7 +1482,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 		{
 			if ( Goal->goal_no == 1 )
 			{
-				te = find( world, FOFS( s.v.classname ), "player" );
+				te = trap_find( world, FOFS( s.v.classname ), "player" );
 				while ( te )
 				{
 					if ( te->team_no == 2 )
@@ -1530,7 +1530,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 							CenterPrint( te, "\n\n\nYour team гот the енемы flag!!" );
 					} else
 						CenterPrint( te, "\n\n\nYour flag has been такен!!" );
-					te = find( te, FOFS( s.v.classname ), "player" );
+					te = trap_find( te, FOFS( s.v.classname ), "player" );
 				}
 				G_bprint( 2, "%s гот the блуе flag!\n", AP->s.v.netname );
 				AP->s.v.items = ( int ) AP->s.v.items | 131072;
@@ -1538,7 +1538,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 			{
 				if ( Goal->goal_no == 2 )
 				{
-					te = find( world, FOFS( s.v.classname ), "player" );
+					te = trap_find( world, FOFS( s.v.classname ), "player" );
 					while ( te )
 					{
 						if ( te->team_no == 1 )
@@ -1590,7 +1590,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 									     "\n\n\nYour team гот the енемы flag!!" );
 						} else
 							CenterPrint( te, "\n\n\nYour flag has been такен!!" );
-						te = find( te, FOFS( s.v.classname ), "player" );
+						te = trap_find( te, FOFS( s.v.classname ), "player" );
 					}
 					G_bprint( 2, "%s гот the ред flag!\n", AP->s.v.netname );
 					AP->s.v.items = ( int ) AP->s.v.items | 262144;
@@ -1598,7 +1598,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 				{
 					if ( Goal->goal_no == 3 )
 					{
-						te = find( world, FOFS( s.v.classname ), "player" );
+						te = trap_find( world, FOFS( s.v.classname ), "player" );
 						while ( te )
 						{
 							if ( te->team_no == 2 )
@@ -1612,7 +1612,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 							} else
 								CenterPrint( te,
 									     "\n\n\nYour team цаптуред the flag!!" );
-							te = find( te, FOFS( s.v.classname ), "player" );
+							te = trap_find( te, FOFS( s.v.classname ), "player" );
 						}
 						G_bprint( 2, "%s цаптуред the ред flag!\n", AP->s.v.netname );
 						AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & 262144 );
@@ -1620,7 +1620,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 					{
 						if ( Goal->goal_no == 4 )
 						{
-							te = find( world, FOFS( s.v.classname ), "player" );
+							te = trap_find( world, FOFS( s.v.classname ), "player" );
 							while ( te )
 							{
 								if ( te->team_no == 1 )
@@ -1634,7 +1634,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 								} else
 									CenterPrint( te,
 										     "\n\n\nYour team цаптуред the flag!!" );
-								te = find( te, FOFS( s.v.classname ), "player" );
+								te = trap_find( te, FOFS( s.v.classname ), "player" );
 							}
 							G_bprint( 2, "%s цаптуред the блуе flag!\n", AP->s.v.netname );
 							AP->s.v.items =
@@ -1646,7 +1646,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 		}
 	}
 	gotone = 0;
-	te = find( world, FOFS( s.v.classname ), "player" );
+	te = trap_find( world, FOFS( s.v.classname ), "player" );
 	while ( te )
 	{
 		if ( Goal->broadcast && !CTF_Map )
@@ -1719,7 +1719,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 				gotone = 1;
 			}
 		}
-		te = find( te, FOFS( s.v.classname ), "player" );
+		te = trap_find( te, FOFS( s.v.classname ), "player" );
 	}
 	if ( strneq( Goal->s.v.classname, "item_tfgoal" ) )
 		Goal->goal_state = 1;
@@ -1727,14 +1727,14 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 	{
 		TeamFortress_TeamShowScores( 1 );
 		winners = TeamFortress_TeamGetWinner(  );
-		te = find( world, FOFS( s.v.classname ), "player" );
+		te = trap_find( world, FOFS( s.v.classname ), "player" );
 		while ( te )
 		{
 			te->s.v.takedamage = 0;
 			te->s.v.movetype = MOVETYPE_NONE;
 			SetVector( te->s.v.velocity, 0, 0, 0 );
 			SetVector( te->s.v.avelocity, 0, 0, 0 );
-			te = find( te, FOFS( s.v.classname ), "player" );
+			te = trap_find( te, FOFS( s.v.classname ), "player" );
 		}
 		te = spawn(  );
 		te->s.v.nextthink = g_globalvars.time + 5;
@@ -1823,14 +1823,14 @@ void item_tfgoal_touch(  )
 				if ( other->team_no == 1 )
 				{
 					G_bprint( 2, "%s ретурнед the блуе flag!\n", other->s.v.netname );
-					te = find( world, FOFS( s.v.classname ), "player" );
+					te = trap_find( world, FOFS( s.v.classname ), "player" );
 					while ( te )
 					{
 						if ( te->team_no == 1 )
 							CenterPrint( te, "\n\n\nYour flag was ретурнед!!" );
 						else
 							CenterPrint( te, "\n\n\nThe енемы flag was ретурнед!!" );
-						te = find( te, FOFS( s.v.classname ), "player" );
+						te = trap_find( te, FOFS( s.v.classname ), "player" );
 					}
 					self->goal_state = 2;
 					self->s.v.solid = SOLID_TRIGGER;
@@ -1856,7 +1856,7 @@ void item_tfgoal_touch(  )
 					if ( other->team_no == 2 )
 					{
 						G_bprint( 2, "%s ретурнед the ред flag!\n", other->s.v.netname );
-						te = find( world, FOFS( s.v.classname ), "player" );
+						te = trap_find( world, FOFS( s.v.classname ), "player" );
 						while ( te )
 						{
 							if ( te->team_no == 2 )
@@ -1864,7 +1864,7 @@ void item_tfgoal_touch(  )
 							else
 								CenterPrint( te,
 									     "\n\n\n The енемы flag was ретурнед!!" );
-							te = find( te, FOFS( s.v.classname ), "player" );
+							te = trap_find( te, FOFS( s.v.classname ), "player" );
 						}
 						self->goal_state = 2;
 						self->s.v.solid = SOLID_TRIGGER;
@@ -1903,6 +1903,8 @@ void item_tfgoal_touch(  )
 void tfgoalitem_GiveToPlayer( gedict_t * Item, gedict_t * AP, gedict_t * Goal )
 {
 
+        //REMOVE ME !!!!
+        //G_sprint(AP,2,"tfgoalitem_GiveToPlayer %s %s\n",Item->s.v.netname,Goal->s.v.netname);
 	Item->s.v.owner = EDICT_TO_PROG( AP );
 	if ( Item->mdl )
 		setmodel( Item, "" );
@@ -1953,7 +1955,7 @@ void ReturnItem(  )
 	{
 		if ( enemy->s.v.noise3 || enemy->noise4 )
 		{
-			te = find( world, FOFS( s.v.classname ), "player" );
+			te = trap_find( world, FOFS( s.v.classname ), "player" );
 			while ( te )
 			{
 				if ( te->team_no == enemy->owned_by )
@@ -1966,7 +1968,7 @@ void ReturnItem(  )
 				   if ( enemy->noise4 )
 					CenterPrint( te, "\n\n\n%s", enemy->noise4 );
 				}
-				te = find( te, FOFS( s.v.classname ), "player" );
+				te = trap_find( te, FOFS( s.v.classname ), "player" );
 			}
 		}
 	}
@@ -1983,6 +1985,8 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 	float   spyoff;
 	gedict_t *DelayReturn;
 
+        //REMOVE ME !!!!
+        //G_sprint(AP,2,"tfgoalitem_RemoveFromPlayer %s\n",Item->s.v.netname);
 	if ( !Item || Item == world )
 	{
 		G_Error( "error: tfgoalitem_RemoveFromPlayer(): Item == world" );
@@ -1993,7 +1997,7 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 	key1on = 0;
 	key2on = 0;
 	spyoff = 0;
-	te = find( world, FOFS( s.v.classname ), "item_tfgoal" );
+	te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
 	while ( te )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( AP ) && te != Item )
@@ -2009,7 +2013,7 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 			if ( te->goal_result & 16 )
 				spyoff = 1;
 		}
-		te = find( te, FOFS( s.v.classname ), "item_tfgoal" );
+		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 	}
 	if ( !lighton )
 	{
@@ -2035,16 +2039,16 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 		AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & 131072 );
 	if ( !key2on )
 		AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & 262144 );
-	te = find( world, FOFS( s.v.classname ), "player" );
+	te = trap_find( world, FOFS( s.v.classname ), "player" );
 	while ( te )
 	{
 		if ( IsAffectedBy( Item, te, AP ) )
 			RemoveResults( Item, te );
-		te = find( te, FOFS( s.v.classname ), "player" );
+		te = trap_find( te, FOFS( s.v.classname ), "player" );
 	}
 	if ( !method || method == 2 )
 	{
-		te = find( world, FOFS( s.v.classname ), "player" );
+		te = trap_find( world, FOFS( s.v.classname ), "player" );
 		while ( te )
 		{
 			if ( te->team_no == Item->owned_by )
@@ -2064,7 +2068,7 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 					G_sprint( te, 2, "%s%s", AP->s.v.netname, Item->netname_non_team_drop );
 				}
 			}
-			te = find( te, FOFS( s.v.classname ), "player" );
+			te = trap_find( te, FOFS( s.v.classname ), "player" );
 		}
 		if ( Item->goal_activation & 8 )
 		{
@@ -2490,7 +2494,7 @@ void CTF_FlagCheck(  )
 	float   pos;
 
 	flagcount = 0;
-	te = find( world, FOFS( s.v.classname ), "item_tfgoal" );
+	te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
 	while ( te )
 	{
 		if ( te->goal_no == 1 )
@@ -2517,7 +2521,7 @@ void CTF_FlagCheck(  )
 				flagcount = flagcount + 1;
 			}
 		}
-		te = find( te, FOFS( s.v.classname ), "item_tfgoal" );
+		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 	}
 	if ( flagcount != 2 )
 		G_dprint( "*****BUG*****\nFlag(s) missing.\nPlease report this.\n" );
@@ -2595,7 +2599,7 @@ void DropGoalItems(  )
 	VectorScale( g_globalvars.v_forward, 64, g_globalvars.v_forward );
 
 	VectorAdd( g_globalvars.v_forward, self->s.v.origin, newmis->s.v.origin );
-	te = find( world, FOFS( s.v.classname ), "item_tfgoal" );
+	te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
 	while ( te )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
@@ -2603,7 +2607,7 @@ void DropGoalItems(  )
 			if ( ( te->goal_activation & 4096 ) || tf_data.allow_drop_goal )
 				tfgoalitem_RemoveFromPlayer( te, self, 2 );
 		}
-		te = find( te, FOFS( s.v.classname ), "item_tfgoal" );
+		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 	}
 	dremove( newmis );
 }

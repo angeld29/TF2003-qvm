@@ -73,7 +73,7 @@ int DoorShouldOpen(  )
 	if ( coop != 2 )
 		return 1;
 	plyrcount = 0;
-	ptr = find( world, FOFS( s.v.classname ), "player" );
+	ptr = trap_find( world, FOFS( s.v.classname ), "player" );
 	while ( ptr != world )
 	{
 		if ( !( ptr->tf_items & ( int ) self->s.v.items ) && ptr->playerclass
@@ -88,7 +88,7 @@ int DoorShouldOpen(  )
 					plyr2 = ptr;
 			}
 		}
-		ptr = find( ptr, FOFS( s.v.classname ), "player" );
+		ptr = trap_find( ptr, FOFS( s.v.classname ), "player" );
 	}
 	if ( plyrcount )
 	{

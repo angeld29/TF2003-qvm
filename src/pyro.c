@@ -79,16 +79,16 @@ int RemoveFlameFromQueue( int id_flame )
 	switch ( id_flame )
 	{
 	case 1:
-		tmp = find( world, FOFS( flame_id ), "1" );
+		tmp = trap_find( world, FOFS( flame_id ), "1" );
 		break;
 	case 2:
-		tmp = find( world, FOFS( flame_id ), "2" );
+		tmp = trap_find( world, FOFS( flame_id ), "2" );
 		break;
 	case 3:
-		tmp = find( world, FOFS( flame_id ), "3" );
+		tmp = trap_find( world, FOFS( flame_id ), "3" );
 		break;
 	case 4:
-		tmp = find( world, FOFS( flame_id ), "4" );
+		tmp = trap_find( world, FOFS( flame_id ), "4" );
 		break;
 	}
 	if ( !tmp )

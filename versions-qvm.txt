@@ -2,6 +2,11 @@ QuakeWorld TeamFortress 2003 (QVM/DDL/SO Versions)
 by [sd] angel for MTFL
 
 ////////////////////////////////////////////////////
+Внесенные изменения (на 09.12.2004 r1): crc: 
+fixed delay_time
+
+
+////////////////////////////////////////////////////
 Внесенные изменения (на 04.12.2004 r1): crc: 59565
 fixed civilian class bugs
 fixed map teammaxplayers limit

@@ -505,7 +505,7 @@ void TeamFortress_ChangeClass(  )
 		}
 	}
 	
-	for( spot = world;( spot = find( spot, FOFS( s.v.classname ), "player" ) ) ;)
+	for( spot = world;( spot = trap_find( spot, FOFS( s.v.classname ), "player" ) ) ;)
 	{
 		if ( spot->team_no == self->team_no && spot != self )
 		{
@@ -653,7 +653,7 @@ void TeamFortress_Inventory(  )
 			G_sprint( self, 2, "%d Detpack. ", self->ammo_detpack );
 	}
 	
-	for ( tg = world;( tg = find( tg, FOFS( s.v.classname ), "item_tfgoal" ) ) ; )
+	for ( tg = world;( tg = trap_find( tg, FOFS( s.v.classname ), "item_tfgoal" ) ) ; )
 	{
 		if ( tg->s.v.owner == EDICT_TO_PROG( self ) )
 		{
@@ -678,7 +678,7 @@ void TeamFortress_Inventory(  )
 		}
 	}
 	G_sprint( self, 2, "\n" );
-	for ( te = world;( te = find( te, FOFS( s.v.classname ), "detpack" ) ) ; )
+	for ( te = world;( te = trap_find( te, FOFS( s.v.classname ), "detpack" ) ) ; )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
@@ -1277,7 +1277,7 @@ void TeamFortress_ThrowGrenade(  )
 	if ( !( self->tfstate & 1 ) )
 		return;
 	self->tfstate |= TFSTATE_GRENTHROWING;
-	for ( te = world ; ( te = find( te, FOFS( s.v.classname ), "primer" ) ) ; )
+	for ( te = world ; ( te = trap_find( te, FOFS( s.v.classname ), "primer" ) ) ; )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 			if ( te->respawn_time <= g_globalvars.time )
@@ -1335,7 +1335,7 @@ void TeamFortress_SetSpeed( gedict_t * p )
 		return;
 	}
 
-	while ( ( te = find( te, FOFS( s.v.classname ), "item_tfgoal" ) ) && !tf )
+	while ( ( te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" ) ) && !tf )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( p ) )
 		{
@@ -1701,7 +1701,7 @@ void TeamFortress_RemoveTimers(  )
 
 	ResetGasSkins(self);
 
-	for( te = world; ( te = find( te, FOFS( s.v.classname ), "timer" ) );)
+	for( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "timer" ) );)
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
@@ -1710,7 +1710,7 @@ void TeamFortress_RemoveTimers(  )
 		}
 	}
 
-	for( te = world; (te = find( te, FOFS( s.v.classname ), "item_tfgoal" )); )
+	for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" )); )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
@@ -1728,7 +1728,7 @@ void TeamFortress_RemoveTimers(  )
 			}
 		}
 	}
-	for( te = world; (te = find( te, FOFS( s.v.classname ), "detpack" ));)
+	for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "detpack" ));)
 	{
 		if ( te->weaponmode == 1 && te->s.v.enemy == EDICT_TO_PROG( self ) )
 			te->weaponmode = 0;
@@ -1738,7 +1738,7 @@ void TeamFortress_RemoveTimers(  )
 
 	if ( self->has_disconnected == 1 )
 	{
-		for(te = world; (te = find( te, FOFS( s.v.classname ), "grenade" ));)
+		for(te = world; (te = trap_find( te, FOFS( s.v.classname ), "grenade" ));)
 		{
 			if ( te->s.v.owner == EDICT_TO_PROG( self ) && streq(te->s.v.model , "progs/caltrop.mdl") )
 			{
@@ -2118,7 +2118,7 @@ void RemoveOldAmmoboxOld( int tno )
 	} else
 		index = index - 20;
 
-	old = find( world, FOFS( s.v.classname ), "ammobox" );
+	old = trap_find( world, FOFS( s.v.classname ), "ammobox" );
 	while ( index > 0 )
 	{
 		if ( !old || old == world )
@@ -2130,7 +2130,7 @@ void RemoveOldAmmoboxOld( int tno )
 			index--;
 //			decrement_team_ammoboxes( old->team_no );
 		}
-		old = find( old, FOFS( s.v.classname ), "ammobox" );
+		old = trap_find( old, FOFS( s.v.classname ), "ammobox" );
 	}
 }
 
@@ -2141,7 +2141,7 @@ void RemoveOldAmmobox( int tno )
 
 	time = g_globalvars.time + 35;
 
-	for(old = world; (old = find( old, FOFS( s.v.classname ), "ammobox" ));)
+	for(old = world; (old = trap_find( old, FOFS( s.v.classname ), "ammobox" ));)
 	{
 	        if( old->team_no != tno && tno )
 	        	continue;
@@ -2378,7 +2378,7 @@ void TeamFortress_DisplayDetectionItems(  )
 	gedict_t *Goal;
 	gedict_t *te;
 
-	Goal = find( world, FOFS( s.v.classname ), "info_tfdetect" );
+	Goal = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
 
 	if ( !Goal )
 		return;
@@ -2674,12 +2674,12 @@ void TF_AddFrags( gedict_t * pl, int fr )
 
 	if ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE )
 	{
-		e = find( world, FOFS( s.v.classname ), "player" );
+		e = trap_find( world, FOFS( s.v.classname ), "player" );
 		while ( e )
 		{
 			if ( e->team_no == pl->team_no )
 				e->s.v.frags = TeamFortress_TeamGetScore( e->team_no );
-			e = find( e, FOFS( s.v.classname ), "player" );
+			e = trap_find( e, FOFS( s.v.classname ), "player" );
 		}
 	} else
 	{

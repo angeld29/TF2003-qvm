@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_utils.c,v 1.5 2004-11-14 07:04:08 AngelD Exp $
+ *  $Id: g_utils.c,v 1.6 2004-12-09 14:34:22 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -85,7 +85,7 @@ gedict_t *nextent( gedict_t * ent )
 		return NULL;
 }
 
-gedict_t *find( gedict_t * start, int fieldoff, char *str )
+/*gedict_t *find( gedict_t * start, int fieldoff, char *str )
 {
 	gedict_t *e;
 	char   *s;
@@ -99,8 +99,24 @@ gedict_t *find( gedict_t * start, int fieldoff, char *str )
 			return e;
 	}
 	return NULL;
-}
+}*/
+/*gedict_t *find( gedict_t * start, int fieldoff, char *str )
+{
+	int     entn;
 
+	if ( !start )
+		G_Error( "find: NULL start\n" );
+	entn = trap_find( NUM_FOR_EDICT( start ),fieldoff, str);
+
+	if(!entn)
+		return NULL;
+	return &g_edicts[entn];
+}*/
+
+/*gedict_t *find( gedict_t * start, int fieldoff, char *str )
+{
+        return trap_find(start, fieldoff, str);
+}*/
 
 void normalize( vec3_t value, vec3_t newvalue )
 {

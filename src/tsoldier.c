@@ -24,7 +24,7 @@ void NailGrenadeExplode(  )
 	if ( owner->no_active_nail_grens > 2 )
 	{
 
-		te = find( world, FOFS( s.v.classname ), "grenade" );
+		te = trap_find( world, FOFS( s.v.classname ), "grenade" );
 		while ( te )
 		{
 			if ( te->s.v.owner == self->s.v.owner && te->no_active_nail_grens == 1 )
@@ -33,7 +33,7 @@ void NailGrenadeExplode(  )
 				te->s.v.think = ( func_t ) GrenadeExplode;
 				te->s.v.nextthink = g_globalvars.time + 0.1;
 			}
-			te = find( te, FOFS( s.v.classname ), "grenade" );
+			te = trap_find( te, FOFS( s.v.classname ), "grenade" );
 		}
 	}
 	self->no_active_nail_grens = owner->no_active_nail_grens;

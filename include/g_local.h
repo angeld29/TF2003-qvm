@@ -60,7 +60,7 @@ gedict_t       *spawn( void );
 void            ent_remove( gedict_t * t );
 
 gedict_t       *nextent( gedict_t * ent );
-gedict_t       *find( gedict_t * start, int fieldoff, char *str );
+//gedict_t       *find( gedict_t * start, int fieldoff, char *str );
 gedict_t       *findradius( gedict_t * start, vec3_t org, float rad );
 void            normalize( vec3_t value, vec3_t newvalue );
 float           vlen( vec3_t value1 );

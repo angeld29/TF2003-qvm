@@ -230,7 +230,7 @@ typedef struct gedict_s {
 	char           *netname_non_team_drop;
 	int             all_active;
 	int             item_list;
-	int             delay_time;
+	float           delay_time;
 	int             dont_do_triggerwork;
 
 	int             numflames;

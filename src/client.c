@@ -155,7 +155,7 @@ void DecodeLevelParms()
 		strncpy( nextmap, g_globalvars.mapname, 64 );
 		tf_data.allow_hook = 1;
 
-		ent = find( world, FOFS( s.v.classname ), "info_tfdetect" );
+		ent = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
 		if ( ent )
 		{
 			if ( !teamplay )
@@ -167,7 +167,7 @@ void DecodeLevelParms()
 				number_of_teams = 4;
 		} else
 		{
-			ent = find( world, FOFS( s.v.classname ), "info_player_team1" );
+			ent = trap_find( world, FOFS( s.v.classname ), "info_player_team1" );
 			if ( ent || CTF_Map == 1 )
 			{
 				CTF_Map = 1;
@@ -267,13 +267,13 @@ void DecodeLevelParms()
 					
                    			tf_data.cease_fire = 1;
                    			G_bprint( 2, "CEASE FIRE\n" );
-                   			te = find( world, FOFS( s.v.classname ), "player" );
+                   			te = trap_find( world, FOFS( s.v.classname ), "player" );
                    			while ( te )
                    			{
                    				CenterPrint( te, "CEASE FIRE\n" );
                    				te->tfstate = te->tfstate | TFSTATE_CANT_MOVE;
                    				TeamFortress_SetSpeed( te );
-                   				te = find( te, FOFS( s.v.classname ), "player" );
+                   				te = trap_find( te, FOFS( s.v.classname ), "player" );
                    			}
                    			te = spawn();
                    			te->s.v.classname = "ceasefire";
@@ -625,33 +625,33 @@ gedict_t *FindIntermission()
 	int     cyc;
 
 // look for info_intermission first
-	spot = find( world, FOFS( s.v.classname ), "info_intermission" );
+	spot = trap_find( world, FOFS( s.v.classname ), "info_intermission" );
 	if ( spot )
 	{			// pick a random one
 		cyc = g_random() * 1;
 /*		while ( cyc > 1 )
 		{
-			spot = find( spot, FOFS( s.v.classname ), "info_intermission" );
+			spot = trap_find( spot, FOFS( s.v.classname ), "info_intermission" );
 			if ( !spot )
-				spot = find( world, FOFS( s.v.classname ), "info_intermission" );
+				spot = trap_find( world, FOFS( s.v.classname ), "info_intermission" );
 			cyc = cyc - 1;
 		}*/
 		return spot;
 	}
 // then look for the start position
-	spot = find( world, FOFS( s.v.classname ), "info_player_start" );
+	spot = trap_find( world, FOFS( s.v.classname ), "info_player_start" );
 	if ( spot )
 		return spot;
 // look for deathmatch
-	spot = find( world, FOFS( s.v.classname ), "info_player_deathmatch" );
+	spot = trap_find( world, FOFS( s.v.classname ), "info_player_deathmatch" );
 	if ( spot )
 	{			// pick a random one
 		cyc = g_random() * 7;
 		while ( cyc > 1 )
 		{
-			spot = find( spot, FOFS( s.v.classname ), "info_player_deathmatch" );
+			spot = trap_find( spot, FOFS( s.v.classname ), "info_player_deathmatch" );
 			if ( !spot )
-				spot = find( world, FOFS( s.v.classname ), "info_player_deathmatch" );
+				spot = trap_find( world, FOFS( s.v.classname ), "info_player_deathmatch" );
 			cyc = cyc - 1;
 		}
 		return spot;
@@ -672,7 +672,7 @@ gedict_t *FindNextIntermission( gedict_t * start_point )
 	{
 		if ( streq( start_point->s.v.classname, "info_intermission" ) || start_point == world || !start_point )
 		{
-			spot = find( start_point, FOFS( s.v.classname ), "info_intermission" );
+			spot = trap_find( start_point, FOFS( s.v.classname ), "info_intermission" );
 			if ( spot )
 				return spot;
 			else
@@ -681,19 +681,19 @@ gedict_t *FindNextIntermission( gedict_t * start_point )
 		if ( streq( start_point->s.v.classname, "info_player_deathmatch" )
 		     || start_point == world || !start_point )
 		{
-			spot = find( start_point, FOFS( s.v.classname ), "info_player_deathmatch" );
+			spot = trap_find( start_point, FOFS( s.v.classname ), "info_player_deathmatch" );
 			if ( spot )
 				return spot;
 		}
-		spot = find( world, FOFS( s.v.classname ), "info_intermission" );
+		spot = trap_find( world, FOFS( s.v.classname ), "info_intermission" );
 		if ( spot )
 			return spot;
-		spot = find( world, FOFS( s.v.classname ), "info_player_deathmatch" );
+		spot = trap_find( world, FOFS( s.v.classname ), "info_player_deathmatch" );
 		if ( spot )
 			return spot;
 	} else
 	{
-		spot = find( world, FOFS( s.v.classname ), "info_player_start" );
+		spot = trap_find( world, FOFS( s.v.classname ), "info_player_start" );
 		if ( spot )
 			return spot;
 	}
@@ -897,14 +897,14 @@ void execute_changelevel()
 	trap_WriteAngle( MSG_ALL, pos->mangle[0] );
 	trap_WriteAngle( MSG_ALL, pos->mangle[1] );
 	trap_WriteAngle( MSG_ALL, pos->mangle[2] );
-	other = find( world, FOFS( s.v.classname ), "player" );
+	other = trap_find( world, FOFS( s.v.classname ), "player" );
 	while ( other )
 	{
 		other->s.v.takedamage = DAMAGE_NO;
 		other->s.v.solid = SOLID_NOT;
 		other->s.v.movetype = MOVETYPE_NONE;
 		other->s.v.modelindex = 0;
-		other = find( other, FOFS( s.v.classname ), "player" );
+		other = trap_find( other, FOFS( s.v.classname ), "player" );
 	}
 
 	if ( !tf_data.clan_scores_dumped )
@@ -1033,7 +1033,7 @@ void ClientKill()
 
 	if ( self->tfstate & TFSTATE_INFECTED )
 	{
-		te = find( world, FOFS( s.v.classname ), "timer" );
+		te = trap_find( world, FOFS( s.v.classname ), "timer" );
 		while ( te )
 		{
 			if ( te->s.v.owner == EDICT_TO_PROG( self ) && te->s.v.think == ( func_t ) BioInfection_Decay )
@@ -1041,7 +1041,7 @@ void ClientKill()
 				logfrag( te, self );
 				TF_AddFrags( PROG_TO_EDICT( te->s.v.enemy ), 1 );
 			}
-			te = find( te, FOFS( s.v.classname ), "timer" );
+			te = trap_find( te, FOFS( s.v.classname ), "timer" );
 		}
 	} else
 		logfrag( self, self );
@@ -1099,7 +1099,7 @@ int CheckTelefragSpot( vec3_t v )
 	spot_maxs[1] = VEC_HULL_MAX[1] + v[1] + 5;	
 	spot_maxs[2] = VEC_HULL_MAX[2] + v[2] + 5;	
 
-	for (   te = world ; (te = find( te , FOFS(s.v.classname), "player"));)
+	for (   te = world ; (te = trap_find( te , FOFS(s.v.classname), "player"));)
 	{
 		if( te->team_no != self->team_no )
 			continue;
@@ -1145,9 +1145,9 @@ gedict_t *FindTeamSpawnPoint( int team_num )
 		spot = world;
 	for ( attempts = 0;; attempts++ )
 	{
-		spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] );
+		spot = trap_find( spot, FOFS( team_str_home ), team_spawn_str[team_num] );
 		if ( !spot )
-			spot = find( world, FOFS( team_str_home ), team_spawn_str[team_num] );
+			spot = trap_find( world, FOFS( team_str_home ), team_spawn_str[team_num] );
 		if ( !spot )
 			return world;
 		spot_found = CheckTelefragSpot( spot->s.v.origin );
@@ -1170,7 +1170,7 @@ gedict_t *FindRandomTeamSpawnPoint( int team_num )
 	int     numspots = 0, numallspots = 0;
 	int     rndspot;
 
-	for ( spot = world; (spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] )); )
+	for ( spot = world; (spot = trap_find( spot, FOFS( team_str_home ), team_spawn_str[team_num] )); )
 	{
 		if ( !Activated( spot, self ) )
 			continue;
@@ -1183,7 +1183,7 @@ gedict_t *FindRandomTeamSpawnPoint( int team_num )
 	if ( numspots )
 	{
 		rndspot = g_random() * numspots;
-		for ( spot = world; (spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] )); )
+		for ( spot = world; (spot = trap_find( spot, FOFS( team_str_home ), team_spawn_str[team_num] )); )
 		{
 
 			if ( !Activated( spot, self ) )
@@ -1197,7 +1197,7 @@ gedict_t *FindRandomTeamSpawnPoint( int team_num )
 	} else			// not found no telefrag spot
 	{
 		rndspot = g_random() * numallspots;
-		for ( spot = world; (spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] )); )
+		for ( spot = world; (spot = trap_find( spot, FOFS( team_str_home ), team_spawn_str[team_num] )); )
 		{
 
 			if ( !Activated( spot, self ) )
@@ -1229,9 +1229,9 @@ gedict_t *FindDeathmatchSpawnPoint()
 		spot = world;
 	for ( attempts = 0;; attempts++ )
 	{
-		spot = find( spot, FOFS( s.v.classname ), "info_player_deathmatch" );
+		spot = trap_find( spot, FOFS( s.v.classname ), "info_player_deathmatch" );
 		if ( !spot )
-			spot = find( world, FOFS( s.v.classname ), "info_player_deathmatch" );
+			spot = trap_find( world, FOFS( s.v.classname ), "info_player_deathmatch" );
 		if ( !spot )
 			return world;
 
@@ -1268,9 +1268,9 @@ gedict_t *SelectSpawnPoint()
 	}
 	if ( coop )
 	{
-		lastspawn = find( lastspawn, FOFS( s.v.classname ), "info_player_coop" );
+		lastspawn = trap_find( lastspawn, FOFS( s.v.classname ), "info_player_coop" );
 		if ( !lastspawn )
-			lastspawn = find( world, FOFS( s.v.classname ), "info_player_coop" );
+			lastspawn = trap_find( world, FOFS( s.v.classname ), "info_player_coop" );
 		if ( lastspawn )
 			return lastspawn;
 	} else
@@ -1284,11 +1284,11 @@ gedict_t *SelectSpawnPoint()
 	}
 	if ( ( int ) ( g_globalvars.serverflags ) )
 	{
-		spot = find( world, FOFS( s.v.classname ), "info_player_start2" );
+		spot = trap_find( world, FOFS( s.v.classname ), "info_player_start2" );
 		if ( spot )
 			return spot;
 	}
-	spot = find( world, FOFS( s.v.classname ), "info_player_start" );
+	spot = trap_find( world, FOFS( s.v.classname ), "info_player_start" );
 	if ( !spot )
 		G_Error( "PutClientInServer: no info_player_start on level\n" );
 	return spot;
@@ -1511,7 +1511,7 @@ void DumpScore()
 
  if (world.chain) 
   error("DumpScore: world.chain is set");
- e = find(world, FOFS(s.v.classname), "player");
+ e = trap_find(world, FOFS(s.v.classname), "player");
  sort = world;
  while (e) {
   if (!sort) {
@@ -1541,7 +1541,7 @@ void DumpScore()
     } while (walk.chain != e);
    }
   }
-  e = find(e, FOFS(s.v.classname), "player");
+  e = trap_find(e, FOFS(s.v.classname), "player");
  }
  bprint(1, "\n");
  while (sort) {
@@ -2026,7 +2026,7 @@ void CheckPowerups()
 		} else
 		{
 			lighton = 0;
-			te = find( world, FOFS( s.v.classname ), "item_tfgoal" );
+			te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
 			while ( te )
 			{
 				if ( te->s.v.owner == EDICT_TO_PROG( self ) )
@@ -2034,7 +2034,7 @@ void CheckPowerups()
 					if ( te->goal_activation & 1 )
 						lighton = 1;
 				}
-				te = find( te, FOFS( s.v.classname ), "item_tfgoal" );
+				te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 			}
 			if ( !lighton )
 			{
@@ -2078,7 +2078,7 @@ void CheckPowerups()
 		} else
 		{
 			lighton = 0;
-			te = find( world, FOFS( s.v.classname ), "item_tfgoal" );
+			te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
 			while ( te )
 			{
 				if ( te->s.v.owner == EDICT_TO_PROG( self ) )
@@ -2086,7 +2086,7 @@ void CheckPowerups()
 					if ( te->goal_activation & 1 )
 						lighton = 1;
 				}
-				te = find( te, FOFS( s.v.classname ), "item_tfgoal" );
+				te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 			}
 			if ( !lighton )
 			{
@@ -2294,7 +2294,7 @@ void ClientConnect()
 		if ( self->tf_id )
 		{
 			G_sprint( self, 2, "Welcome back!\n" );
-			te = find( world, FOFS( s.v.classname ), "ghost" );
+			te = trap_find( world, FOFS( s.v.classname ), "ghost" );
 			while ( te )
 			{
 				if ( te->tf_id == self->tf_id )
@@ -2310,7 +2310,7 @@ void ClientConnect()
 					dremove( te );
 					te = world;
 				} else
-					te = find( te, FOFS( s.v.classname ), "ghost" );
+					te = trap_find( te, FOFS( s.v.classname ), "ghost" );
 			}
 		}
 		if ( !got_one )
@@ -2349,9 +2349,9 @@ void ClientDisconnect()
 
 	sound( self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_NONE );
 
-	te = find( world, FOFS( s.v.classname ), "primer" );
+	te = trap_find( world, FOFS( s.v.classname ), "primer" );
 	while ( te && te->s.v.owner != EDICT_TO_PROG( self ) )
-		te = find( te, FOFS( s.v.classname ), "primer" );
+		te = trap_find( te, FOFS( s.v.classname ), "primer" );
 	if ( te )
 //  te->s.v.nextthink = g_globalvars.time;
 	{
@@ -2368,7 +2368,7 @@ void ClientDisconnect()
 
 
 	Engineer_RemoveBuildings( self );
-	te = find( world, FOFS( s.v.classname ), "detpack" );
+	te = trap_find( world, FOFS( s.v.classname ), "detpack" );
 	while ( te )
 	{
 		if ( te->real_owner == self )
@@ -2382,7 +2382,7 @@ void ClientDisconnect()
 			dremove( te );
 			te = world;
 		}
-		te = find( te, FOFS( s.v.classname ), "detpack" );
+		te = trap_find( te, FOFS( s.v.classname ), "detpack" );
 	}
 	if ( tf_data.clanbattle && self->tf_id )
 	{

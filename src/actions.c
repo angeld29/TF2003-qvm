@@ -127,7 +127,7 @@ void TeamFortress_SaveMe(  )
 			sound( self, 1, "speech/saveme2.wav", 1, 1 );
 		self->last_saveme_sound = g_globalvars.time + 4;
 	}
-	for ( te = world; ( te = find( te, FOFS( s.v.classname ) , "player" )); )
+	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ) , "player" )); )
 	{
 		if ( self == te || te->playerclass == PC_MEDIC || te->playerclass == PC_ENGINEER
 		     || te->playerclass == PC_SPY )
@@ -515,7 +515,7 @@ void TeamFortress_ID(  )
 		{
 			if ( streq( trace_ent->s.v.classname, "building_sentrygun_base" ) )
 			{
-				for ( te = world; ( te = find( te, FOFS( s.v.classname ) , "building_sentrygun" )); )
+				for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ) , "building_sentrygun" )); )
 				{
 					if ( te->trigger_field == trace_ent )
 					{

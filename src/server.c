@@ -43,7 +43,7 @@ void t_movetarget(  )
 	self = other;
 	other = temp;
 
-	self->movetarget = find( world, FOFS( s.v.targetname ), other->s.v.target );
+	self->movetarget = trap_find( world, FOFS( s.v.targetname ), other->s.v.target );
 	self->s.v.goalentity = EDICT_TO_PROG( self->movetarget );
 
 	VectorSubtract( self->movetarget->s.v.origin, self->s.v.origin, tmpv );

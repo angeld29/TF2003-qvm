@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: vote.c,v 1.1 2004-11-14 07:04:08 AngelD Exp $
+ *  $Id: vote.c,v 1.2 2004-12-09 14:34:23 AngelD Exp $
  */
 
 // vote.q: mapchange voting functions
@@ -33,7 +33,7 @@ int CountPlayers()
 	gedict_t	*p=world;
 	int 		num = 0;
 
-	while((p = find(p, FOFS(s.v.classname), "player"))) 
+	while((p = trap_find(p, FOFS(s.v.classname), "player"))) 
 		if(p->s.v.netname[0]) 
 			num++;
 
@@ -47,7 +47,7 @@ void VoteThink()
 	G_bprint(2, "The voting has timed out.\n");
 	self->s.v.nextthink = -1;
 	k_vote = 0;
-        while((p = find(p, FOFS(s.v.classname), "player"))) 
+        while((p = trap_find(p, FOFS(s.v.classname), "player"))) 
         {
 		if(p->s.v.netname[0] ) p->k_voted = 0;
 	}
@@ -108,12 +108,12 @@ void VoteYes()
 	if(k_vote >= f2) {
 		G_bprint(3, "Map changed by majority vote\n");
 		k_vote = 0;
-        	while((p = find(p, FOFS(s.v.classname), "player"))) 
+        	while((p = trap_find(p, FOFS(s.v.classname), "player"))) 
         	{
 			if(p->s.v.netname[0] ) p->k_voted = 0;
 		}
 
-		p = find(world, FOFS(s.v.classname), "voteguard");
+		p = trap_find(world, FOFS(s.v.classname), "voteguard");
 		if(p) {
 			p->s.v.classname  = "";
 		 dremove(p);
@@ -144,7 +144,7 @@ void VoteNo()
 	k_vote--;
 	if(!k_vote) {
 		G_bprint(3, "Voting is closed\n");
-		p = find(world, FOFS(s.v.classname), "voteguard");
+		p = trap_find(world, FOFS(s.v.classname), "voteguard");
 		if(p) 
 		{
 			p->s.v.classname  = "";
