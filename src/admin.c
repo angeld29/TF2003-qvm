@@ -99,7 +99,6 @@ void Admin_CeaseFire(  )
 		for ( te = world; (te = find( te, FOFS( s.v.classname ), "player" )); )
 		{
 			G_centerprint( te, "CEASE FIRE\n" );
-//   te.immune_to_check = g_globalvars.time + 10;
 			te->tfstate = te->tfstate | TFSTATE_CANT_MOVE;
 			TeamFortress_SetSpeed( te );
 		}
@@ -118,7 +117,6 @@ void Admin_CeaseFire(  )
 		{
 
 			G_centerprint( te, "RESUME FIRE\n" );
-//   te.immune_to_check = g_globalvars.time + 10;
 			te->tfstate = te->tfstate - ( te->tfstate & TFSTATE_CANT_MOVE );
 			TeamFortress_SetSpeed( te );
 		}

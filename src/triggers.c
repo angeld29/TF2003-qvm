@@ -570,7 +570,9 @@ void SP_trigger_setskill(  )
 	return;
 }
 
-/*void trigger_skill_touch()
+/*
+//REMOVE!!!
+void trigger_skill_touch()
 {
  gedict_t* te;
 

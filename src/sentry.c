@@ -448,12 +448,14 @@ void Sentry_Die(  )
 	} else
 	{
 		self->real_owner->has_sentry -= 1;
+#ifdef HAS_SENTRY_CHECK
 		if(!tg_data.tg_enabled && self->real_owner->has_sentry)
 		{
 			G_dprint("Error SentryDie owner->has_sentry !=0 %d\n",self->real_owner->has_sentry);
 			G_sprint(self->real_owner,2,"Error SentryDie owner->has_sentry !=0 %d\n",self->real_owner->has_sentry);
 			self->real_owner->has_sentry = 0;
 		}
+#endif
 		self->s.v.think = ( func_t ) Sentry_Explode;
 		self->s.v.nextthink = g_globalvars.time + 0.1;
 	}

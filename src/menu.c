@@ -227,7 +227,8 @@ void Menu_Team_Input( int inp )
 		{
 			if ( !number_of_teams && inp <= 4 )
 				TeamFortress_TeamSet( inp );
-/*   else {
+/*   //REMOVE!!! DoBinding menu?
+					else {
     if (inp == 7) 
      self.current_menu = 9;
    }*/
@@ -1289,7 +1290,8 @@ void 	TG_Main_Menu_Input( int inp )
   self->menu_count = 23;
 
 }
-/*char* sentry_type_names[]=
+/*REMOVE!!!
+char* sentry_type_names[]=
 {
  "Sentry: 2.8.1",
  "Sentry: 2.8.1 fixed(mtfl)",
@@ -1378,7 +1380,8 @@ void 	TG_SGOptions_Menu_Input( int inp )
 		case 1:
 		        tf_data.sg_newfind = (tf_data.sg_newfind)?0:1;
 		       break;
-/*		case 3:
+/*REMOVE!!!
+		case 3:
 			if( tf_data.sg_newfind )
 				tf_data.sgppl++;
 			break;	

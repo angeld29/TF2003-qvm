@@ -124,7 +124,7 @@ self.angles rotating
 The calling function should make sure self.think is valid
 ===============
 */
-
+//REMOVE!!!
 /*void  SUB_CalcAngleMove(vec3_t destangle, float tspeed, void();
 
 void  SUB_CalcAngleMoveEnt(gedict_t* ent, vec3_t destangle, float tspeed, void()

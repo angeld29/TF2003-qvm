@@ -60,26 +60,6 @@ int TeamFortress_TeamGetTopColor( int tno )
 		return 0;
 }
 
-/*void (float tno) TeamFortress_TeamSetColor =
-{
- if (tno == 1) {
-  team1col = 14;
-  return;
- }
- if (tno == 2) {
-  team2col = 5;
-  return;
- }
- if (tno == 3) {
-  team3col = 13;
-  return;
- }
- if (tno == 4) {
-  team4col = 12;
-  return;
- }
-};*/
-
 char    team_names[4][10] = { "blue", "red", "yell", "gren" };
 
 void LoadTeamNames(  )

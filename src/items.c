@@ -892,11 +892,6 @@ void SP_weapon_lightning(  )
 }
 extern char *GrenadeNames[];
 
-/*void PrintGrenadeType(gedict_t* pl, int typ)
-{
- G_sprint(pl, 2, "%s",GrenadeNames[typ]);
-};*/
-
 int GetGrenadePossibility(  )
 {
 	float   maxg;
@@ -1620,13 +1615,10 @@ PLAYER BACKPACKS
 
 ===============================================================================
 */
-//????????????????????????
 extern char *GrenadePrimeName[];
 void BackpackTouch(  )
 {
 	float   best;
-
-//      gedict_t *stemp;
 	int		gotgren1 = 0;
 	int		gotgren2	= 0;
 

@@ -12,10 +12,6 @@ void EMPGrenadeExplode(  );
 void CheckDistance(  );
 void teamsprint( int tno, gedict_t * ignore, char *st );
 
-/*void    T_Mortar(  );
-void    Sentry_Die(  );
-void    Sentry_Pain( struct gedict_s *attacker, float take );
-*/
 
 
 void LaserBolt_Think(  )
@@ -453,7 +449,6 @@ void TeamFortress_Build( int objtobuild )
 	return;
     }
     self->is_building = 1;
-// self.immune_to_check = g_globalvars.time + 5;
     self->tfstate = self->tfstate | TFSTATE_CANT_MOVE;
     self->s.v.weapon = self->current_weapon;
     self->current_weapon = 0;
@@ -492,9 +487,6 @@ void CheckBelowBuilding( gedict_t * bld )
 	bld->s.v.movetype = MOVETYPE_TOSS;
 	bld->s.v.flags = ( int ) bld->s.v.flags - ( ( int ) bld->s.v.flags & FL_ONGROUND );
     }
-    /*else{
-       bld->s.v.flags = (bld->s.v.flags | 512);
-       } */
 
 }
 
@@ -670,11 +662,6 @@ void TeamFortress_FinishedBuilding(  )
     self = oldself;
 }
 
-/*void T_Mortar()
-{
- self->s.v.touch = T_Mortar;
-}*/
-
 void T_Dispenser(  )
 {
     gedict_t *dist_checker;
@@ -776,9 +763,6 @@ void Engineer_UseSentryGun( gedict_t * gun )
     dist_checker->s.v.nextthink = g_globalvars.time + 0.3;
 }
 
-/*void Engineer_UseMortar(gedict_t* mortar)
-{
-};*/
 
 void CheckSentry( gedict_t * gunhead )
 {
@@ -860,6 +844,13 @@ void Engineer_RemoveBuildings( gedict_t * eng )
 {
     DestroyBuilding( eng, "building_dispenser" );
     DestroyBuilding( eng, "building_sentrygun" );
+#ifdef HAS_SENTRY_CHECK
+    if( eng->has_sentry)
+    {
+    	G_dprint("Warning Engineer_RemoveBuildings: eng->has_sentry == %d\n",eng->has_sentry);
+    	eng->has_sentry = 0;
+    }
+#endif
 }
 
 

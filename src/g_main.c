@@ -20,26 +20,14 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.7 2004-09-22 19:10:50 AngelD Exp $
+ *  $Id: g_main.c,v 1.8 2004-10-03 08:15:24 AngelD Exp $
  */
 
 #include "g_local.h"
-/* global 4 fix
-entity          self;
-entity          other;
-entity          world;
-entity          newmis;                         // if this is set, the entity that just
-        // run created a new missile that should
-        // be simulated immediately
-entity          trace_ent;
-entity          msg_entity;                             // destination of single entity writes
-
-*/
 gedict_t        g_edicts[MAX_EDICTS];	//768
 gedict_t       *world = g_edicts;
 gedict_t       *self, *other;
 
-//short shortvar=0xfedc;
 globalvars_t    g_globalvars;
 field_t         expfields[] = {
 	{"maxspeed", FOFS( maxspeed ), F_FLOAT}	,
@@ -329,7 +317,9 @@ void G_EdictBlocked()
 		( ( void ( * )() ) ( self->s.v.blocked ) ) ();
 	} else
 	{
-		//G_Printf("Null blocked func");
+#ifdef PARANOID
+		G_Printf("Null blocked func");
+#endif
 	}
 
 }

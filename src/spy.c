@@ -885,14 +885,15 @@ void TeamFortress_SpyFeignDeath( int issilent )
 			break;
 		}
 		return;
-	} else
+	} else  // !self->is_feigning
 	{
-		// !self->is_feigning
+		
 		if ( self->hook_out )
 		{
 			G_sprint( self, 2, "You can't feign with the hook out.\n" );
 			return;
 		}
+//REMOVE!!!		
 /*          if (self.is_unabletospy == 1) {
            G_sprint(self, 2, "You can't go undercover right now.\n");
            return;
@@ -911,7 +912,6 @@ void TeamFortress_SpyFeignDeath( int issilent )
 				return;
 			}
 		}
-//  self.immune_to_check = g_globalvars.time + 5;
 		self->tfstate = self->tfstate | TFSTATE_CANT_MOVE;
 		TeamFortress_SetSpeed( self );
 		self->is_feigning = 1;
@@ -1233,7 +1233,6 @@ void GasGrenadeMakeGas(  )
 				if ( timer )
 				{
 					timer->s.v.health = timer->s.v.health + 25;
-					//if ( tf_data.old_grens == 1 )
 					if(!( tf_data.new_gas & GAS_MASK_NEWGREN_TIMES))
 					{
 						if ( timer->s.v.health < 100 )
@@ -1251,7 +1250,6 @@ void GasGrenadeMakeGas(  )
 				}
 			} else
 			{
-				//if ( tf_data.old_grens == 1 )
 				if ( tf_data.new_gas & GAS_MASK_PALETTE)
 				{
 					stuffcmd( te, "v_cshift 50 25 50 -50\n" );
@@ -1260,7 +1258,6 @@ void GasGrenadeMakeGas(  )
 					G_sprint( te, 2, "Run for cover! They're everywhere!\n" );
 				te->tfstate = te->tfstate | TFSTATE_HALLUCINATING;
 				timer = spawn(  );
-				//if ( tf_data.old_grens == 1 )
 				if( !(tf_data.new_gas & GAS_MASK_NEWGREN_TIMES))
 					timer->s.v.nextthink = g_globalvars.time + 0.5;
 				else
@@ -1271,7 +1268,6 @@ void GasGrenadeMakeGas(  )
 
 				timer->s.v.classname = "timer";
 				timer->s.v.owner = EDICT_TO_PROG( te );
-				//if ( tf_data.old_grens == 1 )
 				if( !(tf_data.new_gas & GAS_MASK_NEWGREN_TIMES))
 					timer->s.v.health = 100;
 				else
@@ -1333,7 +1329,6 @@ void GasEffect1( gedict_t * owner )	//Random Temp Entites
 	trap_WriteCoord( 1, owner->s.v.origin[1] + g_random(  ) * 800 - 400 );
 	trap_WriteCoord( 1, owner->s.v.origin[2] );
 	if( tf_data.new_gas & GAS_MASK_NEWGREN_DMG)
-	//if ( tf_data.old_grens != 1 )
 		T_Damage( owner, owner, owner, 0 );
 }
 
@@ -1369,7 +1364,6 @@ void GasEffect2( gedict_t * owner )	//sounds
 	trap_WriteCoord( 1, owner->s.v.origin[1] + g_random(  ) * 800 - 400 );
 	trap_WriteCoord( 1, owner->s.v.origin[2] );
 
-	//if ( tf_data.old_grens == 1 )
 	if ( !(tf_data.new_gas & GAS_MASK_NEWGREN_EFFECTS))
 		return;
 	i = g_random(  ) * ( sizeof( gas_sounds ) / sizeof( gas_sounds[0] )  );
@@ -1410,7 +1404,6 @@ void GasEffect3( gedict_t * owner )
 	trap_WriteCoord( 1, owner->s.v.origin[2] );
 	dremove( te );
 
-	//if ( tf_data.old_grens == 1 )
 	if ( !(tf_data.new_gas & GAS_MASK_NEWGREN_EFFECTS))
 		return;
 	i = g_random(  ) * ( sizeof( gas_sounds ) / sizeof( gas_sounds[0] ) );
@@ -1436,14 +1429,12 @@ void HallucinationTimer(  )
 	{
 	        ResetGasSkins( owner );
 
-		//if ( tf_data.old_grens == 1 )
 		if ( tf_data.new_gas & GAS_MASK_PALETTE) 
 			stuffcmd( owner, "v_cshift; wait; bf\n" );
 		G_sprint( owner, 2, "You feel a little better now.\n" );
 		dremove( self );
 		return;
 	}
-	//if ( tf_data.old_grens == 1 )
 	if( !(tf_data.new_gas & GAS_MASK_NEWGREN_TIMES))
 		self->s.v.nextthink = g_globalvars.time + 0.5;
 	else
@@ -1455,16 +1446,11 @@ void HallucinationTimer(  )
 
 	if ( g_random(  ) < 0.5 )
 		KickPlayer( -10, owner );
-	//if ( tf_data.old_grens == 1 )
 	if ( tf_data.new_gas & GAS_MASK_PALETTE)
 	{
 		stuffcmd( owner, "v_cshift %d %d %d -75\n", ( int ) ( g_random(  ) * 100 ),
 			  ( int ) ( g_random(  ) * 100 ), ( int ) ( g_random(  ) * 100 ) );
 	}
-/* tmpx = g_random() * 800 - 400;
- tmpy = g_random() * 800 - 400;
- halltype = g_random();
- halltype2 = g_random();*/
 	g_globalvars.msg_entity = EDICT_TO_PROG( owner );
 	switch ( ( int ) ( g_random(  ) * 3 ) )
 	{

@@ -41,7 +41,9 @@ void UpdateAbbreviations( gedict_t * Goal )
 
 	if ( !Goal->has_abbreviated )
 	{
-/*  if (Goal->g_a && !Goal->goal_activation) 
+/*
+//REMOVE !!!
+  if (Goal->g_a && !Goal->goal_activation) 
    Goal->goal_activation = Goal->g_a;
   if (Goal->g_e && !Goal->goal_effects) 
    Goal->goal_effects = Goal->g_e;
@@ -679,16 +681,6 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 			Player->ammo_detpack = Player->ammo_detpack + Goal->ammo_detpack;
 			Player->no_grenades_1 = Player->no_grenades_1 + Goal->no_grenades_1;
 			Player->no_grenades_2 = Player->no_grenades_2 + Goal->no_grenades_2;
-			/*if ( Player->no_grenades_1 > 4 )
-			   Player->no_grenades_1 = 4;
-			   if ( Player->no_grenades_2 > 4 )
-			   Player->no_grenades_2 = 4;
-			   if ( Player->tp_grenades_1 == 3 && Player->no_grenades_1 > 2 )
-			   Player->no_grenades_1 = 2;
-			   if ( Player->tp_grenades_2 == 3 && Player->no_grenades_2 > 2 )
-			   Player->no_grenades_2 = 2;
-			   if ( Player->ammo_detpack > Player->maxammo_detpack )
-			   Player->ammo_detpack = Player->maxammo_detpack; */
 			bound_other_ammo( Player );
 			if ( Player->tfstate & TFSTATE_GRENPRIMED )
 			{
@@ -885,16 +877,6 @@ void RemoveResults( gedict_t * Goal, gedict_t * Player )
 	Player->ammo_detpack = Player->ammo_detpack - Goal->ammo_detpack;
 	Player->no_grenades_1 = Player->no_grenades_1 - Goal->no_grenades_1;
 	Player->no_grenades_2 = Player->no_grenades_2 - Goal->no_grenades_2;
-	/*if ( Player->no_grenades_1 > 4 )
-	   Player->no_grenades_1 = 4;
-	   if ( Player->no_grenades_2 > 4 )
-	   Player->no_grenades_2 = 4;
-	   if ( Player->tp_grenades_1 == 3 && Player->no_grenades_1 > 2 )
-	   Player->no_grenades_1 = 2;
-	   if ( Player->tp_grenades_2 == 3 && Player->no_grenades_2 > 2 )
-	   Player->no_grenades_2 = 2;
-	   if ( Player->ammo_detpack > Player->maxammo_detpack )
-	   Player->ammo_detpack = Player->maxammo_detpack; */
 	bound_other_ammo( Player );
 	if ( Player->tfstate & TFSTATE_GRENPRIMED )
 	{

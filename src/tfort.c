@@ -304,9 +304,6 @@ char   *GrenadePrimeName[] = { "Grenade",
 	"Flash grenade"
 };
 
-//int     class_maxhealth[11] = { 1, 75, 90, 100, 90, 90, 100, 100, 90, 80, 50 };
-//int     classmaxspeed[11]   = { /*320 */ 0, 450, 300, 240, 280, 320, 230, 300, 300, 300, 240 };
-//int     classmaxstrafespeed[11] ={ /*320 */ 0, 450, 300, 240, 280, 320, 230, 300, 300, 300, 240 };
 int     classbits[] = { 0, 1, 2, 4, 8, 16, 32, 64, 256, 512, 128 };
 
 void UseSpecialSkill(  )
@@ -568,7 +565,6 @@ void TeamFortress_ChangeClass(  )
 	if ( tf_data.cease_fire )
 	{
 		G_sprint( self, 2, "\n\nCEASE FIRE MODE\n" );
-//  self.immune_to_check = g_globalvars.time + 10;
 		self->tfstate |= TFSTATE_CANT_MOVE;
 		TeamFortress_SetSpeed( self );
 	}
@@ -982,19 +978,7 @@ void TeamFortress_ShowTF(  )
 	if ( tf_data.mtfl )
 		G_sprint( self, 2, "ÍÔÆÌ Settings ÏÎ\n" );
 
-/*#ifdef TG
-#ifdef LAN_SERVER
-	G_sprint( self, 2, "TF2003(QWLAN TF) Training Ground by sd‘ angel for ÍÔÆÌ\n" );
-#else
-	G_sprint( self, 2, "TF2003 Training Ground by sd‘ angel for ÍÔÆÌ\n" );
-#endif
-#else
-#ifdef LAN_SERVER
-	G_sprint( self, 2, "TF2003(QWLAN TF) by sd‘ angel for ÍÔÆÌ\n" );
-#else*/
 	G_sprint( self, 2, "TF2003 (build %d) by sd‘ angel for ÍÔÆÌ\n" ,build_number());
-/*#endif
-#endif*/
 
         if( tg_data.tg_enabled )
         	G_sprint( self, 2, "Training Ground enabled\n" );
@@ -1324,11 +1308,8 @@ void TeamFortress_GrenadePrimed(  )
 
 	}
 	setsize( newmis, 0, 0, 0, 0, 0, 0 );
-// setsize(newmis ,0, 0, 0 ,1, 1, 1);
+// 	setsize(newmis ,0, 0, 0 ,1, 1, 1);
 	setorigin( newmis, PASSVEC3( user->s.v.origin ) );
-/* oldself = self;
- self = EDICT_TO_PROG(self->s.v.owner);
- self = oldself;*/
 	dremove( self );
 }
 
@@ -1376,10 +1357,6 @@ void TeamFortress_SetSpeed( gedict_t * p )
 	stuffcmd( p, "cl_movespeedkey 1\n" );
 	if ( p->tfstate & TFSTATE_CANT_MOVE )
 	{
-/*  if (0 == 1) {
-   stuffcmd(p, "m_forward 0\n");
-   stuffcmd(p, "m_side 0\n");
-  }*/
 		SetVector( p->s.v.velocity, 0, 0, 0 );
 		stuffcmd( p, "cl_backspeed 0\n" );
 		stuffcmd( p, "cl_forwardspeed 0\n" );
@@ -1387,12 +1364,6 @@ void TeamFortress_SetSpeed( gedict_t * p )
 		p->maxspeed = 0;
 		return;
 	}
-/* else {
-  if (0 == 1) {
-   stuffcmd(p, "m_forward 1\n");
-   stuffcmd(p, "m_side 0.8\n");
-  }
- }*/
 	pc = p->playerclass;
 	if ( pc <= 0 || pc > 11 )
 	{
@@ -2036,17 +2007,6 @@ void TeamFortress_DropAmmo( int type )
 	W_SetCurrentAmmo(  );
 	increment_team_ammoboxes( self->team_no );
 
-/* if (self->team_no) {
-  if((num_team_ammoboxes[self->team_no-1]++)>= 20/number_of_teams)
-       RemoveOldAmmobox(self->team_no);
-  increment_team_ammoboxes(self->team_no);
-  if (num_team_ammoboxes(self->team_no) > 20 / number_of_teams) 
-   RemoveOldAmmobox(self->team_no);
- }
- else {
-  if (++num_world_ammoboxes > 20) 
-   RemoveOldAmmobox(0);
- }*/
 	newmis = spawn(  );
 	g_globalvars.newmis = EDICT_TO_PROG( newmis );
 	newmis->aflag = ammo;
@@ -2186,24 +2146,6 @@ void TeamFortress_AmmoboxTouch(  )
 	W_SetCurrentAmmo(  );
 }
 
-/*float (float tno) num_team_ammoboxes =
-{
- if (tno == 1) 
-  return num_team_ammoboxes_1;
- else {
-  if (tno == 2) 
-   return num_team_ammoboxes_2;
-  else {
-   if (tno == 3) 
-    return num_team_ammoboxes_3;
-   else {
-    if (tno == 4) 
-     return num_team_ammoboxes_4;
-   }
-  }
- }
- return 0;
-};*/
 
 void RemoveOldAmmoboxOld( int tno )
 {
@@ -2680,7 +2622,9 @@ void TeamFortress_AutoID(  )
 
 
 
-/*void () TeamFortress_CheckforCheats =
+/*
+//REMOVE!!!
+void () TeamFortress_CheckforCheats =
 {
  float tf;
  float pf;

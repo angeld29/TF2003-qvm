@@ -1268,18 +1268,6 @@ gedict_t *SelectSpawnPoint()
 			spot = FindDeathmatchSpawnPoint();
 			if ( spot != world )
 				return spot;
-
-/*			spot = find( lastspawn, FOFS( s.v.classname ), "info_player_deathmatch" );
-			if ( !spot )
-				spot = find( world, FOFS( s.v.classname ), "info_player_deathmatch" );
-			for ( ; spot; spot = find( spot, FOFS( s.v.classname ), "info_player_deathmatch" ) )
-			{
-				if ( CheckTelefragSpot( spot->s.v.origin ) )
-				{
-					lastspawn = spot;
-					return spot;
-				}
-			}*/
 		}
 	}
 	if ( ( int ) ( g_globalvars.serverflags ) )
@@ -1333,7 +1321,6 @@ void PutClientInServer()
 	self->reload_super_shotgun = 0;
 	self->reload_grenade_launcher = 0;
 	self->reload_rocket_launcher = 0;
-// self.immune_to_check = g_globalvars.time + 10;
 	self->immune_to_check = g_globalvars.time + tf_data.cheat_pause;
 	self->on_hook = 0;
 	self->hook_out = 0;
@@ -1682,7 +1669,8 @@ void PlayerJump()
 			else
 				sound( self, 4, "misc/water2.wav", 1, 1 );
 		}
-/*  if (self.fire_held_down && self.current_weapon == 32768) {
+/*//REMOVE!!! 
+if (self.fire_held_down && self.current_weapon == 32768) {
    stuffcmd(self, "v_idlescale 0\n");
    self->tfstate = self->tfstate - (self->tfstate & 2048);
    TeamFortress_SetSpeed(self);

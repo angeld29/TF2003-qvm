@@ -16,6 +16,7 @@
 
 #include "menu.h"
 #define NEWHWGUY
+#define HAS_SENTRY_CHECK
 
 #include "tg.h"
 

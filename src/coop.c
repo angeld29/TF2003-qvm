@@ -18,7 +18,6 @@ char   *key_sound2[3] = { "misc/medkey.wav", "misc/runekey.wav", "misc/basekey.w
 
 void DropKey(  )
 {
-//      vec3_t  org;
 
 	if ( ( ( int ) self->s.v.items & IT_KEY1 ) || ( ( int ) self->s.v.items & IT_KEY2 ) )
 	{

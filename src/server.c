@@ -83,7 +83,8 @@ void SP_path_corner(  )
 
 //============================================================================
 
-/*void HuntTarget()
+/*//REMOVE!!!
+void HuntTarget()
 {
  self.goalgedict_t* = self->s.v.enemy;
  self->s.v.think = (func_t) self.th_run;

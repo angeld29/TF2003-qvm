@@ -2,17 +2,11 @@
 void    ClientObituary( gedict_t * e1, gedict_t * e2 );
 float   TeamEqualiseDamage( gedict_t * targ, gedict_t * attacker, float damage );
 
-/*void    DoResults( gedict_t * Goal, gedict_t * AP, float addb );
-int     Activated( gedict_t * Goal, gedict_t * AP );
-*/
 
 //============================================================================
 
 void monster_death_use(  )
 {
-//      gedict_t *ent;
-//      gedict_t *otemp;
-//      gedict_t *stemp;
 
 	if ( ( int ) self->s.v.flags & FL_FLY )
 		self->s.v.flags -= FL_FLY;

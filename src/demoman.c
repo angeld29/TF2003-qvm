@@ -436,7 +436,6 @@ void TeamFortress_DetpackTouch(  )
 	traceline( PASSVEC3( source ), PASSVEC3( dest ), 0, other );
 	if ( g_globalvars.trace_fraction == 1 || g_globalvars.trace_ent != EDICT_TO_PROG( self ) )
 		return;
-// other.immune_to_check = g_globalvars.time + 5;
 	other->tfstate = other->tfstate | TFSTATE_CANT_MOVE;
 	G_sprint( other, 2, "Disarming detpack...\n" );
 	TeamFortress_SetSpeed( other );

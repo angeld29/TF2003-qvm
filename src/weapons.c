@@ -393,7 +393,6 @@ void W_FireMedikit(  )
 							  self->s.v.netname, trace_ent->s.v.netname );
 						
 						ResetGasSkins(trace_ent);
-						//if ( tf_data.old_grens == 1 )
 						if ( tf_data.new_gas & GAS_MASK_PALETTE) 
 							stuffcmd( trace_ent, "v_cshift; wait; bf\n" );
 						if ( te->team_no != self->team_no )
@@ -813,7 +812,12 @@ void TraceAttack( float damage, vec3_t dir )
 	//vec3_t  vel;
 	vec3_t  	org, tmp;
 
-/*	VectorScale( g_globalvars.v_up, crandom(  ), tmp );
+	//REMOVE!!! not used vel var
+	/*vel = normalize(dir + v_up*crandom() + v_right*crandom());
+	   vel = vel + 2*trace_plane_normal;
+	   vel = vel * 200; */
+
+/*	VectorScale( g_globalvars.v_up, crandom(  ), tmp ); 
 	VectorAdd( dir, tmp, vel );
 	VectorScale( g_globalvars.v_right, crandom(  ), tmp );
 	VectorAdd( vel, tmp, vel );
@@ -821,12 +825,11 @@ void TraceAttack( float damage, vec3_t dir )
 	VectorScale( g_globalvars.trace_plane_normal, 2, tmp );
 	VectorAdd( vel, tmp, vel );
 	VectorScale( vel, 200, vel );*/
-	/*vel = normalize(dir + v_up*crandom() + v_right*crandom());
-	   vel = vel + 2*trace_plane_normal;
-	   vel = vel * 200; */
+	
+	// org = trace_endpos - dir*4;
 	VectorScale( dir, 4, tmp );
 	VectorSubtract( g_globalvars.trace_endpos, tmp, org );
-	// org = trace_endpos - dir*4;
+	
 	if ( PROG_TO_EDICT( g_globalvars.trace_ent )->s.v.takedamage )
 	{
 		blood_count = blood_count + 1;
@@ -3661,7 +3664,8 @@ int Angel_GetSavedImpulse(  )
 		self->tf_impulse = self->tf_impulse - ( self->tf_impulse & SI_RELOAD );
 		return 173;
 	}
-/* if (self.imp1){
+/* REMOVE!!!
+if (self.imp1){
    saved = self.imp1;
    self.imp1 = 0;
    return saved;

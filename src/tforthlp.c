@@ -22,20 +22,9 @@ void TeamFortress_MOTD(  )
 		if ( !self->got_aliases )
 			G_sprint( self, 2, "\n\n\n" );
 		G_sprint( self, 2, "Type help for more info.\n" );
-/*#ifdef TG
-#ifdef LAN_SERVER
-		G_sprint( self, 2, "ΡυαλεΧοςμδ ΤεανΖοςτςεσσ ”’’•(QWLAN TF) Training Ground\n" );
-#else
-		G_sprint( self, 2, "ΡυαλεΧοςμδ ΤεανΖοςτςεσσ ”’’• Training Ground\n" );
-#endif
-#else
-#ifdef LAN_SERVER
-		G_sprint( self, 2, "ΡυαλεΧοςμδ ΤεανΖοςτςεσσ ”’’•(QWLAN TF)\n" );
-#else*/
 		G_sprint( self, 2, "ΡυαλεΧοςμδ ΤεανΖοςτςεσσ ”’’•\n" );
 //		G_sprint(self, 2, "Official ΝΤΖΜ version\n");
-//#endif
-//#endif
+
 		G_sprint( self, 2, "by sd‘ angel for ΝΤΖΜ\n" );
 		G_sprint( self, 2, "Bug reports to angel_death@mail.ru\n" );
 		G_sprint( self, 2, "http://ντζμ®σδ®ςυ\n" );
