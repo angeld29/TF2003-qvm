@@ -756,7 +756,7 @@ void TeamFortress_ShowTF(  )
 		G_sprint( self, 2, "AutoTeam Off.\n" );
 
 	if ( tf_data.toggleflags & TFLAG_RESPAWNDELAY )
-		G_sprint( self, 2, "%d second Respawn Delay.\n", tf_data.respawn_delay_time );
+		G_sprint( self, 2, "%.0f second Respawn Delay.\n", tf_data.respawn_delay_time );
 	else
 		G_sprint( self, 2, "No Respawn Delay.\n" );
 

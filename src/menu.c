@@ -813,7 +813,7 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 			     )
 			{
 #ifdef TG
-				if( tg_data.tg_enabled )
+				if( !tg_data.tg_enabled )
 #endif
 					self->s.v.ammo_cells = self->s.v.ammo_cells - 130;
 

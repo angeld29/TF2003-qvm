@@ -606,7 +606,7 @@ int Sentry_Fire(  )
 	gedict_t *enemy = PROG_TO_EDICT( self->s.v.enemy );
 
 #ifdef TG
-	if ( tg_data.sg_disable_fire || !CheckTarget(enemy) )
+	if ( tg_data.sg_disable_fire )
 		return 0;
 #endif
 	self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & 8 );
@@ -629,8 +629,9 @@ int Sentry_Fire(  )
 		newmis->s.v.owner = EDICT_TO_PROG( self );
 		newmis->s.v.movetype = MOVETYPE_FLYMISSILE;
 		newmis->s.v.solid = SOLID_BBOX;
-		VectorScale( dir, 800, newmis->s.v.velocity );
+		VectorSubtract( enemy->s.v.origin, self->s.v.origin, newmis->s.v.velocity );
 		VectorNormalize( newmis->s.v.velocity );
+		VectorScale( newmis->s.v.velocity, 800, newmis->s.v.velocity );
 		vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
 		newmis->s.v.weapon = 34;
 		newmis->s.v.touch = ( func_t ) T_MissileTouch;
@@ -638,6 +639,7 @@ int Sentry_Fire(  )
 		newmis->s.v.think = ( func_t ) SUB_Remove;
 		setmodel( newmis, "progs/missile.mdl" );
 		setsize( newmis, 0, 0, 0, 0, 0, 0 );
+		makevectors( self->s.v.angles);
 		VectorScale( g_globalvars.v_forward, 8, vtemp );
 		VectorAdd( vtemp, self->s.v.origin, vtemp );
 		vtemp[2] += 16;
