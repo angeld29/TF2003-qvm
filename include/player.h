@@ -1,6 +1,7 @@
 #include "spy.h"
 
 void ThrowGib( char *gibname, float dm );
+void Headless_Think();
 void player_touch();
 void player_stand1();
 void player_run();
@@ -172,4 +173,4 @@ void player_die_ax6();
 void player_die_ax7();
 void player_die_ax8();
 void player_die_ax9();
-void Headless_Think();
+

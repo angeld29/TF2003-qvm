@@ -1,5 +1,5 @@
 /*
- *  QWProgs-DM
+ *  QW262
  *  Copyright (C) 2004  [sd] angel
  *
  *  This code is based on Q3 VM code by Id Software, Inc.
@@ -20,12 +20,18 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_public.h,v 1.1 2004-09-05 22:48:30 AngelD Exp $
+ *  $Id: g_public.h,v 1.2 2004-09-06 02:37:37 AngelD Exp $
  */
 
+#ifndef __G_PUBLIC_H__
+#define __G_PUBLIC_H__
+
+
+// Copyright (C) 1999-2000 Id Software, Inc.
+//
 // g_public.h -- game module information visible to server
 
-#define	GAME_API_VERSION	2
+#define	GAME_API_VERSION	3
 
 
 //===============================================================
@@ -33,10 +39,11 @@
 //
 // system traps provided by the main engine
 //
-typedef enum {
+typedef enum
+{
 	//============== general Quake services ==================
 
-	G_GETAPIVERSION,	// ( void);
+	G_GETAPIVERSION,		// ( void);
 
 	G_DPRINT,		// ( const char *string );
 	// print message on the local console
@@ -78,65 +85,67 @@ typedef enum {
 	G_GETINFOKEY,
 	G_MULTICAST,
 	G_DISABLEUPDATES,
-	G_WRITEBYTE,
-	G_WRITECHAR,
-	G_WRITESHORT,
-	G_WRITELONG,
-	G_WRITEANGLE,
-	G_WRITECOORD,
-	G_WRITESTRING,
+	G_WRITEBYTE,     
+	G_WRITECHAR,     
+	G_WRITESHORT,    
+	G_WRITELONG,     
+	G_WRITEANGLE,    
+	G_WRITECOORD,    
+	G_WRITESTRING,   
 	G_WRITEENTITY,
 	G_FLUSHSIGNON,
 	g_memset,
-	g_memcpy,
-	g_strncpy,
-	g_sin,
-	g_cos,
-	g_atan2,
-	g_sqrt,
-	g_floor,
-	g_ceil,
+	g_memcpy,		
+	g_strncpy,		
+	g_sin,	
+	g_cos,	
+	g_atan2,	
+	g_sqrt,	
+	g_floor,	
+	g_ceil,	
 	g_acos,
 	G_CMD_ARGC,
-	G_CMD_ARGV
+	G_CMD_ARGV,
+	G_TRACEAREA
 } gameImport_t;
 
 
 //
 // functions exported by the game subsystem
 //
-typedef enum {
-	GAME_INIT,		// ( int levelTime, int randomSeed, int restart );
+typedef enum
+{
+	GAME_INIT,	// ( int levelTime, int randomSeed, int restart );
 	// init and shutdown will be called every single level
 	// The game should call G_GET_ENTITY_TOKEN to parse through all the
 	// entity configuration text and spawn gentities.
 	GAME_LOADENTS,
-	GAME_SHUTDOWN,		// (void);
+	GAME_SHUTDOWN,	// (void);
 
-	GAME_CLIENT_CONNECT,	// ( int clientNum ,int isSpectator);
+	GAME_CLIENT_CONNECT,	 	// ( int clientNum ,int isSpectator);
 	// ( int clientNum, qboolean firstTime, qboolean isBot );
 	// return NULL if the client is allowed to connect, otherwise return
 	// a text string with the reason for denial
 	GAME_PUT_CLIENT_IN_SERVER,
-	//GAME_CLIENT_BEGIN,                            // ( int clientNum ,int isSpectator);
+	//GAME_CLIENT_BEGIN,				// ( int clientNum ,int isSpectator);
 
 	GAME_CLIENT_USERINFO_CHANGED,	// ( int clientNum,int isSpectator );
 
-	GAME_CLIENT_DISCONNECT,	// ( int clientNum,int isSpectator );
+	GAME_CLIENT_DISCONNECT,			// ( int clientNum,int isSpectator );
 
-	GAME_CLIENT_COMMAND,	// ( int clientNum,int isSpectator );
+	GAME_CLIENT_COMMAND,			// ( int clientNum,int isSpectator );
 
 	GAME_CLIENT_PRETHINK,
-	GAME_CLIENT_THINK,	// ( int clientNum,int isSpectator );
+	GAME_CLIENT_THINK,				// ( int clientNum,int isSpectator );
 	GAME_CLIENT_POSTTHINK,
 
-	GAME_START_FRAME,	// ( int levelTime );
-	GAME_SETCHANGEPARMS,	//self
+	GAME_START_FRAME,					// ( int levelTime );
+	GAME_SETCHANGEPARMS, //self
 	GAME_SETNEWPARMS,
-	GAME_CONSOLE_COMMAND,	// ( void );
-	GAME_EDICT_TOUCH,	//(self,other)
-	GAME_EDICT_THINK,	//(self,other=world,time)
-	GAME_EDICT_BLOCKED,	//(self,other)
+	GAME_CONSOLE_COMMAND,			// ( void );
+	GAME_EDICT_TOUCH,                      //(self,other)
+	GAME_EDICT_THINK,                      //(self,other=world,time)
+	GAME_EDICT_BLOCKED,                     //(self,other)
 	// ConsoleCommand will be called when a command has been issued
 	// that is not recognized as a builtin function.
 	// The game can issue trap_argc() / trap_argv() commands to get the command
@@ -145,30 +154,36 @@ typedef enum {
 } gameExport_t;
 
 
-typedef enum {
-	F_INT,
+typedef enum
+{
+	F_INT, 
 	F_FLOAT,
-	F_LSTRING,		// string on disk, pointer in memory, TAG_LEVEL
-//      F_GSTRING,                      // string on disk, pointer in memory, TAG_GAME
+	F_LSTRING,			// string on disk, pointer in memory, TAG_LEVEL
+//	F_GSTRING,			// string on disk, pointer in memory, TAG_GAME
 	F_VECTOR,
 	F_ANGLEHACK,
-//      F_ENTITY,                       // index on disk, pointer in memory
-//      F_ITEM,                         // index on disk, pointer in memory
-//      F_CLIENT,                       // index on disk, pointer in memory
+//	F_ENTITY,			// index on disk, pointer in memory
+//	F_ITEM,				// index on disk, pointer in memory
+//	F_CLIENT,			// index on disk, pointer in memory
 	F_IGNORE
 } fieldtype_t;
 
-typedef struct {
-	string_t        name;
-	int             ofs;
-	fieldtype_t     type;
-//      int             flags;
+typedef struct
+{
+	string_t	name;
+	int			ofs;
+	fieldtype_t	type;
+//	int			flags;
 } field_t;
 
-typedef struct {
-	edict_t        *ents;
-	int             sizeofent;
-	globalvars_t   *global;
-	field_t        *fields;
+typedef struct
+{
+	edict_t		*ents;
+	int		sizeofent;
+	globalvars_t	*global;
+	field_t		*fields;
 	int 		APIversion;
 } gameData_t;
+
+
+#endif /* !__G_PUBLIC_H__ */

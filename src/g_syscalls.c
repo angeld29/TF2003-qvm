@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.c,v 1.1 2004-09-05 22:48:30 AngelD Exp $
+ *  $Id: g_syscalls.c,v 1.2 2004-09-06 02:37:37 AngelD Exp $
  */
 
 //#include "g_local.h"
@@ -296,4 +296,18 @@ int trap_CmdArgc()
 void trap_CmdArgv( int arg, char *valbuff, int sizebuff )
 {
 	syscall( G_CMD_ARGV, arg, (int)valbuff, sizebuff );
+}
+
+void    trap_tracearea( float v1_x, float v1_y, float v1_z, 
+			float v2_x, float v2_y, float v2_z, 
+			int nomonst, int edn ,
+			float min_x, float min_y, float min_z, 
+			float max_x, float max_y, float max_z)
+{
+ 	syscall( G_TRACEAREA, 
+ 		 PASSFLOAT( v1_x), PASSFLOAT( v1_y), PASSFLOAT( v1_z),
+		 PASSFLOAT( v2_x), PASSFLOAT( v2_y), PASSFLOAT( v2_z), 
+		 nomonst, edn,
+ 		 PASSFLOAT( min_x), PASSFLOAT( min_y), PASSFLOAT( min_z),
+		 PASSFLOAT( max_x), PASSFLOAT( max_y), PASSFLOAT( max_z));
 }

@@ -47,24 +47,6 @@ void	TeamFortress_AutoID();
 
 int     num_team_ammoboxes[5] = { 0, 0, 0, 0, 0 };
 
-typedef struct {
-	int     bitmask;
-	int     maxhealth, maxspeed, maxstrafespeed;
-	int     weapons_carried, current_weapon;
-	int     ammo_shells, ammo_nails, ammo_rockets, ammo_cells, ammo_detpack, ammo_medikit;
-	int     maxammo_shells, maxammo_nails, maxammo_rockets, maxammo_cells, maxammo_detpack, maxammo_medikit;
-	int     no_grenades_1, no_grenades_2;
-	int     tp_grenades_1, tp_grenades_2;
-	int     og_tp_grenades_1, og_tp_grenades_2;
-	int     tf_items, tf_items_flags;
-	int     armorclass, armorvalue, maxarmor;
-	float   armortype, armor_allowed;
-	int     items_allowed, items;
-	char   *name;
-	char   *defaultskin;
-	char    skin[20];
-	char   *infokey4skin[4];
-} class_settings_t;
 
 class_settings_t class_set[] = {
 	{
@@ -1479,10 +1461,10 @@ void TeamFortress_SetEquipment(  )
 		self->lives = -1;
 	self->s.v.items = ( int ) self->s.v.items | kept_items;
     
-	self->assault_min_shells = GetInfokeyInt( self, "sb", NULL, 20 );
+	self->assault_min_shells = GetInfokeyInt( self, "sb", NULL, DEFAULT_ASSAULT_MIN_SHELLS );
         
 	if( self->assault_min_shells < 0)
-		self->assault_min_shells = 20;
+		self->assault_min_shells = DEFAULT_ASSAULT_MIN_SHELLS;
 
 	GetInfokeyString( self, "s", NULL, st, sizeof(st), "off" );
 	opt = GetInfokeyInt( self, "s", NULL, 0 );
@@ -1697,6 +1679,8 @@ void TeamFortress_RemoveTimers(  )
 	if ( self->tfstate & TFSTATE_HALLUCINATING )
 		self->tfstate -= TFSTATE_HALLUCINATING;
 
+	ResetGasSkins(self);
+
 	while ( te = find( te, FOFS( s.v.classname ), "timer" ) )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
@@ -1748,7 +1732,7 @@ void TeamFortress_RemoveTimers(  )
 				te = find( te, FOFS( s.v.classname ), "grenade" );
 		}
 	}
-	if ( tf_data.old_grens == 1 )
+	if ( (tf_data.old_grens == 1) || (tf_data.new_gas & GAS_MASK_PALETTE) )
 	{
 		stuffcmd( self, "v_idlescale 0\n" );
 		stuffcmd( self, "v_cshift; wait; bf\n" );

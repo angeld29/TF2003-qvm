@@ -1233,7 +1233,8 @@ void GasGrenadeMakeGas(  )
 				if ( timer )
 				{
 					timer->s.v.health = timer->s.v.health + 25;
-					if ( tf_data.old_grens == 1 )
+					//if ( tf_data.old_grens == 1 )
+					if(!( tf_data.new_gas & GAS_MASK_NEWGREN_TIMES))
 					{
 						if ( timer->s.v.health < 100 )
 							timer->s.v.health = 100;
@@ -1244,10 +1245,14 @@ void GasGrenadeMakeGas(  )
 							timer->s.v.health = 150;
 						timer->s.v.nextthink = g_globalvars.time + 0.3;
 					}
+					    
+					if( !( tf_data.new_gas & GAS_MASK_ALLSPYS ) && (g_random() < SETGAS_IN_GAS_TIME))
+						SetGasSkins(te);
 				}
 			} else
 			{
-				if ( tf_data.old_grens == 1 )
+				//if ( tf_data.old_grens == 1 )
+				if ( tf_data.new_gas & GAS_MASK_PALETTE)
 				{
 					stuffcmd( te, "v_cshift 50 25 50 -50\n" );
 					G_sprint( te, 2, "Far out man!\n" );
@@ -1255,14 +1260,19 @@ void GasGrenadeMakeGas(  )
 					G_sprint( te, 2, "Run for cover! They're everywhere!\n" );
 				te->tfstate = te->tfstate | TFSTATE_HALLUCINATING;
 				timer = spawn(  );
-				if ( tf_data.old_grens == 1 )
+				//if ( tf_data.old_grens == 1 )
+				if( !(tf_data.new_gas & GAS_MASK_NEWGREN_TIMES))
 					timer->s.v.nextthink = g_globalvars.time + 0.5;
 				else
 					timer->s.v.nextthink = g_globalvars.time + 0.3;
 				timer->s.v.think = ( func_t ) HallucinationTimer;
+
+				SetGasSkins(te);
+
 				timer->s.v.classname = "timer";
 				timer->s.v.owner = EDICT_TO_PROG( te );
-				if ( tf_data.old_grens == 1 )
+				//if ( tf_data.old_grens == 1 )
+				if( !(tf_data.new_gas & GAS_MASK_NEWGREN_TIMES))
 					timer->s.v.health = 100;
 				else
 					timer->s.v.health = 150;
@@ -1322,7 +1332,8 @@ void GasEffect1( gedict_t * owner )	//Random Temp Entites
 	trap_WriteCoord( 1, owner->s.v.origin[0] + g_random(  ) * 800 - 400 );
 	trap_WriteCoord( 1, owner->s.v.origin[1] + g_random(  ) * 800 - 400 );
 	trap_WriteCoord( 1, owner->s.v.origin[2] );
-	if ( tf_data.old_grens != 1 )
+	if( tf_data.new_gas & GAS_MASK_NEWGREN_DMG)
+	//if ( tf_data.old_grens != 1 )
 		T_Damage( owner, owner, owner, 0 );
 }
 
@@ -1358,7 +1369,8 @@ void GasEffect2( gedict_t * owner )	//sounds
 	trap_WriteCoord( 1, owner->s.v.origin[1] + g_random(  ) * 800 - 400 );
 	trap_WriteCoord( 1, owner->s.v.origin[2] );
 
-	if ( tf_data.old_grens == 1 )
+	//if ( tf_data.old_grens == 1 )
+	if ( !(tf_data.new_gas & GAS_MASK_NEWGREN_EFFECTS))
 		return;
 	i = g_random(  ) * ( sizeof( gas_sounds ) / sizeof( gas_sounds[0] )  );
 	stuffcmd( owner, gas_sounds[i] );
@@ -1398,7 +1410,8 @@ void GasEffect3( gedict_t * owner )
 	trap_WriteCoord( 1, owner->s.v.origin[2] );
 	dremove( te );
 
-	if ( tf_data.old_grens == 1 )
+	//if ( tf_data.old_grens == 1 )
+	if ( !(tf_data.new_gas & GAS_MASK_NEWGREN_EFFECTS))
 		return;
 	i = g_random(  ) * ( sizeof( gas_sounds ) / sizeof( gas_sounds[0] ) );
 	stuffcmd( owner, gas_sounds[i] );
@@ -1415,24 +1428,35 @@ void HallucinationTimer(  )
 		owner->tfstate = owner->tfstate - ( owner->tfstate & TFSTATE_HALLUCINATING );
 	if ( owner->s.v.deadflag || owner->has_disconnected == 1 )
 	{
+	        ResetGasSkins( owner );
 		dremove( self );
 		return;
 	}
 	if ( !( owner->tfstate & TFSTATE_HALLUCINATING ) )
 	{
-		if ( tf_data.old_grens == 1 )
+	        ResetGasSkins( owner );
+
+		//if ( tf_data.old_grens == 1 )
+		if ( tf_data.new_gas & GAS_MASK_PALETTE) 
 			stuffcmd( owner, "v_cshift; wait; bf\n" );
 		G_sprint( owner, 2, "You feel a little better now.\n" );
 		dremove( self );
 		return;
 	}
-	if ( tf_data.old_grens == 1 )
+	//if ( tf_data.old_grens == 1 )
+	if( !(tf_data.new_gas & GAS_MASK_NEWGREN_TIMES))
 		self->s.v.nextthink = g_globalvars.time + 0.5;
 	else
 		self->s.v.nextthink = g_globalvars.time + 0.3;
+
+	if(!( tf_data.new_gas & GAS_MASK_ALLSPYS ) && g_random()< SETGAS_TIMER_THINK)
+		SetGasSkins(owner);
+                self->s.v.nextthink = g_globalvars.time + 0.5;
+
 	if ( g_random(  ) < 0.5 )
 		KickPlayer( -10, owner );
-	if ( tf_data.old_grens == 1 )
+	//if ( tf_data.old_grens == 1 )
+	if ( tf_data.new_gas & GAS_MASK_PALETTE)
 	{
 		stuffcmd( owner, "v_cshift %d %d %d -75\n", ( int ) ( g_random(  ) * 100 ),
 			  ( int ) ( g_random(  ) * 100 ), ( int ) ( g_random(  ) * 100 ) );
@@ -1595,5 +1619,176 @@ void Spy_RemoveDisguise( gedict_t * spy )
 			}
 			self->StatusRefreshTime = g_globalvars.time + 0.1;
 		}
+	}
+}
+
+///Fake Color Skin Setinfo
+void ResetGasSkins( gedict_t*pl)
+{
+	gedict_t*te;
+	int		entnum;
+	char	st[20];
+
+	if( !(tf_data.new_gas & (GAS_MASK_COLOR | GAS_MASK_SKIN | GAS_MASK_ALLSPYS)) )
+		return;
+
+	if( pl->has_disconnected )
+		return;
+
+	if( !pl->has_fake_gas_setinfo )
+		return;
+
+	for( te = world; te = find( te, FOFS( s.v.classname), "player" );)
+	{
+		if( te->has_disconnected )
+			continue;
+
+		entnum = NUM_FOR_EDICT(te) - 1;
+		
+		if( entnum > MAX_CLIENTS )
+		{
+			G_dprint("ResetGasSkins: entnum > MAX_CLIENTS\n");
+			continue;
+		}
+
+		g_globalvars.msg_entity = EDICT_TO_PROG( pl );
+
+		if( tf_data.new_gas & (GAS_MASK_COLOR|GAS_MASK_ALLSPYS) )
+		{
+			GetInfokeyString( te, "topcolor", NULL, st, sizeof(st), "");
+
+			trap_WriteByte(MSG_ONE,SVC_SETINFO );
+			trap_WriteByte(MSG_ONE, entnum );
+			trap_WriteString(MSG_ONE,"topcolor" );
+			trap_WriteString(MSG_ONE, st);
+
+			GetInfokeyString( te, "bottomcolor", NULL, st, sizeof(st), "");
+
+			trap_WriteByte(MSG_ONE, SVC_SETINFO );
+			trap_WriteByte(MSG_ONE, entnum );
+			trap_WriteString(MSG_ONE,"bottomcolor" );
+			trap_WriteString(MSG_ONE, st);
+		}
+
+		if( tf_data.new_gas & (GAS_MASK_SKIN|GAS_MASK_ALLSPYS) )
+		{
+			GetInfokeyString( te, "skin", NULL, st, sizeof(st), "");
+
+			trap_WriteByte(MSG_ONE, SVC_SETINFO );
+			trap_WriteByte(MSG_ONE, entnum );
+			trap_WriteString(MSG_ONE,"skin" );
+			trap_WriteString(MSG_ONE, st);
+		}
+	}
+}
+
+
+void SetGasSkins( gedict_t*pl)
+{
+	gedict_t*te;
+	int		entnum;
+	int		rskin,rteam,rcol;
+	char	st[20];
+
+	if( !(tf_data.new_gas & (GAS_MASK_COLOR | GAS_MASK_SKIN | GAS_MASK_ALLSPYS)) )
+		return;
+
+	if( pl->has_disconnected )
+		return;
+
+	pl->has_fake_gas_setinfo = 1;
+	for( te = world; te = find( te, FOFS( s.v.classname), "player" );)
+	{
+
+		entnum = NUM_FOR_EDICT(te) - 1;
+		
+		if( te->has_disconnected || te == pl)
+			continue;
+		
+		if( entnum > MAX_CLIENTS )
+		{
+			G_dprint("SetGasSkins: entnum > MAX_CLIENTS\n");
+			continue;
+		}
+
+		g_globalvars.msg_entity = EDICT_TO_PROG( pl );
+		if( tf_data.new_gas & GAS_MASK_ALLSPYS)
+		{
+			rteam = pl->team_no%2 + 1;
+
+			rcol = TeamFortress_TeamGetTopColor(rteam);
+			sprintf(st, "%d",rcol);
+			trap_WriteByte(MSG_ONE,SVC_SETINFO );
+			trap_WriteByte(MSG_ONE, entnum );
+			trap_WriteString(MSG_ONE,"topcolor" );
+			trap_WriteString(MSG_ONE, st);
+
+			rcol = TeamFortress_TeamGetColor(rteam) - 1;
+			sprintf(st, "%d",rcol);
+
+			trap_WriteByte(MSG_ONE, SVC_SETINFO );
+			trap_WriteByte(MSG_ONE, entnum );
+			trap_WriteString(MSG_ONE,"bottomcolor" );
+			trap_WriteString(MSG_ONE, st);
+
+
+			GetSVInfokeyString( class_set[8].infokey4skin[rteam], NULL,
+			    st, sizeof( st ), class_set[8].defaultskin );
+	
+			trap_WriteByte(MSG_ONE, SVC_SETINFO );
+			trap_WriteByte(MSG_ONE, entnum );
+			trap_WriteString(MSG_ONE,"skin" );
+			trap_WriteString(MSG_ONE, st);
+		}else
+		{
+			rteam = pl->team_no;
+
+			if( ( tf_data.new_gas & GAS_MASK_COLOR ) && g_random()< SETGAS_SETCOLOR)
+			{
+				if( tf_data.new_gas & GAS_MASK_ALLCOLORS)
+				{
+					rcol = g_random() * 16;
+				}else
+				{
+					if( tf_data.new_gas & GAS_MASK_4COLORS)
+						rteam = g_random() * 4;
+					else
+						rteam = g_random() * number_of_teams;
+					rteam++;
+					rcol = TeamFortress_TeamGetTopColor( rteam  );
+				}
+
+				sprintf(st, "%d",rcol);
+				trap_WriteByte(MSG_ONE,SVC_SETINFO );
+				trap_WriteByte(MSG_ONE, entnum );
+				trap_WriteString(MSG_ONE,"topcolor" );
+				trap_WriteString(MSG_ONE, st);
+
+				if( !(tf_data.new_gas & GAS_MASK_ALLCOLORS))
+				{
+					rcol = TeamFortress_TeamGetColor(rteam) - 1;
+					sprintf(st, "%d",rcol);
+				}
+				trap_WriteByte(MSG_ONE,SVC_SETINFO );
+				trap_WriteByte(MSG_ONE, entnum );
+				trap_WriteString(MSG_ONE,"bottomcolor" );
+				trap_WriteString(MSG_ONE, st);
+			}
+
+			if( (tf_data.new_gas & GAS_MASK_SKIN ) && g_random()<SETGAS_SETSKIN)
+			{
+				rskin = g_random() *9 +1;
+
+				GetSVInfokeyString( class_set[rskin].infokey4skin[rteam], NULL,
+						st, sizeof( st ), class_set[rskin].defaultskin );
+	
+				trap_WriteByte(MSG_ONE, SVC_SETINFO );
+				trap_WriteByte(MSG_ONE, entnum );
+				trap_WriteString(MSG_ONE,"skin" );
+				trap_WriteString(MSG_ONE, st);
+			}
+	
+		}
+
 	}
 }

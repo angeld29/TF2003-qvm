@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.h,v 1.1 2004-09-05 22:48:30 AngelD Exp $
+ *  $Id: g_syscalls.h,v 1.2 2004-09-06 02:37:37 AngelD Exp $
  */
 
 int     trap_GetApiVersion(  );
@@ -72,3 +72,8 @@ void    trap_FlushSignon(  );
 void    trap_disableupdates( int edn, float time );
 int     trap_CmdArgc(  );
 void    trap_CmdArgv( int arg, char *valbuff, int sizebuff );
+void    trap_tracearea( float v1_x, float v1_y, float v1_z, 
+			float v2_x, float v2_y, float v2_z, 
+			int nomonst, int edn ,
+			float min_x, float min_y, float min_z, 
+			float max_x, float max_y, float max_z);

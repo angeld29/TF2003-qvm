@@ -312,6 +312,29 @@ void TeamFortress_EngineerBuild(  )
 		}
 	}
 }
+int CheckAreaNew( gedict_t * obj, gedict_t * builder )
+{
+	gedict_t *te;
+	vec3_t end;
+
+	tracearea(PASSVEC3( obj->s.v.origin ), PASSVEC3( obj->s.v.origin ) , 0, obj , -16, -16, 0, 16, 16, 48);
+ 	if( g_globalvars.trace_startsolid == 1 )
+ 	{
+ 		VectorCopy(obj->s.v.origin,end);
+ 		end[2] -= 48;
+ 		tracearea(PASSVEC3( obj->s.v.origin ), PASSVEC3( end ) , 0, obj , -16, -16, 0, 16, 16, 4);
+ 		VectorCopy(g_globalvars.trace_endpos,end);
+ 		end[2]++;
+ 		tracearea( PASSVEC3( end ), PASSVEC3( end ) , 0, obj , -16, -16, 0, 16, 16, 48 );
+ 		if( g_globalvars.trace_startsolid == 1 )
+ 			return 0;
+ 	}
+
+	te = findradius( world, obj->s.v.origin, 64 );
+	if ( te )
+		return 0;
+	return 1;
+}
 
 int CheckArea( gedict_t * obj, gedict_t * builder )
 {
@@ -319,6 +342,11 @@ int CheckArea( gedict_t * obj, gedict_t * builder )
 	vec3_t  end;
 	int     pos;
 	gedict_t *te;
+
+	pos = CheckAreaNew(obj,builder);
+	if( pos == 0)
+		return 0;
+	
 
 	pos = trap_pointcontents( PASSVEC3( obj->s.v.origin ) );
 	if ( pos == -2 || pos == -6 )

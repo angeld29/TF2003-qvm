@@ -59,3 +59,6 @@ equ	ceil			-55
 equ     acos			-56
 equ     trap_CmdArgc            -57                
 equ     trap_CmdArgv            -58
+
+equ     trap_tracearea          -59
+

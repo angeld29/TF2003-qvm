@@ -376,6 +376,10 @@ SOURCE=.\include\spy.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\tfort.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\tg.h
 
 !IF  "$(CFG)" == "qwprogs - Win32 Release"

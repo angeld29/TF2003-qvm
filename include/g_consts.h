@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_consts.h,v 1.1 2004-09-05 22:48:30 AngelD Exp $
+ *  $Id: g_consts.h,v 1.2 2004-09-06 02:37:37 AngelD Exp $
  */
 
 //
@@ -205,6 +205,7 @@
 #define SVC_FINALE 31
 #define SVC_CDTRACK 32
 #define SVC_SELLSCREEN 33
+#define SVC_SETINFO 51
 
 #define SVC_SMALLKICK  34
 #define SVC_BIGKICK   35

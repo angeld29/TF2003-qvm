@@ -11,6 +11,8 @@
 #include "g_tf_consts.h"
 #include "g_syscalls.h"
 #include "player.h"
+#include "tfort.h"
+#include "spy.h"
 
 #include "menu.h"
 #define NEWHWGUY
@@ -82,6 +84,9 @@ void    	sound( gedict_t * ed, int channel, char *samp, int vol, float att );
 gedict_t 	*checkclient(  );
 void    	traceline( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z,
 		   int nomonst, gedict_t * ed );
+void tracearea( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z, int nomonst, gedict_t * ed ,
+			float min_x, float min_y, float min_z, 
+			float max_x, float max_y, float max_z);
 void    	stuffcmd( gedict_t * ed, const char *fmt , ...);
 int     	droptofloor( gedict_t * ed );
 int     	walkmove( gedict_t * ed, float yaw, float dist );
@@ -257,25 +262,6 @@ int TeamFortress_TeamSet( int tno );
 void TeamFortress_TeamShowScores( int all );
 int TeamFortress_TeamGetNoPlayers( int tno );
 void teamsprint( int tno, gedict_t * ignore, char *st );
-//tfort.c
-char   *TeamFortress_GetClassName( int pc );
-void TF_AddFrags( gedict_t * pl, int fr );
-void TeamFortress_RemoveTimers();
-void TeamFortress_SetupRespawn( int Suicided );
-void TeamFortress_ChangeClass();
-void TeamFortress_CheckClassStats();
-int IsLegalClass( int pc );
-void    TeamFortress_DescribeArmor( gedict_t * Player, int Armorclass );
-void    TeamFortress_PrintClassName( gedict_t *, int, int );
-void    TeamFortress_SetEquipment();
-void    TeamFortress_SetHealth();
-void    TeamFortress_SetSpeed( gedict_t * );
-void    TeamFortress_SetSkin( gedict_t * );
-void    TeamFortress_ExecClassScript( gedict_t * );
-void 	TeamFortress_ExecMapScript( gedict_t * p );
-int TeamFortress_TeamPutPlayerInTeam();
-void KickCheater( gedict_t * p );
-void    TeamFortress_Alias( char *halias, int himpulse1, int himpulse2 );
 //tfortmap.c
 void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item );
 gedict_t *Finditem( int );
@@ -298,11 +284,9 @@ void 	Engineer_RemoveBuildings();
 void 	DestroyBuilding( gedict_t * eng, char *bld );
 void    TeamFortress_EngineerBuild(  );
 void    TeamFortress_Build( int objtobuild );
-void TeamFortress_SpyChangeSkin( int class );
-void TeamFortress_SpyChangeColor( int teamno );
 
 void TF_zoom( int zoom_level );
-void Spy_RemoveDisguise( gedict_t * spy );
+
 void CheckBelowBuilding( gedict_t * bld );
 void TeamFortress_DetonatePipebombs(  );
 void TeamFortress_SpyFeignDeath( int issilent );

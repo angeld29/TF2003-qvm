@@ -272,6 +272,7 @@ typedef struct gedict_s {
 	struct gedict_s*	admin_use;
 
 	float		allow_snip_time;
+	int		has_fake_gas_setinfo;
 
 } gedict_t;
 extern  int 		skill;

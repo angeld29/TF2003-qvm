@@ -15,13 +15,15 @@ disable_reload
 [ ] print rules topcolor check,gas
 [+] new server defaults
 [+] hwguy gren jump
-[ ] new traceline in server
-[ ] new check area
+[+] new traceline in server
+[+] new check area
 [+] remove detpack exploded msg
 [+] sentry visibility on watervis 1
 [+] assault regulated min_shells
 [+] pyro in water
 [+] scanner settings
-[ ] spy new gas
+[+] spy new gas
 [+] snip_ammo, snip_reload
 [+] add_pipe
+
+fix TeamFortress_TeamGetColor чтобы возвращал реальный цвет а не цвет+1

@@ -1,3 +1,9 @@
+void    SetGasSkins( gedict_t * pl );
+void 	ResetGasSkins( gedict_t * pl );
+void 	Spy_RemoveDisguise( gedict_t * spy );
+void 	TeamFortress_SpyChangeSkin( int class );
+void 	TeamFortress_SpyChangeColor( int teamno );
+
 void spy_diea1();
 void spy_diea2();
 void spy_diea3();

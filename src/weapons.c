@@ -404,7 +404,10 @@ void W_FireMedikit(  )
 						G_bprint( 1,
 							  "%s healed %s of his hallucinations\n",
 							  self->s.v.netname, trace_ent->s.v.netname );
-						if ( tf_data.old_grens == 1 )
+						
+						ResetGasSkins(trace_ent);
+						//if ( tf_data.old_grens == 1 )
+						if ( tf_data.new_gas & GAS_MASK_PALETTE) 
 							stuffcmd( trace_ent, "v_cshift; wait; bf\n" );
 						if ( te->team_no != self->team_no )
 							TF_AddFrags( self, 1 );
