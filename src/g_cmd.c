@@ -17,48 +17,79 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.7 2004-12-17 01:57:46 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.8 2004-12-19 03:30:18 AngelD Exp $
  */
 
 #include "g_local.h"
 
+
+#define CMD_NOT_PREMATCH 	1
+#define CMD_NOT_DEAD		2
+#define CMD_NOT_ATTACK		4
+#define CMD_NOT_TEAM		8
+#define CMD_NOT_CLASS		16
+
+
+typedef struct {
+	char		*command;
+	void		(*Action) ();
+	int		allowed;
+}cmd_t;
+
+void    ClientKill();
+void	Test();
+void	TG_Cmd();
+void	Vote_Cmd();
+void 	TeamFortress_Cmd_Discard(  );
+void 	Engineer_RotateSG(  );
+void 	TeamFortress_Cmd_Detpack();
+
+cmd_t cmds[] ={
+	{"kill",ClientKill},
+	{"test",Test},
+	{"tg",TG_Cmd},
+	{"vote",Vote_Cmd,CMD_NOT_PREMATCH},
+	{"discard", TeamFortress_Cmd_Discard, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
+	{"sg_rotate",Engineer_RotateSG, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
+	{"detpack",TeamFortress_Cmd_Detpack, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
+	{NULL,NULL,0}
+};
 extern void trap_CmdArgv( int arg, char *valbuff, int sizebuff );
 
-void    ClientKill(  );
-void Test();
-void TG_Cmd();
-void Vote_Cmd();
+
 qboolean ClientCommand(  )
 {
 	char    cmd_command[1024];
+	cmd_t	*ucmd;
 
 	self = PROG_TO_EDICT( g_globalvars.self );
 	trap_CmdArgv( 0, cmd_command, sizeof( cmd_command ) );
+	for ( ucmd = cmds ; ucmd->command  ; ucmd++ )
+	{
+		if(strcmp(cmd_command,ucmd->command))
+			continue;
+		if( (ucmd->allowed & CMD_NOT_PREMATCH) && (tf_data.cb_prematch_time > g_globalvars.time))
+		{
+			G_sprint( self, 2, "cmd '%s' not allowed in prematch\n",cmd_command);
+			return true;
+		}
 
-	if ( !strcmp( cmd_command, "kill" ) )
-	{
-		ClientKill(  );
-		return true;
-	}
-	if ( !strcmp( cmd_command, "test" ) )
-	{
-	     //!!!!!!remove me
-//	     Test();
-	     return true;
-	}
-	if ( !strcmp( cmd_command, "tg" ) )
-	{
-	     TG_Cmd();
-	     return true;
-	}
+		if( (ucmd->allowed & CMD_NOT_DEAD) && ( self->s.v.deadflag))
+			return true;
 
-	if ( !strcmp( cmd_command, "vote" ) )
-	{
-	     Vote_Cmd();
-	     return true;
-	}
+		if( (ucmd->allowed & CMD_NOT_ATTACK) && ( g_globalvars.time < self->attack_finished ))
+			return true;
 
-	//G_Printf("ClientCommand %s\n",cmd_command);
+		if( (ucmd->allowed & CMD_NOT_TEAM) && ( !self->team_no))
+			return true;
+
+		if( (ucmd->allowed & CMD_NOT_CLASS) && ( !self->playerclass))
+			return true;
+
+
+	        ucmd->Action();
+	        return true;
+	}
 	return false;
 }
 

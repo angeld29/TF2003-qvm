@@ -760,6 +760,25 @@ void Engineer_UseSentryGun( gedict_t * gun )
     dist_checker->s.v.nextthink = g_globalvars.time + 0.3;
 }
 
+void 	Engineer_RotateSG(  )
+{
+        int angle;
+        char    value[1024];
+
+	if( !tg_data.tg_enabled  && (self->playerclass != PC_ENGINEER ))
+		return;
+
+	if( self->current_menu != MENU_ENGINEER_FIX_SENTRYGUN )
+		return;
+
+        if( trap_CmdArgc() != 2)
+        	return;
+
+        trap_CmdArgv( 1, value, sizeof( value ) );
+        angle = atoi(value);
+	self->building->waitmin = anglemod( self->building->waitmin + angle );
+	self->building->waitmax = anglemod( self->building->waitmax + angle );
+};
 
 void CheckSentry( gedict_t * gunhead )
 {

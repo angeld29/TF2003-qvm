@@ -129,6 +129,27 @@ void Detpack_SetClip(  )
 	}
 }
 
+void TeamFortress_Cmd_Detpack()
+{
+        int time;
+        char    value[1024];
+
+        if( trap_CmdArgc() != 2)
+        	return;
+
+        trap_CmdArgv( 1, value, sizeof( value ) );
+        if( !strcmp(value,"stop"))
+        {
+        	TeamFortress_DetpackStop();
+        	return;
+        }
+
+        time = atoi(value);
+        if (  time > 255 )
+        	time = 255;
+        TeamFortress_SetDetpack( time );
+}
+
 void TeamFortress_SetDetpack( float timer )
 {
 	gedict_t *te;
