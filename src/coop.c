@@ -55,7 +55,7 @@ void DropKey(  )
 
 		newmis->s.v.movetype = MOVETYPE_TOSS;
 		newmis->s.v.solid = SOLID_TRIGGER;
-		newmis->s.v.deadflag = 1;
+		newmis->s.v.deadflag = DEAD_DYING;
 		setsize( newmis, -16, -16, -24, 16, 16, 32 );
 		newmis->s.v.think = ( func_t ) DroppedKeyThink;
 		newmis->s.v.nextthink = g_globalvars.time + 1.5;

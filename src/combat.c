@@ -287,8 +287,11 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 
 	if ( !targ->s.v.takedamage )
 		return;
-	if ( T_AttackType & 256 )
+	if ( T_AttackType & TF_TD_NOSOUND )
 	{
+	        if(streq(targ->s.v.classname,"player"))
+	        	G_sprint(targ,2,"!!!BUG BUG BUG!!! killed by TF_TD_NOSOUND\n");
+
 		targ->s.v.health = damage;
 		return;
 	}
@@ -494,7 +497,8 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 	}
 	if ( take < 1 )
 		take = 1;
-	take = floor( take );
+	take = rint( take );
+	//take = floor( take );
 
 	if ( !no_damage )
 	{

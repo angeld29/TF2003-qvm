@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.5 2004-10-03 10:37:14 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.6 2004-11-14 07:04:08 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -27,6 +27,7 @@ extern void trap_CmdArgv( int arg, char *valbuff, int sizebuff );
 void    ClientKill(  );
 void Test();
 void TG_Cmd();
+void Vote_Cmd();
 qboolean ClientCommand(  )
 {
 	char    cmd_command[1024];
@@ -41,12 +42,19 @@ qboolean ClientCommand(  )
 	}
 	if ( !strcmp( cmd_command, "test" ) )
 	{
-	     //Test();
+	     //!!!!!!remove me
+	     Test();
 	     return true;
 	}
 	if ( !strcmp( cmd_command, "tg" ) )
 	{
 	     TG_Cmd();
+	     return true;
+	}
+
+	if ( !strcmp( cmd_command, "vote" ) )
+	{
+	     Vote_Cmd();
 	     return true;
 	}
 
@@ -85,6 +93,22 @@ qboolean ClientUserInfoChanged()
 void Test()
 {
 	char    value[1024];
+	float	h;
+	
+	if( trap_CmdArgc() < 2)
+	{
+		G_sprint( self, 2, "health %f %f\n",self->s.v.health, self->s.v.deadflag);
+	        return;
+	}
+	trap_CmdArgv( 1, value, sizeof( value ) );
+	h = atof(value);
+	if(h < 0)
+		h = 1;
+	TF_T_Damage( self, world, world, h, TF_TD_IGNOREARMOUR, 0 );
+}
+void Test_q()
+{
+	char    value[1024];
 	int type,dist;
 	vec3_t  src;
 	vec3_t  dst;
@@ -119,4 +143,5 @@ void Test()
 	}
 	
 		
-};
+}
+

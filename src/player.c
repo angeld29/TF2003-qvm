@@ -1391,7 +1391,7 @@ void DeathSound(  )
 void PlayerDead(  )
 {
 	self->s.v.nextthink = -1;
-	self->s.v.deadflag = 2;
+	self->s.v.deadflag = DEAD_DEAD;
 }
 
 void VelocityForDamage( float dm, vec3_t v )
@@ -1538,12 +1538,12 @@ void PlayerDie(  )
 	if ( te )
 //  te->s.v.nextthink = g_globalvars.time;
 	{
-		self->s.v.deadflag = 1;
+		self->s.v.deadflag = DEAD_DYING;
 		saveself = self;
 		self = te;
 		( ( void ( * )(  ) ) ( self->s.v.think ) ) (  );
 		self = saveself;
-		self->s.v.deadflag = 0;
+		self->s.v.deadflag = DEAD_NO;
 	}
 	self->s.v.items = ( int ) self->s.v.items - ( ( int ) self->s.v.items & 524288 );
 	self->invisible_finished = 0;

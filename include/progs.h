@@ -279,6 +279,9 @@ typedef struct gedict_s {
 	vec3_t		lastvel,accel;
 	float		lasttime;
 
+	int	 	k_voted;
+//	int		k_stuff;
+
 } gedict_t;
 extern float sv_gravity;
 extern  int 		skill;

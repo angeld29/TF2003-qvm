@@ -730,7 +730,7 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 		Player->lives = Player->lives + Goal->lives;
 		if ( Goal->s.v.frags )
 		{
-			if ( Goal->goal_effects == 1 || !( tf_data.toggleflags & 2048 ) )
+			if ( Goal->goal_effects == 1 || !( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
 				TF_AddFrags( Player, Goal->s.v.frags );
 		}
 		oldself = self;

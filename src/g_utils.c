@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_utils.c,v 1.4 2004-10-03 10:37:14 AngelD Exp $
+ *  $Id: g_utils.c,v 1.5 2004-11-14 07:04:08 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -55,6 +55,14 @@ gedict_t *spawn(  )
 	return t;
 }
 
+int rint(float f)
+{
+	if(f > 0)
+		return (int)( f + 0.5);
+	else
+		return (int)( f - 0.5);
+
+}
 void ent_remove( gedict_t * t )
 {
 	if ( !t || t == world )
@@ -69,7 +77,7 @@ gedict_t *nextent( gedict_t * ent )
 	int     entn;
 
 	if ( !ent )
-		G_Error( "find: NULL start\n" );
+		G_Error( "nextent: NULL start\n" );
 	entn = trap_nextent( NUM_FOR_EDICT( ent ) );
 	if ( entn )
 		return &g_edicts[entn];

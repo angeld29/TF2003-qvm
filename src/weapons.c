@@ -378,7 +378,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->tfstate & TFSTATE_INFECTED )
 				{
-					healam = floor( trace_ent->s.v.health / 2 );
+					healam = rint( trace_ent->s.v.health / 2 );
 					trace_ent->tfstate -= ( trace_ent->tfstate & TFSTATE_INFECTED );
 					tf_data.deathmsg = DMSG_MEDIKIT;
 					T_Damage( trace_ent, self, self, healam );
@@ -1695,8 +1695,7 @@ void spike_touch(  )
 		spawn_touchblood( 9 );
 		tf_data.deathmsg = self->s.v.weapon;
 		if ( streq( PROG_TO_EDICT( self->s.v.owner )->s.v.classname, "grenade" ) )
-			TF_T_Damage( other, self, PROG_TO_EDICT( PROG_TO_EDICT( self->s.v.owner )->s.v.owner ), 9, 2,
-				     2 );
+			TF_T_Damage( other, self, PROG_TO_EDICT( PROG_TO_EDICT( self->s.v.owner )->s.v.owner ), 9, 2, 2 );
 		else
 			TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 18, 2, 2 );
 	} else
@@ -1745,8 +1744,7 @@ void superspike_touch(  )
 		else
 			ndmg = 26;
 		if ( streq( PROG_TO_EDICT( self->s.v.owner )->s.v.classname, "grenade" ) )
-			TF_T_Damage( other, self, PROG_TO_EDICT( PROG_TO_EDICT( self->s.v.owner )->s.v.owner ), ndmg, 2,
-				     2 );
+			TF_T_Damage( other, self, PROG_TO_EDICT( PROG_TO_EDICT( self->s.v.owner )->s.v.owner ), ndmg, 2, 2 );
 		else
 			TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), ndmg, 2, 2 );
 	} else

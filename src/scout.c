@@ -941,7 +941,7 @@ void	TG_Eff_Remove(gedict_t *pl)
      	}
      	if ( pl->tfstate & TFSTATE_INFECTED )
      	{
-     		healam = floor( pl->s.v.health / 2 );
+     		healam = rint( pl->s.v.health / 2 );
      		pl->tfstate -= ( pl->tfstate & TFSTATE_INFECTED );
      		tf_data.deathmsg = DMSG_MEDIKIT;
      		T_Damage( pl, self, self, healam );

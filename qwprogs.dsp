@@ -320,6 +320,10 @@ SOURCE=.\src\version.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\vote.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\weapons.c
 # End Source File
 # Begin Source File

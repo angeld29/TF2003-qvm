@@ -72,7 +72,10 @@ void PreMatch_Think(  )
 			if ( gren->s.v.owner == EDICT_TO_PROG( self ) )
 				gren->s.v.nextthink = g_globalvars.time + 0.1;
 		}
-		TF_T_Damage( self, world, world, self->s.v.health + 1, 1, 0 );
+		//!!!!!!remove me 
+		G_sprint( self, 2, "remove me %f %f / ", self->s.v.health, self->s.v.deadflag );
+		TF_T_Damage( self, world, world, self->s.v.health + 1, TF_TD_IGNOREARMOUR, 0 );
+		G_sprint( self, 2, "%f %f\n", self->s.v.health,self->s.v.deadflag );
 		self = oldself;
 	}
 }

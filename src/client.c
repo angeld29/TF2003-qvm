@@ -1046,7 +1046,7 @@ void ClientKill()
 	TeamFortress_SetupRespawn( 1 );
 	self->s.v.health = -1;
 	self->th_die();
-	self->s.v.deadflag = 3;
+	self->s.v.deadflag = DEAD_RESPAWNABLE;
 	self->tfstate |= TFSTATE_RESPAWN_READY;
 	self->s.v.takedamage = 0;
 }
@@ -1380,7 +1380,7 @@ void PutClientInServer()
 		self->height = 0;
 		TF_zoom( 90 );
 	}
-	self->s.v.deadflag = 0;
+	self->s.v.deadflag = DEAD_NO;
 	self->pausetime = 0;
 	spot = SelectSpawnPoint();
 
@@ -1759,7 +1759,7 @@ void WaterMove()
 			if ( self->dmgtime < g_globalvars.time && self->radsuit_finished < g_globalvars.time )
 			{
 				self->dmgtime = g_globalvars.time + 1;
-				T_Damage( self, world, world, 4 * self->s.v.waterlevel );
+				T_Damage( self, world, world, 4 * self->s.v.waterlevel ); //!!! fix me for TF_T_Damage ???
 			}
 		}
 	}
@@ -2157,7 +2157,7 @@ void PlayerPostThink()
 					if ( self->playerclass == 6 )
 						fdmg = fdmg * 1.5;
 				}
-				fdmg = ( int ) fdmg;
+				fdmg = rint( fdmg );
 				TF_T_Damage( self, world, world, fdmg, 1, 0 );
 				sound( self, 2, "player/land2.wav", 1, 1 );
 				self->deathtype = "falling";
@@ -2339,12 +2339,12 @@ void ClientDisconnect()
 	if ( te )
 //  te->s.v.nextthink = g_globalvars.time;
 	{
-		self->s.v.deadflag = 1;
+		self->s.v.deadflag = DEAD_DYING;
 		saveself = self;
 		self = te;
 		( ( void ( * )(  ) ) ( self->s.v.think ) ) (  );
 		self = saveself;
-		self->s.v.deadflag = 0;
+		self->s.v.deadflag = DEAD_NO;
 	}
 
 	self->has_disconnected = 1;
