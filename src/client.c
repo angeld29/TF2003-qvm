@@ -67,7 +67,7 @@ void SetNewParms( void )
 	g_globalvars.parm13 = 0;
 	g_globalvars.parm14 = 0;
 	g_globalvars.parm15 = 0;
-};
+}
 
 void SetChangeParms(  )
 {
@@ -110,20 +110,20 @@ void SetChangeParms(  )
 	g_globalvars.parm13 = self->StatusBarRes;
 	g_globalvars.parm14 = self->StatusBarSize;
 	g_globalvars.parm15 = self->is_admin;
-};
+}
 
 
 void autoteam_think(  )
 {
 	tf_data.toggleflags |= TFLAG_AUTOTEAM;
 	dremove( self );
-};
+}
 
 void autokick_think(  )
 {
 	PROG_TO_EDICT( self->s.v.owner )->teamkills = 0;
 	dremove( self );
-};
+}
 
 void DecodeLevelParms(  )
 {
@@ -546,7 +546,7 @@ void DecodeLevelParms(  )
 	{
 		self->is_admin = g_globalvars.parm15;
 	}
-};
+}
 
 /*
 ============
@@ -634,7 +634,7 @@ gedict_t *FindNextIntermission( gedict_t * start_point )
 			return spot;
 	}
 	return FindIntermission(  );
-};
+}
 
 void TF_MovePlayer(  )
 {
@@ -645,7 +645,7 @@ void TF_MovePlayer(  )
 	setorigin( self, place->s.v.origin[0], place->s.v.origin[1], place->s.v.origin[2] + 1 );
 	VectorCopy( place->s.v.angles, self->s.v.angles );
 	self->s.v.fixangle = 1;
-};
+}
 
 void GotoNextMap(  )
 {
@@ -654,7 +654,7 @@ void GotoNextMap(  )
 
 //      gedict_t *te;
 
-	if ( strncmp( nextmap, g_globalvars.mapname, 64 ) )
+	if ( Q_strncmp( nextmap, g_globalvars.mapname, 64 ) )
 	{
 		trap_changelevel( nextmap );
 		tf_data.already_chosen_map = 1;
@@ -679,7 +679,7 @@ void GotoNextMap(  )
 	}
 	if ( GetSVInfokeyInt( "n", NULL, 0 ) == 0 )
 		tf_data.already_chosen_map = 0;
-};
+}
 
 void ExitIntermission(  )
 {
@@ -767,7 +767,7 @@ void ExitIntermission(  )
 	}
 	G_dprint( "Exit Intermission.\n" );
 	GotoNextMap(  );
-};
+}
 
 void IntermissionThink(  )
 {
@@ -807,7 +807,7 @@ void IntermissionThink(  )
 		localcmd( "localinfo maxp \"\"\n" );
 		localcmd( "localinfo nmap \"\"\n" );
 	}
-};
+}
 
 void execute_changelevel(  )
 {
@@ -848,7 +848,7 @@ void execute_changelevel(  )
 		DumpClanScores(  );
 		tf_data.clan_scores_dumped = 1;
 	}
-};
+}
 
 void changelevel_touch(  )
 {
@@ -882,7 +882,7 @@ void changelevel_touch(  )
 // in the middle of C movement code, so set a think g_globalvars.time to do it
 	self->s.v.think = ( func_t ) execute_changelevel;
 	self->s.v.nextthink = g_globalvars.time + 0.1;
-};
+}
 
 /*QUAKED trigger_changelevel (0.5 0.5 0.5) ? NO_INTERMISSION
 When the player touches this, he gets sent to the map listed in the "map" variable.  Unless the NO_INTERMISSION flag is set, the view will go to the info_intermission spot and display stats.
@@ -900,7 +900,7 @@ void SP_trigger_changelevel(  )
 
 	InitTrigger(  );
 	self->s.v.touch = ( func_t ) changelevel_touch;
-};
+}
 
 /*
 =============================================================================
@@ -939,7 +939,7 @@ void respawn(  )
 		} else
 			localcmd( "restart\n" );
 	}
-};
+}
 
 /*
 ============
@@ -993,7 +993,7 @@ void ClientKill(  )
 	self->s.v.deadflag = 3;
 	self->tfstate |= TFSTATE_RESPAWN_READY;
 	self->s.v.takedamage = 0;
-};
+}
 
 gedict_t *lastspawn_team[5] = { NULL, NULL, NULL, NULL, NULL };
 char   *team_spawn_str[5] = { "", "ts1", "ts2", "ts3", "ts4" };
@@ -1132,7 +1132,7 @@ gedict_t *FindDeathmatchSpawnPoint(  )
 void ValidateUser( gedict_t * e )
 {
 
-};
+}
 
 
 gedict_t *SelectSpawnPoint(  )
@@ -1189,10 +1189,6 @@ gedict_t *SelectSpawnPoint(  )
 }
 
 
-/*void () PlayerDie;
-void () TeamFortress_SetHealth;
-void () TeamFortress_SetEquipment;
-void () player_touch;*/
 
 ////////////////
 // GlobalParams:
@@ -1390,13 +1386,13 @@ void SP_Null_tf_spawn(  )
 		dremove( self );
 		return;
 	}
-};
+}
 
 
 void PrintClientScore( gedict_t * c )
 {
 	G_bprint( 1, "%3d %s\n", c->s.v.frags, c->s.v.netname );
-};
+}
 
 
 void DumpScore(  )
@@ -1447,7 +1443,7 @@ void DumpScore(  )
  }
  bprint(1, "\n");
  */
-};
+}
 
 /*
 ===============================================================================
@@ -1474,7 +1470,7 @@ void NextLevel(  )
 
 	o->s.v.think = ( func_t ) execute_changelevel;
 	o->s.v.nextthink = g_globalvars.time + 0.1;
-};
+}
 
 /*
 ============
@@ -1491,7 +1487,7 @@ void CheckRules(  )
 
 	if ( fraglimit && self->s.v.frags >= fraglimit )
 		NextLevel(  );
-};
+}
 
 //============================================================================
 
@@ -1547,7 +1543,7 @@ void PlayerDeathThink(  )
 		}
 		return;
 	}
-};
+}
 
 void PlayerJump(  )
 {
@@ -1608,7 +1604,7 @@ void PlayerJump(  )
   player_assaultcannondown1();
  }*/
 
-};
+}
 
 
 
@@ -1690,7 +1686,7 @@ void WaterMove(  )
 		self->s.v.flags += FL_INWATER;
 		self->dmgtime = 0;
 	}
-};
+}
 
 void CheckWaterJump(  )
 {
@@ -1728,7 +1724,7 @@ void CheckWaterJump(  )
 			return;
 		}
 	}
-};
+}
 
 ////////////////
 // GlobalParams:
@@ -1819,7 +1815,7 @@ void PlayerPreThink(  )
 	}
 	if ( self->on_hook )
 		Service_Grapple(  );
-};
+}
 
 /////////////////////////////////////////////////////////////////
 /*
@@ -2020,7 +2016,7 @@ void CheckPowerups(  )
 			self->radsuit_finished = 0;
 		}
 	}
-};
+}
 
 ////////////////
 // GlobalParams:
@@ -2090,7 +2086,7 @@ void PlayerPostThink(  )
 		TeamFortress_CheckTeamCheats(  );
 		self->cheat_check = g_globalvars.time + 3;
 	}
-};
+}
 
 ////////////////
 // GlobalParams:
@@ -2218,7 +2214,7 @@ void ClientConnect(  )
 #ifdef TG
 	stuffcmd( self, "exec tg.cfg\n" );
 #endif
-};
+}
 
 ////////////////
 // GlobalParams:
@@ -2278,7 +2274,7 @@ void ClientDisconnect(  )
 	self->team_no = 0;
 	self->s.v.solid = 0;
 	setsize( self, 0, 0, 0, 0, 0, 0 );
-};
+}
 
 /*
 ===========
@@ -3288,4 +3284,4 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
    }
   }
  }*/
-};
+}

@@ -18,7 +18,7 @@ void SP_noclass(  )
 {
 	G_dprint( "noclass spawned at %f %f %f\n", self->s.v.origin[0], self->s.v.origin[1], self->s.v.origin[2] );
 	ent_remove( self );
-};
+}
 
 void q_touch(  )
 {
@@ -209,7 +209,7 @@ int T_Heal( gedict_t * e, float healamount, float ignore )
 		TeamFortress_SetSpeed( e );
 	}
 	return 1;
-};
+}
 
 
 #define   H_ROTTEN  1
@@ -601,7 +601,7 @@ void bound_other_ammo( gedict_t * p )
 		p->no_grenades_1 = 3;
 	if ( p->tp_grenades_2 == GR_TYPE_CALTROPS && p->no_grenades_2 > 3 )
 		p->no_grenades_2 = 3;
-};
+}
 
 float RankForWeapon( float w )
 {
@@ -622,7 +622,7 @@ float RankForWeapon( float w )
 
 void Deathmatch_Weapon( float old, float new )
 {
-};
+}
 
 
 void    ammo_touch(  );
@@ -831,7 +831,7 @@ void SP_weapon_supernailgun(  )
 	self->s.v.touch = ( func_t ) weapon_touch;
 	setsize( self, -16, -16, 0, 16, 16, 56 );
 	StartItem(  );
-};
+}
 
 /*QUAKED weapon_grenadelauncher (0 .5 .8) (-16 -16 0) (16 16 32)
 */

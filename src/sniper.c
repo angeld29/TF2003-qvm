@@ -20,7 +20,7 @@ void TeamFortress_SniperWeapon(  )
 	else
 		self->current_weapon = WEAP_SNIPER_RIFLE;
 	W_SetCurrentAmmo(  );
-};
+}
 
 void TF_zoom( int zoom_level )
 {
@@ -28,7 +28,7 @@ void TF_zoom( int zoom_level )
 	if ( self->tfstate & TFSTATE_ZOOMOFF )
 		return;
 	stuffcmd( self, "fov %d\n", zoom_level );
-};
+}
 
 void SniperSight_Update(  )
 {
@@ -59,7 +59,7 @@ void SniperSight_Update(  )
 	vectoangles( g_globalvars.v_forward, self->s.v.angles );
 	setorigin( self, PASSVEC3( g_globalvars.trace_endpos ) );
 	self->s.v.nextthink = g_globalvars.time + 0.1;
-};
+}
 
 void SniperSight_Create(  )
 {
@@ -77,7 +77,7 @@ void SniperSight_Create(  )
 	setorigin( sight, PASSVEC3( self->s.v.origin ) );
 	sight->s.v.think = ( func_t ) SniperSight_Update;
 	sight->s.v.nextthink = g_globalvars.time + 0.05;
-};
+}
 
 void TeamFortress_AutoZoomToggle(  )
 {
@@ -90,4 +90,4 @@ void TeamFortress_AutoZoomToggle(  )
 		self->tfstate = self->tfstate | TFSTATE_ZOOMOFF;
 		G_sprint( self, 2, "autozoom OFF\n" );
 	}
-};
+}

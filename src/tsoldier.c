@@ -12,7 +12,7 @@ void NailGrenadeTouch(  )
 	sound( self, 1, "weapons/bounce.wav", 1, 1 );
 	if ( VectorCompareF( self->s.v.velocity, 0, 0, 0 ) )
 		SetVector( self->s.v.avelocity, 0, 0, 0 );
-};
+}
 
 void NailGrenadeExplode(  )
 {
@@ -64,7 +64,7 @@ void NailGrenadeNailEm(  )
 	self->s.v.nextthink = g_globalvars.time + 0.1;
 	self->s.v.think = ( func_t ) NailGrenadeLaunchNail;
 	self->playerclass = 0;
-};
+}
 
 void NailGrenadeLaunchNail(  )
 {
@@ -94,4 +94,4 @@ void NailGrenadeLaunchNail(  )
 		self->s.v.weapon = 9;
 		self->s.v.think = ( func_t ) GrenadeExplode;
 	}
-};
+}

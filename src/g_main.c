@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.1 2004-09-05 22:48:30 AngelD Exp $
+ *  $Id: g_main.c,v 1.2 2004-09-07 14:36:08 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -78,7 +78,10 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 	{
 	case GAME_INIT:
 		if ( trap_GetApiVersion() < GAME_API_VERSION )
+		{
+			G_dprint("Mod requried API_VERSION %d or higher\n", GAME_API_VERSION);
 			return 0;
+		}
 
 		G_InitGame( arg0, arg1 );
 		return ( int ) ( &gamedata );
@@ -218,21 +221,23 @@ void Com_Printf( const char *msg, ... )
 void G_InitGame( int levelTime, int randomSeed )
 {
 	int             i;
-
+//Common Initialization
 	srand( randomSeed );
 	framecount = 0;
 	starttime = levelTime * 0.001;
 	G_Printf( "Init Game\n" );
 	G_InitMemory();
 	memset( g_edicts, 0, sizeof( gedict_t ) * MAX_EDICTS );
-	memset( &tf_data, 0, sizeof(tf_data));
+	
 
 	world->s.v.model = worldmodel;
 	g_globalvars.mapname = mapname;
 	for ( i = 0; i < MAX_CLIENTS; i++ )
 	{
-		g_edicts[i + 1].s.v.netname = netnames[i];
+		g_edicts[i + 1].s.v.netname = netnames[i]; //Init client names
 	}
+//TF Intialization
+	memset( &tf_data, 0, sizeof(tf_data));
 
 }
 

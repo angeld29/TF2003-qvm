@@ -1175,7 +1175,7 @@ void W_FireAssaultCannon(  )
 #ifdef NEWHWGUY
 	FireBullets( 5, dir, PASSVEC3( spread ) );
 #endif
-};
+}
 
 /*
 ==============================================================================
@@ -1483,7 +1483,7 @@ float num_team_pipebombs(float tno)
   }
  }
  return 0;
-};
+}
 
 float num_team_flares(float tno)
 {
@@ -1502,7 +1502,7 @@ float num_team_flares(float tno)
   }
  }
  return 0;
-};
+}
 
 void RemoveOldFlare(float tno)
 {
@@ -1803,7 +1803,7 @@ void W_FireSuperSpikes(  )
 	setmodel( newmis, "progs/s_spike.mdl" );
 	setsize( newmis, 0, 0, 0, 0, 0, 0 );
 	KickPlayer( -2, self );
-};
+}
 
 void W_FireSpikes( float ox )
 {
@@ -3234,7 +3234,7 @@ void CycleWeaponCommand(  )
 			return;
 		}
 	}
-};
+}
 
 
 

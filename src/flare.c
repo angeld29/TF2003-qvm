@@ -21,7 +21,7 @@ void FlareGrenadeTouch(  )
 		SetVector( self->s.v.avelocity, 0, 0, 0 );
 		self->s.v.touch = ( func_t ) SUB_Null;
 	}
-};
+}
 
 void FlareGrenadeThink(  )
 {
@@ -65,7 +65,7 @@ void FlareGrenadeThink(  )
 			}
 		}
 	}
-};
+}
 
 
 void FlareGrenadeExplode(  )
@@ -87,7 +87,7 @@ void FlareGrenadeExplode(  )
 	self->s.v.health = g_globalvars.time + 40;
 	self->s.v.nextthink = g_globalvars.time + 0.05 + g_random(  ) * 0.1;
 	self->s.v.think = ( func_t ) FlareGrenadeThink;
-};
+}
 
 void RemoveFlare(  )
 {
@@ -95,7 +95,7 @@ void RemoveFlare(  )
 	dremove( self );
 	if ( num_team_flares[( int ) self->s.v.weapon] )
 		num_team_flares[( int ) self->s.v.weapon]--;
-};
+}
 
 
 void RemoveOldFlare( int tno )
@@ -126,4 +126,4 @@ void RemoveOldFlare( int tno )
 		}
 		old = find( old, FOFS( mdl ), "flare" );
 	}
-};
+}

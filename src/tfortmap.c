@@ -273,7 +273,7 @@ int CheckExistence(  )
 void SP_info_tfdetect(  )
 {
 	UpdateAbbreviations( self );
-};
+}
 
 extern char *team_spawn_str[5];
 void SP_info_player_teamspawn(  )
@@ -533,7 +533,7 @@ gedict_t *Findteamspawn( int gno )
 	}
 	G_dprint( "Could not find a Teamspawn with a goal_no of %d.\n", gno );
 	return NULL;
-};
+}
 
 void InactivateGoal( gedict_t * Goal )
 {
@@ -1106,7 +1106,7 @@ int APMeetsCriteria( gedict_t * Goal, gedict_t * AP )
 		}
 	}
 	return 1;
-};
+}
 
 void SetupRespawn( gedict_t * Goal )
 {
@@ -1133,13 +1133,13 @@ void SetupRespawn( gedict_t * Goal )
 			return;
 	}
 	InactivateGoal( Goal );
-};
+}
 
 void DoRespawn(  )
 {
 	RestoreGoal( self );
 	InactivateGoal( self );
-};
+}
 
 int Activated( gedict_t * Goal, gedict_t * AP )
 {
@@ -1169,7 +1169,7 @@ int Activated( gedict_t * Goal, gedict_t * AP )
 			Act = 1;
 	}
 	return Act;
-};
+}
 
 void AttemptToActivate( gedict_t * Goal, gedict_t * AP, gedict_t * ActivatingGoal )
 {
@@ -1197,7 +1197,7 @@ void AttemptToActivate( gedict_t * Goal, gedict_t * AP, gedict_t * ActivatingGoa
 				AttemptToActivate( te, AP, Goal );
 		}
 	}
-};
+}
 
 void DoGoalWork( gedict_t * Goal, gedict_t * AP )
 {
@@ -1264,7 +1264,7 @@ void DoGoalWork( gedict_t * Goal, gedict_t * AP )
 			}
 		}
 	}
-};
+}
 
 void DoGroupWork( gedict_t * Goal, gedict_t * AP )
 {
@@ -1468,7 +1468,7 @@ void DoTriggerWork( gedict_t * Goal, gedict_t * AP )
 		}
 		while ( t );
 	}
-};
+}
 
 void DelayedResult(  )
 {
@@ -1798,7 +1798,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 	DoTriggerWork( Goal, AP );
 	if ( streq( Goal->s.v.classname, "info_tfgoal" ) )
 		SetupRespawn( Goal );
-};
+}
 
 void tfgoal_touch(  )
 {
@@ -1828,12 +1828,12 @@ void tfgoal_touch(  )
 		}
 	}
 	AttemptToActivate( self, other, self );
-};
+}
 
 void info_tfgoal_use(  )
 {
 	AttemptToActivate( self, activator, self );
-};
+}
 
 void tfgoal_timer_tick(  )
 {
@@ -1848,7 +1848,7 @@ void tfgoal_timer_tick(  )
 			self->s.v.nextthink = g_globalvars.time + self->search_time;
 		}
 	}
-};
+}
 
 void item_tfgoal_touch(  )
 {
@@ -1949,7 +1949,7 @@ void item_tfgoal_touch(  )
 				AttemptToActivate( te, other, self );
 		}
 	}
-};
+}
 
 void tfgoalitem_GiveToPlayer( gedict_t * Item, gedict_t * AP, gedict_t * Goal )
 {
@@ -1980,7 +1980,7 @@ void tfgoalitem_GiveToPlayer( gedict_t * Item, gedict_t * AP, gedict_t * Goal )
 		AP->is_unabletospy = 1;
 	DoResults( Item, AP, 1 );
 	DoItemGroupWork( Item, AP );
-};
+}
 
 void ReturnItem(  )
 {
@@ -2016,7 +2016,7 @@ void ReturnItem(  )
 		}
 	}
 	dremove( self );
-};
+}
 
 void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 {
@@ -2212,14 +2212,14 @@ void tfgoalitem_dropthink(  )
 		}
 		self->s.v.think = ( func_t ) tfgoalitem_remove;
 	}
-};
+}
 
 void tfgoalitem_droptouch(  )
 {
 	self->s.v.touch = ( func_t ) item_tfgoal_touch;
 	self->s.v.nextthink = g_globalvars.time + 4.25;
 	self->s.v.think = ( func_t ) tfgoalitem_dropthink;
-};
+}
 
 void tfgoalitem_drop( gedict_t * Item, float PAlive, gedict_t * P )
 {
@@ -2265,7 +2265,7 @@ void tfgoalitem_drop( gedict_t * Item, float PAlive, gedict_t * P )
 		Item->s.v.nextthink = g_globalvars.time + 5;
 		Item->s.v.think = ( func_t ) tfgoalitem_dropthink;
 	}
-};
+}
 
 void tfgoalitem_remove(  )
 {
@@ -2302,7 +2302,7 @@ void tfgoalitem_checkgoalreturn( gedict_t * Item )
 				AttemptToActivate( te, world, Item );
 		}
 	}
-};
+}
 
 void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 {
@@ -2368,7 +2368,7 @@ void SP_info_player_team1(  )
 	self->team_no = 2;
 	self->goal_effects = 1;
 	self->team_str_home = "ts2";
-};
+}
 
 void SP_info_player_team2(  )
 {
@@ -2377,7 +2377,7 @@ void SP_info_player_team2(  )
 	self->team_no = 1;
 	self->goal_effects = 1;
 	self->team_str_home = "ts1";
-};
+}
 
 void SP_item_flag_team2(  )
 {
@@ -2448,7 +2448,7 @@ void SP_item_flag_team2(  )
 	setsize( dp, PASSVEC3( dp->goal_min ), PASSVEC3( dp->goal_max ) );
 	dp->s.v.nextthink = g_globalvars.time + 0.2;
 	dp->s.v.think = ( func_t ) TF_PlaceGoal;
-};
+}
 
 void SP_item_flag_team1(  )
 {
@@ -2519,7 +2519,7 @@ void SP_item_flag_team1(  )
 	setsize( dp, PASSVEC3( dp->goal_min ), PASSVEC3( dp->goal_max ) );
 	dp->s.v.nextthink = g_globalvars.time + 0.2;
 	dp->s.v.think = ( func_t ) TF_PlaceGoal;
-};
+}
 
 void CTF_FlagCheck(  )
 {
@@ -2560,7 +2560,7 @@ void CTF_FlagCheck(  )
 	if ( flagcount != 2 )
 		G_dprint( "*****BUG*****\nFlag(s) missing.\nPlease report this.\n" );
 	self->s.v.nextthink = g_globalvars.time + 30;
-};
+}
 
 void ForceRespawn( gedict_t * P )
 {
@@ -2643,4 +2643,4 @@ void DropGoalItems(  )
 		te = find( te, FOFS( s.v.classname ), "item_tfgoal" );
 	}
 	dremove( newmis );
-};
+}

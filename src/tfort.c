@@ -387,7 +387,7 @@ void UseSpecialSkill(  )
 		break;
 	}
 
-};
+}
 
 void TeamFortress_ChangeClass(  )
 {
@@ -563,7 +563,7 @@ void TeamFortress_ChangeClass(  )
 		self->tfstate |= TFSTATE_CANT_MOVE;
 		TeamFortress_SetSpeed( self );
 	}
-};
+}
 
 void TeamFortress_DisplayLegalClasses(  )
 {
@@ -644,7 +644,7 @@ void TeamFortress_DisplayLegalClasses(  )
 		G_sprint( self, 2, "RandomPC" );
 	}
 	G_sprint( self, 2, "\n" );
-};
+}
 
 void TeamFortress_Inventory(  )
 {
@@ -725,7 +725,7 @@ void TeamFortress_Inventory(  )
 		}
 	}
 
-};
+}
 
 void TeamFortress_ShowTF(  )
 {
@@ -1144,7 +1144,7 @@ void TeamFortress_PrimeGrenade(  )
 	else
 		tGrenade->heat = g_globalvars.time + 3 + 0.8;
 	tGrenade->s.v.think = ( func_t ) TeamFortress_GrenadePrimed;
-};
+}
 
 void TeamFortress_GrenadePrimed(  )
 {
@@ -1318,7 +1318,7 @@ void TeamFortress_GrenadePrimed(  )
  self = EDICT_TO_PROG(self->s.v.owner);
  self = oldself;*/
 	dremove( self );
-};
+}
 
 void TeamFortress_ThrowGrenade(  )
 {
@@ -1337,7 +1337,7 @@ void TeamFortress_ThrowGrenade(  )
 //              else te->s.v.nextthink=te.respawn_time;
 	}
 
-};
+}
 
 
 
@@ -1435,15 +1435,15 @@ void TeamFortress_SetSpeed( gedict_t * p )
 
 void TeamFortress_SetHealth(  )
 {
-	int     pc = self->playerclass;
-
+	int     pc ;
+	pc = self->playerclass;
 	if ( pc <= 0 || pc >= 10 )
 	{
 		pc = 0;
 		self->s.v.takedamage = 0;
 	}
 	self->s.v.health = self->s.v.max_health = class_set[pc].maxhealth;
-};
+}
 
 
 char   *TeamFortress_GetSkin( gedict_t * p )
@@ -1466,7 +1466,7 @@ char   *TeamFortress_GetSkin( gedict_t * p )
 	GetSVInfokeyString( class_set[pc].infokey4skin[tn - 1], NULL,
 			    class_set[pc].skin, sizeof( class_set[pc].skin ), class_set[pc].defaultskin );
 	return class_set[pc].skin;
-};
+}
 
 void TeamFortress_SetSkin( gedict_t * p )
 {
@@ -1480,7 +1480,7 @@ void TeamFortress_SetSkin( gedict_t * p )
 		stuffcmd( p, "skin %s\n", TeamFortress_GetSkin( p ) );
 	else
 		stuffcmd( p, "skin base\n" );
-};
+}
 
 
 void TeamFortress_SetEquipment(  )
@@ -1648,7 +1648,7 @@ void TeamFortress_SetEquipment(  )
 	if ( tf_data.allow_hook && self->playerclass )
 		self->weapons_carried |= WEAP_HOOK;
 	W_SetCurrentAmmo(  );
-};
+}
 
 
 int TeamFortress_GetMaxAmmo( gedict_t * Retriever, int AmmoType )
@@ -1683,14 +1683,14 @@ int TeamFortress_GetMaxAmmo( gedict_t * Retriever, int AmmoType )
 	G_dprint( "Error in TeamFortress_GetMaxAmmo()\n" );
 	G_dprint( "Invalid ammo type passed.\n" );
 	return 0;
-};
+}
 
 int TeamFortress_CanGetWeapon( gedict_t * Retriever, int WeaponType )
 {
 	if ( Retriever->items_allowed & WeaponType )
 		return 1;
 	return 0;
-};
+}
 
 
 void TeamFortress_DescribeArmor( gedict_t * Player, int Armorclass )
@@ -1709,17 +1709,17 @@ void TeamFortress_DescribeArmor( gedict_t * Player, int Armorclass )
 	if ( Armorclass & AT_SAVESHOT )
 		G_sprint( Player, 2, "Kevlar " );
 	G_sprint( Player, 2, "armor\n" );
-};
+}
 
 void TeamFortress_AddBackpackItems( gedict_t * Retriever, gedict_t * Items )
 {
 	return;
-};
+}
 
 char   *TeamFortress_GetClassName( int pc )
 {
 	return class_set[pc].name;
-};
+}
 
 
 void TeamFortress_PrintClassName( gedict_t * Viewer, int pc, int rpc )
@@ -1728,7 +1728,7 @@ void TeamFortress_PrintClassName( gedict_t * Viewer, int pc, int rpc )
 		G_sprint( Viewer, 2, "%s (Random)\n", TeamFortress_GetClassName( pc ) );
 	else
 		G_sprint( Viewer, 2, "%s\n", TeamFortress_GetClassName( pc ) );
-};
+}
 
 
 void TeamFortress_RemoveTimers(  )
@@ -1817,7 +1817,7 @@ void TeamFortress_RemoveTimers(  )
 	self->menu_count = MENU_REFRESH_RATE;
 	self->current_menu = MENU_DEFAULT;
 	self->s.v.impulse = 0;
-};
+}
 
 void TeamFortress_SetupRespawn( int Suicided )
 {
@@ -1876,7 +1876,7 @@ void TeamFortress_SetupRespawn( int Suicided )
 	{
 		G_sprint( self, 2, "%d seconds till respawn.\n", ( int ) restime );
 	}
-};
+}
 
 
 void TeamFortress_CheckClassStats(  )
@@ -1939,7 +1939,7 @@ void TeamFortress_CheckClassStats(  )
 				self->s.v.items = ( int ) self->s.v.items | IT_ARMOR1;
 		}
 	}
-};
+}
 
 
 void TeamFortress_DropAmmo( int type )
@@ -2099,7 +2099,7 @@ void TeamFortress_DropAmmo( int type )
 		setmodel( newmis, "progs/grenade3.mdl" );
 	else
 		setmodel( newmis, "progs/ammobox.mdl" );
-};
+}
 
 
 void TeamFortress_AmmoboxTouch(  )
@@ -2177,7 +2177,7 @@ void TeamFortress_AmmoboxTouch(  )
 	dremove( self );
 	self = other;
 	W_SetCurrentAmmo(  );
-};
+}
 
 /*float (float tno) num_team_ammoboxes =
 {
@@ -2224,7 +2224,7 @@ void RemoveOldAmmobox( int tno )
 		}
 		old = find( old, FOFS( s.v.classname ), "ammobox" );
 	}
-};
+}
 
 void increment_team_ammoboxes( int tno )
 {
@@ -2238,13 +2238,13 @@ void increment_team_ammoboxes( int tno )
 		if ( ++( num_team_ammoboxes[tno] ) > 20 )
 			RemoveOldAmmobox( tno );
 	}
-};
+}
 
 void decrement_team_ammoboxes( int tno )
 {
 	if ( num_team_ammoboxes[tno] )
 		num_team_ammoboxes[tno]--;
-};
+}
 
 void TeamFortress_AssaultWeapon(  )
 {
@@ -2270,7 +2270,7 @@ void TeamFortress_AssaultWeapon(  )
 	}
 	self->current_weapon = WEAP_ASSAULT_CANNON;
 	W_SetCurrentAmmo(  );
-};
+}
 
 char   *explode_msgs[] = {
 	"%s wouldn't let go of his gifts!\n",
@@ -2411,7 +2411,7 @@ void TeamFortress_ExplodePerson(  )
 		}
 	}
 	dremove( self );
-};
+}
 
 void NormalGrenadeTouch(  )
 {
@@ -2420,7 +2420,7 @@ void NormalGrenadeTouch(  )
 	sound( self, 1, "weapons/bounce.wav", 1, 1 );
 	if ( ( self->s.v.velocity[0] == 0 ) && ( self->s.v.velocity[1] == 0 ) && ( self->s.v.velocity[2] == 0 ) )
 		SetVector( self->s.v.avelocity, 0, 0, 0 );
-};
+}
 
 void NormalGrenadeExplode(  )
 {
@@ -2433,7 +2433,7 @@ void NormalGrenadeExplode(  )
 	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
 	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
 	dremove( self );
-};
+}
 void TeamFortress_DisplayDetectionItems(  )
 {
 	gedict_t *Goal;
@@ -2482,7 +2482,7 @@ void TeamFortress_DisplayDetectionItems(  )
 	} else
 		return;
 
-};
+}
 
 
 void BioInfection_Decay(  )
@@ -2541,7 +2541,7 @@ void BioInfection_Decay(  )
 	tf_data.deathmsg = DMSG_BIOWEAPON;
 	TF_T_Damage( owner, self, enemy, 8, 1, 0 );
 	SpawnBlood( owner->s.v.origin, 30 );
-};
+}
 
 
 void BioInfection_MonsterDecay(  )
@@ -2551,7 +2551,7 @@ void BioInfection_MonsterDecay(  )
 	SpawnBlood( PROG_TO_EDICT( self->s.v.enemy )->s.v.origin, 20 );
 	if ( PROG_TO_EDICT( self->s.v.enemy )->s.v.health < 1 )
 		dremove( self );
-};
+}
 
 void TeamFortress_Alias( char *halias, int himpulse1, int himpulse2 )
 {
@@ -2562,7 +2562,7 @@ void TeamFortress_Alias( char *halias, int himpulse1, int himpulse2 )
 		stuffcmd( self, ";wait; impulse %d", himpulse2 );
 	}
 	stuffcmd( self, "\"\n" );
-};
+}
 
 void TeamFortress_Regenerate(  )
 {
@@ -2594,7 +2594,7 @@ void TeamFortress_Regenerate(  )
 		owner->s.v.health = owner->s.v.max_health;
 
 	owner->s.v.currentammo = owner->ammo_medikit;
-};
+}
 
 void TeamFortress_RegenerateCells(  )
 {
@@ -2625,7 +2625,7 @@ void TeamFortress_RegenerateCells(  )
 		if ( owner->s.v.ammo_cells > owner->maxammo_cells )
 			owner->s.v.ammo_cells = owner->maxammo_cells;
 	}
-};
+}
 
 
 void TeamFortress_AutoID(  )
@@ -2637,7 +2637,7 @@ void TeamFortress_AutoID(  )
 	self = PROG_TO_EDICT( self->s.v.owner );
 	TeamFortress_ID(  );
 	self = oldself;
-};
+}
 
 
 
@@ -2703,7 +2703,7 @@ void PlayerObserverMode(  )
 	G_sprint( self, 2, "Observer mode\n" );
 	CenterPrint( self, "\n" );
 	stuffcmd( self, "cl_rollangle 0\n" );
-};
+}
 
 
 float crossproduct( vec3_t veca, vec3_t vecb )
@@ -2712,7 +2712,7 @@ float crossproduct( vec3_t veca, vec3_t vecb )
 
 	result = veca[0] * vecb[1] - vecb[0] * veca[1];
 	return result;
-};
+}
 
 void TF_AddFrags( gedict_t * pl, int fr )
 {
@@ -2744,7 +2744,7 @@ void TF_AddFrags( gedict_t * pl, int fr )
 		if ( !( tf_data.toggleflags & TFLAG_TEAMFRAGS ) )
 			pl->s.v.frags = pl->real_frags;
 	}
-};
+}
 
 char   *ec_strings[] = {
 	"",
@@ -2767,18 +2767,18 @@ void TeamFortress_ExecClassScript( gedict_t * p )
 
 	if ( GetInfokeyString( p, "ec", "exec_class", st, sizeof( st ), "" ) )
 	{
-		if ( stricmp( st, "on" ) )
+		if ( Q_stricmp( st, "on" ) )
 			return;
 	} else
 	{
 		pl_set = GetInfokeyInt( p, "s", NULL, 0 );
 		if ( !( pl_set & TF_EXEC_CLASS_MASK ) )
 			return;
-	};
+	}
 	if ( !p->playerclass || p->playerclass > 9 )
 		return;
 	stuffcmd( p, ec_strings[p->playerclass] );
-};
+}
 
 void TeamFortress_ExecMapScript( gedict_t * p )
 {
@@ -2787,18 +2787,18 @@ void TeamFortress_ExecMapScript( gedict_t * p )
 
 	if ( GetInfokeyString( p, "em", "exec_map", st, sizeof( st ), "" ) )
 	{
-		if ( stricmp( st, "on" ) )
+		if ( Q_stricmp( st, "on" ) )
 			return;
 	} else
 	{
 		pl_set = GetInfokeyInt( p, "s", NULL, 0 );
 		if ( !( pl_set & TF_EXEC_MAP_MASK ) )
 			return;
-	};
+	}
 
 	stuffcmd( p, "exec mapdefault.cfg\n" );
 	stuffcmd( p, "exec %s.cfg", g_globalvars.mapname );
-};
+}
 
 void KickCheater( gedict_t * p )
 {
@@ -2815,4 +2815,4 @@ void KickCheater( gedict_t * p )
 	p->tfstate = p->tfstate | TFSTATE_CANT_MOVE;
 	TeamFortress_SetSpeed( p );
 	TeamFortress_RemoveTimers(  );
-};
+}

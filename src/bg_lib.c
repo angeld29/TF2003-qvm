@@ -1323,12 +1323,13 @@ int sscanf( const char *buffer, const char *fmt, ... ) {
 	return count;
 }
 
-int sprintf( char *str, const char *fmt, va_list argptr ) 
+int sprintf( char *str, const char *fmt, ... ) 
 {
 	va_list		argptr;
 	int		ret;
 	va_start (argptr, fmt);
 	ret =  vsprintf (str, fmt, argptr);
 	va_end (argptr);
+	return ret;
 }
 #endif

@@ -316,7 +316,7 @@ void StartFrame( int time )
 {
 	timelimit = trap_cvar( "timelimit" ) * 60;
 	fraglimit = trap_cvar( "fraglimit" );
-	teamplay = trap_cvar( "teamplay" );
+	teamplay  = trap_cvar( "teamplay" );
 	deathmatch = trap_cvar( "deathmatch" );
 
 	framecount = framecount + 1;

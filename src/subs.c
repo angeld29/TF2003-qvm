@@ -135,7 +135,7 @@ void  SUB_CalcAngleMoveEnt(gedict_t* ent, vec3_t destangle, float tspeed, void()
  self = ent;
  SUB_CalcAngleMove(destangle, tspeed, func);
  self = stemp;
-};
+}
 
 void func) SUB_CalcAngleMove(vec3_t destangle, float tspeed, void()
 {
@@ -153,7 +153,7 @@ void func) SUB_CalcAngleMove(vec3_t destangle, float tspeed, void()
  self.think1 = func;
  self.finalangle = destangle;
  self->s.v.think = (func_t) SUB_CalcAngleMoveDone;
-};
+}
 
 void SUB_CalcAngleMoveDone()
 {

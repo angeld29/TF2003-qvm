@@ -31,7 +31,7 @@ void button_return(  )
 
 	if ( self->s.v.health )
 		self->s.v.takedamage = DAMAGE_YES;	// can be shot again
-};
+}
 
 void button_blocked(  )
 {				// do nothing, just don't ome all the way back out
@@ -48,7 +48,7 @@ void button_fire(  )
 
 	SUB_CalcMove( self->pos2, self->speed, button_wait );
 
-};
+}
 
 void button_use(  )
 {
@@ -87,7 +87,7 @@ void button_touch(  )
 	}
 	self->s.v.enemy = EDICT_TO_PROG( other );
 	button_fire(  );
-};
+}
 
 void button_killed(  )
 {
@@ -98,7 +98,7 @@ void button_killed(  )
 	self->s.v.takedamage = DAMAGE_NO;	// wil be reset upon return
 
 	button_fire(  );
-};
+}
 
 /*QUAKED func_button (0 .5 .8) ?
 When a button is touched, it moves some distance in the direction of it's angle, triggers all of it's targets, waits some time, then returns to it's original position where it can be triggered again.
@@ -183,4 +183,4 @@ void SP_func_button(  )
 
 	if ( ( int ) ( self->s.v.spawnflags ) & 32 )
 		button_fire(  );
-};
+}

@@ -124,7 +124,7 @@ void NapalmGrenadeTouch(  )
 	sound( self, 1, "weapons/bounce.wav", 1, 1 );
 	if ( VectorCompareF( self->s.v.velocity, 0, 0, 0 ) )
 		SetVector( self->s.v.avelocity, 0, 0, 0 );
-};
+}
 
 void NapalmGrenadeNetThink(  )
 {
@@ -201,7 +201,7 @@ void NapalmGrenadeExplode(  )
 	self->s.v.movetype = MOVETYPE_NONE;
 	SetVector( self->s.v.velocity, 0, 0, 0 );
 
-};
+}
 #else
 void NapalmGrenadeExplode(  )
 {
@@ -227,7 +227,7 @@ void NapalmGrenadeExplode(  )
 	}
 	self->s.v.solid = SOLID_NOT;
 	BecomeExplosion(  );
-};
+}
 #endif
 void NapalmGrenadeLaunch( vec3_t org, gedict_t * shooter )
 {
@@ -807,7 +807,7 @@ void TeamFortress_IncendiaryCannon(  )
 	}
 	self->current_weapon = WEAP_INCENDIARY;
 	W_SetCurrentAmmo(  );
-};
+}
 
 void TeamFortress_FlameThrower(  )
 {

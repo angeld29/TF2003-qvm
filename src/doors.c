@@ -360,7 +360,7 @@ gedict_t *spawn_field( vec3_t fmins, vec3_t fmaxs )
 	setsize( trigger, fmins[0] - 60, fmins[1] - 60, fmins[2] - 8, fmaxs[0] + 60, fmaxs[1] + 60, fmaxs[2] + 8 );
 	return ( trigger );
 
-};
+}
 
 qboolean EntitiesTouching( gedict_t * e1, gedict_t * e2 )
 {

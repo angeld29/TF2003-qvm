@@ -62,4 +62,4 @@ void TeamFortress_CTF_FlagInfo(  )
 				G_sprint( self, 2, "The enemy flag is in their base.\n" );
 		}
 	}
-};
+}

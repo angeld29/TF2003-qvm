@@ -30,7 +30,7 @@ typedef struct gedict_s {
 	float           maxspeed, gravity;
 	char           *mdl;
 	char           *killtarget;
-	int           worldtype;	// 0=medieval 1=metal 2=base
+	int            worldtype;	// 0=medieval 1=metal 2=base
 	char           *map;
 //player
 	int             walkframe;

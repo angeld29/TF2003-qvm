@@ -16,6 +16,7 @@
 
 #include "menu.h"
 #define NEWHWGUY
+#define FIXDETPACKDROP
 #ifdef TG
 #include "tg.h"
 #endif
@@ -84,7 +85,7 @@ void    	sound( gedict_t * ed, int channel, char *samp, int vol, float att );
 gedict_t 	*checkclient(  );
 void    	traceline( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z,
 		   int nomonst, gedict_t * ed );
-void tracearea( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z, int nomonst, gedict_t * ed ,
+void 		tracearea( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z, int nomonst, gedict_t * ed ,
 			float min_x, float min_y, float min_z, 
 			float max_x, float max_y, float max_z);
 void    	stuffcmd( gedict_t * ed, const char *fmt , ...);
@@ -307,3 +308,4 @@ void Menu_Team_Input(int impulse);
 void Menu_Class_Input(int impulse);
 
 #endif
+

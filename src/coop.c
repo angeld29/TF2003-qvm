@@ -6,7 +6,7 @@ void DroppedKeyThink(  )
 	self->s.v.think = ( func_t ) SUB_Null;
 	self->s.v.touch = ( func_t ) key_touch;
 	self->s.v.owner = EDICT_TO_PROG( world );
-};
+}
 
 char   *key_models1[3] = { "progs/w_s_key.mdl", "progs/m_s_key.mdl", "progs/b_s_key.mdl" };
 char   *key_names1[3] = { "silver key", "silver runekey", "silver keycard" };
@@ -62,7 +62,7 @@ void DropKey(  )
 		newmis->s.v.nextthink = g_globalvars.time + 1.5;
 	} else
 		G_sprint( self, 2, "You don't have a key\n" );
-};
+}
 
 int DoorShouldOpen(  )
 {
@@ -119,4 +119,4 @@ int DoorShouldOpen(  )
 		G_bprint( 2, "gold" );
 	G_bprint( 2, " door has been unlocked\n" );
 	return 1;
-};
+}

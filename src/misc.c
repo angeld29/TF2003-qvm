@@ -243,7 +243,7 @@ void fire_touch(  )
 	if ( other->s.v.takedamage )
 		TF_T_Damage( other, self, self, 20, 0, 16 );
 	dremove( self );
-};
+}
 
 //============================================================================
 

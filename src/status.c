@@ -18,7 +18,7 @@ void CenterPrint( gedict_t * pl, const char *fmt, ... )
 	trap_CenterPrint( NUM_FOR_EDICT( pl ), text );
 
 	pl->StatusRefreshTime = g_globalvars.time + 1.5;
-};
+}
 
 void StatusPrint( gedict_t * pl, float fTime, const char *fmt, ... )
 {
@@ -32,7 +32,7 @@ void StatusPrint( gedict_t * pl, float fTime, const char *fmt, ... )
 	trap_CenterPrint( NUM_FOR_EDICT( pl ), text );
 
 	pl->StatusRefreshTime = g_globalvars.time + fTime;
-};
+}
 
 char   *teamnames[5] = {
 	"  Blue:",
@@ -146,7 +146,7 @@ void RefreshStatusBar( gedict_t * pl )
 	*sbar_p = 0;
 //      *(char*)0 = 0;
 	trap_CenterPrint( NUM_FOR_EDICT( pl ), sbar_str );
-};
+}
 
 int     SbarReSizes[] = { 0, 5, 12, 17, 23, 25, 35, 50, 70 };
 char   *AddStatusSize( gedict_t * pl, char *strp )
@@ -165,7 +165,7 @@ char   *AddStatusSize( gedict_t * pl, char *strp )
 		*strp++ = '\n';
 	*strp = 0;
 	return strp;
-};
+}
 
 char   *sbar_msg[] = {
 	"Status Bar Res set to 320x200.\n",
@@ -184,7 +184,7 @@ void StatusRes( int res )
 		res = 8;
 	self->StatusBarRes = res;
 	G_sprint( self, 2, sbar_msg[res] );
-};
+}
 
 
 char   *ClipSizeToString( gedict_t * pl, char *str )
@@ -231,7 +231,7 @@ char   *ClipSizeToString( gedict_t * pl, char *str )
 	sprintf( str, "  ÃÌÉĞ:%2d", num );
 	while ( *( ++str ) );
 	return str;
-};
+}
 char   *spy_teams[] = {
 	"  ",
 	"Blue",
@@ -279,7 +279,7 @@ char   *DisguiseToSbar( gedict_t * pl, char *str )
 		 spy_teams[pl->undercover_team], spy_skins[pl->undercover_skin] );
 	while ( *( ++str ) );
 	return str;
-};
+}
 
 char   *SentryInfoToSBar( gedict_t * pl, char *str )
 {
@@ -329,6 +329,6 @@ char   *DispHealthToSbar( gedict_t * pl, char *str )
 		sprintf( str, "DISP: %3d ", ( int ) te->s.v.health );
 		while ( *( ++str ) );
 		return str;
-	};
+	}
 	return str;
-};
+}

@@ -169,7 +169,7 @@ void TeamFortress_MOTD(  )
 		TeamFortress_Alias( "detsentry", 188, 0 );
 		TeamFortress_Alias( "detdispenser", 187, 0 );
 	}
-};
+}
 
 void TeamFortress_HelpMap(  )
 {
@@ -185,4 +185,4 @@ void TeamFortress_HelpMap(  )
 		}
 	}
 	G_sprint( self, 2, "There is no help for this map.\n" );
-};
+}

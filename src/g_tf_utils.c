@@ -96,7 +96,7 @@ void KickPlayer( int psize, gedict_t * p )
 		trap_WriteByte( MSG_ONE, SVC_SMALLKICK );
 	else
 		trap_WriteByte( MSG_ONE, SVC_BIGKICK );
-};
+}
 
 void muzzleflash(  )
 {

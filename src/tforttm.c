@@ -39,7 +39,7 @@ int TeamFortress_TeamPutPlayerInTeam(  )
 		}
 	}
 	return TeamFortress_TeamSet( likely_team );
-};
+}
 
 int     team_colors[5] = { 0, 14, 5, 13, 12 };
 int     team_top_colors[5] = { 0, 13, 4, 12, 11 };
@@ -50,7 +50,7 @@ int TeamFortress_TeamGetColor( int tno )
 		return team_colors[tno];
 	else
 		return 0;
-};
+}
 
 int TeamFortress_TeamGetTopColor( int tno )
 {
@@ -58,7 +58,7 @@ int TeamFortress_TeamGetTopColor( int tno )
 		return team_top_colors[tno];
 	else
 		return 0;
-};
+}
 
 /*void (float tno) TeamFortress_TeamSetColor =
 {
@@ -181,7 +181,7 @@ int TeamFortress_TeamSet( int tno )
 		}
 	}
 	return 1;
-};
+}
 
 void TeamFortress_CheckTeamCheats(  )
 {
@@ -309,7 +309,7 @@ void TeamFortress_CheckTeamCheats(  )
   }
  }
 */
-};
+}
 
 
 int TeamFortress_TeamGetScore( int tno )
@@ -337,7 +337,7 @@ void TeamFortress_TeamIncreaseScore( int tno, int scoretoadd )
 				e->s.v.frags = TeamFortress_TeamGetScore( tno );
 		}
 	}
-};
+}
 
 
 int TeamFortress_TeamGetScoreFrags( int tno )
@@ -352,7 +352,7 @@ int TeamFortress_TeamGetScoreFrags( int tno )
 		return teamfrags[tno];
 
 	return 0;
-};
+}
 
 int TeamFortress_TeamGetLives( int tno )
 {
@@ -360,7 +360,7 @@ int TeamFortress_TeamGetLives( int tno )
 		return 0;
 
 	return teamlives[tno];
-};
+}
 
 int TeamFortress_TeamGetNoPlayers( int tno )
 {
@@ -373,7 +373,7 @@ int TeamFortress_TeamGetNoPlayers( int tno )
 			size_team++;
 	}
 	return size_team;
-};
+}
 
 int TeamFortress_GetNoPlayers(  )
 {
@@ -383,7 +383,7 @@ int TeamFortress_GetNoPlayers(  )
 	while ( search = find( search, FOFS( s.v.classname ), "player" ) )
 		nump++;
 	return nump;
-};
+}
 
 
 int TeamFortress_TeamGetMaxPlayers( int tno )
@@ -391,7 +391,7 @@ int TeamFortress_TeamGetMaxPlayers( int tno )
 	if ( tno <= 0 || tno > 4 )
 		return 0;
 	return teammaxplayers[tno];
-};
+}
 
 
 int TeamFortress_TeamGetWinner(  )
@@ -408,7 +408,7 @@ int TeamFortress_TeamGetWinner(  )
 		}
 	}
 	return highestteam;
-};
+}
 
 int TeamFortress_TeamGetSecond(  )
 {
@@ -428,7 +428,7 @@ int TeamFortress_TeamGetSecond(  )
 		}
 	}
 	return secondteam;
-};
+}
 
 
 
@@ -462,7 +462,7 @@ void TeamFortress_TeamShowScores( int all )
 					  TeamFortress_TeamGetColorString( i ), TeamFortress_TeamGetScore( i ) );
 		}
 	}
-};
+}
 
 //////////////////////
 char   *colornames[15] = { "DarkBlue",
@@ -490,7 +490,7 @@ char   *TeamFortress_TeamGetColorString( int tno )
 	if ( col > 14 )
 		col = 0;
 	return colornames[col];
-};
+}
 
 void TeamFortress_TeamShowMemberClasses( gedict_t * Player )
 {
@@ -722,7 +722,7 @@ void CalculateTeamEqualiser(  )
 		}
 	}
 	self->s.v.nextthink = g_globalvars.time + 10;
-};
+}
 
 void SetupTeamEqualiser(  )
 {
@@ -735,7 +735,7 @@ void SetupTeamEqualiser(  )
 	TE->s.v.classname = "Team Equaliser";
 	TE->s.v.think = ( func_t ) CalculateTeamEqualiser;
 	TE->s.v.nextthink = g_globalvars.time + 30;
-};
+}
 
 float TeamEqualiseDamage( gedict_t * targ, gedict_t * attacker, float damage )
 {
@@ -766,7 +766,7 @@ float TeamEqualiseDamage( gedict_t * targ, gedict_t * attacker, float damage )
 	}
 	newdam = newdam * 1 / adv;
 	return newdam;
-};
+}
 
 void TeamFortress_StatusQuery(  )
 {
@@ -780,7 +780,7 @@ void TeamFortress_StatusQuery(  )
 		  teamadvantage[1], teamadvantage[2], teamadvantage[3], teamadvantage[4] );
 
 	G_sprint( self, 2, "Teamplay is %d\n", teamplay );
-};
+}
 
 
 int TeamFortress_TeamGetIllegalClasses( int tno )
@@ -865,4 +865,4 @@ void teamsprint( int tno, gedict_t * ignore, char *st )
 		if ( te->team_no == tno && te != ignore )
 			G_sprint( te, 2, st );
 	}
-};
+}

@@ -90,7 +90,7 @@ void SP_path_corner(  )
  self.ideal_yaw = vectoyaw(self->s.v.enemy->s.v.origin - self->s.v.origin);
  self->s.v.nextthink = g_globalvars.time + 0.1;
  SUB_AttackFinished(1);
-};
+}
 
 float FindTarget()
 {

@@ -902,7 +902,7 @@ void Engineer_RemoveBuildings( gedict_t * eng )
  G_sprint(self, 2, "You have upgraded/fixed/reloaded sentrygun\n");
  sg->s.v.ammo_shells = 144;
  sg->s.v.ammo_rockets = 20;
-};
+}
 
 void Eng_DispLoad()
 {
@@ -929,7 +929,7 @@ void Eng_DispLoad()
  bprint(2, "maximum detdispenser damage - ");
  bprint(2, st);
  bprint(2, "\n");
-};
+}
 
 void Eng_DispUnload()
 {
@@ -956,7 +956,7 @@ void Eng_DispUnload()
  bprint(2, "maximum detdispenser damage - ");
  bprint(2, st);
  bprint(2, "\n");
-};
+}
 
 void Eng_SGReload()
 {
@@ -979,7 +979,7 @@ void Eng_SGReload()
  sg->s.v.ammo_rockets = sg.maxammo_rockets;
  sound(sg, 3, "weapons/turrset.wav", 1, 1);
  G_sprint(self, 2, "You have fixed/reloaded ONE sentrygun\n");
-};
+}
 */
 
 #endif

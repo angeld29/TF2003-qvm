@@ -321,7 +321,7 @@ int Sentry_FindTarget_Angel(  )
 	}
 	self->s.v.enemy = EDICT_TO_PROG( world );
 	return 0;
-};
+}
 
 //////////////////////////////////////////////////////////////////////
 int Sentry_FindTarget(  )
@@ -423,7 +423,7 @@ void Sentry_Die(  )
 	self->real_owner->has_sentry = 0;
 	self->s.v.think = ( func_t ) Sentry_Explode;
 	self->s.v.nextthink = g_globalvars.time + 0.1;
-};
+}
 #else
 void SG_Static(  )
 {
@@ -437,7 +437,7 @@ void SG_Static(  )
 		self->s.v.health = 0;
 	}
 	self->s.v.nextthink = g_globalvars.time + 0.5;
-};
+}
 
 void Sentry_Die(  )
 {

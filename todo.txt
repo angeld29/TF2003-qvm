@@ -12,7 +12,7 @@ disable_reload
 
 
 [+] no id with newgas
-[ ] print rules topcolor check,gas
+[+] print rules topcolor check,gas
 [+] new server defaults
 [+] hwguy gren jump
 [+] new traceline in server
