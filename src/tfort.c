@@ -9,6 +9,7 @@ void    TeamFortress_ExplodePerson(  );
 gedict_t *SelectSpawnPoint(  );
 
 void    TeamFortress_AmmoboxTouch(  );
+void    TeamFortress_AmmoboxRemove(  );
 void    FlareGrenadeExplode(  );
 void    FlareGrenadeTouch(  );
 void    NormalGrenadeTouch(  );
@@ -821,7 +822,11 @@ void TeamFortress_ShowTF(  )
 		G_sprint( self, 2, "Sentry Shells Fire: NEW\n" );
 		break;
 	}
-
+	if(tf_data.sg_rfire)
+		G_sprint( self, 2, "Sentry Rockets Fire: NEW\n" );
+	else
+		G_sprint( self, 2, "Sentry Rockets Fire: OLD\n" );
+	
 	G_sprint( self, 2, "New Gas Options %d:\n" ,tf_data.new_gas );
 	if( (tf_data.new_gas & GAS_MASK_COLOR) && !(tf_data.new_gas & GAS_MASK_ALLSPYS))
 	{
@@ -2098,7 +2103,7 @@ void TeamFortress_DropAmmo( int type )
 	setsize( newmis, 0, 0, 0, 0, 0, 0 );
 	setorigin( newmis, PASSVEC3( self->s.v.origin ) );
 	newmis->s.v.nextthink = g_globalvars.time + 30;
-	newmis->s.v.think = ( func_t ) SUB_Remove;
+	newmis->s.v.think = ( func_t ) TeamFortress_AmmoboxRemove;//SUB_Remove;
 	newmis->s.v.touch = ( func_t ) TeamFortress_AmmoboxTouch;
 	newmis->s.v.skin = type - 1;
 	if ( tf_data.birthday == 1 && g_random(  ) < 0.6 )
@@ -2107,6 +2112,12 @@ void TeamFortress_DropAmmo( int type )
 		setmodel( newmis, "progs/ammobox.mdl" );
 }
 
+
+void    TeamFortress_AmmoboxRemove(  )
+{
+	decrement_team_ammoboxes( self->team_no );
+	SUB_Remove();
+};
 
 void TeamFortress_AmmoboxTouch(  )
 {
@@ -2204,7 +2215,7 @@ void TeamFortress_AmmoboxTouch(  )
  return 0;
 };*/
 
-void RemoveOldAmmobox( int tno )
+void RemoveOldAmmoboxOld( int tno )
 {
 	int     index;
 	gedict_t *old;
@@ -2223,13 +2234,44 @@ void RemoveOldAmmobox( int tno )
 			return;
 		if ( old->team_no == tno || !tno )
 		{
-			old->s.v.think = ( func_t ) SUB_Remove;
+			old->s.v.think = ( func_t ) TeamFortress_AmmoboxRemove;//SUB_Remove;
 			old->s.v.nextthink = g_globalvars.time + 0.1;
 			index--;
-			decrement_team_ammoboxes( old->team_no );
+//			decrement_team_ammoboxes( old->team_no );
 		}
 		old = find( old, FOFS( s.v.classname ), "ammobox" );
 	}
+}
+
+void RemoveOldAmmobox( int tno )
+{
+	float time;
+	gedict_t *old,*lastgood=NULL;
+
+	time = g_globalvars.time + 35;
+
+	for(old = world; old = find( old, FOFS( s.v.classname ), "ammobox" );)
+	{
+	        if( old->team_no != tno && tno )
+	        	continue;
+		if( old->s.v.nextthink > time)
+			continue;
+
+		if( old->s.v.nextthink <= g_globalvars.time + 0.1 )
+			continue;
+		if( old->s.v.think != ( func_t ) TeamFortress_AmmoboxRemove )
+		{
+			G_dprint("Warning: ammobox ent with bad remove func\n");
+		}
+		time = old->s.v.nextthink;
+		lastgood = old;
+	}
+	if(lastgood)
+	{
+     		lastgood->s.v.think = ( func_t ) TeamFortress_AmmoboxRemove;
+     		lastgood->s.v.nextthink = g_globalvars.time + 0.1;
+	}
+
 }
 
 void increment_team_ammoboxes( int tno )

@@ -646,9 +646,174 @@ void    FireSentryLighting( gedict_t * targ )
 	}
 }
 //////////////////////////////////////////////////////////////////////////////
+void LaunchSGRocketOLD(gedict_t*targ)
+{
+		vec3_t   vtemp;
+
+       	newmis = spawn(  );
+       	g_globalvars.newmis = EDICT_TO_PROG( newmis );
+       	newmis->s.v.owner = EDICT_TO_PROG( self );
+       	newmis->s.v.movetype = MOVETYPE_FLYMISSILE;
+       	newmis->s.v.solid = SOLID_BBOX;
+
+
+       	newmis->s.v.weapon = DMSG_SENTRYGUN_ROCKET;
+       	newmis->s.v.touch = ( func_t ) T_MissileTouch;
+       	newmis->s.v.nextthink = g_globalvars.time + 5;
+       	newmis->s.v.think = ( func_t ) SUB_Remove;
+       	
+       	setmodel( newmis, "progs/missile.mdl" );
+       	setsize( newmis, 0, 0, 0, 0, 0, 0 );
+
+       	VectorSubtract( targ->s.v.origin, self->s.v.origin, newmis->s.v.velocity );
+       	VectorNormalize( newmis->s.v.velocity );
+       	VectorScale( newmis->s.v.velocity, 800, newmis->s.v.velocity );
+       	
+       	vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
+
+       	makevectors( self->s.v.angles);
+       	VectorScale( g_globalvars.v_forward, 8, vtemp );
+       	VectorAdd( vtemp, self->s.v.origin, vtemp );
+       	vtemp[2] += 16;
+       	setorigin( newmis, PASSVEC3( vtemp ) );
+
+
+}
+//////////////////////////////////////////////////////////////////////////////
+int CheckAim(vec3_t src, gedict_t*targ, float vel, float time,vec3_t vTarget)
+{
+	vec3_t  vtemp;
+	float dist;
+
+	
+        VectorScale(targ->s.v.velocity,time ,vTarget);
+        VectorAdd(vTarget, targ->s.v.origin, vTarget);
+
+//        VectorScale(self->accel,time*time*0.5,vtemp);
+//        VectorAdd(vTarget, vtemp, vTarget);
+
+	if(!((int)targ->s.v.flags & FL_ONGROUND ))
+	{
+		
+		vTarget[2] -= 0.5*time*time*sv_gravity;
+	}
+
+	VectorSubtract(vTarget, src, vtemp);
+	dist = vlen(vtemp);
+	if( fabs(vel*(time+0.05) - dist) < 40)
+		return 1;
+	else 
+		return 0;
+
+}
+void LaunchSGRocketNEW(gedict_t*targ)
+{
+	vec3_t   vtemp,dir,norm_dir;
+	vec3_t  src;
+	vec3_t  dst;
+	float time;
+
+       	newmis = spawn(  );
+       	g_globalvars.newmis = EDICT_TO_PROG( newmis );
+       	newmis->s.v.owner = EDICT_TO_PROG( self );
+       	newmis->s.v.movetype = MOVETYPE_FLYMISSILE;
+       	newmis->s.v.solid = SOLID_BBOX;
+
+
+       	newmis->s.v.weapon = DMSG_SENTRYGUN_ROCKET;
+       	newmis->s.v.touch = ( func_t ) T_MissileTouch;
+       	newmis->s.v.nextthink = g_globalvars.time + 5;
+       	newmis->s.v.think = ( func_t ) SUB_Remove;
+       	
+       	setmodel( newmis, "progs/missile.mdl" );
+       	setsize( newmis, 0, 0, 0, 0, 0, 0 );
+
+//try fire to targ origin
+
+       	makevectors( self->s.v.angles);
+       	VectorScale( g_globalvars.v_forward, 8, vtemp );
+       	VectorAdd( vtemp, self->s.v.origin, src );
+       	src[2] += 16;
+
+	
+	VectorCopy( targ->s.v.origin, dst );
+	VectorSubtract( dst, src, dir );
+
+	normalize(dir,norm_dir);
+
+	//чтобы не попадать в подставку
+	traceline( PASSVEC3( src ), PASSVEC3( dst ), 0, self );
+	
+	if( (PROG_TO_EDICT(g_globalvars.trace_ent) == self->trigger_field) && vlen(dir) > 100 )
+	{
+		 VectorScale(norm_dir, 60, vtemp);
+		 VectorAdd(src,vtemp,src);
+	}
+
+	traceline( PASSVEC3( src ), PASSVEC3( dst ), 1, self );
+
+	if( g_globalvars.trace_fraction != 1 && vlen(dir) > 100 ) //FIX ME can shot trown wall??
+	{
+		 VectorScale(norm_dir, 60, vtemp);
+		 VectorAdd(src,vtemp,src);
+	}
+
+
+       	setorigin( newmis, PASSVEC3( src ) );
+//prediction
+        for ( time = 0 ; time < 3 ; time+=0.05 )
+        {
+        	if(CheckAim(src,targ,800,time,vtemp))
+        	{
+        	        traceline( PASSVEC3( src ), PASSVEC3( vtemp ), 1, self );
+        	        if( g_globalvars.trace_fraction != 1 )
+        	        	continue;
+        	        VectorCopy(vtemp,dst);
+        		break;
+        	}
+        }
+        if((int)targ->s.v.flags & FL_ONGROUND )
+        {
+ 	        VectorAdd(dst,targ->s.v.mins,vtemp);
+
+ 	        traceline( PASSVEC3( src ), PASSVEC3( vtemp ), 1, self );
+ 	        if(g_globalvars.trace_fraction == 1)
+ 	        	VectorCopy(vtemp,dst);
+        }else
+        {
+#define MAX_BOTTOM_DISTANCE  100
+                VectorCopy(dst,vtemp);
+                vtemp[2] -= MAX_BOTTOM_DISTANCE;
+                traceline( PASSVEC3( dst ), PASSVEC3( vtemp ), 1, self );
+                if(g_globalvars.trace_fraction != 1)
+                {
+                	vtemp[2] = dst[2] - MAX_BOTTOM_DISTANCE*g_globalvars.trace_fraction;
+                	traceline( PASSVEC3( dst ), PASSVEC3( vtemp ), 1, self );
+ 	        	if(g_globalvars.trace_fraction == 1)
+ 	        		VectorCopy(vtemp,dst);
+                }
+        }
+
+#ifdef DEBUG_SG
+	trap_WriteByte(MULTICAST_PHS_R, SVC_TEMPENTITY);
+	trap_WriteByte(MULTICAST_PHS_R, TE_TAREXPLOSION);
+	trap_WriteCoord(MULTICAST_PHS_R, dst[0]);
+	trap_WriteCoord(MULTICAST_PHS_R, dst[1]);
+	trap_WriteCoord(MULTICAST_PHS_R, dst[2]);
+	trap_multicast(PASSVEC3(dst), 1);
+#endif
+
+       	VectorSubtract( dst, src, dir );
+       	normalize(dir,norm_dir);
+       	VectorScale( norm_dir, 800, newmis->s.v.velocity );
+
+       	vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
+}
+
+//////////////////////////////////////////////////////////////////////////////
 int Sentry_Fire(  )
 {
-	vec3_t  dir, vtemp;
+	vec3_t  dir;
 
 	gedict_t *enemy = PROG_TO_EDICT( self->s.v.enemy );
 
@@ -668,36 +833,16 @@ int Sentry_Fire(  )
 	{
 		Sentry_MuzzleFlash(  );
 		sound( self, 1, "weapons/rocket1i.wav", 1, 1 );
-		newmis = spawn(  );
-		g_globalvars.newmis = EDICT_TO_PROG( newmis );
-		newmis->s.v.owner = EDICT_TO_PROG( self );
-		newmis->s.v.movetype = MOVETYPE_FLYMISSILE;
-		newmis->s.v.solid = SOLID_BBOX;
 
-
-		newmis->s.v.weapon = 34;
-		newmis->s.v.touch = ( func_t ) T_MissileTouch;
-		newmis->s.v.nextthink = g_globalvars.time + 5;
-		newmis->s.v.think = ( func_t ) SUB_Remove;
-		
-		setmodel( newmis, "progs/missile.mdl" );
-		setsize( newmis, 0, 0, 0, 0, 0, 0 );
-
-		VectorSubtract( enemy->s.v.origin, self->s.v.origin, newmis->s.v.velocity );
-		VectorNormalize( newmis->s.v.velocity );
-		VectorScale( newmis->s.v.velocity, 800, newmis->s.v.velocity );
-		
-		vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
-
-		makevectors( self->s.v.angles);
-		VectorScale( g_globalvars.v_forward, 8, vtemp );
-		VectorAdd( vtemp, self->s.v.origin, vtemp );
-		vtemp[2] += 16;
-		setorigin( newmis, PASSVEC3( vtemp ) );
+	        if(tf_data.sg_rfire)
+	        	LaunchSGRocketNEW(enemy);
+	        else
+	        	LaunchSGRocketOLD(enemy); 
 
 		self->super_damage_finished = g_globalvars.time + 3;
+#ifndef DEBUG_SG
 		self->s.v.ammo_rockets = self->s.v.ammo_rockets - 1;
-		
+#endif		
 		if ( self->s.v.ammo_rockets == 10 )
 			G_sprint( self->real_owner, 2, "Sentry Gun is low on rockets.\n" );
 	}

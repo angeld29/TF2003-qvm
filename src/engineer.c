@@ -212,7 +212,7 @@ void EMPGrenadeExplode(  )
 		te->s.v.solid = SOLID_NOT;
 		tf_data.deathmsg = 30;
 		T_RadiusDamage( te, PROG_TO_EDICT( self->s.v.owner ), expsize, te );
-		te->s.v.think = ( func_t ) SUB_Remove;
+		te->s.v.think = ( func_t ) TeamFortress_AmmoboxRemove;//SUB_Remove;
 		te->s.v.nextthink = g_globalvars.time + 0.1;
 		trap_WriteByte( 4, 23 );
 		trap_WriteByte( 4, 3 );

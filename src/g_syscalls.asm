@@ -57,10 +57,10 @@ equ	sqrt			-53
 equ     floor			-54
 equ	ceil			-55
 equ     acos			-56
-equ     trap_CmdArgc            -57                
+equ     trap_CmdArgc            -57
 equ     trap_CmdArgv            -58
 
-equ     trap_TraceCapsule          -59
+equ     trap_TraceCapsule        -59
 
 equ	trap_FS_OpenFile         -60
 equ    	trap_FS_CloseFile        -61

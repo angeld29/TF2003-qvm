@@ -145,6 +145,12 @@ void TG_LoadSettings()
       	if( !strcmp(st, "mtfl2"))
       		tf_data.sg_sfire = SG_SFIRE_MTFL2;
       		
+	GetSVInfokeyString( "sg_rfire", NULL, st, sizeof( st ), "new" );
+
+	if( !strcmp(st, "new"))
+		tf_data.sg_rfire = true;
+	else
+		tf_data.sg_rfire = false;
 
        	tf_data.sgppl = GetSVInfokeyInt( "sgppl", NULL, 12 );
        	if ( tf_data.sgppl < 0 )

@@ -1325,16 +1325,23 @@ char* sentry_firetype_names[]=
 void 	TG_SGOptions_Menu(menunum_t menu)
 {
   char *s_sg_newfind,*s_sg_sfire, s_sgppl[80], *s_sg_fire,*s_sg_find,*s_sgfiretype,*s_sbar;
+  char *s_sg_rfire;
   
   if( tf_data.sg_newfind )
   {
   		s_sg_newfind =  "1)‰Sentry New Find Target ON  \n";
-        sprintf(s_sgppl,"2)-    %3d ppl emulation   3)+\n",tf_data.sgppl);
+//        sprintf(s_sgppl,"2)-    %3d ppl emulation   3)+\n",tf_data.sgppl);
+        sprintf(s_sgppl,"       %3d ppl emulation      \n",tf_data.sgppl);
   }else
   {
   	s_sg_newfind = "1)‡Sentry New Find Target OFF \n";
   	sprintf(s_sgppl,"\n");
   }
+  if ( tf_data.sg_rfire)
+  	s_sg_rfire = "3)‰Sentry Rocket Fire: NEW    \n";
+  else
+  	s_sg_rfire = "3)‡Sentry Rocket Fire: OLD    \n";
+
 
   if(tf_data.sg_sfire >= SG_SFIRE_NUM)
   	tf_data.sg_sfire = 0;
@@ -1358,10 +1365,10 @@ void 	TG_SGOptions_Menu(menunum_t menu)
   	s_sbar = "8)‡Limited Eng Sbar           \n";
 
   CenterPrint(self,"Sentry Gun Options:\n"
-  		   "%s%s%s"
+  		   "%s%s%s%s"
   		   "%s%s%s%s"
   		   "9) Nothing                    \n",
-  		   s_sg_newfind, s_sgppl, s_sg_sfire,
+  		   s_sg_newfind, s_sgppl, s_sg_rfire,s_sg_sfire,
   		   s_sg_fire, s_sg_find, s_sgfiretype, s_sbar );
 }
 void 	TG_SGOptions_Menu_Input( int inp )
@@ -1371,7 +1378,7 @@ void 	TG_SGOptions_Menu_Input( int inp )
 		case 1:
 		        tf_data.sg_newfind = (tf_data.sg_newfind)?0:1;
 		       break;
-		case 3:
+/*		case 3:
 			if( tf_data.sg_newfind )
 				tf_data.sgppl++;
 			break;	
@@ -1381,7 +1388,10 @@ void 	TG_SGOptions_Menu_Input( int inp )
 				 if(tf_data.sgppl)
 				 	tf_data.sgppl--;
 			}
-			break;	
+			break;	*/
+		case 3:
+			tf_data.sg_rfire = (tf_data.sg_rfire)?0:1;
+			break;
 		case 4:
 			if( ++(tf_data.sg_sfire) >= SG_SFIRE_NUM)
 				tf_data.sg_sfire = 0;

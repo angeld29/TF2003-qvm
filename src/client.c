@@ -465,6 +465,12 @@ void DecodeLevelParms()
 			tf_data.sg_sfire = SG_SFIRE_MTFL2;
 			
 
+		GetSVInfokeyString( "sg_rfire", NULL, st, sizeof( st ), "old" );
+
+		if( !strcmp(st, "new"))
+			tf_data.sg_rfire = true;
+		else
+			tf_data.sg_rfire = false;
 
 		tf_data.sgppl = GetSVInfokeyInt( "sgppl", NULL, 12 );
 		if ( tf_data.sgppl < 0 )
@@ -1021,7 +1027,7 @@ void ClientKill()
 	self->suicide_time = g_globalvars.time + 5 + g_random() * 5;
 	G_bprint( PRINT_MEDIUM, "%s suicides\n", self->s.v.netname );
 
-	set_suicide_frame();
+//	set_suicide_frame();
 	self->s.v.modelindex = modelindex_player;
 
 	if ( self->tfstate & TFSTATE_INFECTED )
@@ -1802,6 +1808,7 @@ void PlayerPreThink()
 //      float   r;
 //      vec3_t  src;
 
+
 	if ( self->is_feigning && self->s.v.waterlevel == 1 )
 	{
 		self->s.v.watertype = -3;
@@ -2085,6 +2092,15 @@ void PlayerPostThink()
 //      float   aspeed;
 //      float   r;
 	float   fdmg;
+	float   dtime;
+
+	dtime = g_globalvars.time - self->lasttime;
+
+ 	VectorSubtract(self->s.v.velocity,self->lastvel,self->accel);
+	VectorScale(self->accel, 1/dtime , self->accel);
+	VectorCopy(self->s.v.velocity, self->lastvel);
+	self->lasttime = g_globalvars.time;
+	
 
 	if ( self->s.v.view_ofs[0] == 0 && self->s.v.view_ofs[1] == 0 && self->s.v.view_ofs[2] == 0 )
 		return;		// intermission or finale
@@ -2992,7 +3008,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
 		{
 			if ( targ == attacker->real_owner )
 			{
-				if ( tf_data.deathmsg == 34 )
+				if ( tf_data.deathmsg == DMSG_SENTRYGUN_ROCKET )
 					deathstring = "%s intercepts his sentry gun's rocket\n";
 				else
 				{
@@ -3009,7 +3025,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
 				{
 					TF_AddFrags( attacker->real_owner, 1 );
 					logfrag( attacker->real_owner, targ );
-					if ( tf_data.deathmsg == 34 )
+					if ( tf_data.deathmsg == DMSG_SENTRYGUN_ROCKET )
 					{
 						deathstring = "%s hates %s's sentry gun\n";
 					} else

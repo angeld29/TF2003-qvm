@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.6 2004-09-19 22:17:05 AngelD Exp $
+ *  $Id: g_main.c,v 1.7 2004-09-22 19:10:50 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -334,8 +334,9 @@ void G_EdictBlocked()
 
 }
 
-
+float sv_gravity;
 void ClearGlobals()
 {
 	damage_attacker = damage_inflictor = activator = self = other = newmis = world;
+	sv_gravity = trap_cvar("sv_gravity");
 }

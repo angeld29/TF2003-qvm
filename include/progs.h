@@ -276,7 +276,11 @@ typedef struct gedict_s {
 	float		allow_snip_time;
 	int		has_fake_gas_setinfo;
 	float		gren_eff_time;
+	vec3_t		lastvel,accel;
+	float		lasttime;
+
 } gedict_t;
+extern float sv_gravity;
 extern  int 		skill;
 extern  int 		number_of_teams; 
 extern  int             illegalclasses[5];
@@ -307,6 +311,7 @@ typedef enum
 	SG_SFIRE_MTFL2,
 	SG_SFIRE_NUM
 }sg_sfire_t;
+
 
 typedef struct {
 	int             toggleflags;
@@ -342,6 +347,7 @@ typedef struct {
 //	sentry_types_t	sentry_type;
 	qboolean	sg_newfind;
 	sg_sfire_t	sg_sfire;
+	qboolean	sg_rfire;
 	int		sgppl;
 	int		snip_range_fix,snip_fps,snip_ammo;
 	float		snip_time;

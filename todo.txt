@@ -1,36 +1,9 @@
-hook
-сообщения о смерти
 camera
-check team cheats
-suicide body
-
-Training Ground
-eff_flash
-eff_remove
-eff_conc
-disable_reload
-
-
-[+] no id with newgas
-[+] print rules topcolor check,gas
-[+] new server defaults
-[+] hwguy gren jump
-[+] new traceline in server
-[+] new check area
-[+] remove detpack exploded msg
-[+] sentry visibility on watervis 1
-[+] assault regulated min_shells
-[+] pyro in water
-[+] scanner settings
-[+] spy new gas
-[+] snip_ammo, snip_reload
-[+] add_pipe
++suicide body
 
 fix TeamFortress_TeamGetColor чтобы возвращал реальный цвет а не цвет+1
 
-//fixed API
-+on walk move save globals
-
-
-watervis действует на id
++watervis действует на id
 scanner на sentry, флаги
+sound on grens
+new menu system

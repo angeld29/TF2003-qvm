@@ -111,7 +111,7 @@ void TeamFortress_Discard(  )
 	setsize( newmis, 0, 0, 0, 0, 0, 0 );
 	setorigin( newmis, PASSVEC3( self->s.v.origin ) );
 	newmis->s.v.nextthink = g_globalvars.time + 30;
-	newmis->s.v.think = ( func_t ) SUB_Remove;
+	newmis->s.v.think = ( func_t ) TeamFortress_AmmoboxRemove;//	SUB_Remove;
 	newmis->s.v.touch = ( func_t ) TeamFortress_AmmoboxTouch;
 	setmodel( newmis, "progs/backpack.mdl" );
 }
@@ -461,10 +461,20 @@ void TeamFortress_ID(  )
 	VectorAdd( end, src, end );
 	traceline( PASSVEC3( src ), PASSVEC3( end ), 0, self );
 	trace_ent = PROG_TO_EDICT( g_globalvars.trace_ent );
+
 	if ( trace_ent == world )
 		return;
+
 	if ( VectorCompare( trace_ent->s.v.origin, world->s.v.origin ) )
 		return;
+
+    	if( GetSVInfokeyInt( "watervis", NULL, 0) == 0)
+	{
+	 traceline( PASSVEC3( src ), PASSVEC3( g_globalvars.trace_endpos ), 1, self );
+	 //inwater inopen startsolid set only if NOMONSTERS = 1
+	 if ( g_globalvars.trace_inopen && g_globalvars.trace_inwater )
+	 	return;
+	}
 
 	if ( streq( trace_ent->s.v.classname, "player" ) && trace_ent->s.v.health > 0 )
 	{

@@ -730,7 +730,6 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 		}
 	}
 
-//#ifndef MULTISCAN
 	if ( multiscan == 0 && saveent )
 	{
 		if ( saveent )
@@ -751,7 +750,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 			trap_WriteCoord( MSG_ONE, lightningvec[2] + 8 );
 		}
 	}
-//#endif
+
 	if ( typescan == 0 && any_detected2 == 0 )
 		G_sprint( self, PRINT_HIGH, "No blips.\n" );
 
