@@ -216,7 +216,11 @@ void            spawn_tdeath( vec3_t org, gedict_t * death_owner );
 void 		dremove( gedict_t* te );
 void 		display_location();
 
+//version.c
+extern char * ANGEL_VERSION;
+int build_number (void);
 //g_tf_utils.c
+
 qboolean 	GetSVInfokeyString( char*key, char* key2, char*value, int size, char*defaultval);
 int		GetSVInfokeyInt   ( char*key, char* key2, int defalutval);
 float 		GetSVInfokeyFloat ( char*key, char* key2, float defalutval);

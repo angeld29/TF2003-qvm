@@ -105,7 +105,7 @@ field_t         fields[] = {
 	{"g_a",			FOFS( goal_activation ),	F_INT},
 	{"goal_effects",	FOFS( goal_effects ),		F_INT},
 	{"g_e",			FOFS( goal_effects ),		F_INT},
-	{"items_allowed",	FOFS( items_allowed ),		F_INT},
+//	{"items_allowed",	FOFS( items_allowed ),		F_INT},
 	
         {"mdl",			FOFS( mdl ),			 F_LSTRING},
         {"killtarget",		FOFS( killtarget ),		 F_LSTRING},

@@ -289,8 +289,8 @@ void TeamFortress_EngineerBuild(  )
 	self->menu_count = MENU_REFRESH_RATE;
     } else
     {
-	if ( self->is_building == 1 )
-	{
+//	if ( self->is_building == 1 )
+//	{
 	    G_sprint( self, 2, "You stop building.\n" );
 	    self->tfstate = self->tfstate - ( self->tfstate & TFSTATE_CANT_MOVE );
 	    TeamFortress_SetSpeed( self );
@@ -305,7 +305,7 @@ void TeamFortress_EngineerBuild(  )
 	    self->is_building = 0;
 	    self->current_weapon = self->s.v.weapon;
 	    W_SetCurrentAmmo(  );
-	}
+//	}
     }
 }
 int CheckAreaNew( gedict_t * obj, gedict_t * builder )
@@ -861,7 +861,7 @@ void Engineer_RemoveBuildings( gedict_t * eng )
 void Eng_SGUp(  )
 {
     gedict_t *sg;
-    int numupg = 0;
+//    int numupg = 0;
 
     for ( sg = world; sg = find( sg, FOFS( s.v.classname ), "building_sentrygun" ); )
     {

@@ -305,6 +305,22 @@ SOURCE=.\src\tsoldier.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\version.c
+
+!IF  "$(CFG)" == "qwprogs - Win32 Release"
+
+# ADD CPP /YX
+# SUBTRACT CPP /FA<none>
+
+!ELSEIF  "$(CFG)" == "qwprogs - Win32 Debug"
+
+!ELSEIF  "$(CFG)" == "qwprogs - Win32 TG Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\weapons.c
 # End Source File
 # Begin Source File

@@ -39,13 +39,13 @@
 #define TF_RESPAWNDELAY2 10  // seconds of waiting before player can respawn
 #define TF_RESPAWNDELAY3 20  // seconds of waiting before player can respawn
 
-#define TEAMPLAY_NORMAL    1   
-#define TEAMPLAY_HALFDIRECT   2
-#define TEAMPLAY_NODIRECT   4
-#define TEAMPLAY_HALFEXPLOSIVE  8
-#define TEAMPLAY_NOEXPLOSIVE  16
+#define TEAMPLAY_NORMAL		 1
+#define TEAMPLAY_HALFDIRECT	 2
+#define TEAMPLAY_NODIRECT	 4
+#define TEAMPLAY_HALFEXPLOSIVE	 8
+#define TEAMPLAY_NOEXPLOSIVE	 16
 #define TEAMPLAY_LESSPLAYERSHELP 32
-#define TEAMPLAY_LESSSCOREHELP  64
+#define TEAMPLAY_LESSSCOREHELP	 64
 
 // FortressMap stuff
 #define TEAM1_CIVILIANS 1 

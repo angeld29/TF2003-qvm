@@ -1,5 +1,5 @@
 #include "g_local.h"
-#define ANGEL_VERSION "Compiled: " __DATE__ " " __TIME__ " r1"
+
 tf_server_data_t tf_data;
 int FLAME_MAXWORLDNUM, MAX_WORLD_PIPEBOMBS, MAX_WORLD_AMMOBOXES, GR_TYPE_MIRV_NO, GR_TYPE_NAPALM_NO;
 
@@ -990,7 +990,7 @@ void TeamFortress_ShowTF(  )
 #ifdef LAN_SERVER
 	G_sprint( self, 2, "TF2003(QWLAN TF) by êsdë angel for Õ‘∆Ã\n" );
 #else*/
-	G_sprint( self, 2, "TF2003 by êsdë angel for Õ‘∆Ã\n" );
+	G_sprint( self, 2, "TF2003 (build %d) by êsdë angel for Õ‘∆Ã\n" ,build_number());
 /*#endif
 #endif*/
 
@@ -1000,7 +1000,8 @@ void TeamFortress_ShowTF(  )
         if( tf_data.lan_mode )
         	G_sprint( self, 2, "Lan mode enabled\n" );
 
-	G_sprint( self, 2, ANGEL_VERSION "\n");
+	G_sprint( self, 2,  "%s\n", ANGEL_VERSION);
+	
 }
 
 
