@@ -252,7 +252,7 @@ void DecodeLevelParms()
 			if ( timelimit && ( ( timelimit ) < tf_data.cb_prematch_time ) )
 			{
 				timelimit = tf_data.cb_prematch_time + 1;
-				sprintf( st, "%d", ceil( timelimit / 60 ) );
+				sprintf( st, "%d", (int)( timelimit / 60 ) );
 				trap_cvar_set( "timelimit", st );
 			}
 			if ( tf_data.cb_prematch_time > g_globalvars.time )

@@ -1,4 +1,4 @@
-#   QWProgs-KTFFA
+#   QWProgs-TF2003
 #   Copyright (C) 2004  [MAD]ApxuTekTop
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 #   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-#   $Id: Makefile.in,v 1.1 2004-10-01 03:57:28 AngelD Exp $
+#   $Id: Makefile.in,v 1.2 2004-10-02 00:59:37 AngelD Exp $
 
 RM=@RM@
 @SET_MAKE@

@@ -16,7 +16,7 @@
 #   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-#   $Id: Makefile.vm.in,v 1.1 2004-10-01 03:57:32 AngelD Exp $
+#   $Id: Makefile.vm.in,v 1.2 2004-10-02 00:59:40 AngelD Exp $
 
 LCC=@LCC@
 Q3ASM=@Q3ASM@
@@ -28,8 +28,8 @@ MODULE=qwprogs.qvm
 CFLAGS=-DQ3_VM -S -Wf-target=bytecode -Wf-g
 INCFLAGS=-I../include
 
-SOURCES=bg_lib.c  actions.c admin.c buttons.c clan.c client.c combat.c coop.c ctf.c debug.c \
-         demoman.c doors.c engineer.c flare.c g_cmd.c g_main.c g_mem.c g_spawn.c g_syscalls.c\
+SOURCES= g_main.c actions.c admin.c bg_lib.c buttons.c clan.c client.c combat.c coop.c ctf.c debug.c \
+         demoman.c doors.c engineer.c flare.c g_cmd.c g_mem.c g_spawn.c\
          g_tf_utils.c g_utils.c hook.c items.c mathlib.c menu.c misc.c plats.c player.c\
          pyro.c q_shared.c scout.c sentry.c server.c sniper.c  spectate.c spy.c status.c subs.c\
          tfort.c  tforthlp.c tfortmap.c tforttm.c tg.c triggers.c tsoldier.c version.c\
