@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: menu.c,v 1.17 2005-02-14 13:52:51 AngelD Exp $
+ *  $Id: menu.c,v 1.18 2005-04-03 10:52:05 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -597,6 +597,13 @@ void Menu_Engineer_Input( int inp )
 	switch ( inp )
 	{
 	case 1:
+                if ( !( ( int ) self->s.v.flags & FL_ONGROUND ) )
+                {
+            		CenterPrint( self, "You can't build in the air!\n\n" );
+                        ResetMenu(  );
+            		self->s.v.impulse = 0;
+            		return;
+                }
 		if ( (self->s.v.ammo_cells >= BUILD_COST_DISPENSER && self->has_dispenser == 0) || tg_data.tg_enabled )
 		{
 			TeamFortress_Build( 1 );
@@ -605,6 +612,13 @@ void Menu_Engineer_Input( int inp )
 		}
 		break;
 	case 2:
+                if ( !( ( int ) self->s.v.flags & FL_ONGROUND ) )
+                {
+            		CenterPrint( self, "You can't build in the air!\n\n" );
+            		ResetMenu(  );
+            		self->s.v.impulse = 0;
+            		return;
+                }
 		if ( (self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN && self->has_sentry == 0) || tg_data.tg_enabled )
 		{
 			TeamFortress_Build( 2 );

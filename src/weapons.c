@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.20 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: weapons.c,v 1.21 2005-04-03 10:52:05 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -957,31 +957,24 @@ void W_FireSniperRifle(  )
 	if ( !tg_data.unlimit_ammo )
 		self->s.v.currentammo = ( self->s.v.ammo_shells -= tf_data.snip_ammo);
 	makevectors( self->s.v.v_angle );
-	if ( tf_data.snip_range_fix )
-		VectorCopy( g_globalvars.v_forward, dir );
+	VectorCopy( g_globalvars.v_forward, dir );
+
 	src[0] = self->s.v.origin[0] + g_globalvars.v_forward[0] * 10;
 	src[1] = self->s.v.origin[1] + g_globalvars.v_forward[1] * 10;
 	src[2] = self->s.v.absmin[2] + self->s.v.size[2] * 0.7;
-	use_this = 0;
-	traceline( PASSVEC3( src ), src[0] + dir[0] * 8092, src[1] + dir[1] * 8092,
-		   src[2] + dir[2] * 8092, false, self );
-	trace_ent = PROG_TO_EDICT( g_globalvars.trace_ent );
-	if ( g_globalvars.trace_fraction != 1 )
-	{
-		if ( trace_ent != world )
-		{
-			if ( streq( trace_ent->s.v.classname, "player" ) )
-				use_this = 1;
-		}
-	}
-	KickPlayer( -4, self );
-	if ( !use_this )
-	{
-		aim( dir );
+
+	if ( tf_data.snip_range_fix )
+	       traceline( PASSVEC3( src ), src[0] + dir[0] * 8092, src[1] + dir[1] * 8092,
+	       	       src[2] + dir[2] * 8092, false, self );
+	else
 		traceline( PASSVEC3( src ), src[0] + dir[0] * 3072, src[1] + dir[1] * 3072,
 			   src[2] + dir[2] * 3072, false, self );
-		trace_ent = PROG_TO_EDICT( g_globalvars.trace_ent );
-	}
+	        
+	        
+	trace_ent = PROG_TO_EDICT( g_globalvars.trace_ent );
+
+	KickPlayer( -4, self );
+
 	tf_data.deathmsg = DMSG_SNIPERRIFLE;
 	dam_mult = 1;
 	if ( g_globalvars.trace_ent )

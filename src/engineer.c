@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: engineer.c,v 1.20 2005-03-13 04:00:29 AngelD Exp $
+ *  $Id: engineer.c,v 1.21 2005-04-03 10:52:05 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -285,11 +285,11 @@ void TeamFortress_EngineerBuild(  )
 {
     gedict_t *te;
 
-    if ( !( ( int ) self->s.v.flags & FL_ONGROUND ) )
+/*    if ( !( ( int ) self->s.v.flags & FL_ONGROUND ) )
     {
 	CenterPrint( self, "You can't build in the air!\n\n" );
 	return;
-    }
+    }*/
     if ( !self->is_building )
     {
         if(!tg_data.tg_enabled)

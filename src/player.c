@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: player.c,v 1.9 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: player.c,v 1.10 2005-04-03 10:52:05 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -51,7 +51,7 @@ void player_touch(  )
 				     && !TeamFortress_isTeamsAllied (self->team_no , other->team_no) )
 				{
 					TF_AddFrags( self, 1 );
-					G_bprint( 1, "%s uncovered an enemy spy!\n", other->s.v.netname );
+					G_bprint( 1, "%s uncovered an enemy spy!\n", self->s.v.netname );
 					Spy_RemoveDisguise( other );
 				}
 			}
