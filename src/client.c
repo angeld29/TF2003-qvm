@@ -2569,7 +2569,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
 						deathstring = "%s gathers the darling buds of %s's Mirv grenade\n";
 						break;
 					case 30:
-						deathstring = "'s presents go up in %s's EMP presence.\n";
+						deathstring = "%s's presents go up in %s's EMP presence.\n";
 						break;
 					case 35:
 						G_bprint( 1, "%s goes POP!\n", targ->s.v.netname );
@@ -2665,32 +2665,32 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
 					switch ( attacker->playerclass )
 					{
 					case 2:
-						deathstring = "%s got up-close and personal with " "'s grenade\n";
+						deathstring = "%s got up-close and personal with %s's grenade\n";
 						break;
 					case 3:
-						deathstring = "%s played catch with " "'s grenade\n";
+						deathstring = "%s played catch with %s's grenade\n";
 						break;
 					case 4:
-						deathstring = "%s received a pineapple enema from " "\n";
+						deathstring = "%s received a pineapple enema from %s\n";
 						break;
 					case 5:
-						deathstring = "%s fetched " "'s pineapple\n";
+						deathstring = "%s fetched %s's pineapple\n";
 						break;
 					case 6:
-						deathstring = "%s caught too much shrapnel from " "'s grenade\n";
+						deathstring = "%s caught too much shrapnel from %s's grenade\n";
 						break;
 					case 7:
-						deathstring = "%s tried to pick up " "'s hot potato\n";
+						deathstring = "%s tried to pick up %s's hot potato\n";
 						break;
 					case 8:
-						deathstring = "%s thought " " was tossing him a spare grenade\n";
+						deathstring = "%s thought %s was tossing him a spare grenade\n";
 						break;
 					case 9:
 						deathstring =
-						    "%s stops to ponder the technical details of " "'s grenade\n";
+						    "%s stops to ponder the technical details of %s's grenade\n";
 						break;
 					default:
-						deathstring = "%s surfs on a grenade from " "\n";
+						deathstring = "%s surfs on a grenade from %s\n";
 						break;
 					}
 					break;
@@ -2713,7 +2713,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
 					deathstring = "%s gags on %s's noxious gasses\n";
 					break;
 				case 30:
-					deathstring = "'s ammo detonates him as %s's EMP fries it\n";
+					deathstring = "%s's ammo detonates him as %s's EMP fries it\n";
 					break;
 				case 41:
 					deathstring = "%s stepped on too many of %s's caltrops\n";
@@ -2773,7 +2773,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
 						deathstring = "%s was knife-murdered by %s\n";
 						break;
 					case 1:
-						deathstring = "'s mellon was split by %s\n";
+						deathstring = "%s's mellon was split by %s\n";
 						break;
 					case 2:
 						deathstring = "%s was put on the chop block by %s\n";
@@ -2788,10 +2788,10 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
 						deathstring = "%s is split in two with a powerful axe blow from %s\n";
 						break;
 					case 7:
-						deathstring = "'s death put another notch on %s's axe\n";
+						deathstring = "%s's death put another notch on %s's axe\n";
 						break;
 					default:
-						deathstring = "'s death put another notch on %s's axe\n";
+						deathstring = "%s's death put another notch on %s's axe\n";
 						break;
 					}
 					break;
@@ -2842,7 +2842,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
 						deathstring = "%s gets ventilated by %s's super-shotgun blast\n";
 						break;
 					case 9:
-						deathstring = "'s body got chuck full of %s's lead pellets\n";
+						deathstring = "%s's body got chuck full of %s's lead pellets\n";
 						break;
 					default:
 						deathstring = "%s ate 2 loads of %s's buckshot\n";
@@ -2871,9 +2871,9 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
 					break;
 				case 7:
 					if ( attacker->s.v.waterlevel > 1 )
-						deathstring = "%s accepts " "'s discharge\n";
+						deathstring = "%s accepts %s's discharge\n";
 					else
-						deathstring = "%s accepts " "'s shaft\n";
+						deathstring = "%s accepts %s's shaft\n";
 					break;
 				case 21:
 					deathstring = "%s grappled with %s\n";

@@ -486,8 +486,6 @@ void FireSentryBullets( int shotcount, gedict_t * targ, float spread_x, float sp
 	VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
 	VectorSubtract( dst, src, dir );
 
-	VectorNormalize( dir );	//FIX ME???
-
 	ClearMultiDamage(  );
 	VectorScale( dir, 2048, end );
 	VectorAdd( end, src, end );

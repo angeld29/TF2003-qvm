@@ -72,3 +72,6 @@ equ	trap_FS_GetFileList	 -66
 
 equ     trap_cvar_set_float      -67
 equ     trap_cvar_string	 -68
+
+equ     trap_Map_Extension	 -69
+

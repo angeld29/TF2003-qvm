@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.c,v 1.3 2004-09-15 11:21:22 AngelD Exp $
+ *  $Id: g_syscalls.c,v 1.4 2004-09-16 13:06:08 AngelD Exp $
  */
 
 //#include "g_local.h"
@@ -350,3 +350,9 @@ int 	trap_FS_GetFileList(  const char *path, const char *extension, char *listbu
 {
 	return syscall( G_FSGetFileList, (int)path, (int)extension, (int)listbuf, bufsize);
 }
+
+int trap_Map_Extension( const char* ext_name, int mapto)
+{
+	return syscall( G_Map_Extension, (int)ext_name, mapto );
+}
+

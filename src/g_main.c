@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.3 2004-09-15 11:21:22 AngelD Exp $
+ *  $Id: g_main.c,v 1.4 2004-09-16 13:06:08 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -57,6 +57,7 @@ float           starttime;
 void            G_InitGame( int levelTime, int randomSeed );
 void            StartFrame( int time );
 qboolean        ClientCommand();
+qboolean        ClientUserInfoChanged();
 void            G_EdictTouch();
 void            G_EdictThink();
 void            G_EdictBlocked();
@@ -146,22 +147,27 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 		G_EdictBlocked();
 		return 1;
 
-	case GAME_SETCHANGEPARMS:
+	case GAME_SETCHANGEPARMS: //called before spawn new server for save client params
 		self = PROG_TO_EDICT( g_globalvars.self );
 		SetChangeParms();
 		return 1;
 
 	case GAME_CLIENT_COMMAND:
-
+	        self = PROG_TO_EDICT( g_globalvars.self );
 		return ClientCommand();
 
-/*	case GAME_SHUTDOWN:
-		G_ShutdownGame( arg0 );
-		return 0;
 	case GAME_CLIENT_USERINFO_CHANGED:
-		ClientUserinfoChanged( arg0 );
+		// called on user /cmd setinfo	if value changed
+		// return not zero dont allow change
+		// params like GAME_CLIENT_COMMAND, but argv(0) always setinfo and argc always 3
+
+		self = PROG_TO_EDICT( g_globalvars.self );
+		return ClientUserInfoChanged();
+
+	case GAME_SHUTDOWN:
 		return 0;
-	case GAME_CONSOLE_COMMAND:
+
+/*	case GAME_CONSOLE_COMMAND:
 		return ConsoleCommand();*/
 	}
 

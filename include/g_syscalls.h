@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.h,v 1.4 2004-09-15 11:21:22 AngelD Exp $
+ *  $Id: g_syscalls.h,v 1.5 2004-09-16 13:06:04 AngelD Exp $
  */
 
 int     trap_GetApiVersion(  );
@@ -87,3 +87,10 @@ int	trap_FS_WriteFile( char*src, int quantity, fileHandle_t handle );
 int	trap_FS_SeekFile( fileHandle_t handle, int offset, int type );
 int	trap_FS_TellFile( fileHandle_t handle );
 int 	trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
+
+int 	trap_Map_Extension( const char* ext_name, int mapto);
+/*  return:
+    0 	success maping
+   -1	not found
+   -2	cannot map
+*/

@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.1 2004-09-05 22:48:30 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.2 2004-09-16 13:06:08 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -58,4 +58,32 @@ qboolean ClientCommand(  )
 	}*/
 	//G_Printf("ClientCommand %s\n",cmd_command);
 	return false;
+}
+
+
+qboolean ClientUserInfoChanged()
+{
+	char    key[1024];
+	char    value[1024];
+	char	*sk;
+
+	self = PROG_TO_EDICT( g_globalvars.self );
+	
+	trap_CmdArgv( 1, key, sizeof( key ) );
+
+	if(strcmp(key,"team"))
+		return 0;
+	trap_CmdArgv( 2, value, sizeof( value ) );
+
+	if(!self->team_no)
+		return 0;
+	sk = GetTeamName( self->team_no );
+	if( strneq( value, sk ) )
+	{
+		SetTeamName( self );
+	        G_sprint( self, 2, "you cannot change your team setinfo\n");
+	        return 1;
+	}
+	return 0;
+
 }

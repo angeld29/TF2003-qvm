@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_public.h,v 1.3 2004-09-15 11:21:22 AngelD Exp $
+ *  $Id: g_public.h,v 1.4 2004-09-16 13:06:04 AngelD Exp $
  */
 
 #ifndef __G_PUBLIC_H__
@@ -115,7 +115,8 @@ typedef enum
 	G_FSTellFile,
 	G_FSGetFileList,
 	G_CVAR_SET_FLOAT,
-	G_CVAR_STRING
+	G_CVAR_STRING,
+	G_Map_Extension
 } gameImport_t;
 
 
