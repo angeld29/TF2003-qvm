@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: engineer.c,v 1.19 2005-02-14 13:52:51 AngelD Exp $
+ *  $Id: engineer.c,v 1.20 2005-03-13 04:00:29 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -376,7 +376,7 @@ int CheckAreaNew( gedict_t * obj, gedict_t * builder )
     return 1;
 }
 
-int CheckArea( gedict_t * obj, gedict_t * builder )
+/*int CheckArea( gedict_t * obj, gedict_t * builder )
 {
     vec3_t src;
     vec3_t end;
@@ -429,9 +429,62 @@ int CheckArea( gedict_t * obj, gedict_t * builder )
     if ( te )
 		return 0;
     return 1;
+}*/
+
+int CheckArea( gedict_t * obj, gedict_t * builder )
+{
+    vec3_t src;
+    vec3_t end;
+    int pos;
+    gedict_t *te;
+
+    pos = CheckAreaNew( obj, builder );
+    if ( pos == 0 )
+	return 0;
+
+
+    pos = trap_pointcontents( PASSVEC3( obj->s.v.origin ) );
+    if ( pos == -2 || pos == -6 )
+	return 0;
+    src[0] = obj->s.v.origin[0]  + 24;
+    src[1] = obj->s.v.origin[1]  + 24;
+    src[2] = obj->s.v.origin[2]  + 16;
+    pos = trap_pointcontents( PASSVEC3( src ) );
+    if ( pos == -2 || pos == -6 )
+	return 0;
+    end[0] = obj->s.v.origin[0]  - 16;
+    end[1] = obj->s.v.origin[1]  - 16;
+    end[2] = obj->s.v.origin[2]  - 16;
+    traceline( PASSVEC3( src ), PASSVEC3( end ), 1, obj );
+    if ( g_globalvars.trace_fraction != 1 )
+	return 0;
+    pos = trap_pointcontents( PASSVEC3( end ) );
+    if ( pos == -2 || pos == -6 )
+	return 0;
+    src[0] = obj->s.v.origin[0] - 16;
+    src[1] = obj->s.v.origin[1] + 16;
+    src[2] = obj->s.v.origin[2] + 16;
+    pos = trap_pointcontents( PASSVEC3( src ) );
+    if ( pos == -2 || pos == -6 )
+	return 0;
+    end[0] = obj->s.v.origin[0] + 16;
+    end[1] = obj->s.v.origin[1] - 16;
+    end[2] = obj->s.v.origin[2] - 16;
+    traceline( PASSVEC3( src ), PASSVEC3( end ), 1, obj );
+
+    if ( g_globalvars.trace_fraction != 1 )
+	return 0;
+    pos = trap_pointcontents( PASSVEC3( end ) );
+    if ( pos == -2 || pos == -6 )
+	return 0;
+    traceline( PASSVEC3( builder->s.v.origin ), PASSVEC3( obj->s.v.origin ), 1, builder );
+    if ( g_globalvars.trace_fraction != 1 )
+	return 0;
+    te = findradius( world, obj->s.v.origin, 64 );
+    if ( te )
+		return 0;
+    return 1;
 }
-
-
 void TeamFortress_Build( int objtobuild )
 {
     float btime;
@@ -484,8 +537,8 @@ void TeamFortress_Build( int objtobuild )
 	}
 
     }
-	VectorCopy(tmp1,newmis->s.v.mins);
-	VectorCopy(tmp2,newmis->s.v.maxs);
+    VectorCopy(tmp1,newmis->s.v.mins);
+    VectorCopy(tmp2,newmis->s.v.maxs);
 
     if ( !CheckArea( newmis, self ) )
     {

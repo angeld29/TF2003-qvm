@@ -2,7 +2,11 @@ QuakeWorld TeamFortress 2003 (QVM/DDL/SO Versions)
 by [sd] angel for MTFL
 
 ////////////////////////////////////////////////////
-Внесенные изменения (на 14.02.2005 r1) crc:
+Внесенные изменения (на 18.02.2005 r1) crc: 
+checkarea fixed
+
+////////////////////////////////////////////////////
+Внесенные изменения (на 14.02.2005 r1) crc: 47352
 double flash fixed
 Skin reset\n fixed
 prematch не зависит от clan mode
