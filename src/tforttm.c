@@ -824,3 +824,29 @@ void teamsprint( int tno, gedict_t * ignore, char *st )
 			G_sprint( te, 2, st );
 	}
 }
+
+int teams_allied = 0;
+int team_allied_bitindex[4][4] = 
+{
+	{  0,  1,  2,  4},
+	{  1,  0,  8, 16},
+	{  2,  8,  0, 32},
+	{  4, 16, 32,  0}
+};
+/*
+    1  - team 1 & 2
+    2  - team 1 & 3
+    4  - team 1 & 4
+    8  - team 2 & 3
+   16  - team 2 & 4
+   32  - team 3 & 4
+*/
+qboolean TeamFortress_isTeamsAllied( int teamno1, int teamno2 )
+{
+        if( teamno1 == teamno2 )
+        	return true;
+	
+	if(!teamno1 || !teamno2 || teamno1 > 4 || teamno2 > 4 )
+		   return false;
+	return teams_allied & team_allied_bitindex[teamno1-1][teamno2-1];
+}

@@ -16,7 +16,7 @@ void player_touch(  )
 			if ( self->undercover_team || self->undercover_skin )
 			{
 				if ( ( other->playerclass == PC_SPY || other->playerclass == PC_SCOUT )
-				     && other->team_no != self->team_no )
+				     && !TeamFortress_isTeamsAllied (other->team_no , self->team_no) )
 				{
 					TF_AddFrags( other, 1 );
 					G_bprint( 1, "%s uncovered an enemy spy!\n", other->s.v.netname );
@@ -26,7 +26,7 @@ void player_touch(  )
 			if ( other->undercover_team || other->undercover_skin )
 			{
 				if ( ( self->playerclass == PC_SPY || self->playerclass == PC_SCOUT )
-				     && self->team_no != other->team_no )
+				     && !TeamFortress_isTeamsAllied (self->team_no , other->team_no) )
 				{
 					TF_AddFrags( self, 1 );
 					G_bprint( 1, "%s uncovered an enemy spy!\n", other->s.v.netname );

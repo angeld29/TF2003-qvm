@@ -294,6 +294,7 @@ extern  int             teamfrags[5];
 extern  int             teamlives[5];
 extern	int             teammaxplayers[5];
 extern  float		teamadvantage[5];       
+extern 	int 		teams_allied;
 
 extern  int             CTF_Map;                
 extern  float           rj;                     

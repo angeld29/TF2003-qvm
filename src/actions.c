@@ -273,7 +273,7 @@ void TeamFortress_SaveMe(  )
 		if ( self == te || te->playerclass == PC_MEDIC || te->playerclass == PC_ENGINEER
 		     || te->playerclass == PC_SPY )
 		{
-			if ( ( te->team_no == self->team_no && self->team_no ) || te->playerclass == PC_SPY )
+			if ( ( self->team_no && TeamFortress_isTeamsAllied(te->team_no , self->team_no) ) || te->playerclass == PC_SPY )
 			{
 				if ( visible( te ) )
 				{
@@ -458,7 +458,7 @@ void TeamFortress_ID_Player( gedict_t * trace_ent )
 {
 	char   *cls;
 
-	if ( self->team_no && self->team_no == trace_ent->team_no )
+	if ( self->team_no && TeamFortress_isTeamsAllied(self->team_no , trace_ent->team_no) )
 	{
 		cls = TeamFortress_GetClassName( trace_ent->playerclass );
 		switch ( self->playerclass )
@@ -487,7 +487,7 @@ void TeamFortress_ID_Player( gedict_t * trace_ent )
 	}
 //enemy spy
 	cls = TeamFortress_GetClassName( trace_ent->undercover_skin );
-	if ( self->team_no && self->team_no == trace_ent->undercover_team )
+	if ( self->team_no && TeamFortress_isTeamsAllied( self->team_no , trace_ent->undercover_team) )
 	{
 		switch ( self->playerclass )
 		{
@@ -553,7 +553,7 @@ void TeamFortress_ID_Sentry( gedict_t * te )
 			G_centerprint( self, "\n\n\n\nSentrygun made by\n%s\n", te->real_owner->s.v.netname );
 		else
 		{
-			if ( self->team_no && self->team_no == te->team_no )
+			if ( self->team_no && TeamFortress_isTeamsAllied(self->team_no , te->team_no) )
 			{
 				if ( self->playerclass == PC_ENGINEER )
 				{
@@ -617,7 +617,7 @@ void TeamFortress_ID(  )
 
 	if ( streq( trace_ent->s.v.classname, "player" ) && trace_ent->s.v.health > 0 )
 	{
-		if ( trace_ent->is_feigning && self->team_no && self->team_no != trace_ent->team_no )
+		if ( trace_ent->is_feigning && self->team_no && !TeamFortress_isTeamsAllied(self->team_no, trace_ent->team_no) )
 			return;
 		self->StatusRefreshTime = g_globalvars.time + 1.5;
 		TeamFortress_ID_Player( trace_ent );
@@ -638,7 +638,7 @@ void TeamFortress_ID(  )
 				return;
 			} else
 			{
-				if ( self->team_no && self->team_no == trace_ent->team_no
+				if ( self->team_no && TeamFortress_isTeamsAllied( self->team_no , trace_ent->team_no)
 				     && self->playerclass == PC_ENGINEER )
 				{
 					G_centerprint( self,

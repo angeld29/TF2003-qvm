@@ -665,7 +665,7 @@ void T_Dispenser(  )
 
     if ( strneq( other->s.v.classname, "player" ) )
 	return;
-    if ( other->team_no && other->team_no != self->team_no )
+    if ( other->team_no && !TeamFortress_isTeamsAllied (other->team_no , self->team_no) )
 	CenterPrint( self->real_owner, "Enemies are using your dispenser!\n" );
     if ( ( !other->building || other->building == world ) && other->building_wait < g_globalvars.time )
     {

@@ -253,12 +253,12 @@ int CheckTarget( gedict_t * Target )
 
 	if ( teamplay )
 	{
-		if ( Target->team_no == self->team_no && self->team_no )
+		if (  self->team_no && TeamFortress_isTeamsAllied (Target->team_no , self->team_no) )
 		{
 			if ( tg_data.sg_allow_find == TG_SG_FIND_IGNORE_TEAM )
 				return 0;
 		}
-		if ( Target->undercover_team == self->team_no && self->team_no )
+		if ( self->team_no && TeamFortress_isTeamsAllied(Target->undercover_team , self->team_no))
 		{
 			if ( tg_data.sg_allow_find == TG_SG_FIND_IGNORE_TEAM )
 				return 0;

@@ -445,7 +445,7 @@ void TeamFortress_DetpackTouch(  )
 		return;
 	owner = PROG_TO_EDICT( self->s.v.owner );
 
-	if ( (other->team_no == owner->team_no && owner->team_no ) && !tg_data.tg_enabled )
+	if ( (owner->team_no && TeamFortress_isTeamsAllied (other->team_no , owner->team_no)) && !tg_data.tg_enabled )
 		return;
 
 	makevectors( other->s.v.v_angle );

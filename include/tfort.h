@@ -203,3 +203,5 @@ void    DoGoalWork( gedict_t * Goal, gedict_t * AP );
 void    DoGroupWork( gedict_t * Goal, gedict_t * AP );
 int     TeamFortress_GetMaxAmmo( gedict_t * Retriever, int AmmoType );
 int     TeamFortress_CanGetWeapon( gedict_t * Retriever, int WeaponType );
+
+qboolean TeamFortress_isTeamsAllied(int teamno1, int teamno2);

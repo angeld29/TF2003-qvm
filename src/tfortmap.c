@@ -457,6 +457,8 @@ void ParseTFDetect( gedict_t * AD )
 		illegalclasses[4] = 0;
 		civilianteams = civilianteams | 8;
 	}
+
+	teams_allied = AD->team_no;
 }
 
 gedict_t *Finditem( int ino )

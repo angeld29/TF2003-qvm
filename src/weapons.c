@@ -199,7 +199,7 @@ void W_FireSpanner(  )
 				{
 					if ( streq( trace_ent->s.v.classname, "player" ) )
 					{
-						if ( ( trace_ent->team_no == self->team_no
+						if ( ( TeamFortress_isTeamsAllied(trace_ent->team_no ,self->team_no)
 						       && self->team_no && teamplay ) || coop )
 						{
 							healam = WEAP_SPANNER_REPAIR;
@@ -278,7 +278,7 @@ void W_FireMedikit(  )
 	{
 		if ( streq( trace_ent->s.v.classname, "player" ) )
 		{
-			if ( ( trace_ent->team_no == self->team_no && self->team_no ) || coop )
+			if ( ( TeamFortress_isTeamsAllied(trace_ent->team_no , self->team_no) && self->team_no ) || coop )
 			{
 				healam = WEAP_MEDIKIT_HEAL;
 				for ( te=world ; (te = trap_find( te, FOFS( s.v.classname ), "timer" ));)
@@ -292,7 +292,7 @@ void W_FireMedikit(  )
 						stuffcmd( trace_ent, "v_idlescale 0\nfov 90\n" );
 					SpawnBlood( org, 20 );
 					G_bprint( 1, "%s cured %s's concussion\n", self->s.v.netname, trace_ent->s.v.netname );
-					if ( te->team_no != self->team_no )
+					if ( !TeamFortress_isTeamsAllied(te->team_no , self->team_no) )
 						TF_AddFrags( self, 1 );
 					dremove( te );
 					break;
@@ -314,7 +314,7 @@ void W_FireMedikit(  )
 						ResetGasSkins(trace_ent);
 						if ( tf_data.new_gas & GAS_MASK_PALETTE) 
 							stuffcmd( trace_ent, "v_cshift; wait; bf\n" );
-						if ( te->team_no != self->team_no )
+						if ( !TeamFortress_isTeamsAllied(te->team_no , self->team_no) )
 							TF_AddFrags( self, 1 );
 						dremove( te );
 						break;
@@ -336,7 +336,7 @@ void W_FireMedikit(  )
 						SpawnBlood( org, 20 );
 						G_bprint( 1, "%s healed %s's tranquilisation\n",
 							  self->s.v.netname, trace_ent->s.v.netname );
-						if ( te->team_no != self->team_no )
+						if ( !TeamFortress_isTeamsAllied(te->team_no , self->team_no) )
 							TF_AddFrags( self, 1 );
 						dremove( te );
 						break;
@@ -357,7 +357,7 @@ void W_FireMedikit(  )
 						SpawnBlood( org, 20 );
 						G_bprint( 1, "%s cured %s's blindness\n",
 							  self->s.v.netname, trace_ent->s.v.netname );
-						if ( te->team_no != self->team_no )
+						if ( !TeamFortress_isTeamsAllied(te->team_no , self->team_no) )
 							TF_AddFrags( self, 1 );
 						if ( tf_data.new_flash )
 							disableupdates( trace_ent, -1 );	/* server-side flash */
@@ -380,7 +380,7 @@ void W_FireMedikit(  )
 					{
 						G_bprint( 1, "%s cured %s's infection\n",
 							  self->s.v.netname, trace_ent->s.v.netname );
-						if ( trace_ent->infection_team_no != self->team_no )
+						if ( !TeamFortress_isTeamsAllied(trace_ent->infection_team_no , self->team_no) )
 							TF_AddFrags( self, 1 );
 					}
 					return;
@@ -494,7 +494,7 @@ void W_FireBioweapon(  )
 	{
 		if ( streq( trace_ent->s.v.classname, "player" ) )
 		{
-			if ( ( trace_ent->team_no != self->team_no && self->team_no && teamplay ) || !teamplay )
+			if ( ( !TeamFortress_isTeamsAllied(trace_ent->team_no , self->team_no) && self->team_no && teamplay ) || !teamplay )
 			{
 				trace_ent->axhitme = 1;
 				SpawnBlood( org, 20 );

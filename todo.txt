@@ -15,7 +15,7 @@ flare dmg
 
 Arena Mode
 bot sold like sentry
-team allies (border/hunted)
++team allies (border/hunted)
 
 vote for classlimit(отдельных игроков)
 

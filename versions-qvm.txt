@@ -23,6 +23,15 @@ fixed 4 - class help on
 если есть setinfo s и бит 4 не установлен classhelp выключен
 иначе включен
 
+team allies
+в entity info_tfdetect
+поле team_no
+    1  - team 1 & 2
+    2  - team 1 & 3
+    4  - team 1 & 4
+    8  - team 2 & 3
+   16  - team 2 & 4
+   32  - team 3 & 4
 
 ////////////////////////////////////////////////////
 Внесенные изменения (на 11.12.2004 r1) 
