@@ -265,21 +265,21 @@ void DecodeLevelParms()
 						tf_data.cb_prematch_time += 6;
 					}
 					
-         			tf_data.cease_fire = 1;
-         			G_bprint( 2, "CEASE FIRE\n" );
-         			te = find( world, FOFS( s.v.classname ), "player" );
-         			while ( te )
-         			{
-         				CenterPrint( te, "CEASE FIRE\n" );
-         				te->tfstate = te->tfstate | TFSTATE_CANT_MOVE;
-         				TeamFortress_SetSpeed( te );
-         				te = find( te, FOFS( s.v.classname ), "player" );
-         			}
-         			te = spawn();
-         			te->s.v.classname = "ceasefire";
-         			te->s.v.think = ( func_t ) CeaseFire_think;
-         			te->s.v.nextthink = g_globalvars.time + 5;
-         			te->s.v.weapon = 1;
+                   			tf_data.cease_fire = 1;
+                   			G_bprint( 2, "CEASE FIRE\n" );
+                   			te = find( world, FOFS( s.v.classname ), "player" );
+                   			while ( te )
+                   			{
+                   				CenterPrint( te, "CEASE FIRE\n" );
+                   				te->tfstate = te->tfstate | TFSTATE_CANT_MOVE;
+                   				TeamFortress_SetSpeed( te );
+                   				te = find( te, FOFS( s.v.classname ), "player" );
+                   			}
+                   			te = spawn();
+                   			te->s.v.classname = "ceasefire";
+                   			te->s.v.think = ( func_t ) CeaseFire_think;
+                   			te->s.v.nextthink = g_globalvars.time + 5;
+                   			te->s.v.weapon = 1;
 				}else
 					tf_data.cb_ceasefire_time = 0;
 			}

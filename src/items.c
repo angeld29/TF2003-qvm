@@ -171,7 +171,7 @@ int T_Heal( gedict_t * e, float healamount, float ignore )
 	if ( e->s.v.health <= 0 )
 		return 0;
 
-	if ( ( !ignore ) && ( e->s.v.health >= other->s.v.max_health ) )
+	if ( ( !ignore ) && ( e->s.v.health >= e->s.v.max_health ) )
 	{
 		if ( e->leg_damage )
 		{
@@ -187,8 +187,8 @@ int T_Heal( gedict_t * e, float healamount, float ignore )
 	healamount = ceil( healamount );
 
 	e->s.v.health = e->s.v.health + healamount;
-	if ( ( !ignore ) && ( e->s.v.health >= other->s.v.max_health ) )
-		e->s.v.health = other->s.v.max_health;
+	if ( ( !ignore ) && ( e->s.v.health >= e->s.v.max_health ) )
+		e->s.v.health = e->s.v.max_health;
 
 	if ( e->s.v.health > 250 )
 		e->s.v.health = 250;

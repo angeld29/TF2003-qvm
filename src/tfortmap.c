@@ -1957,9 +1957,15 @@ void ReturnItem(  )
 			while ( te )
 			{
 				if ( te->team_no == enemy->owned_by )
+				{
+				    if ( enemy->s.v.noise3 )
 					CenterPrint( te, "\n\n\n%s", enemy->s.v.noise3 );
+				}
 				else
+				{
+				   if ( enemy->noise4 )
 					CenterPrint( te, "\n\n\n%s", enemy->noise4 );
+				}
 				te = find( te, FOFS( s.v.classname ), "player" );
 			}
 		}

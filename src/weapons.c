@@ -295,8 +295,7 @@ void W_FireMedikit(  )
 					if ( tf_data.old_grens == 1 )
 						stuffcmd( trace_ent, "v_idlescale 0\nfov 90\n" );
 					SpawnBlood( org, 20 );
-					G_bprint( 1, "%s cured %s's concussion\n",
-						  self->s.v.netname, trace_ent->s.v.netname );
+					G_bprint( 1, "%s cured %s's concussion\n", self->s.v.netname, trace_ent->s.v.netname );
 					if ( te->team_no != self->team_no )
 						TF_AddFrags( self, 1 );
 					dremove( te );
@@ -304,7 +303,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->tfstate & TFSTATE_HALLUCINATING )
 				{
-				        for ( te=world ; (te = find( te, FOFS( s.v.classname ), "timer" ));)
+				    for ( te=world ; (te = find( te, FOFS( s.v.classname ), "timer" ));)
 					{
 						if ( te->s.v.owner != g_globalvars.trace_ent )
 							continue;
@@ -313,8 +312,7 @@ void W_FireMedikit(  )
 
 						trace_ent->tfstate -= ( trace_ent->tfstate & TFSTATE_HALLUCINATING );
 						SpawnBlood( org, 20 );
-						G_bprint( 1,
-							  "%s healed %s of his hallucinations\n",
+						G_bprint( 1, "%s healed %s of his hallucinations\n",
 							  self->s.v.netname, trace_ent->s.v.netname );
 						
 						ResetGasSkins(trace_ent);
@@ -330,7 +328,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->tfstate & TFSTATE_TRANQUILISED )
 				{
-				        for ( te=world ; (te = find( te, FOFS( s.v.classname ), "timer" ));)
+				    for ( te=world ; (te = find( te, FOFS( s.v.classname ), "timer" ));)
 					{
 						if ( te->s.v.owner != g_globalvars.trace_ent )
 							continue;
@@ -340,8 +338,7 @@ void W_FireMedikit(  )
 						trace_ent->tfstate -= ( trace_ent->tfstate & TFSTATE_TRANQUILISED );
 						TeamFortress_SetSpeed( trace_ent );
 						SpawnBlood( org, 20 );
-						G_bprint( 1,
-							  "%s healed %s's tranquilisation\n",
+						G_bprint( 1, "%s healed %s's tranquilisation\n",
 							  self->s.v.netname, trace_ent->s.v.netname );
 						if ( te->team_no != self->team_no )
 							TF_AddFrags( self, 1 );
@@ -353,7 +350,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->FlashTime > 0 )
 				{
-				        for ( te=world ; (te = find( te, FOFS( s.v.netname ), "flashtimer" ));)
+				    for ( te=world ; (te = find( te, FOFS( s.v.netname ), "flashtimer" ));)
 					{
 						if ( te->s.v.owner != g_globalvars.trace_ent )
 							continue;
@@ -403,6 +400,7 @@ void W_FireMedikit(  )
 					}
 					return;
 				}
+				
 				if ( healam > 0 && trace_ent->s.v.health < trace_ent->s.v.max_health )
 				{
 					sound( trace_ent, 1, "items/r_item1.wav", 1, 1 );
