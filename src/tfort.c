@@ -47,7 +47,20 @@ void	TeamFortress_AutoID();
 
 int     num_team_ammoboxes[5] = { 0, 0, 0, 0, 0 };
 
-
+char class_skin[][20]={
+ "base",
+ "tf_scout",
+ "tf_snipe",
+ "tf_sold",
+ "tf_demo", 
+ "tf_medic",
+ "tf_hwguy",
+ "tf_pyro",
+ "tf_spy",
+ "tf_eng",
+ "",
+ "base"
+};
 class_settings_t class_set[] = {
 	{
 	 0,
@@ -59,7 +72,7 @@ class_settings_t class_set[] = {
 	 0, 0,
 	 0, 0, 0, 0, 0,
 	 0, 0,
-	 "Observer", "base", "base", {NULL, NULL, NULL, NULL}
+	 "Observer", "base", /*"base",*/ {NULL, NULL, NULL, NULL}
 	 },
 	{
 	 1,			//bitmask
@@ -75,7 +88,7 @@ class_settings_t class_set[] = {
 	 0.3, 0.3,		//AT ,Aallow
 	 WEAP_AXE | WEAP_SHOTGUN | WEAP_NAILGUN,	//items allowed
 	 IT_SHOTGUN | IT_NAILGUN,	//items
-	 "Scout", "tf_scout", "tf_scout",
+	 "Scout", "tf_scout", //"tf_scout",
 	 {"sk_t1_scout", "sk_t2_scout", "sk_t3_scout", "sk_t4_scout"}
 	 },
 	{
@@ -93,7 +106,7 @@ class_settings_t class_set[] = {
 	 0.3, 0.3,		//AT ,Aallow
 	 WEAP_SNIPER_RIFLE | WEAP_AUTO_RIFLE | WEAP_AXE | WEAP_NAILGUN,	//items allowed
 	 IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_NAILGUN,	//items
-	 "Sniper", "tf_snipe", "tf_snipe",
+	 "Sniper", "tf_snipe", //"tf_snipe",
 	 {"sk_t1_sniper", "sk_t2_sniper", "sk_t3_sniper", "sk_t4_sniper"}
 	 },
 	{
@@ -111,7 +124,7 @@ class_settings_t class_set[] = {
 	 0.8, 0.8,		//AT ,Aallow
 	 WEAP_AXE | WEAP_SHOTGUN | WEAP_SUPER_SHOTGUN | WEAP_ROCKET_LAUNCHER,	//items allowed
 	 IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_ROCKET_LAUNCHER,	//items
-	 "Soldier", "tf_sold", "tf_sold",
+	 "Soldier", "tf_sold", //"tf_sold",
 	 {"sk_t1_soldier", "sk_t2_soldier", "sk_t3_soldier", "sk_t4_soldier"}
 	 },
 	{
@@ -129,7 +142,7 @@ class_settings_t class_set[] = {
 	 0.6, 0.6,		//AT ,Aallow
 	 WEAP_AXE | WEAP_SHOTGUN | WEAP_GRENADE_LAUNCHER | WEAP_DETPACK,	//items allowed
 	 IT_SHOTGUN | IT_GRENADE_LAUNCHER,	//items
-	 "Demolitions Man", "tf_demo", "tf_demo",
+	 "Demolitions Man", "tf_demo", //"tf_demo",
 	 {"sk_t1_demoman", "sk_t2_demoman", "sk_t3_demoman", "sk_t4_demoman"}
 	 },
 	{
@@ -147,7 +160,7 @@ class_settings_t class_set[] = {
 	 0.3, 0.6,		//AT ,Aallow
 	 WEAP_BIOWEAPON | WEAP_MEDIKIT | WEAP_SHOTGUN | WEAP_SUPER_SHOTGUN | WEAP_SUPER_NAILGUN,	//items allowed
 	 IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_SUPER_NAILGUN,	//items
-	 "Combat Medic", "tf_medic", "tf_medic",
+	 "Combat Medic", "tf_medic", //"tf_medic",
 	 {"sk_t1_medic", "sk_t2_medic", "sk_t3_medic", "sk_t4_medic"}
 	 },
 	{
@@ -165,7 +178,7 @@ class_settings_t class_set[] = {
 	 0.8, 0.8,		//AT ,Aallow
 	 WEAP_ASSAULT_CANNON | WEAP_AXE | WEAP_SHOTGUN | WEAP_SUPER_SHOTGUN,	//items allowed
 	 IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_ROCKET_LAUNCHER,	//items
-	 "Heavy Weapons Guy", "tf_hwguy", "tf_hwguy",
+	 "Heavy Weapons Guy", "tf_hwguy", //"tf_hwguy",
 	 {"sk_t1_hwguy", "sk_t2_hwguy", "sk_t3_hwguy", "sk_t4_hwguy"}
 	 },
 	{
@@ -183,7 +196,7 @@ class_settings_t class_set[] = {
 	 0.6, 0.6,		//AT ,Aallow
 	 WEAP_INCENDIARY | WEAP_FLAMETHROWER | WEAP_AXE | WEAP_SHOTGUN,	//items allowed
 	 IT_SHOTGUN | IT_GRENADE_LAUNCHER | IT_ROCKET_LAUNCHER,	//items
-	 "Pyro", "tf_pyro", "tf_pyro",
+	 "Pyro", "tf_pyro", //"tf_pyro",
 	 {"sk_t1_pyro", "sk_t2_pyro", "sk_t3_pyro", "sk_t4_pyro"}
 	 },
 	{
@@ -201,7 +214,7 @@ class_settings_t class_set[] = {
 	 0.3, 0.6,		//AT ,Aallow
 	 WEAP_AXE | WEAP_TRANQ | WEAP_SUPER_SHOTGUN | WEAP_NAILGUN,	//items allowed
 	 IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_NAILGUN,	//items
-	 "Spy", "tf_spy", "tf_spy",
+	 "Spy", "tf_spy", //"tf_spy",
 	 {"sk_t1_spy", "sk_t2_spy", "sk_t3_spy", "sk_t4_spy"}
 	 },
 	{
@@ -219,7 +232,7 @@ class_settings_t class_set[] = {
 	 0.3, 0.6,		//AT ,Aallow
 	 WEAP_SPANNER | WEAP_LASER | WEAP_SUPER_SHOTGUN,	//items allowed
 	 IT_SHOTGUN | IT_SUPER_SHOTGUN,	//items
-	 "Engineer", "tf_eng", "tf_eng",
+	 "Engineer", "tf_eng", //"tf_eng",
 	 {"sk_t1_engineer", "sk_t2_engineer", "sk_t3_engineer", "sk_t4_engineer"}
 	 },
 	{
@@ -237,7 +250,7 @@ class_settings_t class_set[] = {
 	 0, 0,			//AT ,Aallow
 	 0,			//items allowed
 	 0,			//items
-	 "Random Playerclass", "", "",
+	 "Random Playerclass", "",// "",
 	 {NULL, NULL, NULL, NULL}
 	 },
 	{
@@ -255,7 +268,7 @@ class_settings_t class_set[] = {
 	 0, 0,			//AT ,Aallow
 	 WEAP_AXE,		//items allowed
 	 0,			//items
-	 "Civilian", "base", "base",
+	 "Civilian", "base", //"base",
 	 {NULL, NULL, NULL, NULL}
 	 }
 
@@ -1464,8 +1477,8 @@ char   *TeamFortress_GetSkin( gedict_t * p )
 	}
 
 	GetSVInfokeyString( class_set[pc].infokey4skin[tn - 1], NULL,
-			    class_set[pc].skin, sizeof( class_set[pc].skin ), class_set[pc].defaultskin );
-	return class_set[pc].skin;
+			    class_skin[pc], sizeof( class_skin[pc] ), class_set[pc].defaultskin );
+	return class_skin[pc];
 }
 
 void TeamFortress_SetSkin( gedict_t * p )
