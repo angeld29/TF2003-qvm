@@ -1,0 +1,24 @@
+#define MENU_REFRESH_RATE 			25
+typedef enum {
+	MENU_NULL,
+	MENU_DEFAULT,			//1  
+	MENU_TEAM,			//2  
+	MENU_CLASS,			//3  
+	MENU_DROP,		        //4
+	MENU_INTRO,		        //5
+	MENU_CLASSHELP,		        //6
+	MENU_CLASSHELP2,	        //7
+	MENU_REPEATHELP,	        //8
+	MENU_PICKBINDS,		        //9
+	MENU_SHOWBINDS1,	        //10
+	MENU_SHOWBINDS2,	        //11
+	MENU_SPY,		        //12
+	MENU_SPY_SKIN,		        //13
+	MENU_SPY_COLOR,		        //14
+	MENU_ENGINEER,		        //15
+	MENU_ENGINEER_FIX_DISPENSER,	//16 
+	MENU_ENGINEER_FIX_SENTRYGUN,	//17 
+	MENU_ENGINEER_FIX_MORTAR,	//18 
+	MENU_DISPENSER,			//19 
+	MENU_CHANGECLASS		//20
+} menunum_t;

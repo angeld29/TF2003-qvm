@@ -1,0 +1,1 @@
+tf_tg_server_data_t tg_data;
