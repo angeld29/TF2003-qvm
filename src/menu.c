@@ -711,7 +711,7 @@ void Menu_EngineerFix_SentryGun( menunum_t menu )
 {
 	char   *s_upgrade = "\n", *s_static = "";
 
-	if ( self->building->s.v.weapon < 3 && self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN )
+	if ( self->building->s.v.weapon < 3 && (self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.tg_enabled ) )
 		s_upgrade = menu_eng_fixsg_upgrade;
 
         if( tg_data.tg_enabled )
@@ -766,7 +766,7 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 			break;
 	case 2:
 			if ( self->building->s.v.weapon < 3
-			     && (self->s.v.ammo_cells >= 130 || tg_data.tg_enabled )
+			     && (self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.tg_enabled )
 			     )
 			{
 				if( !tg_data.tg_enabled )

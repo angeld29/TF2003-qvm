@@ -416,8 +416,10 @@ void ScannerSwitch(  )
 		for ( te = world; te = find( te, FOFS( s.v.netname ), "scanner" ); )
 		{
 			if ( te->s.v.owner == EDICT_TO_PROG( self ) )
+			{
 				dremove( te );
-			break;
+				break;
+			}
 		}
 		G_sprint( self, PRINT_HIGH, "Scanner Off.\n" );
 		self->ScannerOn = 0;

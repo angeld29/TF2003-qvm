@@ -878,9 +878,8 @@ int Sentry_Fire(  )
 			VectorCopy( self->s.v.angles, self->s.v.v_angle );
 			FireSentryBulletsNEW( 4, enemy, 0.1, 0.1, 0 );
 			break;
-        		
         	default:
-        		G_Error("Unknown SG TYPE\n");
+        		G_Error("Unknown SG TYPE %d\n",tf_data.sg_sfire);
         
         }
 //////

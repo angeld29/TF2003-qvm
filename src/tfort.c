@@ -2641,7 +2641,8 @@ void TeamFortress_Regenerate(  )
 	if ( owner->s.v.health > owner->s.v.max_health )
 		owner->s.v.health = owner->s.v.max_health;
 
-	owner->s.v.currentammo = owner->ammo_medikit;
+	if( owner->current_weapon == WEAP_MEDIKIT )
+		owner->s.v.currentammo = owner->ammo_medikit;
 }
 
 void TeamFortress_RegenerateCells(  )

@@ -523,16 +523,23 @@ void TeamFortress_FinishedBuilding(  )
 {
     gedict_t *oldself;
     gedict_t *owner;
-
+    vec3_t  end;
 //      float   current_yaw;
-//      vec3_t  source;
+
 
     owner = PROG_TO_EDICT( self->s.v.owner );
     if ( owner->is_building != 1 )
 	return;
+
     if ( self->s.v.weapon == BUILD_SENTRYGUN && tg_data.tg_enabled )
     {
-	droptofloor( self );
+    	
+	VectorCopy( self->s.v.origin, end );
+	end[2] -= 2048;
+	TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( end ), 0, self, -16, -16, 0, 16, 16, 4 );
+	VectorCopy( g_globalvars.trace_endpos, end );
+	end[2]++;
+	setorigin( self, PASSVEC3( end ) );
     }
     oldself = self;
     self = owner;

@@ -1,12 +1,31 @@
 camera
 +suicide body
 
-fix TeamFortress_TeamGetColor зв®Ўл ў®§ўа й « аҐ «м­л© жўҐв   ­Ґ жўҐв+1
+fix TeamFortress_TeamGetColor чтобы возвращал реальный цвет а не цвет+1
 
-+watervis ¤Ґ©бвўгҐв ­  id
++watervis действует на id
 
-scanner ­  sentry, д« ЈЁ
+scanner на sentry, флаги
 sound on grens
 new menu system
-setting зҐаҐ§ cmd
-telefrag check on respawn
+setting через cmd
++telefrag check on respawn
+
+Arena Mode
+bot sold like sentry
+team allies (border/hunted)
+
+vote for classlimit(отдельных игроков)
+
++localinfo mtfl on
+
+[20.08.2004 13:17:54] >> из наиболее актуального:1. поменять зависимость 
+чисфайра от прематча. при включенном (on)чисфайра он просто задается на всё 
+время прематча, минус пара (или сколько там надо?) секунд.2. серверная 
+возможность респавна с полной броней/патронами (для аренных карт). или даже 
+какую-то настройку на это, типа как в pro-x если получится:1. френдли тим (для 
+карт типа хунтед)2. вид от фейнутого спая (с земли)3. всякие извраты с трупами 
+:)4. всякие извраты с пузырями :)ну а голисовалки по картам, админсмкие вещи и 
+прочие менюшки, как я понимаю, ждут уже версию на С. 
+
+fix explode grenade after disconnect

@@ -123,9 +123,11 @@ int visible( gedict_t * targ )
 	{
 	 if ( g_globalvars.trace_inopen && g_globalvars.trace_inwater )
 		return 0;
-	 if ( g_globalvars.trace_fraction == 1 )
-		return 1;
 	}
+
+	if ( g_globalvars.trace_fraction == 1 )
+		return 1;
+
 	return 0;
 }
 
