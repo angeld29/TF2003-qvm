@@ -378,15 +378,15 @@ void TeamFortress_ID_Player( gedict_t * trace_ent )
 	if ( trace_ent->undercover_name )
 	{
 		if ( trace_ent->undercover_skin )
-			G_centerprint( self, "\n\n\n\n%s\nFriendly %s\n", trace_ent->undercover_name, cls );
+			G_centerprint( self, "\n\n\n\n%s\nEnemy %s\n", trace_ent->undercover_name, cls );
 		else
-			G_centerprint( self, "\n\n\n\n%s\nFriendly Spy\n", trace_ent->undercover_name );
+			G_centerprint( self, "\n\n\n\n%s\nEnemy Spy\n", trace_ent->undercover_name );
 	} else
 	{
 		if ( trace_ent->undercover_skin )
-			G_centerprint( self, "\n\n\n\n%s\nFriendly %s\n", trace_ent->s.v.netname, cls );
+			G_centerprint( self, "\n\n\n\n%s\nEnemy %s\n", trace_ent->s.v.netname, cls );
 		else
-			G_centerprint( self, "\n\n\n\n%s\nFriendly Spy\n", trace_ent->s.v.netname );
+			G_centerprint( self, "\n\n\n\n%s\nEnemy Spy\n", trace_ent->s.v.netname );
 	}
 }
 void TeamFortress_ID_Sentry( gedict_t * te )
