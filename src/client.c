@@ -519,6 +519,8 @@ void DecodeLevelParms()
 			tg_data.tg_enabled = 1;
 //////////////
 		tf_data.respawn_delay_time = GetSVInfokeyFloat( "rd", "respawn_delay", 0 );
+		
+		tf_data.pyrotype = GetSVInfokeyInt( "pyrotype", NULL, 0 )?1:0;
 
 		if ( tf_data.respawn_delay_time )
 			tf_data.toggleflags |= TFLAG_RESPAWNDELAY;
@@ -564,6 +566,7 @@ void DecodeLevelParms()
 			tf_data.gren2box = 0;
 			tf_data.random_tf_spawn = 1;
 			tf_data.lan_mode = 0;
+			tf_data.pyrotype = 0;
 			tg_data.tg_enabled = 0;
 		} else
 			tf_data.mtfl = 0;

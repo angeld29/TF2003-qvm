@@ -487,7 +487,7 @@ void TeamFortress_DetpackCountDown(  )
 	self->s.v.health = self->s.v.health - 1;
 	if ( self->s.v.health < 10 )
 	{
-		G_sprint( owner, 2, "%.0f...\n", self->s.v.health );
+		G_sprint( owner, 2, "%.0f...\n", self->s.v.health+1 );
 		if ( self->s.v.health < 5 && !self->has_disconnected )
 		{
 			sound( enemy, 2, "doors/baseuse.wav", 1, 1 );

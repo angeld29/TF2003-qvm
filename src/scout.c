@@ -156,8 +156,8 @@ void FlashGrenadeExplode(  )
 
 	owner = PROG_TO_EDICT( self->s.v.owner );
 	self->s.v.effects = ( int ) self->s.v.effects | 4;
-	trap_WriteByte( 4, 23 );
-	trap_WriteByte( 4, 4 );
+	trap_WriteByte( 4, SVC_TEMPENTITY );
+	trap_WriteByte( 4, TE_TAREXPLOSION );
 	trap_WriteCoord( 4, self->s.v.origin[0] );
 	trap_WriteCoord( 4, self->s.v.origin[1] );
 	trap_WriteCoord( 4, self->s.v.origin[2] );

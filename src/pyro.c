@@ -536,6 +536,7 @@ void Flamer_stream_touch(  )
 		if ( g_random(  ) < 0.3 || trap_pointcontents( PASSVEC3( self->s.v.origin ) + 1 ) != -1 )
 		{
 			ent_remove( self );
+//                        SetVector( self->s.v.velocity, 0, 0, 0 );
 			return;
 		}
 		flame = FlameSpawn( 4, other );
@@ -551,7 +552,8 @@ void Flamer_stream_touch(  )
 			flame->s.v.think = ( func_t ) Remove;
 			flame->s.v.enemy = self->s.v.owner;
 		}
-		ent_remove( self );
+		if(!tf_data.pyrotype)
+			ent_remove( self );
 	}
 }
 

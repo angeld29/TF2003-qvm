@@ -353,6 +353,7 @@ typedef struct {
 	float		snip_time;
 	int		add_pipe;
 	int		new_gas;
+	int		pyrotype;
 	int		gren2box,random_tf_spawn,disable_powerups,flag_timer,detpack_block;
 	int		mtfl;
 	int 		lan_mode;

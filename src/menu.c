@@ -101,7 +101,7 @@ void Player_Menu(  )
 		return;
 	}
 
-	if ( self->current_menu <= MENU_DEFAULT )
+	if ( self->current_menu <= MENU_CLASS/*MENU_DEFAULT*/ )
 	{
 		if ( !self->team_no && teamplay && self->lives )
 		{
@@ -111,7 +111,10 @@ void Player_Menu(  )
 			if ( !self->playerclass && self->lives )
 				self->current_menu = MENU_CLASS;
 			else
+			{
+				self->current_menu = MENU_DEFAULT;
 				return;
+			}
 		}
 	}
 
