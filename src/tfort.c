@@ -1377,7 +1377,8 @@ void TeamFortress_SetHealth(  )
 {
 	int     pc ;
 	pc = self->playerclass;
-	if ( pc <= 0 || pc >= 10 )
+	//if ( (pc <= 0 || pc >= 10)  && (pc != 11 ))
+	if ( (pc <= 0 || pc > 11) )
 	{
 		pc = 0;
 		self->s.v.takedamage = 0;
@@ -1391,7 +1392,7 @@ char   *TeamFortress_GetSkin( gedict_t * p )
 	int     tn;
 	int     pc;
 
-	if ( p->playerclass == 11 || !p->team_no )
+	if ( p->playerclass == PC_CIVILIAN || !p->team_no )
 		return "base";
 	tn = p->team_no;
 	pc = p->playerclass;
@@ -1412,7 +1413,7 @@ void TeamFortress_SetSkin( gedict_t * p )
 {
 
 	p->immune_to_check = g_globalvars.time + tf_data.cheat_pause;	//10;
-	if ( p->playerclass == 8 && p->undercover_skin )
+	if ( p->playerclass == PC_SPY && p->undercover_skin )
 		p->s.v.skin = p->undercover_skin;
 	else
 		p->s.v.skin = p->playerclass;
@@ -1440,7 +1441,7 @@ void TeamFortress_SetEquipment(  )
 	self->current_weapon = 0;
 	self->weapons_carried = 0;
 	self->tf_items = 0;
-	if ( self->playerclass != 1 )
+	if ( self->playerclass != PC_SCOUT )
 		self->tf_items_flags = 0;
 	self->armorclass = 0;
 	self->s.v.impulse = 0;
@@ -1895,7 +1896,7 @@ void TeamFortress_DropAmmo( int type )
           		ammo = DROP_SHELLS;
           		if ( self->s.v.ammo_shells < ammo )
           		{
-          			if ( self->playerclass == 9 )
+          			if ( self->playerclass == PC_ENGINEER )
           			{
           				if ( self->s.v.ammo_cells / AMMO_COST_SHELLS > ammo - self->s.v.ammo_shells )
           				{
@@ -1914,7 +1915,7 @@ void TeamFortress_DropAmmo( int type )
 			ammo = DROP_NAILS;
 			if ( self->s.v.ammo_nails < ammo )
 			{
-				if ( self->playerclass == 9 )
+				if ( self->playerclass == PC_ENGINEER )
 				{
 					if ( self->s.v.ammo_cells / AMMO_COST_NAILS > ammo - self->s.v.ammo_nails )
 					{
@@ -1934,7 +1935,7 @@ void TeamFortress_DropAmmo( int type )
        			ammo = DROP_ROCKETS;
        			if ( self->s.v.ammo_rockets < ammo )
        			{
-       				if ( self->playerclass == 9 )
+       				if ( self->playerclass == PC_ENGINEER )
        				{
        					if ( self->s.v.ammo_cells /
        					     AMMO_COST_ROCKETS > ammo - self->s.v.ammo_rockets )
@@ -2444,7 +2445,7 @@ void BioInfection_Decay(  )
 			return;
 		}
 	}
-	if ( !( owner->tfstate & TFSTATE_INFECTED ) || owner->playerclass == 5 )
+	if ( !( owner->tfstate & TFSTATE_INFECTED ) || owner->playerclass == PC_MEDIC )
 	{
 		dremove( self );
 		return;
@@ -2460,7 +2461,7 @@ void BioInfection_Decay(  )
 			continue;
 		if ( te->tfstate & TFSTATE_INFECTED )
 			continue;
-		if ( te->playerclass == 5 )
+		if ( te->playerclass == PC_MEDIC )
 			continue;
 		if ( ( teamplay & 16 ) && owner->team_no == enemy->team_no && owner->team_no )
 			continue;

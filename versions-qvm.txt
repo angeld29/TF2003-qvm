@@ -2,6 +2,11 @@ QuakeWorld TeamFortress 2003 (QVM/DDL/SO Versions)
 by [sd] angel for MTFL
 
 ////////////////////////////////////////////////////
+Внесенные изменения (на 03.12.2004 r1):
+fixed civilian class bugs
+fixed map teammaxplayers limit
+
+////////////////////////////////////////////////////
 Внесенные изменения (на 02.12.2004 r1):
 fixed 
 	подбирание dropammo если патронов и так достаточно

@@ -421,7 +421,7 @@ void ParseTFDetect( gedict_t * AD )
 	teammaxplayers[1] = AD->ammo_medikit;
 	teammaxplayers[2] = AD->ammo_detpack;
 	teammaxplayers[3] = AD->maxammo_medikit;
-	teammaxplayers[3] = AD->maxammo_detpack;
+	teammaxplayers[4] = AD->maxammo_detpack;
 	if ( !teammaxplayers[1] )
 		teammaxplayers[1] = 100;
 	if ( !teammaxplayers[2] )
