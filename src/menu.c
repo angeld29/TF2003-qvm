@@ -525,14 +525,22 @@ void Menu_Engineer( menunum_t menu )
 	{
 		s_detdisp = menu_eng_detdisp;
 #ifdef TG
-		s_bdisp = menu_eng_builddisp;
+                if( tg_data.tg_enabled )
+			s_bdisp = menu_eng_builddisp;
+                else 
+                	s_bdisp = "";
 #else
 		s_bdisp = "";
 #endif
 	} else
 	{
+
 #ifndef TG
 		if ( self->s.v.ammo_cells < BUILD_COST_DISPENSER )
+			s_bdisp = "\n";
+		else
+#else
+		if ( (self->s.v.ammo_cells < BUILD_COST_DISPENSER) && !tg_data.tg_enabled)
 			s_bdisp = "\n";
 		else
 #endif
@@ -545,7 +553,10 @@ void Menu_Engineer( menunum_t menu )
 	{
 		s_detsentry = menu_eng_detsentry;
 #ifdef TG
-		s_bsentry = menu_eng_buildsentry;
+                if( tg_data.tg_enabled )
+			s_bsentry = menu_eng_buildsentry;
+                else
+                	s_bsentry = "";
 #else
 		s_bsentry = "";
 #endif
@@ -553,6 +564,10 @@ void Menu_Engineer( menunum_t menu )
 	{
 #ifndef TG
 		if ( self->s.v.ammo_cells < BUILD_COST_SENTRYGUN )
+			s_bsentry = "\n";
+		else
+#else
+		if ( (self->s.v.ammo_cells < BUILD_COST_SENTRYGUN) && !tg_data.tg_enabled)
 			s_bsentry = "\n";
 		else
 #endif
@@ -571,6 +586,8 @@ void Menu_Engineer_Input( int inp )
 	case 1:
 #ifndef TG
 		if ( self->s.v.ammo_cells >= BUILD_COST_DISPENSER && self->has_dispenser == 0 )
+#else
+		if ( (self->s.v.ammo_cells >= BUILD_COST_DISPENSER && self->has_dispenser == 0) || tg_data.tg_enabled )
 #endif
 		{
 			TeamFortress_Build( 1 );
@@ -581,6 +598,8 @@ void Menu_Engineer_Input( int inp )
 	case 2:
 #ifndef TG
 		if ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN && self->has_sentry == 0 )
+#else
+		if ( (self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN && self->has_sentry == 0) || tg_data.tg_enabled )
 #endif
 		{
 			TeamFortress_Build( 2 );
@@ -729,10 +748,13 @@ void Menu_EngineerFix_SentryGun( menunum_t menu )
 	if ( self->building->s.v.weapon < 3 && self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN )
 		s_upgrade = menu_eng_fixsg_upgrade;
 #ifdef TG
-	if ( self->building->has_sentry )
-		s_static = menu_eng_fixsg_nostatic;
-	else
-		s_static = menu_eng_fixsg_static;
+        if( tg_data.tg_enabled )
+        {
+	 	if ( self->building->has_sentry )
+ 			s_static = menu_eng_fixsg_nostatic;
+ 		else
+			s_static = menu_eng_fixsg_static;
+        }
 #endif
 	CenterPrint( self, "Action:                            \n"
 		     "“‘ Put Ammo into Sentry Gun    \n"
@@ -785,12 +807,16 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 			if ( self->building->s.v.weapon < 3
 #ifndef TG
 			     && self->s.v.ammo_cells >= 130
+#else
+			     && (self->s.v.ammo_cells >= 130 || tg_data.tg_enabled )
 #endif
 			     )
 			{
-#ifndef TG
-				self->s.v.ammo_cells = self->s.v.ammo_cells - 130;
+#ifdef TG
+				if( tg_data.tg_enabled )
 #endif
+					self->s.v.ammo_cells = self->s.v.ammo_cells - 130;
+
 				self->building->s.v.weapon = self->building->s.v.weapon + 1;
 				self->building->s.v.max_health = self->building->s.v.max_health * 1.2;
 				self->building->s.v.health = self->building->s.v.max_health;
@@ -857,7 +883,8 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 		break;
 #ifdef TG
 	case 7:
-
+	        if( !tg_data.tg_enabled )
+	        	return;
 		self->s.v.impulse = 0;
 		if ( self->building->has_sentry )
 			self->building->has_sentry = 0;

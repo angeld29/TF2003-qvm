@@ -987,6 +987,10 @@ void TeamFortress_ShowTF(  )
 	G_sprint( self, 2, "TF2003 by sd‘ angel for ÍÔÆÌ\n" );
 #endif
 #endif
+#ifdef TG
+        if( tg_data.tg_enabled )
+        	G_sprint( self, 2, "Training Ground enabled\n" );
+#endif
 	G_sprint( self, 2, ANGEL_VERSION "\n");
 }
 
@@ -1561,8 +1565,11 @@ void TeamFortress_SetEquipment(  )
 		pc = 0;
 	self->weapons_carried |= class_set[pc].weapons_carried;
 #ifdef TG
-	self->weapons_carried |= WEAP_SPANNER;
-	self->weapons_carried -= self->weapons_carried & WEAP_AXE;
+        if( tg_data.tg_enabled )
+        {
+		self->weapons_carried |= WEAP_SPANNER;
+		self->weapons_carried -= self->weapons_carried & WEAP_AXE;
+        }
 #endif
 	self->s.v.ammo_rockets = class_set[pc].ammo_rockets;
 	self->s.v.ammo_nails = class_set[pc].ammo_nails;

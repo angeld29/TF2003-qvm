@@ -134,9 +134,16 @@ void TeamFortress_SetDetpack( float timer )
 #ifndef TG
 	if ( !( self->weapons_carried & WEAP_DETPACK ) )
 		return;
-	if ( tf_data.disable_grens & DG_TYPE_DETPACK )
+	if ( (tf_data.disable_grens & DG_TYPE_DETPACK) )
 		return;
 	if ( self->ammo_detpack <= 0 )
+		return;
+#else
+	if ( !( self->weapons_carried & WEAP_DETPACK ) && !tg_data.tg_enabled )
+		return;
+	if ( (tf_data.disable_grens & DG_TYPE_DETPACK) && !tg_data.tg_enabled )
+		return;
+	if ( self->ammo_detpack <= 0 && !tg_data.tg_enabled )
 		return;
 #endif
 	for ( at_spot = world; at_spot = findradius( at_spot, self->s.v.origin, 65 ); )
@@ -188,16 +195,18 @@ void TeamFortress_SetDetpack( float timer )
 		G_sprint( self, 2, "You can't set detpacks in the air!\n" );
 		return;
 	}
-#ifndef TG
+#ifdef TG
+        if( !tg_data.tg_enabled )
+#endif
 	for ( te = world; te = find( te, FOFS( s.v.classname ), "detpack" ); )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
-			G_sprint( self, 2, "You can only have 1 detpack active at a g_globalvars.time.\n" );
+			G_sprint( self, 2, "You can only have 1 detpack active at a time.\n" );
 			return;
 		}
 	}
-#endif
+
 	if ( timer < 5 )
 	{
 		G_sprint( self, 2, "You can't set detpacks for less that 5 seconds.\n" );
@@ -215,12 +224,10 @@ void TeamFortress_SetDetpack( float timer )
 	G_sprint( self, 2, "Setting detpack for %.0f seconds...\n", timer );
 	newmis = spawn(  );
 	g_globalvars.newmis = EDICT_TO_PROG( newmis );
-#ifndef TG
 	newmis->s.v.owner = EDICT_TO_PROG( self );
-#else
-	newmis->s.v.owner = EDICT_TO_PROG( self );
+#ifdef TG
 	newmis->real_owner = self;
-	VectorCopy( self->s.v.origin, newmis->s.v.origin );
+//	VectorCopy( self->s.v.origin, newmis->s.v.origin );
 #endif
 	newmis->s.v.classname = "timer";
 	newmis->s.v.netname = "detpack_timer";
@@ -454,7 +461,10 @@ void TeamFortress_DetpackTouch(  )
 	if ( self->weaponmode == 1 )
 		return;
 	owner = PROG_TO_EDICT( self->s.v.owner );
-#ifndef TG
+#ifdef TG
+	if ( (other->team_no == owner->team_no && owner->team_no ) && !tg_data.tg_enabled )
+		return;
+#else
 	if ( other->team_no == owner->team_no && owner->team_no )
 		return;
 #endif

@@ -3285,45 +3285,48 @@ void ImpulseCommands(  )
 		UseSpecialSkill(  );
 
 #ifdef TG
-	switch ( ( int ) self->s.v.impulse )
-	{
-	case TG_MAINMENU_IMPULSE:
-		self->current_menu = TG_MENU_MAIN;
-		self->s.v.impulse = 0;
-		break;
-	case TG_SG_REBUILD_IMPULSE:
-		Eng_StaticSG_Activate(  );
-		self->s.v.impulse = 0;
-		break;
-	case TG_SG_RELOAD_IMPULSE:
-		Eng_SGReload(  );
-		self->s.v.impulse = 0;
-		break;
-	case TG_SG_UPGRADE_IMPULSE:
-		Eng_SGUp(  );
-		self->s.v.impulse = 0;
-		break;
-	case TG_DISP_LOAD_IMPULSE:
-		Eng_DispLoad(  );
-		self->s.v.impulse = 0;
-		break;
-	case TG_DISP_UNLOAD_IMPULSE:
-		Eng_DispUnload(  );
-		self->s.v.impulse = 0;
-		break;
-	case TG_CONC_IMPULSE:
-		TG_Eff_Conc( self );
-		self->s.v.impulse = 0;
-		break;
-	case TG_FLASH_IMPULSE:
-		TG_Eff_Flash( self );
-		self->s.v.impulse = 0;
-		break;
-	case TG_EFF_REMOVE_IMPULSE:
-		TG_Eff_Remove(self);
-		self->s.v.impulse = 0;
-		break;
-	}
+        if( tg_data.tg_enabled )
+        {
+         	switch ( ( int ) self->s.v.impulse )
+         	{
+         	case TG_MAINMENU_IMPULSE:
+         		self->current_menu = TG_MENU_MAIN;
+         		self->s.v.impulse = 0;
+         		break;
+         	case TG_SG_REBUILD_IMPULSE:
+         		Eng_StaticSG_Activate(  );
+         		self->s.v.impulse = 0;
+         		break;
+         	case TG_SG_RELOAD_IMPULSE:
+         		Eng_SGReload(  );
+         		self->s.v.impulse = 0;
+         		break;
+         	case TG_SG_UPGRADE_IMPULSE:
+         		Eng_SGUp(  );
+         		self->s.v.impulse = 0;
+         		break;
+         	case TG_DISP_LOAD_IMPULSE:
+         		Eng_DispLoad(  );
+         		self->s.v.impulse = 0;
+         		break;
+         	case TG_DISP_UNLOAD_IMPULSE:
+         		Eng_DispUnload(  );
+         		self->s.v.impulse = 0;
+         		break;
+         	case TG_CONC_IMPULSE:
+         		TG_Eff_Conc( self );
+         		self->s.v.impulse = 0;
+         		break;
+         	case TG_FLASH_IMPULSE:
+         		TG_Eff_Flash( self );
+         		self->s.v.impulse = 0;
+         		break;
+         	case TG_EFF_REMOVE_IMPULSE:
+         		TG_Eff_Remove(self);
+         		self->s.v.impulse = 0;
+         		break;
+         	}
+        }
 #endif
 	if ( !self->is_building && !self->is_detpacking && !self->is_feigning )
 	{
@@ -3419,24 +3422,32 @@ void ImpulseCommands(  )
 	case 188:
 #ifndef TG
 		if ( self->playerclass == PC_ENGINEER )
+#else
+		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
 #endif
 			DestroyBuilding( self, "building_sentrygun" );
 		break;
 	case 187:
 #ifndef TG
 		if ( self->playerclass == PC_ENGINEER )
+#else
+		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
 #endif
 			DestroyBuilding( self, "building_dispenser" );
 		break;
 	case 196:
 #ifndef TG
 		if ( self->playerclass == PC_ENGINEER )
+#else
+		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
 #endif
 			DestroyBuilding( self, "building_teleporter_exit" );
 		break;
 	case 197:
 #ifndef TG
 		if ( self->playerclass == PC_ENGINEER )
+#else
+		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
 #endif
 			DestroyBuilding( self, "building_teleporter_entrance" );
 		break;
@@ -3455,6 +3466,8 @@ void ImpulseCommands(  )
 	case 179:
 #ifndef TG
 		if ( self->playerclass == PC_ENGINEER )
+#else
+		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
 #endif
 			TeamFortress_EngineerBuild(  );
 		break;

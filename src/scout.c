@@ -221,11 +221,7 @@ void FlashGrenadeExplode(  )
 					newmis->gren_eff_time = g_globalvars.time + tg_data.gren_time;
 #endif
 			}
-#ifndef TG
 			if ( te == owner )
-#else
-			if ( te == owner /*&& !tg_data.fullflash_for_self*/ )
-#endif
 			{
 				te->FlashTime = 16;
 				stuffcmd( te, "v_cshift 160 160 160 160\n" );
@@ -253,11 +249,7 @@ void FlashGrenadeExplode(  )
 						newmis->gren_eff_time = g_globalvars.time + tg_data.gren_time;
 #endif
 			}
-#ifndef TG
 			if ( te == owner )
-#else
-			if ( te == owner /*&& !tg_data.fullflash_for_self*/ )
-#endif
 			{
 				te->FlashTime = 16;
 			} else

@@ -148,6 +148,8 @@ void TeamFortress_MOTD(  )
 	if ( self->motd == 85 )
 	{
 #ifdef TG
+              if(tg_data.tg_enabled)
+              {
 		TeamFortress_Alias( "mod_menu", TG_MAINMENU_IMPULSE, 0 );
 		TeamFortress_Alias( "sg_rebuild", TG_SG_REBUILD_IMPULSE, 0 );
 		TeamFortress_Alias( "sg_reload", TG_SG_RELOAD_IMPULSE, 0 );
@@ -157,6 +159,7 @@ void TeamFortress_MOTD(  )
 		TeamFortress_Alias( "eff_conc", TG_CONC_IMPULSE, 0);
 		TeamFortress_Alias( "eff_flash", TG_FLASH_IMPULSE, 0);
 		TeamFortress_Alias( "eff_remove", TG_EFF_REMOVE_IMPULSE, 0);
+              }
 #endif
 		return;
 	}

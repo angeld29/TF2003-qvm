@@ -299,6 +299,8 @@ extern  int             num_team_ammoboxes[5];
 extern	int             item_list_bit;
 extern char           *team_menu_string;  
 
+int FLAME_MAXWORLDNUM, MAX_WORLD_PIPEBOMBS, MAX_WORLD_AMMOBOXES, GR_TYPE_MIRV_NO, GR_TYPE_NAPALM_NO;
+
 typedef struct {
 	int             toggleflags;
 	float           respawn_delay_time;
@@ -338,4 +340,5 @@ typedef struct {
 	int		new_gas;
 	int		gren2box,random_tf_spawn,disable_powerups,flag_timer,detpack_block;
 	int		mtfl;
+	int 		lan_mode;
 } tf_server_data_t;

@@ -60,6 +60,7 @@ typedef enum
 
 
 typedef struct{
+ int tg_enabled;
  int godmode;
  int unlimit_ammo,unlimit_grens;
  int disable_reload;
