@@ -2070,25 +2070,25 @@ void TeamFortress_AmmoboxTouch(  )
 		{
 		case 1:
 			if ( other->s.v.ammo_shells >= TeamFortress_GetMaxAmmo( other, 256 ) )
-				break;
+				return;
 			other->s.v.ammo_shells += self->aflag;
 			G_sprint( other, 0, "You picked up %d shells\n", ( int ) self->aflag );
 			break;
 		case 2:
 			if ( other->s.v.ammo_nails >= TeamFortress_GetMaxAmmo( other, 512 ) )
-				break;
+				return;
 			other->s.v.ammo_nails += self->aflag;
 			G_sprint( other, 0, "You picked up %d nails\n", ( int ) self->aflag );
 			break;
 		case 3:
 			if ( other->s.v.ammo_rockets >= TeamFortress_GetMaxAmmo( other, 1024 ) )
-				break;
+				return;
 			other->s.v.ammo_rockets += self->aflag;
 			G_sprint( other, 0, "You picked up %d rockets\n", ( int ) self->aflag );
 			break;
 		case 4:
 			if ( other->s.v.ammo_cells >= TeamFortress_GetMaxAmmo( other, 2048 ) )
-				break;
+				return;
 			other->s.v.ammo_cells += self->aflag;
 			G_sprint( other, 0, "You picked up %d cells\n", ( int ) self->aflag );
 			break;

@@ -2271,6 +2271,13 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 				G_sprint( Player, 2, "%s ", Goal->team_str_carried );
 			else
 				G_sprint( Player, 2, "%s ", Goal->non_team_str_carried );
+
+	        	if( !(Item->s.v.owner) ) //FIXME !!!!!
+	        	{
+	        	        G_sprint( Player, 2, ".\n");
+	        		return;
+	        	}
+
 			if ( Player == PROG_TO_EDICT( Item->s.v.owner ) )
 				G_sprint( Player, 2, "You.\n" );
 			else

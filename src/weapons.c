@@ -210,18 +210,14 @@ void W_FireSpanner(  )
 							if ( trace_ent->maxarmor -
 							     trace_ent->s.v.armorvalue < healam * 4 )
 								healam =
-								    ceil( ( trace_ent->
-									    maxarmor -
-									    trace_ent->s.v.armorvalue ) / 4 );
+								    ceil( ( trace_ent->maxarmor - trace_ent->s.v.armorvalue ) / 4 );
 							if ( healam > 0 )
 							{
-								trace_ent->s.v.
-								    armorvalue = trace_ent->s.v.armorvalue + healam * 4;
+								trace_ent->s.v.armorvalue = trace_ent->s.v.armorvalue + healam * 4;
 								if ( trace_ent->s.v.armorvalue > trace_ent->maxarmor )
 									trace_ent->s.v.armorvalue = trace_ent->maxarmor;
 								if ( !tg_data.unlimit_ammo )
-									self->s.v.
-									    ammo_cells = self->s.v.ammo_cells - healam;
+									self->s.v.ammo_cells = self->s.v.ammo_cells - healam;
 								sound( trace_ent,
 								       CHAN_WEAPON, "items/r_item1.wav", 1, ATTN_NORM );
 								trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
@@ -896,8 +892,8 @@ void FireSniperBullet( vec3_t direction, float damage )
 	src[1] = self->s.v.origin[1] + g_globalvars.v_forward[1] * 10;
 	src[2] = self->s.v.absmin[2] + self->s.v.size[2] * 0.7;
 	ClearMultiDamage(  );
-	traceline( PASSVEC3( src ), src[0] + direction[0] * 2048, src[1] + direction[1] * 2048,
-		   src[2] + direction[2] * 2048, false, self );
+	traceline( PASSVEC3( src ), src[0] + direction[0] * 4096, src[1] + direction[1] * 4096,
+		   src[2] + direction[2] * 4096, false, self );
 
 	if ( g_globalvars.trace_fraction != 1 )
 		TraceAttack( damage, direction );

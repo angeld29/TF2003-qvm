@@ -145,8 +145,8 @@ void RefreshStatusBar( gedict_t * pl )
 	trap_CenterPrint( NUM_FOR_EDICT( pl ), sbar_str );
 }
 
-int     SbarReSizes[] = { 0, 5, 12, 17, 23, 25, 35, 50, 70 };
-char   *AddStatusSize( gedict_t * pl, char *strp )
+int     SbarReSizes_old[] = { 0, 5, 12, 17, 23, 25, 35, 50, 70 };
+char   *AddStatusSize_old( gedict_t * pl, char *strp )
 {
 	int     i;
 
@@ -158,7 +158,24 @@ char   *AddStatusSize( gedict_t * pl, char *strp )
 		*strp++ = '\n';
 		*strp++ = '\n';
 	}
-	for ( i = 0; i < SbarReSizes[pl->StatusBarRes]; i++ )
+	for ( i = 0; i < SbarReSizes_old[pl->StatusBarRes]; i++ )
+		*strp++ = '\n';
+	*strp = 0;
+	return strp;
+}
+int     SbarReSizes[2][9] = {{ 14 ,19, 26, 32, 37, 39, 49, 64, 84 },
+			     { 11 ,16, 23, 29, 34, 36, 46, 61, 81 }};
+
+char   *AddStatusSize( gedict_t * pl, char *strp )
+{
+	int     i,num;
+
+	if( pl->StatusBarSize == 1)
+		num = SbarReSizes[1][pl->StatusBarRes];
+	else
+		num = SbarReSizes[0][pl->StatusBarRes];
+		
+	for ( i = 0; i < num; i++ )
 		*strp++ = '\n';
 	*strp = 0;
 	return strp;

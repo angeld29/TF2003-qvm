@@ -474,7 +474,7 @@ void FireSentryBulletsNEW( int shotcount, gedict_t * targ, float spread_x, float
 
 	normalize(dir,norm_dir);
 	
-	//чтобы не попадять в подставку
+	//чтобы не попадать в подставку
 	traceline( PASSVEC3( src ), PASSVEC3( dst ), 0, self );
 	
 	if( (PROG_TO_EDICT(g_globalvars.trace_ent) == self->trigger_field) && vlen(dir) > 100 )

@@ -55,9 +55,17 @@ void player_touch(  )
 						{
 							if ( PROG_TO_EDICT( te->s.v.owner ) == self
 							     && te->s.v.think == ( func_t ) BioInfection_Decay )
+							     {
 								found = 1;
+								break;
+							     }
 							else
 								te = find( te, FOFS( s.v.classname ), "timer" );
+						}
+						if(!te)
+						{
+							G_dprint( "***BUG TFSTATE_INFECTED without BioInfection_Decay timer ***\n" );
+							return;
 						}
 						Bio = spawn(  );
 						Bio->s.v.nextthink = 2;

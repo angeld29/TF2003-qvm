@@ -259,10 +259,10 @@ void DecodeLevelParms()
 				{
 					tf_data.cb_ceasefire_time = g_globalvars.time + tf_data.cb_ceasefire_time * 60;
 
-					if( tf_data.cb_prematch_time <= tf_data.cb_ceasefire_time + 6  )
+					if( tf_data.cb_prematch_time <= tf_data.cb_ceasefire_time + 7  )
 					{
 						tf_data.cb_ceasefire_time = tf_data.cb_prematch_time;
-						tf_data.cb_prematch_time += 6;
+						tf_data.cb_prematch_time += 7;
 					}
 					
                    			tf_data.cease_fire = 1;
@@ -1083,13 +1083,21 @@ int CheckTelefragSpot( vec3_t v )
 	vec3_t spot_mins,spot_maxs;
 
 	//make tdeath bbox for spot origin
-	spot_mins[0] = self->s.v.mins[0] + v[0] - 5;
+/*	spot_mins[0] = self->s.v.mins[0] + v[0] - 5;
 	spot_mins[1] = self->s.v.mins[1] + v[1] - 5;
 	spot_mins[2] = self->s.v.mins[2] + v[2] - 5;
 
 	spot_maxs[0] = self->s.v.maxs[0] + v[0] + 5;	
 	spot_maxs[1] = self->s.v.maxs[1] + v[1] + 5;	
-	spot_maxs[2] = self->s.v.maxs[2] + v[2] + 5;	
+	spot_maxs[2] = self->s.v.maxs[2] + v[2] + 5;	*/
+
+	spot_mins[0] = VEC_HULL_MIN[0] + v[0] - 5;
+	spot_mins[1] = VEC_HULL_MIN[1] + v[1] - 5;
+	spot_mins[2] = VEC_HULL_MIN[2] + v[2] - 5;
+
+	spot_maxs[0] = VEC_HULL_MAX[0] + v[0] + 5;	
+	spot_maxs[1] = VEC_HULL_MAX[1] + v[1] + 5;	
+	spot_maxs[2] = VEC_HULL_MAX[2] + v[2] + 5;	
 
 	for (   te = world ; (te = find( te , FOFS(s.v.classname), "player"));)
 	{
