@@ -1862,7 +1862,7 @@ void TeamFortress_CheckClassStats(  )
 		self->no_grenades_2 = 0;
 
 	if ( self->s.v.health > self->s.v.max_health && !( ( int ) ( self->s.v.items ) & IT_SUPERHEALTH ) )
-		TF_T_Damage( self, world, world, self->s.v.health - self->s.v.max_health, 0, TF_TD_NOSOUND );
+		TF_T_Damage( self, world, world, self->s.v.max_health, 0, TF_TD_NOSOUND );
 //		TF_T_Damage( self, world, world, self->s.v.max_health - self->s.v.health, 0, TF_TD_NOSOUND ); //old qqq
 
 	if ( self->s.v.health < 0 )

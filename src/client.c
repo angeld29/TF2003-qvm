@@ -121,6 +121,7 @@ void DecodeLevelParms()
 	char    st[10];
 	gedict_t *ent;
 	gedict_t *te;
+	float fvar;
 
 	// local "21?TeamFortress"
 	// local "info_player_team1"
@@ -241,45 +242,52 @@ void DecodeLevelParms()
 			tf_data.clan_scores_dumped = 0;
 			tf_data.game_locked = 0;
 
-			tf_data.cb_prematch_time = g_globalvars.time + GetSVInfokeyFloat( "pm", "prematch", 0 ) * 60;
-			if ( timelimit && ( ( timelimit ) < tf_data.cb_prematch_time ) )
-			{
-				timelimit = tf_data.cb_prematch_time + 1;
-				sprintf( st, "%d", (int)( timelimit / 60 ) );
-				trap_cvar_set( "timelimit", st );
-			}
-			if ( tf_data.cb_prematch_time > g_globalvars.time )
+			fvar = GetSVInfokeyFloat( "pm", "prematch", 0 );
+			if( fvar < 0 )
+				fvar = 0;
+			tf_data.cb_prematch_time = g_globalvars.time + fvar * 60;
+			if( fvar )
 			{
 				tf_data.cb_prematch_time += 5;
 				ent = spawn();
 				ent->s.v.think = ( func_t ) PreMatch_Think;
 				ent->s.v.nextthink = g_globalvars.time + 5;
+
 				tf_data.cb_ceasefire_time = GetSVInfokeyFloat( "cft", "ceasefire_time", 0 );
-				if ( tf_data.cb_ceasefire_time )
+
+				if ( tf_data.cb_ceasefire_time > 0 )
 				{
 					tf_data.cb_ceasefire_time = g_globalvars.time + tf_data.cb_ceasefire_time * 60;
-					if( tf_data.cb_prematch_time < tf_data.cb_ceasefire_time + 5 )
+
+					if( tf_data.cb_prematch_time <= tf_data.cb_ceasefire_time + 6  )
 					{
-						tf_data.cb_ceasefire_time = tf_data.cb_prematch_time - 5;
+						tf_data.cb_ceasefire_time = tf_data.cb_prematch_time;
+						tf_data.cb_prematch_time += 6;
 					}
-
-         				tf_data.cease_fire = 1;
-         				G_bprint( 2, "CEASE FIRE\n" );
-         				te = find( world, FOFS( s.v.classname ), "player" );
-         				while ( te )
-         				{
-         					CenterPrint( te, "CEASE FIRE\n" );
-         					te->tfstate = te->tfstate | TFSTATE_CANT_MOVE;
-         					TeamFortress_SetSpeed( te );
-         					te = find( te, FOFS( s.v.classname ), "player" );
-         				}
-         				te = spawn();
-         				te->s.v.classname = "ceasefire";
-         				te->s.v.think = ( func_t ) CeaseFire_think;
-         				te->s.v.nextthink = g_globalvars.time + 5;
-         				te->s.v.weapon = 1;
-				}
-
+					
+         			tf_data.cease_fire = 1;
+         			G_bprint( 2, "CEASE FIRE\n" );
+         			te = find( world, FOFS( s.v.classname ), "player" );
+         			while ( te )
+         			{
+         				CenterPrint( te, "CEASE FIRE\n" );
+         				te->tfstate = te->tfstate | TFSTATE_CANT_MOVE;
+         				TeamFortress_SetSpeed( te );
+         				te = find( te, FOFS( s.v.classname ), "player" );
+         			}
+         			te = spawn();
+         			te->s.v.classname = "ceasefire";
+         			te->s.v.think = ( func_t ) CeaseFire_think;
+         			te->s.v.nextthink = g_globalvars.time + 5;
+         			te->s.v.weapon = 1;
+				}else
+					tf_data.cb_ceasefire_time = 0;
+			}
+			if ( timelimit && ( ( timelimit ) < tf_data.cb_prematch_time ) )
+			{
+				timelimit = tf_data.cb_prematch_time + 1;
+				sprintf( st, "%d", (int)( timelimit / 60 ) );
+				trap_cvar_set( "timelimit", st );
 			}
 			GetSVInfokeyString( "lg", "locked_game", st, sizeof( st ), "off" );
 			if ( !strcmp( st, "on" ) )
