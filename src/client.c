@@ -124,7 +124,7 @@ void autokick_think()
 	PROG_TO_EDICT( self->s.v.owner )->teamkills = 0;
 	dremove( self );
 }
-
+extern int     team_top_colors[5];
 void DecodeLevelParms()
 {
 	char    st[10];
@@ -370,30 +370,30 @@ void DecodeLevelParms()
 ////top colors
 		tf_data.topcolor_check = 0;
 
-		tf_data.tc1 = GetSVInfokeyInt( "tc1", NULL, -1 );
-		if ( tf_data.tc1 >= 0 && tf_data.tc1 <= 15 )
+		team_top_colors[1] = GetSVInfokeyInt( "tc1", NULL, -1 );
+		if ( team_top_colors[1] >= 0 && team_top_colors[1] <= 15 )
 			tf_data.topcolor_check = 1;
 		else
-			tf_data.tc1 = TeamFortress_TeamGetColor( 1 ) - 1;
+			team_top_colors[1] = TeamFortress_TeamGetColor( 1 ) - 1;
 
-		tf_data.tc2 = GetSVInfokeyInt( "tc2", NULL, -1 );
-		if ( tf_data.tc2 >= 0 && tf_data.tc2 <= 15 )
+		team_top_colors[2] = GetSVInfokeyInt( "tc2", NULL, -1 );
+		if ( team_top_colors[2] >= 0 && team_top_colors[2] <= 15 )
 			tf_data.topcolor_check = 1;
 		else
-			tf_data.tc2 = TeamFortress_TeamGetColor( 2 ) - 1;
+			team_top_colors[2] = TeamFortress_TeamGetColor( 2 ) - 1;
 
 
-		tf_data.tc3 = GetSVInfokeyInt( "tc3", NULL, -1 );
-		if ( tf_data.tc3 >= 0 && tf_data.tc3 <= 15 )
+		team_top_colors[3] = GetSVInfokeyInt( "tc3", NULL, -1 );
+		if ( team_top_colors[3] >= 0 && team_top_colors[3] <= 15 )
 			tf_data.topcolor_check = 1;
 		else
-			tf_data.tc3 = TeamFortress_TeamGetColor( 3 ) - 1;
+			team_top_colors[3] = TeamFortress_TeamGetColor( 3 ) - 1;
 
-		tf_data.tc4 = GetSVInfokeyInt( "tc4", NULL, -1 );
-		if ( tf_data.tc4 >= 0 && tf_data.tc4 <= 15 )
+		team_top_colors[4] = GetSVInfokeyInt( "tc4", NULL, -1 );
+		if ( team_top_colors[4] >= 0 && team_top_colors[4] <= 15 )
 			tf_data.topcolor_check = 1;
 		else
-			tf_data.tc4 = TeamFortress_TeamGetColor( 4 ) - 1;
+			team_top_colors[4] = TeamFortress_TeamGetColor( 4 ) - 1;
 
 
 		GetSVInfokeyString( "adg", "allow_drop_goal", st, sizeof( st ), "off" );
@@ -509,8 +509,8 @@ void DecodeLevelParms()
 			tf_data.invis_only = 0;
 			tf_data.cheat_pause = 1;
 			tf_data.topcolor_check = 1;
-//                      tf_data.tc1 = 13;
-//                      tf_data.tc2 = 4;
+//                      team_top_colors[1] = 13;
+//                      team_top_colors[2] = 4;
 			tf_data.allow_drop_goal = 0;
 			tf_data.add_pipe = 1;
 			tf_data.new_flash = 1;
@@ -2224,7 +2224,7 @@ void ClientConnect()
 
 void ClientDisconnect()
 {
-	gedict_t *te;
+	gedict_t *te,*saveself;
 
 //      float   fr;
 
@@ -2232,8 +2232,24 @@ void ClientDisconnect()
 
 	sound( self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_NONE );
 
+	te = find( world, FOFS( s.v.classname ), "primer" );
+	while ( te && te->s.v.owner != EDICT_TO_PROG( self ) )
+		te = find( te, FOFS( s.v.classname ), "primer" );
+	if ( te )
+//  te->s.v.nextthink = g_globalvars.time;
+	{
+		self->s.v.deadflag = 1;
+		saveself = self;
+		self = te;
+		( ( void ( * )(  ) ) ( self->s.v.think ) ) (  );
+		self = saveself;
+		self->s.v.deadflag = 0;
+	}
+
 	self->has_disconnected = 1;
 	TeamFortress_RemoveTimers();
+
+
 	Engineer_RemoveBuildings( self );
 	te = find( world, FOFS( s.v.classname ), "detpack" );
 	while ( te )

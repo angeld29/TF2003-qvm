@@ -1775,16 +1775,6 @@ void TeamFortress_RemoveTimers(  )
 		}
 	}
 
-	for ( te = world;te = find( te, FOFS( s.v.classname ), "primer" ) ;)
-	{
-		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
-		{
-		        //FIX ME drop grenade???
-			dremove( te );
-			te = world;
-		}
-	}
-
 	te = world;
 	//FIX ME !!!!!!!!!!!!!!!!!!!!
 	while ( te = find( te, FOFS( s.v.classname ), "item_tfgoal" ) )

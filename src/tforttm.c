@@ -185,130 +185,115 @@ int TeamFortress_TeamSet( int tno )
 
 void TeamFortress_CheckTeamCheats(  )
 {
-//FIX ME !!!!!!!!!!!!!
-/* string st;
- string sk;
- float tc;
+	char    st[20], *sk;
+	int     tc;
 
- if (self.immune_to_check > g_globalvars.time) 
-  return;
- if (self.deadflag) 
-  return;
- if (self.netname == string_null) 
-  KickCheater(self);
- else {
-  if (self.playerclass && !self.team_no && teamplay > 0) 
-   KickCheater(self);
- }
- if (self.team_no > 0 && teamplay > 0) {
-  st = infokey(self, "bottomcolor");
-  tc = stof(st);
-  if (self.playerclass == 8 && self.undercover_team) {
-   if (TeamFortress_TeamGetColor(self.undercover_team) - 1 != tc) {
-    stuffcmd(self, "color ");
-    tc = TeamFortress_TeamGetTopColor(self.undercover_team) ;
-    st = ftos(tc);
-    stuffcmd(self, st);
-    stuffcmd(self, " ");
+	if ( self->immune_to_check > g_globalvars.time )
+		return;
+	if ( self->s.v.deadflag )
+		return;
+	if ( !( self->s.v.netname[0] ) )
+		KickCheater( self );
+	else
+	{
+		if ( self->playerclass && !self->team_no && teamplay > 0 )
+			KickCheater( self );
+	}
+	if ( self->team_no > 0 && teamplay > 0 )
+	{
 
-    tc = TeamFortress_TeamGetColor(self.undercover_team) - 1;
-    st = ftos(tc);
-    stuffcmd(self, st);
+		tc = GetInfokeyInt( self, "bottomcolor", NULL, 0 );
 
-    stuffcmd(self, "\n");
-    bprint2(1, self.netname, " has been kicked for changing color.\n");
-    sprint(self, 2, "You have been kicked for changing your pants color. Don't do it.\n");
-    KickCheater(self);
-    return;
-   }
-  }
-  else {
-   if (tc != TeamFortress_TeamGetColor(self.team_no) - 1) {
-    stuffcmd(self, "color ");
-    tc = TeamFortress_TeamGetTopColor(self.team_no);
-    st = ftos(tc);
-    stuffcmd(self, st);
-    stuffcmd(self, " ");
+		if ( self->playerclass == PC_SPY && self->undercover_team )
+		{
+			if ( TeamFortress_TeamGetColor( self->undercover_team ) - 1 != tc )
+			{
+				stuffcmd( self, "color %d %d\n",
+					  TeamFortress_TeamGetTopColor( self->undercover_team ),
+					  TeamFortress_TeamGetColor( self->undercover_team ) - 1 );
 
-    tc = TeamFortress_TeamGetColor(self.team_no) - 1;
-    st = ftos(tc);
-    stuffcmd(self, st);
+				G_bprint( 1, "%s has been kicked for changing color.\n", self->s.v.netname );
+				G_sprint( self, 2,
+					  "You have been kicked for changing your pants color. Don't do it.\n" );
+				KickCheater( self );
+				return;
+			}
+		} else
+		{
+			if ( tc != TeamFortress_TeamGetColor( self->team_no ) - 1 )
+			{
+				stuffcmd( self, "color %d %d\n",
+					  TeamFortress_TeamGetTopColor( self->team_no ),
+					  TeamFortress_TeamGetColor( self->team_no ) - 1 );
+				G_bprint( 1, "%s has been kicked for changing color.\n", self->s.v.netname );
+				G_sprint( self, 2,
+					  "You have been kicked for changing your pants color. Don't do it.\n" );
+				KickCheater( self );
+				return;
+			}
+		}
+		if ( tf_data.topcolor_check )
+		{
+			tc = GetInfokeyInt( self, "topcolor", NULL, 0 );
+			if ( self->playerclass == PC_SPY && self->undercover_team )
+			{
+				if ( TeamFortress_TeamGetTopColor( self->undercover_team ) != tc )
+				{
+					stuffcmd( self, "color " );
 
-    stuffcmd(self, "\n");
-    bprint2(1, self.netname, " has been kicked for changing color.\n");
-    sprint(self, 2, "You have been kicked for changing your pants color. Don't do it.\n");
-    KickCheater(self);
-    return;
-   }
-  }
-                if(topcolor_check){
-  st = infokey(self, "topcolor");
-  tc = stof(st);
-  if (self.playerclass == 8 && self.undercover_team) {
-   if (TeamFortress_TeamGetTopColor(self.undercover_team) != tc) {
-    stuffcmd(self, "color ");
+					stuffcmd( self, "color %d %d\n",
+						  TeamFortress_TeamGetTopColor( self->undercover_team ),
+						  TeamFortress_TeamGetColor( self->undercover_team ) - 1 );
 
-    tc = TeamFortress_TeamGetTopColor(self.undercover_team) ;
-    st = ftos(tc);
-    stuffcmd(self, st);
-    stuffcmd(self, " ");
+					G_bprint( 1, "%s has been kicked for changing color.\n", self->s.v.netname );
+					G_sprint( self, 2,
+						  "You have been kicked for changing your top color. Don't do it.\n" );
+					KickCheater( self );
+					return;
+				}
+			} else
+			{
+				if ( tc != TeamFortress_TeamGetTopColor( self->team_no ) )
+				{
+					stuffcmd( self, "color %d %d\n",
+						  TeamFortress_TeamGetTopColor( self->undercover_team ),
+						  TeamFortress_TeamGetColor( self->undercover_team ) - 1 );
 
-    tc = TeamFortress_TeamGetColor(self.undercover_team) - 1;
-    st = ftos(tc);
-    stuffcmd(self, st);
+					G_bprint( 1, "%s has been kicked for changing color.\n", self->s.v.netname );
+					G_sprint( self, 2,
+						  "You have been kicked for changing your top color. Don't do it.\n" );
+					KickCheater( self );
+					return;
+				}
+			}
+		}
+		if ( self->playerclass )
+		{
+			GetInfokeyString( self, "skin", NULL, st, sizeof( st ), "" );
+			tc = 0;
+			sk = TeamFortress_GetSkin( self );
+			if ( strneq( st, sk ) )
+			{
+				TeamFortress_SetSkin( self );
+				G_bprint( 1, "%s has been kicked for changing skin.\n", self->s.v.netname );
+				G_sprint( self, 2, "You have been kicked for changing your skin. Don't do it.\n" );
+				KickCheater( self );
+			}
+			if ( tc == 8 )
+				self->playerclass = 8;
+		}
+		sk = GetTeamName( self->team_no );
+		GetInfokeyString( self, "team", NULL, st, sizeof( st ), "" );
+		if ( strneq( st, sk ) )
+		{
+			SetTeamName( self );
+			G_bprint( 1, " has been kicked for changing team.\n", self->s.v.netname );
+			G_sprint( self, 2, "You have been kicked for changing your team. Don't do it.\n" );
+			KickCheater( self );
+			return;
+		}
+	}
 
-    stuffcmd(self, "\n");
-    bprint2(1, self.netname, " has been kicked for changing color.\n");
-    sprint(self, 2, "You have been kicked for changing your top color. Don't do it.\n");
-    KickCheater(self);
-    return;
-   }
-  }
-  else {
-   if (tc != TeamFortress_TeamGetTopColor(self.team_no)) {
-    stuffcmd(self, "color ");
-
-
-    tc = TeamFortress_TeamGetTopColor(self.team_no);
-    st = ftos(tc);
-    stuffcmd(self, st);
-    stuffcmd(self, " ");
-
-    tc = TeamFortress_TeamGetColor(self.team_no) - 1;
-    st = ftos(tc);
-    stuffcmd(self, st);
-
-    stuffcmd(self, "\n");
-    bprint2(1, self.netname, " has been kicked for changing color.\n");
-    sprint(self, 2, "You have been kicked for changing your top color. Don't do it.\n");
-    KickCheater(self);
-    return;
-   }
-   }
-  }
-  if (self.playerclass) {
-   st = infokey(self, "skin");
-   tc = 0;
-   sk = TeamFortress_GetSkin(self);
-   if (st != sk) {
-    TeamFortress_SetSkin(self);
-    bprint2(1, self.netname, " has been kicked for changing skin.\n");
-    sprint(self, 2, "You have been kicked for changing your skin. Don't do it.\n");
-    KickCheater(self);
-   }
-   if (tc == 8) 
-    self.playerclass = 8;
-  }
-  st = GetTeamName(self.team_no);
-  if (st != infokey(self, "team")) {
-   SetTeamName(self);
-   bprint2(1, self.netname, " has been kicked for changing team.\n");
-   sprint(self, 2, "You have been kicked for changing your team. Don't do it.\n");
-   KickCheater(self);
-   return;
-  }
- }
-*/
 }
 
 

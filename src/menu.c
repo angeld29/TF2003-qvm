@@ -1095,7 +1095,105 @@ void Menu_NULL( menunum_t menu )
 }
 
 
+char *birthday_msgs[]={
+"\n\n\n\nHAPPY BIRTHDAY TEAMFORTRESS!\n",
+"\n\n\n\nCurrent number of Snipers on\nthe Battlements:\n%4d",
+"\n\n\n\nYeeha!\nThe 505,672nd detpack was\njust laid on the bridge!\n",
+"\n\n\n\nIs that an assault cannon in your\n pocket, or are you just playing TF?\n(Blame Ian)\n",
+"\n\n\n\n25,000 downloads\n50 donations\nDamn, but we rock!\n",
+"\n\n\n\nTeamFortress is one year old today!\n",
+"\n\n\n\nTF II available 2nd quarter 98\n",
+"\n\n\n\nhmm.... I wonder what the next\nmessage will be...\n",
+"\n\n\n\nKill your friends! Kill your family!\nSnipe your pets! Detpack your house!\nGet TF Now!\n",
+"\n\n\n\nDeath to Potatoes!\n",
+"\n\n\n\n\"You guys have really fucked up\n urinals, you know that?\"\n   - TyR in Australia\n",
+"\n\n\n\nMany potatoes were harmed in the\nmaking of this product.\n",
+"\n\n\n\nBAH! I shoulda put the Demoman\nblast armor back while I was at it!\n   - Gudlyf\n",
+"\n\n\n\nTwin Peaks will be out... uhh...\nerr... soon.\n",
+"\n\n\n\n\"Twin Peaks will be finished tomorrow.\"\n   - TyR, 16th July, 25th July, 2nd August...",
+"\n\n\n\n\"After all, TF is an INSULT to the\npurity of CTF!\"\n   - Mjollnir, who was joking... really!",
+"\n\n\n\n\"I force them to work.\nElse I cut back their supplies\"\n   - Vomitgod, on TFS\n",
+"\n\n\n\nI remember the good ol' days...\nwhen you had to use imin1 & imin2\nto join a team.\n",
+"\n\n\n\nI remember the good ol' days...\nwhen there were 2 TF servers...\nand they were always down.",
+"\n\n\n\nI remember the good ol' days...\nwhen no-one knew how to use\nhand grenades...\n",
+"\n\n\n\nI remember the good ol' days...\nwhen 2fort was the only TF map.\nWe sure have come a long\nway since then... sigh",
+"\n\n\n\nI remember the good ol' days...\nwhen the sniper rifle just\nkilled in one hit... everytime\n",
+"\n\n\n\nI remember the good ol' days...\nwhen I could download TF in\n1 minute 20 seconds\n",
+"\n\n\n\nI remember the good ol' days...\nwhen I didn't have to download\nANYTHING to play TF\n",
+"\n\n\n\nI remember the good ol' days...\nwhen players used to say\n\"What's that bubble?\"\n",
+"\n\n\n\nI remember the good ol' days...\nwhen The Well actually had a well...\n",
+"\n\n\n\nI remember the good ol' days...\nwhen the motion detector was officially\nthe Scout's best friend, at least\naccording to the readme.txt\n",
+"\n\n\n\nI remember the good ol' days...\nwhen  Ian went to jail for punching\nRobin out\n",
+"\n\n\n\nTF Newbie Quote #1:\nUmm... How do I set a detpack?\n",
+"\n\n\n\nTF Newbie Quote #2:\nUmm... How do I throw a grenade?\n",
+"\n\n\n\nTF Newbie Quote #3:\nHey, he is cheating, that soldier just jumped up to the roof!!\n",
+"\n\n\n\nTF Newbie Quote #4:\nHow do I throw the pins?\n",
+"\n\n\n\nTF Newbie Quote #5:\nWhere do I take the flag!?!?!\n",
+"\n\n\n\nTF Newbie Quote #6:\nWhere's the control room?\n",
+"\n\n\n\nTF Newbie Quote #7:\nWhy the hell are these backpacks\nexploding?\n",
+"\n\n\n\nTF Newbie Quote #8:\nWho's the maniac with the axe?\n",
+"\n\n\n\nTF Newbie Quote #9:\nStop shooting me!\nI'm on your team!\nYou tried to attack my with the axe!\n",
+"\n\n\n\nTF Newbie Quote #10:\nWhat's this key? I thought this\nwas a CTF style map, guys?\n",
+"\n\n\n\nTF Veteran Quote #1:\nUm, Red Medics, please don't\nheal the President.\n",
+"\n\n\n\nTF Veteran Quote #2:\nGuys could you NOT set up\nsentries in hunted?\n",
+"\n\n\n\nTF Veteran Quote #3:\nWho the hell is on\nthe lift?\n",
+"\n\n\n\nTF Veteran Quote #4:\nDISCARD!!\n",
+"\n\n\n\nTF Veteran Quote #5:\nDamn Snipers!\n",
+"\n\n\n\nTF Veteran Quote #6:\nDamn Snipers!\n",
+"\n\n\n\nTF Veteran Quote #7:\nGet a mask or\nget in the WATER!!\n",
+"\n\n\n\nTF Veteran Quote #8:\nSpy's, please change colors\noutside our base.\n",
+"\n\n\n\nTF Veteran Quote #9:\nI was typing!!\n",
+"\n\n\n\nTF Veteran Quote #10:\nWhy is that guy running\nout of our yard with\nthe flag???\n",
+"\n\n\n\nTF's original design docs!\nCheck it out!\nwww.teamfortress.com/files/teamfortress/tfdes_1.gif",
+"\n\n\n\nTF's original design docs!\nCheck it out!\nwww.teamfortress.com/files/teamfortress/tfdes_2.gif",
+"\n\n\n\n\"MJ: Did you hear John Cash wrote TF?\"\n   - VomitGod"
+};
+int num_birthday_msgs = sizeof( birthday_msgs ) / sizeof( birthday_msgs[0] ) ;
+int snipers_num;
 void BirthdayTimer(  )
 {
-	dremove( self );
+        int rnum;
+        gedict_t*te;
+        if(self->s.v.weapon >5)
+        {
+  		self->s.v.weapon =  0;
+  		self->s.v.nextthink = g_globalvars.time + 180 + g_random() * 60;
+  		rnum = (int)(g_random() * num_birthday_msgs);
+  		self->team_str_home = NULL;
+  		if(rnum == 1)
+  		{
+  			snipers_num = TeamFortress_GetNoPlayers() / 2;
+			snipers_num = snipers_num * (g_random()+1);
+  		}
+  		self->team_str_moved  = birthday_msgs[rnum];
+        }else
+        {
+  		self->s.v.nextthink = g_globalvars.time + 1.5;
+  		self->s.v.weapon +=  1;
+        }
+        for( te = world; te= find(te, FOFS(s.v.classname) ,"player");)
+        {
+          G_centerprint(te, self->team_str_moved, snipers_num);
+          if(self->s.v.weapon == 1)
+          	sound(te, 3, "misc/b1.wav", 1, 1);
+          else
+          {
+           if(self->s.v.weapon <= 4)
+           {
+             switch((int)(g_random() *3))
+             {
+             	case 0:
+             		sound(te, 3, "misc/b2.wav", 1, 1);
+             		break;
+             	case 1:
+             		sound(te, 3, "misc/b3.wav", 1, 1);
+             		break;
+             	default:
+             		sound(te, 3, "misc/b4.wav", 1, 1);
+             		break;
+             }
+           }
+          }
+          	
+        }
 }

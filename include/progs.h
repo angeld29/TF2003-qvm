@@ -68,6 +68,8 @@ typedef struct gedict_s {
 
 	void            ( *think1 ) ();	//calcmove
 	vec3_t          finaldest;
+//hook  
+	int	lefty;
 //combat
 	float           dmg;
 	float           lip;
@@ -325,7 +327,6 @@ typedef struct {
 
 	int		cheat_pause;
 	int		disable_grens;
-	int		tc1,tc2,tc3,tc4;
 	int		topcolor_check;
 	int		sentry_type,sgppl;
 	int		snip_range_fix,snip_fps,snip_ammo;

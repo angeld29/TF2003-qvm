@@ -41,3 +41,4 @@ int     TeamFortress_TeamPutPlayerInTeam(  );
 void    KickCheater( gedict_t * p );
 void    TeamFortress_Alias( char *halias, int himpulse1, int himpulse2 );
 char   *TeamFortress_TeamGetColorString( int tno );
+char   *TeamFortress_GetSkin( gedict_t * p );
