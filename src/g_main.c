@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.2 2004-09-07 14:36:08 AngelD Exp $
+ *  $Id: g_main.c,v 1.3 2004-09-15 11:21:22 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -221,6 +221,10 @@ void Com_Printf( const char *msg, ... )
 void G_InitGame( int levelTime, int randomSeed )
 {
 	int             i;
+/*	int num;
+	char		dirlist[1024];
+	char*		dirptr;
+	int dirlen;*/
 //Common Initialization
 	srand( randomSeed );
 	framecount = 0;
@@ -238,7 +242,13 @@ void G_InitGame( int levelTime, int randomSeed )
 	}
 //TF Intialization
 	memset( &tf_data, 0, sizeof(tf_data));
-
+//test
+/*        num = trap_FS_GetFileList( "SKINS" , ".pcx" , dirlist, sizeof(dirlist));
+        dirptr=dirlist;
+	for (i = 0; i < num; i++, dirptr += dirlen+1) {
+		dirlen = strlen(dirptr);
+		G_Printf("%s\n",dirptr);
+	}*/
 }
 
 

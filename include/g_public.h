@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_public.h,v 1.2 2004-09-06 02:37:37 AngelD Exp $
+ *  $Id: g_public.h,v 1.3 2004-09-15 11:21:22 AngelD Exp $
  */
 
 #ifndef __G_PUBLIC_H__
@@ -31,7 +31,7 @@
 //
 // g_public.h -- game module information visible to server
 
-#define	GAME_API_VERSION	3
+#define	GAME_API_VERSION	4
 
 
 //===============================================================
@@ -106,7 +106,16 @@ typedef enum
 	g_acos,
 	G_CMD_ARGC,
 	G_CMD_ARGV,
-	G_TRACEAREA
+	G_TraceCapsule,
+	G_FSOpenFile,
+	G_FSCloseFile,
+	G_FSReadFile,
+	G_FSWriteFile,
+	G_FSSeekFile,
+	G_FSTellFile,
+	G_FSGetFileList,
+	G_CVAR_SET_FLOAT,
+	G_CVAR_STRING
 } gameImport_t;
 
 
@@ -185,5 +194,21 @@ typedef struct
 	int 		APIversion;
 } gameData_t;
 
+typedef int		fileHandle_t;
+
+typedef enum {
+	FS_READ_BIN,
+	FS_READ_TXT,
+	FS_WRITE_BIN,
+	FS_WRITE_TXT,
+	FS_APPEND_BIN,
+	FS_APPEND_TXT
+} fsMode_t;
+
+typedef enum {
+	FS_SEEK_CUR,
+	FS_SEEK_END,
+	FS_SEEK_SET
+} fsOrigin_t;
 
 #endif /* !__G_PUBLIC_H__ */

@@ -85,7 +85,7 @@ void    	sound( gedict_t * ed, int channel, char *samp, int vol, float att );
 gedict_t 	*checkclient(  );
 void    	traceline( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z,
 		   int nomonst, gedict_t * ed );
-void 		tracearea( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z, int nomonst, gedict_t * ed ,
+void 		TraceCapsule( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z, int nomonst, gedict_t * ed ,
 			float min_x, float min_y, float min_z, 
 			float max_x, float max_y, float max_z);
 void    	stuffcmd( gedict_t * ed, const char *fmt , ...);
@@ -98,6 +98,7 @@ void    	logfrag( gedict_t * killer, gedict_t * killee );
 void    	infokey( gedict_t * ed, char *key, char *valbuff, int sizebuff );
 void    	WriteEntity( int to, gedict_t * ed );
 void    	disableupdates( gedict_t * ed, float time );
+int		walkmove( gedict_t * ed, float yaw, float dist );
 
 //
 //  subs.c

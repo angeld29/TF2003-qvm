@@ -27,3 +27,6 @@ disable_reload
 [+] add_pipe
 
 fix TeamFortress_TeamGetColor чтобы возвращал реальный цвет а не цвет+1
+
+//fixe API
+on walk move save globals

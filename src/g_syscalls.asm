@@ -60,5 +60,15 @@ equ     acos			-56
 equ     trap_CmdArgc            -57                
 equ     trap_CmdArgv            -58
 
-equ     trap_tracearea          -59
+equ     trap_TraceCapsule          -59
 
+equ	trap_FS_OpenFile         -60
+equ    	trap_FS_CloseFile        -61
+equ    	trap_FS_ReadFile         -62
+equ    	trap_FS_WriteFile        -63
+equ	trap_FS_SeekFile         -64
+equ	trap_FS_TellFile         -65
+equ	trap_FS_GetFileList	 -66
+
+equ     trap_cvar_set_float      -67
+equ     trap_cvar_string	 -68

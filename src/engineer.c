@@ -317,15 +317,15 @@ int CheckAreaNew( gedict_t * obj, gedict_t * builder )
 	gedict_t *te;
 	vec3_t end;
 
-	tracearea(PASSVEC3( obj->s.v.origin ), PASSVEC3( obj->s.v.origin ) , 0, obj , -16, -16, 0, 16, 16, 48);
+	TraceCapsule(PASSVEC3( obj->s.v.origin ), PASSVEC3( obj->s.v.origin ) , 0, obj , -16, -16, 0, 16, 16, 48);
  	if( g_globalvars.trace_startsolid == 1 )
  	{
  		VectorCopy(obj->s.v.origin,end);
  		end[2] -= 48;
- 		tracearea(PASSVEC3( obj->s.v.origin ), PASSVEC3( end ) , 0, obj , -16, -16, 0, 16, 16, 4);
+ 		TraceCapsule(PASSVEC3( obj->s.v.origin ), PASSVEC3( end ) , 0, obj , -16, -16, 0, 16, 16, 4);
  		VectorCopy(g_globalvars.trace_endpos,end);
  		end[2]++;
- 		tracearea( PASSVEC3( end ), PASSVEC3( end ) , 0, obj , -16, -16, 0, 16, 16, 48 );
+ 		TraceCapsule( PASSVEC3( end ), PASSVEC3( end ) , 0, obj , -16, -16, 0, 16, 16, 48 );
  		if( g_globalvars.trace_startsolid == 1 )
  			return 0;
  	}

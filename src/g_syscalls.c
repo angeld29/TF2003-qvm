@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.c,v 1.2 2004-09-06 02:37:37 AngelD Exp $
+ *  $Id: g_syscalls.c,v 1.3 2004-09-15 11:21:22 AngelD Exp $
  */
 
 //#include "g_local.h"
@@ -167,10 +167,19 @@ float trap_cvar( const char *var )
 
 	return tmp._float;
 }
+void trap_cvar_string( const char *var, char *buffer, int buffsize )
+{
+	syscall( G_CVAR_STRING, (int)var, (int)buffer, buffsize );
+}
 
 void trap_cvar_set( const char *var, const char *val )
 {
 	syscall( G_CVAR_SET, (int)var, (int)val );
+}
+
+void    trap_cvar_set_float( const char *var, float val )
+{
+	syscall( G_CVAR_SET_FLOAT, (int)var, PASSFLOAT(val) );
 }
 
 int trap_droptofloor( int edn )
@@ -298,16 +307,46 @@ void trap_CmdArgv( int arg, char *valbuff, int sizebuff )
 	syscall( G_CMD_ARGV, arg, (int)valbuff, sizebuff );
 }
 
-void    trap_tracearea( float v1_x, float v1_y, float v1_z, 
+void    trap_TraceCapsule( float v1_x, float v1_y, float v1_z, 
 			float v2_x, float v2_y, float v2_z, 
 			int nomonst, int edn ,
 			float min_x, float min_y, float min_z, 
 			float max_x, float max_y, float max_z)
 {
- 	syscall( G_TRACEAREA, 
+ 	syscall( G_TraceCapsule, 
  		 PASSFLOAT( v1_x), PASSFLOAT( v1_y), PASSFLOAT( v1_z),
 		 PASSFLOAT( v2_x), PASSFLOAT( v2_y), PASSFLOAT( v2_z), 
 		 nomonst, edn,
  		 PASSFLOAT( min_x), PASSFLOAT( min_y), PASSFLOAT( min_z),
 		 PASSFLOAT( max_x), PASSFLOAT( max_y), PASSFLOAT( max_z));
+}
+
+int trap_FSOpenFile(char*name, fileHandle_t* handle, fsMode_t fmode )
+{
+	return syscall( G_FSOpenFile, (int)name, (int)handle, fmode );
+}
+
+void trap_FSCloseFile( fileHandle_t handle )
+{
+	syscall( G_FSCloseFile, handle );
+}
+
+int trap_FSReadFile( char*dest, int quantity, fileHandle_t handle )
+{
+	return syscall( G_FSReadFile, (int)dest, quantity, handle );
+}
+
+int trap_FSWriteFile( char*src, int quantity, fileHandle_t handle )
+{
+	return syscall( G_FSWriteFile, (int)src, quantity, handle );
+}
+
+int trap_FSeekFile( fileHandle_t handle, int offset, int type )
+{
+	return syscall( G_FSSeekFile, handle,offset,type );
+}
+
+int 	trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize )
+{
+	return syscall( G_FSGetFileList, (int)path, (int)extension, (int)listbuf, bufsize);
 }

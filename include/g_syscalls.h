@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.h,v 1.3 2004-09-07 14:36:08 AngelD Exp $
+ *  $Id: g_syscalls.h,v 1.4 2004-09-15 11:21:22 AngelD Exp $
  */
 
 int     trap_GetApiVersion(  );
@@ -47,7 +47,9 @@ void    trap_traceline( float v1_x, float v1_y, float v1_z, float v2_x, float v2
 void    trap_stuffcmd( int edn, const char *fmt );
 void    trap_localcmd( const char *fmt );
 float   trap_cvar( const char *var );
+void 	trap_cvar_string( const char *var, char *buffer, int bufsize );
 void    trap_cvar_set( const char *var, const char *val );
+void    trap_cvar_set_float( const char *var, float val );
 int     trap_droptofloor( int edn );
 int     trap_walkmove( int edn, float yaw, float dist );
 void    trap_lightstyle( int style, char *val );
@@ -72,8 +74,16 @@ void    trap_FlushSignon(  );
 void    trap_disableupdates( int edn, float time );
 int     trap_CmdArgc(  );
 void    trap_CmdArgv( int arg, char *valbuff, int sizebuff );
-void    trap_tracearea( float v1_x, float v1_y, float v1_z, 
+void    trap_TraceCapsule( float v1_x, float v1_y, float v1_z, 
 			float v2_x, float v2_y, float v2_z, 
 			int nomonst, int edn ,
 			float min_x, float min_y, float min_z, 
 			float max_x, float max_y, float max_z);
+
+int	trap_FS_OpenFile(char*name, fileHandle_t* handle, fsMode_t fmode );
+void	trap_FS_CloseFile( fileHandle_t handle );
+int	trap_FS_ReadFile( char*dest, int quantity, fileHandle_t handle );
+int	trap_FS_WriteFile( char*src, int quantity, fileHandle_t handle );
+int	trap_FS_SeekFile( fileHandle_t handle, int offset, int type );
+int	trap_FS_TellFile( fileHandle_t handle );
+int 	trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );

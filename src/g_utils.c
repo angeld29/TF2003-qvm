@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_utils.c,v 1.2 2004-09-06 02:37:37 AngelD Exp $
+ *  $Id: g_utils.c,v 1.3 2004-09-15 11:21:22 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -402,22 +402,17 @@ void traceline( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, floa
 	trap_traceline( v1_x, v1_y, v1_z, v2_x, v2_y, v2_z, nomonst, NUM_FOR_EDICT( ed ) );
 }
 
-void tracearea( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z, int nomonst, gedict_t * ed ,
+void TraceCapsule( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z, int nomonst, gedict_t * ed ,
 			float min_x, float min_y, float min_z, 
 			float max_x, float max_y, float max_z)
 {
-	trap_tracearea( v1_x, v1_y, v1_z, v2_x, v2_y, v2_z, nomonst, NUM_FOR_EDICT( ed ) ,
+	trap_TraceCapsule( v1_x, v1_y, v1_z, v2_x, v2_y, v2_z, nomonst, NUM_FOR_EDICT( ed ) ,
 	min_x, min_y, min_z, max_x, max_y, max_z);
 }
 
 int droptofloor( gedict_t * ed )
 {
 	return trap_droptofloor( NUM_FOR_EDICT( ed ) );
-}
-
-int walkmove( gedict_t * ed, float yaw, float dist )
-{
-	return trap_walkmove( NUM_FOR_EDICT( ed ), yaw, dist );
 }
 
 int checkbottom( gedict_t * ed )
@@ -453,4 +448,21 @@ void WriteEntity( int to, gedict_t * ed )
 void disableupdates( gedict_t * ed, float time )
 {
 	trap_disableupdates( NUM_FOR_EDICT( ed ), time );
+}
+
+int walkmove( gedict_t * ed, float yaw, float dist )
+{
+	gedict_t*saveself,*saveother,*saveactivator;
+	int retv;
+
+	saveself	= self ;
+	saveother	= other;
+	saveactivator = activator;
+
+	retv = trap_walkmove( NUM_FOR_EDICT( ed ), yaw,  dist );
+
+	self 	= saveself;
+	other	= saveother;
+	activator= saveactivator;
+	return retv;
 }
