@@ -730,6 +730,7 @@ void TeamFortress_Inventory(  )
 void TeamFortress_ShowTF(  )
 {
 	float fl;
+	int	it,i;
 
 	if ( tf_data.toggleflags & TFLAG_CLASS_PERSIST )
 		G_sprint( self, 2, "Class Persistence On.\n" );
@@ -780,6 +781,17 @@ void TeamFortress_ShowTF(  )
 	else
 		G_sprint( self, 2, "ÎÅ× grenades\n" );
 
+	if( tf_data.topcolor_check )
+	{
+		G_sprint( self, 2, "Topcolor checking enabled\n" );
+	        for ( i = 1 ; i <= number_of_teams  ; i++ )
+	        {
+	        	it = TeamFortress_TeamGetTopColor(i);
+	        	G_sprint( self, 2, " Team %d topcolor: %2d %s\n",i , it, TeamFortress_TeamGetColorString( it - 1 ));
+	        }
+	}else
+		G_sprint( self, 2, "Topcolor checking disabled\n" );
+
 	switch ( tf_data.sentry_type )
 	{
 	case SENTRY_MTFL:
@@ -802,6 +814,53 @@ void TeamFortress_ShowTF(  )
 		break;
 	}
 
+	G_sprint( self, 2, "New Gas Options %d:\n" ,tf_data.new_gas );
+	if( (tf_data.new_gas & GAS_MASK_COLOR) && !(tf_data.new_gas & GAS_MASK_ALLSPYS))
+	{
+	 if( tf_data.new_gas & GAS_MASK_ALLCOLORS)
+	 	it = 16;
+	 else
+	 {
+	 	if( tf_data.new_gas & GAS_MASK_4COLORS)
+	 		it = 4;
+	 	else
+	 		it = number_of_teams;
+	 }
+	 G_sprint( self, 2, " Players Colors: %d\n", it );
+	}
+	if( tf_data.new_gas & GAS_MASK_ALLSPYS)
+		G_sprint( self, 2, " Players Skins: Spys\n" );
+	else
+	{
+		if( tf_data.new_gas & GAS_MASK_SKIN)
+			G_sprint( self, 2, " Players Skins: Random\n" );
+	}
+	
+	if( tf_data.new_gas & GAS_MASK_PALETTE)
+		G_sprint( self, 2, " Palette: ÏÎ\n" );
+	else
+		G_sprint( self, 2, " Palette: ÏÆÆ\n" );
+	
+	if( tf_data.new_gas & GAS_MASK_NEWGREN_EFFECTS)
+		G_sprint( self, 2, " New Gren Effects: ÏÎ\n" );
+	else
+		G_sprint( self, 2, " New Gren Effects: ÏÆÆ\n" );
+	
+	if( tf_data.new_gas & GAS_MASK_NEWGREN_TIMES)
+		G_sprint( self, 2, " New Gren Times: ÏÎ\n" );
+	else
+		G_sprint( self, 2, " New Gren Times: ÏÆÆ\n" );
+	
+	if( tf_data.new_gas & GAS_MASK_NEWGREN_DMG)
+		G_sprint( self, 2, " New Gren DMG: ÏÎ\n" );
+	else
+		G_sprint( self, 2, " New Gren DMG: ÏÆÆ\n" );
+	
+	if( !(tf_data.new_gas & GAS_MASK_DISABLE_ID))
+		G_sprint( self, 2, " ID: ÏÎ\n" );
+	else
+		G_sprint( self, 2, " ID: ÏÆÆ\n" );
+	
 	if ( tf_data.new_flash )
 		G_sprint( self, 2, "New Flash: ÏÎ\n" );
 	else
@@ -828,6 +887,10 @@ void TeamFortress_ShowTF(  )
 	else
 		G_sprint( self, 2, "Sniper Range Fix: ÏÆÆ\n" );
 
+	
+	G_sprint( self, 2, "Sniper ammo cost: %d\n", ( int ) tf_data.snip_ammo );
+	G_sprint( self, 2, "Sniper Reload Time: %.1f\n", ( int ) tf_data.snip_time );
+
 	if ( tf_data.random_tf_spawn )
 		G_sprint( self, 2, "Random Team Spawn: ÏÎ\n" );
 	else
@@ -837,6 +900,11 @@ void TeamFortress_ShowTF(  )
 		G_sprint( self, 2, "Drop Goals: ÏÎ\n" );
 	else
 		G_sprint( self, 2, "Drop Goals: ÏÆÆ\n" );
+
+	if ( tf_data.add_pipe )
+		G_sprint( self, 2, "Additional pipebomb: ÏÎ\n" );
+	else
+		G_sprint( self, 2, "Additional pipebomb: ÏÆÆ\n" );
 
 	if ( tf_data.gren2box )
 	{
@@ -895,6 +963,10 @@ void TeamFortress_ShowTF(  )
 			G_sprint( self, 2, " Detpack\n" );
 	} else
 		G_sprint( self, 2, "All Grenades Enabled\n" );
+		
+	if ( tf_data.mtfl )
+		G_sprint( self, 2, "ÍÔÆÌ Settings ÏÎ\n" );
+
 #ifdef TG
 #ifdef LAN_SERVER
 	G_sprint( self, 2, "TF2003(QWLAN TF) Training Ground by sd‘ angel for ÍÔÆÌ\n" );
