@@ -584,7 +584,7 @@
  MAX_SENTRY_TYPES
 }sentry_types_t;*/
 
-#define TF_AUTOIDTIME 1.0
+#define TF_AUTOIDTIME 0.5
 #define TF_AUTOSCAN_TIME 0.5
 
 #define TF_SPY_SFEIGN_IMPULSE 199

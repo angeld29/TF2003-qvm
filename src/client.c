@@ -561,6 +561,7 @@ void DecodeLevelParms()
 
 			tf_data.sg_newfind = true;
 			tf_data.sg_sfire = SG_SFIRE_NEW; //FIX ME
+			tf_data.sg_rfire = 0; //FIX ME
 			tf_data.sgppl = 12;
 			tf_data.disable_grens = 0;
 

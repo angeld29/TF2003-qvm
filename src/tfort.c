@@ -902,7 +902,7 @@ void TeamFortress_ShowTF(  )
 
 	
 	G_sprint( self, 2, "Sniper ammo cost: %d\n", ( int ) tf_data.snip_ammo );
-	G_sprint( self, 2, "Sniper Reload Time: %.1f\n", ( int ) tf_data.snip_time );
+	G_sprint( self, 2, "Sniper Reload Time: %.1f\n", tf_data.snip_time );
 
 	if ( tf_data.random_tf_spawn )
 		G_sprint( self, 2, "Random Team Spawn: он\n" );

@@ -741,7 +741,7 @@ void LaunchSGRocketNEW(gedict_t*targ)
 
 	normalize(dir,norm_dir);
 
-	//çâ®¡ë ­¥ ¯®¯ ¤ âì ¢ ¯®¤áâ ¢ªã
+	//÷òîáû íå ïîïàäàòü â ïîäñòàâêó
 	traceline( PASSVEC3( src ), PASSVEC3( dst ), 0, self );
 	
 	if( (PROG_TO_EDICT(g_globalvars.trace_ent) == self->trigger_field) && vlen(dir) > 100 )
