@@ -94,15 +94,12 @@ void    Engineer_UseSentryGun( gedict_t * gun );
 void    Engineer_UseMortar( gedict_t * mortar );
 void    BioInfection_Decay(  );
 void    BioInfection_MonsterDecay(  );
-void    HallucinationTimer(  );
-void    TranquiliserTimer(  );
 void    ScannerSwitch(  );
 void    Engineer_RemoveBuildings(  );
 void    DestroyBuilding( gedict_t * eng, char *bld );
 void    TeamFortress_Build( int objtobuild );
 void    TF_zoom( int zoom_level );
 void    CheckBelowBuilding( gedict_t * bld );
-void    TeamFortress_SpyFeignDeath( int issilent );
 
 //admin
 void    CTF_FlagCheck(  );

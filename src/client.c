@@ -1017,7 +1017,7 @@ void ClientKill()
 	self->suicide_time = g_globalvars.time + 5 + g_random() * 5;
 	G_bprint( PRINT_MEDIUM, "%s suicides\n", self->s.v.netname );
 
-//	set_suicide_frame();
+	set_suicide_frame();
 	self->s.v.modelindex = modelindex_player;
 
 	if ( self->tfstate & TFSTATE_INFECTED )
@@ -2379,7 +2379,7 @@ void ClientDisconnect()
 			te->tfstate = 8;
 	}
 	set_suicide_frame();
-	//self->s.v.netname = "";
+	self->s.v.netname[0] = 0;
 	self->team_no = 0;
 	self->s.v.solid = 0;
 	setsize( self, 0, 0, 0, 0, 0, 0 );

@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.10 2004-10-03 10:50:52 AngelD Exp $
+ *  $Id: g_main.c,v 1.11 2004-10-30 12:37:51 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -60,13 +60,15 @@ This must be the very first function compiled into the .q3vm file
 int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
 	    int arg6, int arg7, int arg8, int arg9, int arg10, int arg11 )
 {
+        int api_ver;
 	ClearGlobals();
 	switch ( command )
 	{
 	case GAME_INIT:
-		if ( trap_GetApiVersion() < GAME_API_VERSION )
+	        api_ver = trap_GetApiVersion();
+		if ( api_ver < GAME_API_VERSION )
 		{
-			G_dprint("Mod requried API_VERSION %d or higher\n", GAME_API_VERSION);
+			G_dprint("Mod requried API_VERSION %d or higher, server have %d\n", GAME_API_VERSION,api_ver);
 			return 0;
 		}
 
