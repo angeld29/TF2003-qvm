@@ -255,5 +255,10 @@ void TG_Cmd()
         			tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;
                 return;
         }
+	if ( !strcmp( cmd_command, "eff_conc" ) )
+	{
+	     TG_Eff_Conc(self);
+	     return;
+	}
 
 };

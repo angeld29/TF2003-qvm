@@ -9,3 +9,4 @@ scanner на sentry, флаги
 sound on grens
 new menu system
 setting через cmd
+telefrag check on respawn

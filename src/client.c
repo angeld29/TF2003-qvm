@@ -1062,7 +1062,7 @@ void ClientKill()
 gedict_t *lastspawn_team[5] = { NULL, NULL, NULL, NULL, NULL };
 char   *team_spawn_str[5] = { "", "ts1", "ts2", "ts3", "ts4" };
 
-int CheckTelefragSpot( vec3_t v )
+int CheckTelefragSpotOld( vec3_t v )
 {
 	gedict_t *at_spot;
 
@@ -1076,6 +1076,52 @@ int CheckTelefragSpot( vec3_t v )
 	}
 	return 1;
 }
+
+int CheckTelefragSpot( vec3_t v )
+{
+	gedict_t *te;
+	vec3_t spot_mins,spot_maxs;
+
+	//make tdeath bbox for spot origin
+	spot_mins[0] = self->s.v.mins[0] + v[0] - 5;
+	spot_mins[1] = self->s.v.mins[1] + v[1] - 5;
+	spot_mins[2] = self->s.v.mins[2] + v[2] - 5;
+
+	spot_maxs[0] = self->s.v.maxs[0] + v[0] + 5;	
+	spot_maxs[1] = self->s.v.maxs[1] + v[1] + 5;	
+	spot_maxs[2] = self->s.v.maxs[2] + v[2] + 5;	
+
+	for (   te = world ; te = find( te , FOFS(s.v.classname), "player");)
+	{
+		if( te->team_no != self->team_no )
+			continue;
+		if( te == self )
+			continue;
+        	if( te->s.v.deadflag )
+        		continue;
+        	
+        	if( te->s.v.solid == SOLID_NOT )	
+        		continue;
+
+	        if( te->s.v.absmin[0] > spot_maxs[0] )
+	        	continue;
+	        if( te->s.v.absmin[1] > spot_maxs[1] )
+	        	continue;
+	        if( te->s.v.absmin[2] > spot_maxs[2] )
+	        	continue;
+	
+	        if( te->s.v.absmax[0] < spot_mins[0] )
+	        	continue;
+	        if( te->s.v.absmax[1] < spot_mins[1] )
+	        	continue;
+	        if( te->s.v.absmax[2] < spot_mins[2] )
+	        	continue;
+	        
+	        return 0;
+	}
+	return 1;
+}
+
 
 
 gedict_t *FindTeamSpawnPoint( int team_num )
@@ -1358,8 +1404,7 @@ void PutClientInServer()
 	self->s.v.deadflag = 0;
 	self->pausetime = 0;
 	spot = SelectSpawnPoint();
-	if ( self->playerclass )
-		spawn_tdeath( spot->s.v.origin, self );
+
 	self->observer_list = spot;
 	VectorCopy( spot->s.v.origin, self->s.v.origin );
 	self->s.v.origin[2]++;
@@ -1414,6 +1459,10 @@ void PutClientInServer()
 	setsize( self, PASSVEC3( VEC_HULL_MIN ), PASSVEC3( VEC_HULL_MAX ) );
 	SetVector( self->s.v.view_ofs, 0, 0, 22 );
 	SetVector( self->s.v.velocity, 0, 0, 0 );
+//фикс застревания игроков друг в друге на респавн
+//spawn_tdeath после установки размеров игрока
+	if ( self->playerclass )
+		spawn_tdeath( spot->s.v.origin, self );
 
 	player_stand1();
 	if ( deathmatch || coop )

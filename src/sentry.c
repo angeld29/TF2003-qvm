@@ -949,9 +949,11 @@ void Eng_StaticSG_Activate(  )
 				ent->s.v.takedamage = 2;
 				ent->s.v.health = ent->s.v.max_health;
 
-				ent->trigger_field->s.v.origin[2] += 8;
+				//ent->trigger_field->s.v.origin[2] += 1;
+				//ent->s.v.origin[2] += 1;
 				setorigin( ent->trigger_field, PASSVEC3(ent->trigger_field->s.v.origin));
-				SetVector( ent->trigger_field->s.v.velocity, 0, 0, -8 );
+				setorigin( ent, PASSVEC3(ent->s.v.origin));
+				//SetVector( ent->trigger_field->s.v.velocity, 0, 0, -8 );
 
 				G_sprint( ent->real_owner, 2, "Your Static Sentry Gun rebuilded.\n" );
 			}
