@@ -1,15 +1,6 @@
 #include "g_local.h"
 
-void    CaltropTouch(  );
-void    CaltropScatterThink(  );
-void    ScatterCaltrops(  );
-void    FlashGrenadeTouch(  );
-void    FlashTimer(  );
-void    FlashGrenadeExplode(  );
-void    ConcussionGrenadeTouch(  );
-void    ConcussionGrenadeExplode(  );
 void    T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, gedict_t * ignore );
-void    TeamFortress_Scan_Angel( int scanrange, int typescan );
 
 void CanisterTouch(  )
 {

@@ -1,7 +1,7 @@
 #include "g_local.h"
 
 
-char *ANGEL_VERSION = "Compiled: " __DATE__ " " __TIME__ " r1";
+char *ANGEL_VERSION = "Compiled: " __DATE__ " " __TIME__ " ";
 
 static char *date = __DATE__ ;
 static char *mon[12] = 

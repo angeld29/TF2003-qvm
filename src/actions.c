@@ -1,11 +1,9 @@
 #include "g_local.h"
 
-void    increment_team_ammoboxes( int tno );
-void    TeamFortress_AmmoboxTouch(  );
 void	W_Reload_shotgun(  );
 void	W_Reload_super_shotgun(  );
-void W_Reload_grenade_launcher(  );
-void W_Reload_rocket_launcher(  );
+void 	W_Reload_grenade_launcher(  );
+void 	W_Reload_rocket_launcher(  );
 
 int     default_class_discard[10][4] = {
 	{0, 0, 0, 0},

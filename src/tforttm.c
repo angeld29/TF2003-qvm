@@ -8,13 +8,6 @@ float   teamadvantage[5];
 int     illegalclasses[5];
 int     civilianteams;
 
-char   *TeamFortress_TeamGetColorString( int tno );
-void    TeamFortress_TeamShowMemberClasses( gedict_t * Player );
-int     TeamFortress_TeamGetNoPlayers( int tno );
-int     TeamFortress_TeamGetMaxPlayers( int tno );
-int     TeamFortress_TeamGetLives( int tno );
-char   *TeamFortress_GetClassName( int pc );
-
 int TeamFortress_TeamPutPlayerInTeam(  )
 {
 	int     i, j, lowest, likely_team;

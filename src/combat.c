@@ -1,7 +1,5 @@
 #include "g_local.h"
 void    ClientObituary( gedict_t * e1, gedict_t * e2 );
-float   TeamEqualiseDamage( gedict_t * targ, gedict_t * attacker, float damage );
-
 
 //============================================================================
 

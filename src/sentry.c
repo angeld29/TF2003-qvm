@@ -2,7 +2,6 @@
 #include "sentry.h"
 
 void    FireSentryLighting( gedict_t * targ )  ;
-
 void    FireBullets( float shotcount, vec3_t dir, float spread_x, float spread_y, float spread_z );
 
 

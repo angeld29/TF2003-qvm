@@ -1,83 +1,8 @@
 #include "g_local.h"
 void    item_megahealth_rot(  );
 
-void    player_run(  );
-void    TeamFortress_DisplayDetectionItems(  );
-float   crossproduct( vec3_t veca, vec3_t vecb );
-void    SpawnBlood( vec3_t org, float damage );
-void    Reset_Grapple( gedict_t * rhook );
-void    SuperDamageSound(  );
-void    ConcussionGrenadeTimer(  );
-void    OldConcussionGrenadeTimer(  );
-
 float   button_touch(  );
 void    button_fire(  );
-void    DropGoalItems(  );
-void    TeamFortress_DisplayLegalClasses(  );
-void    TeamFortress_Inventory(  );
-void    TeamFortress_SaveMe(  );
-void    TeamFortress_ID(  );
-void    TeamFortress_ShowIDs(  );
-void    TeamFortress_ShowTF(  );
-void    TeamFortress_SniperWeapon(  );
-void    TeamFortress_AssaultWeapon(  );
-void    TeamFortress_IncendiaryCannon(  );
-void    TeamFortress_FlameThrower(  );
-void    TeamFortress_PrimeGrenade(  );
-void    TeamFortress_ThrowGrenade(  );
-void    TeamFortress_Discard(  );
-void    TeamFortress_DetonatePipebombs(  );
-void    PipebombTouch(  );
-void    TeamFortress_DetpackStop(  );
-void    SniperSight_Create(  );
-void    TeamFortress_ReloadCurrentWeapon(  );
-void    TeamFortress_AutoZoomToggle(  );
-void    TeamFortress_StatusQuery(  );
-void    TeamFortress_SpyGoUndercover(  );
-void    TeamFortress_EngineerBuild(  );
-void    DropKey(  );
-void    UseSpecialSkill(  );
-void    RemoveFlare(  );
-void    TeamFortress_Scan( float scanrange );
-void    TeamFortress_Scan_Angel( int scanrange, int typescan );
-void    TeamFortress_SetDetpack( float timer );
-void    TeamFortress_TeamShowMemberClasses( gedict_t * Player );
-void    TeamFortress_TeamShowMemberClasses_New( gedict_t * Player );
-void    Admin_CountPlayers(  );
-void    Admin_CycleKick(  );
-void    Admin_DoKick(  );
-void    Admin_CeaseFire(  );
-void    CamLock(  );
-void    CamDistLock(  );
-void    CamVecLock(  );
-void    CamAngleLock(  );
-void    CamRevAngleLock(  );
-void    CamProjectileLock(  );
-void    CamProjectileZoom(  );
-void    CamProjectileLockOn(  );
-void    CamProjectileLockOff(  );
-void    CamOffset(  );
-void    CamDrop(  );
-void    fadetoblack(  );
-void    fadefromblack(  );
-void    fadetowhite(  );
-void    fadefromwhite(  );
-void    Engineer_UseDispenser( gedict_t * disp );
-void    Engineer_UseSentryGun( gedict_t * gun );
-void    Engineer_UseMortar( gedict_t * mortar );
-void    TeamFortress_MOTD(  );
-void    TeamFortress_HelpMap(  );
-void    BioInfection_Decay(  );
-void    BioInfection_MonsterDecay(  );
-void    W_FireFlame(  );
-void    W_FireIncendiaryCannon(  );
-void    W_FireTranq(  );
-void    W_FireLaser(  );
-void    HallucinationTimer(  );
-void    TranquiliserTimer(  );
-void    TeamFortress_CTF_FlagInfo(  );
-void    TF_MovePlayer(  );
-void    ScannerSwitch(  );
 
 void W_Precache(  )
 {
@@ -1438,72 +1363,6 @@ int CountPlayerPipebombs( gedict_t * player )
 	}
 	return num_pipes;
 }
-
-/*REMOVE!!!
-float num_team_pipebombs(float tno)
-{
- if (tno == 1) 
-  return num_team_pipebombs_1;
- else {
-  if (tno == 2) 
-   return num_team_pipebombs_2;
-  else {
-   if (tno == 3) 
-    return num_team_pipebombs_3;
-   else {
-    if (tno == 4) 
-     return num_team_pipebombs_4;
-   }
-  }
- }
- return 0;
-}
-
-float num_team_flares(float tno)
-{
- if (tno == 1) 
-  return num_team_flares_1;
- else {
-  if (tno == 2) 
-   return num_team_flares_2;
-  else {
-   if (tno == 3) 
-    return num_team_flares_3;
-   else {
-    if (tno == 4) 
-     return num_team_flares_4;
-   }
-  }
- }
- return 0;
-}
-
-void RemoveOldFlare(float tno)
-{
- gedict_t* old;
- float index;
-
- index = num_team_flares(tno);
- index = index - 9 / number_of_teams;
- old = find(world, mdl, "flare");
- while (index > 0) {
-  if (old == world) {
-   num_world_flares = 0;
-   num_team_flares_1 = 0;
-   num_team_flares_2 = 0;
-   num_team_flares_3 = 0;
-   num_team_flares_4 = 0;
-   return;
-  }
-  if (old->s.v.weapon == tno || !tno) {
-   old->s.v.think = (func_t) RemoveFlare;
-   old->s.v.nextthink = g_globalvars.time + 0.1;
-   index = index - 1;
-  }
-  old = find(old, mdl, "flare");
- }
-};*/
-
 
 void ExplodeOldPipebomb( int tno, int extra )
 {

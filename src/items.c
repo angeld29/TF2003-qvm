@@ -1,11 +1,5 @@
 #include "g_local.h"
 
-int     TeamFortress_GetMaxAmmo( gedict_t * Retriever, int AmmoType );
-int     TeamFortress_CanGetWeapon( gedict_t * Retriever, int WeaponType );
-void    TeamFortress_AddBackpackItems( gedict_t * Retriever, gedict_t * Items );
-void    TeamFortress_SetSpeed( gedict_t * p );
-void    tfgoal_touch(  );
-
 void SUB_regen(  )
 {
 	self->s.v.model = self->mdl;	// restore original model

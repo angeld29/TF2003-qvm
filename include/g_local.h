@@ -108,7 +108,7 @@ void            SUB_CalcMoveEnt( gedict_t * ent, vec3_t tdest, float tspeed,
 void            SUB_UseTargets();
 void            SetMovedir();
 void            InitTrigger();
-void SUB_AttackFinished( float normal );
+void 		SUB_AttackFinished( float normal );
 extern gedict_t *activator;
 
 //
@@ -169,20 +169,25 @@ void            SpawnBlood( vec3_t, float );
 void    	PreMatchImpulses(  );
 void    	DeadImpulses(  );
 void 		W_WeaponFrame();
-void W_FireAxe();
-void W_FireSpanner();
-void W_FireMedikit();
-void W_FireBioweapon();
-void W_FireShotgun();
-void W_FireSuperShotgun();
-void W_FireSniperRifle();
-void W_FireAutoRifle();
-void W_FireAssaultCannon();
-void W_FireRocket();
-void W_FireLightning();
-void W_FireGrenade();
-void W_FireSuperSpikes();
-void W_FireSpikes( float ox );
+void 		W_FireAxe();
+void            W_FireSpanner();
+void            W_FireMedikit();
+void            W_FireBioweapon();
+void    	W_FireShotgun();
+void    	W_FireSuperShotgun();
+void 		W_FireSniperRifle();
+void 		W_FireAutoRifle();
+void            W_FireAssaultCannon();
+void            W_FireRocket();
+void            W_FireLightning();
+void    	W_FireGrenade();
+void    	W_FireSuperSpikes();
+void 		W_FireSpikes( float ox );
+void    	W_FireFlame(  );
+void    	W_FireIncendiaryCannon(  );
+void    	W_FireTranq(  );
+void    	W_FireLaser(  );
+     		
 
 void BecomeExplosion();
 void ClearMultiDamage();
@@ -204,11 +209,12 @@ void            T_BeamDamage( gedict_t * attacker, float damage );
 void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker, float damage, int T_flags, int T_AttackType );
 qboolean CanDamage( gedict_t * targ, gedict_t * inflictor );
 //items
-int T_Heal( gedict_t * e, float healamount, float ignore );
+int 		T_Heal( gedict_t * e, float healamount, float ignore );
 void            DropQuad( float timeleft );
 void            DropRing( float timeleft );
 void            DropBackpack();
 void 		bound_other_ammo( gedict_t * p );
+void 		Respawn_Item( gedict_t * ritem, gedict_t * act );
 //triggers.c
 void            spawn_tfog( vec3_t org );
 void            spawn_tdeath( vec3_t org, gedict_t * death_owner );
@@ -243,63 +249,13 @@ void    bubble_bob(  );
 // common tf
 void CenterPrint( gedict_t * pl, const char *fmt, ... );
 float crossproduct( vec3_t veca, vec3_t vecb );
-void TeamFortress_MOTD();
-void    BioInfection_Decay();
-void TeamFortress_Discard();
-void TeamFortress_ID();
-void TeamFortress_ReloadCurrentWeapon();
-
-
-//tforttm
-char   *GetTeamName( int tno );
-int TeamFortress_TeamGetWinner(  );
-int TeamFortress_TeamGetScore( int tno );
-int TeamFortress_TeamGetSecond(  );
-void TeamFortress_CheckTeamCheats(  );
-void    TeamFortress_DetpackExplode();
-int TeamFortress_TeamGetColor( int tno );
-int TeamFortress_TeamGetTopColor( int tno );
-int TeamFortress_GetNoPlayers();
-qboolean TeamFortress_TeamIsCivilian( int tno );
-int ClassIsRestricted( int tno, int pc );
-void SetTeamName( gedict_t * p );
-int TeamFortress_TeamSet( int tno );
-void TeamFortress_TeamShowScores( int all );
-int TeamFortress_TeamGetNoPlayers( int tno );
-void teamsprint( int tno, gedict_t * ignore, char *st );
-//tfortmap.c
-void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item );
-gedict_t *Finditem( int );
-gedict_t *Findgoal( int );
-int Activated( gedict_t * Goal, gedict_t * AP );
-void AttemptToActivate( gedict_t * Goal, gedict_t * AP, gedict_t * ActivatingGoal );
-int CheckExistence();
-void ParseTFDetect( gedict_t * AD );
-void SetupTeamEqualiser();
-void tfgoalitem_GiveToPlayer( gedict_t * Item, gedict_t * AP, gedict_t * Goal );
-void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method );
-void DoResults( gedict_t * Goal, gedict_t * AP, float addb );
 
 ///clan
-void PreMatch_Think();
-void DumpClanScores();
-
-//classes
-void 	Engineer_RemoveBuildings();
-void 	DestroyBuilding( gedict_t * eng, char *bld );
-void    TeamFortress_EngineerBuild(  );
-void    TeamFortress_Build( int objtobuild );
-
-void TF_zoom( int zoom_level );
-
-void CheckBelowBuilding( gedict_t * bld );
-void TeamFortress_DetonatePipebombs(  );
-void TeamFortress_SpyFeignDeath( int issilent );
-void ScannerSwitch();
 
 //hook
 void  Reset_Grapple(gedict_t* rhook);
 void Service_Grapple();
+void    Throw_Grapple(  );
 //status
 void CenterPrint( gedict_t * pl, const char *fmt, ... );
 void StatusPrint( gedict_t * pl, float fTime, const char *fmt, ... );

@@ -1,12 +1,9 @@
 #include "g_local.h"
 
-void    tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method );
 void    TeamFortress_SpyCalcName( gedict_t * spy );
 void    TeamFortress_SpyUndercoverThink(  );
 void    GasGrenadeMakeGas(  );
 void    T_TranqDartTouch(  );
-void    HallucinationTimer(  );
-void    TranquiliserTimer(  );
 void    spawn_touchblood( float damage );
 
 void spy_diea1(  )

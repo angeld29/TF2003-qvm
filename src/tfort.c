@@ -3,49 +3,6 @@
 tf_server_data_t tf_data;
 int FLAME_MAXWORLDNUM, MAX_WORLD_PIPEBOMBS, MAX_WORLD_AMMOBOXES, GR_TYPE_MIRV_NO, GR_TYPE_NAPALM_NO;
 
-void    TeamFortress_Regenerate(  );
-void    TeamFortress_RegenerateCells(  );
-void    TeamFortress_ExplodePerson(  );
-gedict_t *SelectSpawnPoint(  );
-
-void    TeamFortress_AmmoboxTouch(  );
-void    TeamFortress_AmmoboxRemove(  );
-void    FlareGrenadeExplode(  );
-void    FlareGrenadeTouch(  );
-void    NormalGrenadeTouch(  );
-void    NormalGrenadeExplode(  );
-void    ConcussionGrenadeTouch(  );
-void    ConcussionGrenadeExplode(  );
-void    NailGrenadeTouch(  );
-void    NailGrenadeExplode(  );
-void    MirvGrenadeTouch(  );
-void    MirvGrenadeExplode(  );
-void    NapalmGrenadeTouch(  );
-void    NapalmGrenadeExplode(  );
-void    RemoveFlare(  );
-void    GasGrenadeTouch(  );
-void    GasGrenadeExplode(  );
-void    EMPGrenadeTouch(  );
-void    EMPGrenadeExplode(  );
-void    FlashGrenadeTouch(  );
-void    FlashGrenadeExplode(  );
-void    CaltropTouch(  );
-void    ScatterCaltrops(  );
-void    CanisterTouch(  );
-
-int     TeamFortress_TeamGetIllegalClasses( int tno );
-void    TeamFortress_DisplayLegalClasses(  );
-void    increment_team_ammoboxes( int tno );
-void    decrement_team_ammoboxes( int tno );
-
-void    TeamFortress_DescribeArmor( gedict_t * Player, int Armorclass );
-void    TeamFortress_PrintClassName( gedict_t *, int, int );
-void    TeamFortress_SetEquipment(  );
-void    TeamFortress_SetHealth(  );
-void    TeamFortress_SetSpeed( gedict_t * );
-void    TeamFortress_SetSkin( gedict_t * );
-void    TeamFortress_ExecClassScript( gedict_t * );
-void	TeamFortress_AutoID();
 
 int     num_team_ammoboxes[5] = { 0, 0, 0, 0, 0 };
 

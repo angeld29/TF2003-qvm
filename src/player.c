@@ -1,10 +1,5 @@
 #include "g_local.h"
 
-void    bubble_bob(  );
-void    Throw_Grapple(  );
-void    T_Dispenser(  );
-void    BioInfection_Decay(  );
-
 void player_touch(  )
 {
 	gedict_t *Bio;

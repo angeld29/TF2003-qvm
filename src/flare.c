@@ -1,6 +1,4 @@
 #include "g_local.h"
-void    RemoveFlare(  );
-void    RemoveOldFlare( int tno );
 int     num_team_flares[5] = { 0, 0, 0, 0, 0 };
 
 void FlareGrenadeTouch(  )

@@ -1,12 +1,5 @@
 #include "g_local.h"
 
-void    CTF_FlagCheck();
-void    BirthdayTimer();
-void    CeaseFire_think();
-void    PreMatch_Think();
-void    player_pain( gedict_t * attacker, float take );
-void    PlayerDie();
-
 //===========================================================================
 // Client
 // 

@@ -2,7 +2,6 @@
 #include "sentry.h"
 
 void LaserBolt_Touch(  );
-void Respawn_Item( gedict_t * ritem, gedict_t * act );
 void TeamFortress_FinishedBuilding(  );
 void T_Dispenser(  );
 void Dispenser_Die(  );
@@ -11,8 +10,6 @@ void EMPGrenadeTouch(  );
 void EMPGrenadeExplode(  );
 void CheckDistance(  );
 void teamsprint( int tno, gedict_t * ignore, char *st );
-
-
 
 void LaserBolt_Think(  )
 {

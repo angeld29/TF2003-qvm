@@ -2,9 +2,6 @@
  *  QWProgs-DM
  *  Copyright (C) 2004  [sd] angel
  *
- *  This code is based on Q3 VM code by Id Software, Inc.
- *
- *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -20,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_utils.c,v 1.3 2004-09-15 11:21:22 AngelD Exp $
+ *  $Id: g_utils.c,v 1.4 2004-10-03 10:37:14 AngelD Exp $
  */
 
 #include "g_local.h"

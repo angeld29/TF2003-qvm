@@ -1,37 +1,4 @@
 #include "g_local.h"
-void    RemoveGoal( gedict_t * Goal );
-void    tfgoal_touch(  );
-void    item_tfgoal_touch(  );
-void    tfgoal_timer_tick(  );
-void    tfgoalitem_remove(  );
-void    info_tfgoal_use(  );
-void    DoRespawn(  );
-void    TeamFortress_TeamIncreaseScore( int tno, int scoretoadd );
-void    TF_PlaceItem(  );
-void    TF_StartItem(  );
-void    TF_PlaceGoal(  );
-void    TF_StartGoal(  );
-gedict_t *Findteamspawn( int gno );
-void    InactivateGoal( gedict_t * Goal );
-void    RestoreGoal( gedict_t * Goal );
-void    RemoveGoal( gedict_t * Goal );
-int     IsAffectedBy( gedict_t * Goal, gedict_t * Player, gedict_t * AP );
-void    Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float addb );
-int     APMeetsCriteria( gedict_t * Goal, gedict_t * AP );
-void    SetupRespawn( gedict_t * Goal );
-void    DoItemGroupWork( gedict_t * Item, gedict_t * AP );
-void    DoTriggerWork( gedict_t * Goal, gedict_t * AP );
-void    RemoveResults( gedict_t * Goal, gedict_t * Player );
-void    tfgoalitem_drop( gedict_t * Item, float PAlive, gedict_t * P );
-void    tfgoalitem_checkgoalreturn( gedict_t * Item );
-void    ReturnItem(  );
-void    ForceRespawn( gedict_t * P );
-void    DoResults( gedict_t * Goal, gedict_t * AP, float addb );
-void    tfgoalitem_GiveToPlayer( gedict_t * Item, gedict_t * AP, gedict_t * Goal );
-void    tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method );
-void    DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item );
-void    execute_changelevel(  );
-gedict_t *SelectSpawnPoint(  );
 
 int     item_list_bit;
 char   *team_menu_string = NULL;

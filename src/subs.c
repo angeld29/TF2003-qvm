@@ -1,7 +1,5 @@
 #include "g_local.h"
 
-void    DoGoalWork( gedict_t * Goal, gedict_t * AP );
-void    DoGroupWork( gedict_t * Goal, gedict_t * AP );
 
 /*
 QuakeEd only writes a single float for angles (bad idea), so up and down are
