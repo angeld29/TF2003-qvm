@@ -1,9 +1,9 @@
 -o qwprogs
 g_main
 g_syscalls
-bg_lib
 actions
 admin
+bg_lib
 buttons
 clan
 client
@@ -41,9 +41,9 @@ tfort
 tforthlp
 tfortmap
 tforttm
+tg
 triggers
 tsoldier
 version
 weapons
 world
-tg

@@ -269,4 +269,3 @@ void Menu_Class_Input(int impulse);
 void CheckAutoKick( gedict_t * p );
 
 #endif
-

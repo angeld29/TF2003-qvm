@@ -1,5 +1,5 @@
 /*
- *  QWProgs-DM
+ *  QWProgs-TF2003
  *  Copyright (C) 2004  [sd] angel
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -17,10 +17,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.9 2004-10-03 10:37:14 AngelD Exp $
+ *  $Id: g_main.c,v 1.10 2004-10-03 10:50:52 AngelD Exp $
  */
 
 #include "g_local.h"
+
 gedict_t        g_edicts[MAX_EDICTS];	//768
 gedict_t       *world = g_edicts;
 gedict_t       *self, *other;
