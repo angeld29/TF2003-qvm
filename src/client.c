@@ -187,9 +187,7 @@ void DecodeLevelParms()
 				number_of_teams = 2;
 			} else
 				number_of_teams = 4;
-#ifdef LAN_SERVER
-//   cvar_set("sv_aim", "1");
-#endif
+
 			teamlives[0] = -1;
 			teamlives[1] = -1;
 			teamlives[2] = -1;
@@ -481,8 +479,12 @@ void DecodeLevelParms()
 		if ( !strcmp( st, "on" ) )
 			tf_data.random_tf_spawn = 1;
 
-#ifdef TG
+		GetSVInfokeyString( "lan", NULL, st, sizeof( st ), "off" );
+		if ( !strcmp( st, "on" ) )
+			tf_data.lan_mode = 1;
 
+
+#ifdef TG
 		memset( &tg_data, 0, sizeof(tg_data));
 		GetSVInfokeyString( "tg", "training_ground", st, sizeof( st ), "off" );
 		if ( !strcmp( st, "on" ) )
@@ -536,12 +538,29 @@ void DecodeLevelParms()
 			tf_data.snip_time = 1.5;
 			tf_data.gren2box = 0;
 			tf_data.random_tf_spawn = 1;
+			tf_data.lan_mode = 0;
 #ifdef TG
 			tg_data.tg_enabled = 0;
 #endif
 		} else
 			tf_data.mtfl = 0;
 
+//SETUP LAN CONSTANTS
+		if( !tf_data.lan_mode ) 
+		{
+			FLAME_MAXWORLDNUM	=20;	 	// maximum number of flames in the world. DO NOT PUT BELOW 20.
+			MAX_WORLD_PIPEBOMBS	=15;	 	// This is divided between teams - this is the most you should have on a net server
+			MAX_WORLD_AMMOBOXES	=20;		// This is divided between teams - this is the most you should have on a net server
+			GR_TYPE_MIRV_NO		=4;	 	// Number of Mirvs a Mirv Grenade breaks into
+			GR_TYPE_NAPALM_NO	=8; 	 	// Number of flames napalm grenade breaks into (unused if net server)
+		}else
+		{
+			FLAME_MAXWORLDNUM	=60;	 	// maximum number of flames in the world. DO NOT PUT BELOW 20.
+			MAX_WORLD_PIPEBOMBS	=30;	 	// This is divided between teams - this is the most you should have on a net server
+			MAX_WORLD_AMMOBOXES	=20;		// This is divided between teams - this is the most you should have on a net server
+			GR_TYPE_MIRV_NO		=12;	 	// Number of Mirvs a Mirv Grenade breaks into
+			GR_TYPE_NAPALM_NO	=12; 	 	// Number of flames napalm grenade breaks into (unused if net server)
+		}
 #ifdef TG
                 if( tg_data.tg_enabled )
 			TG_LoadSettings();

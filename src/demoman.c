@@ -59,6 +59,9 @@ void MirvGrenadeExplode(  )
 	BecomeExplosion(  );
 }
 
+void GrenadeTouch(  );
+void GrenadeExplode(  );
+
 void MirvGrenadeLaunch( vec3_t org, gedict_t * shooter )
 {
 	float   xdir;
@@ -75,13 +78,16 @@ void MirvGrenadeLaunch( vec3_t org, gedict_t * shooter )
 	newmis->s.v.solid = SOLID_BBOX;
 	newmis->s.v.classname = "grenade";
 	newmis->s.v.weapon = 10;
-#ifndef LAN_SERVER
-	newmis->s.v.touch = ( func_t ) NormalGrenadeTouch;
-	newmis->s.v.think = ( func_t ) NormalGrenadeExplode;
-#else
-	newmis->s.v.touch = ( func_t ) GrenadeTouch;
-	newmis->s.v.think = ( func_t ) GrenadeExplode;
-#endif
+	if( tf_data.lan_mode )
+	{
+		newmis->s.v.touch = ( func_t ) GrenadeTouch;
+		newmis->s.v.think = ( func_t ) GrenadeExplode;
+	}else
+	{
+		newmis->s.v.touch = ( func_t ) NormalGrenadeTouch;
+		newmis->s.v.think = ( func_t ) NormalGrenadeExplode;
+	}
+
 	newmis->s.v.nextthink = g_globalvars.time + 2 + g_random(  );
 	newmis->s.v.velocity[0] = xdir * 2;
 	newmis->s.v.velocity[1] = ydir * 2;

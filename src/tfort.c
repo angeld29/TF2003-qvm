@@ -1,6 +1,7 @@
 #include "g_local.h"
 #define ANGEL_VERSION "Compiled: " __DATE__ " " __TIME__ " r1"
 tf_server_data_t tf_data;
+int FLAME_MAXWORLDNUM, MAX_WORLD_PIPEBOMBS, MAX_WORLD_AMMOBOXES, GR_TYPE_MIRV_NO, GR_TYPE_NAPALM_NO;
 
 void    TeamFortress_Regenerate(  );
 void    TeamFortress_RegenerateCells(  );
@@ -991,6 +992,9 @@ void TeamFortress_ShowTF(  )
         if( tg_data.tg_enabled )
         	G_sprint( self, 2, "Training Ground enabled\n" );
 #endif
+        if( tf_data.lan_mode )
+        	G_sprint( self, 2, "Lan mode enabled\n" );
+
 	G_sprint( self, 2, ANGEL_VERSION "\n");
 }
 

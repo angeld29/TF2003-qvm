@@ -10,10 +10,10 @@ gedict_t *FlameSpawn( int type, gedict_t * p_owner )
 {
 	if ( tf_data.cb_prematch_time > g_globalvars.time )
 		return world;
-#ifndef LAN_SERVER
-	if ( type != 1 )
+
+	if ( type != 1 && !tf_data.lan_mode )
 		return world;
-#endif
+
 	num_world_flames = num_world_flames + 1;
 	while ( num_world_flames > FLAME_MAXWORLDNUM )
 	{
@@ -157,78 +157,74 @@ void NapalmGrenadeNetThink(  )
 	}
 }
 
-#ifndef LAN_SERVER
 void NapalmGrenadeExplode(  )
 {
 //      float   i;
 	gedict_t *head;
-
-	sound( self, 0, "weapons/flmgrexp.wav", 1, 1 );
-	traceline( PASSVEC3( self->s.v.origin ), PASSVEC3( self->s.v.origin ), 1, self );
-	if ( g_globalvars.trace_inwater == 1 )
-	{
-		dremove( self );
-		return;
-	}
-	self->s.v.effects = ( int ) self->s.v.effects | 8;
-	for ( head = world; head = findradius( head, self->s.v.origin, 180 ); )
-	{
-		if ( head->s.v.takedamage )
-		{
-			tf_data.deathmsg = 15;
-			TF_T_Damage( head, self, PROG_TO_EDICT( self->s.v.owner ), 40, 2, 16 );
-			other = head;
-			Napalm_touch(  );
-			if ( streq( other->s.v.classname, "player" ) )
-				stuffcmd( other, "bf\nbf\n" );
-		}
-	}
-	trap_WriteByte( 4, 23 );
-	trap_WriteByte( 4, 3 );
-	trap_WriteCoord( 4, self->s.v.origin[0] );
-	trap_WriteCoord( 4, self->s.v.origin[1] );
-	trap_WriteCoord( 4, self->s.v.origin[2] );
-	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
-	head = spawn(  );
-	head->s.v.think = ( func_t ) NapalmGrenadeNetThink;
-	head->s.v.nextthink = g_globalvars.time + 1;
-	head->heat = 0;
-	VectorCopy( self->s.v.origin, head->s.v.origin );
-	head->s.v.owner = self->s.v.owner;
-	head->team_no = PROG_TO_EDICT( self->s.v.owner )->team_no;
-	head->s.v.enemy = EDICT_TO_PROG( self );
-///Napalm fix
-	self->s.v.movetype = MOVETYPE_NONE;
-	SetVector( self->s.v.velocity, 0, 0, 0 );
-
-}
-#else
-void NapalmGrenadeExplode(  )
-{
 	float   i;
 	vec3_t  tmp;
-
-	sound( self, 0, "weapons/flmgrexp.wav", 1, 1 );
-	traceline( PASSVEC3( self->s.v.origin ), PASSVEC3( self->s.v.origin ), 1, self );
-	if ( g_globalvars.trace_inwater == 1 )
+	if( !tf_data.lan_mode )
 	{
-		dremove( self );
-		return;
-	}
-	deathmsg = 15;
-	T_RadiusDamage( self, PROG_TO_EDICT( self->s.v.owner ), 20, world );
-	i = 0;
-	VectorCopy( self->s.v.origin, tmp );
-	tmp[2] += 5;
-	while ( i < 15 )
+        	sound( self, 0, "weapons/flmgrexp.wav", 1, 1 );
+        	traceline( PASSVEC3( self->s.v.origin ), PASSVEC3( self->s.v.origin ), 1, self );
+        	if ( g_globalvars.trace_inwater == 1 )
+        	{
+        		dremove( self );
+        		return;
+        	}
+        	self->s.v.effects = ( int ) self->s.v.effects | 8;
+        	for ( head = world; head = findradius( head, self->s.v.origin, 180 ); )
+        	{
+        		if ( head->s.v.takedamage )
+        		{
+        			tf_data.deathmsg = 15;
+        			TF_T_Damage( head, self, PROG_TO_EDICT( self->s.v.owner ), 40, 2, 16 );
+        			other = head;
+        			Napalm_touch(  );
+        			if ( streq( other->s.v.classname, "player" ) )
+        				stuffcmd( other, "bf\nbf\n" );
+        		}
+        	}
+        	trap_WriteByte( 4, 23 );
+        	trap_WriteByte( 4, 3 );
+        	trap_WriteCoord( 4, self->s.v.origin[0] );
+        	trap_WriteCoord( 4, self->s.v.origin[1] );
+        	trap_WriteCoord( 4, self->s.v.origin[2] );
+        	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+        	head = spawn(  );
+        	head->s.v.think = ( func_t ) NapalmGrenadeNetThink;
+        	head->s.v.nextthink = g_globalvars.time + 1;
+        	head->heat = 0;
+        	VectorCopy( self->s.v.origin, head->s.v.origin );
+        	head->s.v.owner = self->s.v.owner;
+        	head->team_no = PROG_TO_EDICT( self->s.v.owner )->team_no;
+        	head->s.v.enemy = EDICT_TO_PROG( self );
+        ///Napalm fix
+        	self->s.v.movetype = MOVETYPE_NONE;
+        	SetVector( self->s.v.velocity, 0, 0, 0 );
+	}else
 	{
-		NapalmGrenadeLaunch( tmp, PROG_TO_EDICT( self->s.v.owner ) );
-		i = i + 1;
+        	sound( self, 0, "weapons/flmgrexp.wav", 1, 1 );
+        	traceline( PASSVEC3( self->s.v.origin ), PASSVEC3( self->s.v.origin ), 1, self );
+        	if ( g_globalvars.trace_inwater == 1 )
+        	{
+        		dremove( self );
+        		return;
+        	}
+        	tf_data.deathmsg = 15;
+        	T_RadiusDamage( self, PROG_TO_EDICT( self->s.v.owner ), 20, world );
+        	i = 0;
+        	VectorCopy( self->s.v.origin, tmp );
+        	tmp[2] += 5;
+        	while ( i < 15 )
+        	{
+        		NapalmGrenadeLaunch( tmp, PROG_TO_EDICT( self->s.v.owner ) );
+        		i = i + 1;
+        	}
+        	self->s.v.solid = SOLID_NOT;
+        	BecomeExplosion(  );
 	}
-	self->s.v.solid = SOLID_NOT;
-	BecomeExplosion(  );
 }
-#endif
 void NapalmGrenadeLaunch( vec3_t org, gedict_t * shooter )
 {
 	float   xdir;

@@ -1372,9 +1372,10 @@ void sigil_touch(  )
 		return;
 	if ( tf_data.cb_prematch_time > g_globalvars.time )
 		return;
-#ifdef LAN_SERVER
-	G_centerprint( other, "You got the rune!" );
-#endif
+
+        if( tf_data.lan_mode )
+		G_centerprint( other, "You got the rune!" );
+
 	sound( other, CHAN_ITEM, self->s.v.noise, 1, ATTN_NORM );
 	stuffcmd( other, "bf\n" );
 	self->s.v.solid = SOLID_NOT;
