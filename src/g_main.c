@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.4 2004-09-16 13:06:08 AngelD Exp $
+ *  $Id: g_main.c,v 1.5 2004-09-18 09:58:33 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -159,7 +159,7 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 	case GAME_CLIENT_USERINFO_CHANGED:
 		// called on user /cmd setinfo	if value changed
 		// return not zero dont allow change
-		// params like GAME_CLIENT_COMMAND, but argv(0) always setinfo and argc always 3
+		// params like GAME_CLIENT_COMMAND, but argv(0) always "setinfo" and argc always 3
 
 		self = PROG_TO_EDICT( g_globalvars.self );
 		return ClientUserInfoChanged();
@@ -167,8 +167,10 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 	case GAME_SHUTDOWN:
 		return 0;
 
-/*	case GAME_CONSOLE_COMMAND:
-		return ConsoleCommand();*/
+	case GAME_CONSOLE_COMMAND:
+		// called on server console command "mod"
+		// params like GAME_CLIENT_COMMAND, but argv(0) always "mod"
+		return 0;//ConsoleCommand();
 	}
 
 	return 0;
@@ -248,6 +250,9 @@ void G_InitGame( int levelTime, int randomSeed )
 	}
 //TF Intialization
 	memset( &tf_data, 0, sizeof(tf_data));
+#ifdef TG
+	memset( &tg_data, 0, sizeof(tg_data));
+#endif
 //test
 /*        num = trap_FS_GetFileList( "SKINS" , ".pcx" , dirlist, sizeof(dirlist));
         dirptr=dirlist;

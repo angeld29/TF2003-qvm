@@ -68,7 +68,7 @@ void RefreshStatusBar( gedict_t * pl )
 	if ( pl->playerclass == 9 )
 #else
 	if ( pl->playerclass == 9 || pl->playerclass == 2 ||
-	     pl->playerclass == 3 || pl->playerclass == 5 || pl->playerclass == 6 || pl->playerclass == 7 || tg_sbar )
+	     pl->playerclass == 3 || pl->playerclass == 5 || pl->playerclass == 6 || pl->playerclass == 7 || tg_data.tg_sbar )
 #endif
 	{			/// eng sbar
 		if ( pl->has_dispenser )

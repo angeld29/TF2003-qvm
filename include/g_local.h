@@ -5,10 +5,10 @@
 #define __G_LOCAL
 #include "q_shared.h"
 #include "mathlib.h"
-#include "progs.h"
-#include "g_public.h"
 #include "g_consts.h"
 #include "g_tf_consts.h"
+#include "progs.h"
+#include "g_public.h"
 #include "g_syscalls.h"
 #include "player.h"
 #include "tfort.h"

@@ -302,7 +302,7 @@ void W_FireSpanner(  )
 								if ( trace_ent->s.v.armorvalue > trace_ent->maxarmor )
 									trace_ent->s.v.armorvalue = trace_ent->maxarmor;
 #ifdef TG
-								if ( !unlimit_ammo )
+								if ( !tg_data.unlimit_ammo )
 #endif
 									self->s.v.
 									    ammo_cells = self->s.v.ammo_cells - healam;
@@ -369,14 +369,12 @@ void W_FireMedikit(  )
 			if ( ( trace_ent->team_no == self->team_no && self->team_no ) || coop )
 			{
 				healam = WEAP_MEDIKIT_HEAL;
-				for ( te = find( world, FOFS( s.v.classname ), "timer" );
-				      te; te = find( te, FOFS( s.v.classname ), "timer" ) )
+				for ( te=world ;te = find( te, FOFS( s.v.classname ), "timer" );)
 				{
 					if ( te->s.v.owner != g_globalvars.trace_ent )
 						continue;
-					if ( te->s.v.think != ( func_t ) ConcussionGrenadeTimer )
-						continue;
-					if ( te->s.v.think != ( func_t ) OldConcussionGrenadeTimer )
+					if ( te->s.v.think != ( func_t ) ConcussionGrenadeTimer &&
+						te->s.v.think != ( func_t ) OldConcussionGrenadeTimer )
 						continue;
 					if ( tf_data.old_grens == 1 )
 						stuffcmd( trace_ent, "v_idlescale 0\nfov 90\n" );
@@ -390,9 +388,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->tfstate & TFSTATE_HALLUCINATING )
 				{
-					for ( te =
-					      find( world, FOFS( s.v.classname ),
-						    "timer" ); te; te = find( te, FOFS( s.v.classname ), "timer" ) )
+				        for ( te=world ;te = find( te, FOFS( s.v.classname ), "timer" );)
 					{
 						if ( te->s.v.owner != g_globalvars.trace_ent )
 							continue;
@@ -419,9 +415,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->tfstate & TFSTATE_TRANQUILISED )
 				{
-					for ( te =
-					      find( world, FOFS( s.v.classname ),
-						    "timer" ); te; te = find( te, FOFS( s.v.classname ), "timer" ) )
+				        for ( te=world ;te = find( te, FOFS( s.v.classname ), "timer" );)
 					{
 						if ( te->s.v.owner != g_globalvars.trace_ent )
 							continue;
@@ -444,10 +438,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->FlashTime > 0 )
 				{
-					for ( te =
-					      find( world, FOFS( s.v.netname ),
-						    "flashtimer" ); te;
-					      te = find( te, FOFS( s.v.classname ), "flashtimer" ) )
+				        for ( te=world ;te = find( te, FOFS( s.v.netname ), "flashtimer" );)
 					{
 						if ( te->s.v.owner != g_globalvars.trace_ent )
 							continue;
@@ -462,6 +453,7 @@ void W_FireMedikit(  )
 							TF_AddFrags( self, 1 );
 						if ( tf_data.new_flash )
 							disableupdates( trace_ent, -1 );	/* server-side flash */
+						break;
 					}
 					if ( !te )
 					{
@@ -940,7 +932,7 @@ void W_FireShotgun(  )
 	sound( self, CHAN_WEAPON, "weapons/guncock.wav", 1, ATTN_NORM );
 	KickPlayer( -2, self );
 #ifdef TG
-	if ( !unlimit_ammo )
+	if ( !tg_data.unlimit_ammo )
 #endif
 		self->s.v.currentammo = --( self->s.v.ammo_shells );
 	aim( dir );
@@ -965,7 +957,7 @@ void W_FireSuperShotgun(  )
 	sound( self, CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM );
 	KickPlayer( -4, self );
 #ifdef TG
-	if ( !unlimit_ammo )
+	if ( !tg_data.unlimit_ammo )
 #endif
 		self->s.v.currentammo = self->s.v.ammo_shells = self->s.v.ammo_shells - 2;
 	aim( dir );
@@ -1029,7 +1021,7 @@ void W_FireSniperRifle(  )
 	sound( self, 1, "weapons/sniper.wav", 1, 1 );
 	KickPlayer( -2, self );
 #ifdef TG
-	if ( !unlimit_ammo )
+	if ( !tg_data.unlimit_ammo )
 #endif
 		self->s.v.currentammo = ( self->s.v.ammo_shells -= tf_data.snip_ammo);
 	makevectors( self->s.v.v_angle );
@@ -1135,7 +1127,7 @@ void W_FireAutoRifle(  )
 	sound( self, 1, "weapons/sniper.wav", 1, 1 );
 	KickPlayer( -1, self );
 #ifdef TG
-	if ( !unlimit_ammo )
+	if ( !tg_data.unlimit_ammo )
 #endif
 		self->s.v.currentammo = --( self->s.v.ammo_shells );
 	makevectors( self->s.v.v_angle );
@@ -1164,7 +1156,7 @@ void W_FireAssaultCannon(  )
 	KickPlayer( -4, self );
 
 #ifdef TG
-		if ( !unlimit_ammo )
+		if ( !tg_data.unlimit_ammo )
 #endif
 			self->s.v.currentammo = --( self->s.v.ammo_shells );
 
@@ -1296,7 +1288,7 @@ W_FireRocket
 void W_FireRocket(  )
 {
 #ifdef TG
-	if ( !unlimit_ammo )
+	if ( !tg_data.unlimit_ammo )
 #endif
 		self->s.v.currentammo = --( self->s.v.ammo_rockets );
 	sound( self, CHAN_WEAPON, "weapons/sgun1.wav", 1, ATTN_NORM );
@@ -1424,7 +1416,7 @@ void W_FireLightning(  )
 	}
 	KickPlayer( -2, self );
 #ifdef TG
-	if ( !unlimit_ammo )
+	if ( !tg_data.unlimit_ammo )
 #endif
 		self->s.v.currentammo = --( self->s.v.ammo_cells );
 
@@ -1664,7 +1656,7 @@ void W_FireGrenade(  )
 	int     num_team_pipes;
 
 #ifdef TG
-	if ( !unlimit_ammo )
+	if ( !tg_data.unlimit_ammo  )
 #endif
 		self->s.v.currentammo = --( self->s.v.ammo_rockets );
 
@@ -1790,7 +1782,7 @@ void W_FireSuperSpikes(  )
 
 	sound( self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM );
 #ifdef TG
-	if ( !unlimit_ammo )
+	if ( !tg_data.unlimit_ammo  )
 #endif
 		self->s.v.currentammo = self->s.v.ammo_nails = self->s.v.ammo_nails - 4;
 	aim( dir );		//dir = aim (self, 1000);
@@ -1828,13 +1820,13 @@ void W_FireSpikes( float ox )
 	if ( self->s.v.ammo_nails == 1 )
 	{
 #ifdef TG
-		if ( !unlimit_ammo )
+		if ( !tg_data.unlimit_ammo  )
 #endif
 			self->s.v.currentammo = self->s.v.ammo_nails = self->s.v.ammo_nails - 1;
 	} else
 	{
 #ifdef TG
-		if ( !unlimit_ammo )
+		if ( !tg_data.unlimit_ammo  )
 #endif
 			self->s.v.currentammo = self->s.v.ammo_nails = self->s.v.ammo_nails - 2;
 	}
@@ -2305,6 +2297,17 @@ void W_Reload_rocket_launcher(  )
 float CheckForReload(  )
 {
 	gedict_t *tWeapon;
+
+#ifdef TG
+ 	if( tg_data.disable_reload )
+	{
+		self->reload_shotgun = 0;
+		self->reload_super_shotgun = 0;
+		self->reload_grenade_launcher = 0;
+		self->reload_rocket_launcher = 0;
+		return 0;
+	}
+#endif
 
 	switch ( self->current_weapon )
 	{
@@ -3306,6 +3309,18 @@ void ImpulseCommands(  )
 		break;
 	case TG_DISP_UNLOAD_IMPULSE:
 		Eng_DispUnload(  );
+		self->s.v.impulse = 0;
+		break;
+	case TG_CONC_IMPULSE:
+		TG_Eff_Conc( self );
+		self->s.v.impulse = 0;
+		break;
+	case TG_FLASH_IMPULSE:
+		TG_Eff_Flash( self );
+		self->s.v.impulse = 0;
+		break;
+	case TG_EFF_REMOVE_IMPULSE:
+		TG_Eff_Remove(self);
 		self->s.v.impulse = 0;
 		break;
 	}

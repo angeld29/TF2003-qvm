@@ -107,7 +107,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /out:"D:\games\qwtf\fortress\qwprogs.dll" /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /out:"D:\games\qwtf\fortress\qwprogs.dll" /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /out:"D:\games\qwtf\fortress\qwtg.dll" /pdbtype:sept
 
 !ENDIF 
 
@@ -296,6 +296,8 @@ SOURCE=.\src\tforttm.c
 SOURCE=.\src\tg.c
 
 !IF  "$(CFG)" == "qwprogs - Win32 Release"
+
+# PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "qwprogs - Win32 Debug"
 

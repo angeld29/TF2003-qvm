@@ -1019,9 +1019,9 @@ void TeamFortress_PrimeGrenade(  )
 		{
 			self->no_grenades_1--;
 #else
-		if ( self->no_grenades_1 > 0 || unlimit_grens )
+		if ( self->no_grenades_1 > 0 || tg_data.unlimit_grens )
 		{
-			if ( !unlimit_grens )
+			if ( !tg_data.unlimit_grens )
 				self->no_grenades_1--;
 #endif
 			switch ( gtype )
@@ -1082,9 +1082,9 @@ void TeamFortress_PrimeGrenade(  )
 		{
 			self->no_grenades_2--;
 #else
-		if ( self->no_grenades_2 > 0 || unlimit_grens )
+		if ( self->no_grenades_2 > 0 || tg_data.unlimit_grens )
 		{
-			if ( !unlimit_grens )
+			if ( !tg_data.unlimit_grens )
 				self->no_grenades_2--;
 #endif
 			switch ( gtype )
@@ -1560,6 +1560,10 @@ void TeamFortress_SetEquipment(  )
 	if ( pc > 11 )
 		pc = 0;
 	self->weapons_carried |= class_set[pc].weapons_carried;
+#ifdef TG
+	self->weapons_carried |= WEAP_SPANNER;
+	self->weapons_carried -= self->weapons_carried & WEAP_AXE;
+#endif
 	self->s.v.ammo_rockets = class_set[pc].ammo_rockets;
 	self->s.v.ammo_nails = class_set[pc].ammo_nails;
 	self->s.v.ammo_shells = class_set[pc].ammo_shells;

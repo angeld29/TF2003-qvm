@@ -275,7 +275,9 @@ typedef struct gedict_s {
 
 	float		allow_snip_time;
 	int		has_fake_gas_setinfo;
-
+#ifdef TG
+	float		gren_eff_time;
+#endif
 } gedict_t;
 extern  int 		skill;
 extern  int 		number_of_teams; 
@@ -328,14 +330,12 @@ typedef struct {
 	int		cheat_pause;
 	int		disable_grens;
 	int		topcolor_check;
-	int		sentry_type,sgppl;
+	sentry_types_t	sentry_type;
+	int		sgppl;
 	int		snip_range_fix,snip_fps,snip_ammo;
 	float		snip_time;
 	int		add_pipe;
 	int		new_gas;
 	int		gren2box,random_tf_spawn,disable_powerups,flag_timer,detpack_block;
 	int		mtfl;
-#ifdef TG
-	float		gren_eff_time;
-#endif
 } tf_server_data_t;

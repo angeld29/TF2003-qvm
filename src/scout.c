@@ -198,9 +198,10 @@ void FlashGrenadeExplode(  )
 			TF_T_Damage( te, self, owner, 60, 2, 16 | 4 );
 		}
 #ifdef TG
-		if ( te == owner && tg_data.gren_effect == 2 )
+		if ( tg_data.gren_effect == TG_GREN_EFFECT_OFF )
 			continue;
-		if ( !tg_data.gren_effect )
+
+		if ( te == owner && tg_data.gren_effect == TG_GREN_EFFECT_OFF_FORSELF )
 			continue;
 #endif
                 G_sprint(te, 2, "You are flashed\n");
@@ -248,14 +249,14 @@ void FlashGrenadeExplode(  )
 				newmis->s.v.think = ( func_t ) FlashTimer;
 				newmis->s.v.nextthink = g_globalvars.time + 1;
 #ifdef TG
-				if ( gren_time )
-					newmis->gren_eff_time = g_globalvars.time + tg_data.gren_time;
+				if ( tg_data.gren_time )
+						newmis->gren_eff_time = g_globalvars.time + tg_data.gren_time;
 #endif
 			}
 #ifndef TG
 			if ( te == owner )
 #else
-			if ( te == owner && /*!tg_data.fullflash_for_self*/ )
+			if ( te == owner /*&& !tg_data.fullflash_for_self*/ )
 #endif
 			{
 				te->FlashTime = 16;
@@ -487,9 +488,10 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 		} else
 		{
 #ifdef TG
-			if ( head == PROG_TO_EDICT( inflictor->s.v.owner ) && tg_data.gren_effect == 2 )
+			if ( tg_data.gren_effect == TG_GREN_EFFECT_OFF )
 				continue;
-			if ( !tg_data.gren_effect )
+
+			if ( head == PROG_TO_EDICT( inflictor->s.v.owner ) && tg_data.gren_effect == TG_GREN_EFFECT_OFF_FORSELF )
 				continue;
 #endif
 			G_sprint( head, 2, "You are conced\n");
@@ -786,3 +788,208 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 	W_SetCurrentAmmo(  );
 	return;
 }
+
+#ifdef TG
+void	TG_Eff_Flash(gedict_t *te)
+{
+       	if ( strneq( te->s.v.classname, "player" ) )
+       		return;
+       	if ( te->s.v.health <= 0 )
+       		return;
+
+               G_sprint(te, 2, "You are flashed\n");
+       	if ( tf_data.new_flash )
+       	{
+
+       		if ( !te->FlashTime )
+       		{
+       			newmis = spawn(  );
+       			newmis->s.v.classname = "timer";
+       			newmis->s.v.netname = "flashtimer";
+       			newmis->team_no = te->team_no;
+       			newmis->s.v.owner = EDICT_TO_PROG( te );
+       			newmis->s.v.think = ( func_t ) FlashTimerNew;
+       			newmis->s.v.nextthink = g_globalvars.time + NEW_FLASH_START_TIME;
+       		}
+      			te->FlashTime = 24;
+      			stuffcmd( te, "v_cshift 255 255 255 255\n" );
+      			disableupdates( te, NEW_FLASH_START_TIME );	/* server-side flash */
+       	}else
+       	{
+       		if ( !te->FlashTime )
+       		{
+       			newmis = spawn(  );
+       			newmis->s.v.classname = "timer";
+       			newmis->s.v.netname = "flashtimer";
+       			newmis->team_no = te->team_no;
+       			newmis->s.v.owner = EDICT_TO_PROG( te );
+       			newmis->s.v.think = ( func_t ) FlashTimer;
+       			newmis->s.v.nextthink = g_globalvars.time + 1;
+       		}
+       	        te->FlashTime = 24;
+       		stuffcmd( te, "v_cshift %.0f %.0f %.0f %.0f\n", te->FlashTime * 10, te->FlashTime * 10,
+       			  te->FlashTime * 10, te->FlashTime * 10 );
+       	}
+
+}
+
+void	TG_Eff_Conc(gedict_t *head)
+{
+        gedict_t* te;
+
+       	if ( strneq( head->s.v.classname, "player" ) )
+       		return;
+       	if ( head->s.v.health <= 0 )
+       		return;
+
+	G_sprint( head, 2, "You are conced\n");
+      	for ( te = world; te = find( te, FOFS( s.v.classname ), "timer" ); )
+      	{
+      		if ( te->s.v.owner != EDICT_TO_PROG( head ) )
+      			continue;
+      		if ( te->s.v.think == ( func_t ) ConcussionGrenadeTimer )
+      			break;
+      		if ( te->s.v.think == ( func_t ) OldConcussionGrenadeTimer )
+      			break;
+      	}
+
+       	if ( te )
+       	{
+       		if ( tf_data.old_grens == 1 )
+       		{
+       			stuffcmd( head, "v_idlescale 100\n" );
+       			stuffcmd( head, "fov 130\n" );
+       			te->s.v.health = 100;
+       			te->s.v.nextthink = g_globalvars.time + 5;
+       		} else
+       		{
+       			te->s.v.health = 800;
+       			te->s.v.nextthink = g_globalvars.time + 0.25;
+       		}
+       	} else
+	{
+		if ( tf_data.old_grens == 1 )
+		{
+			stuffcmd( head, "v_idlescale 100\n" );
+			stuffcmd( head, "fov 130\n" );
+			stuffcmd( head, "bf\n" );
+			te = spawn(  );
+			te->s.v.nextthink = g_globalvars.time + 5;
+			te->s.v.think = ( func_t ) OldConcussionGrenadeTimer;
+			te->team_no = head->team_no;
+			te->s.v.classname = "timer";
+			te->s.v.owner = EDICT_TO_PROG( head );
+			te->s.v.health = 100;
+		} else
+		{
+			te = spawn(  );
+			te->s.v.nextthink = g_globalvars.time + 0.25;
+			te->s.v.think = ( func_t ) ConcussionGrenadeTimer;
+			te->team_no = head->team_no;
+			te->s.v.classname = "timer";
+			te->s.v.owner = EDICT_TO_PROG( head );
+			te->s.v.health = 800;
+		}
+	}
+
+}
+
+void    HallucinationTimer(  );
+void    TranquiliserTimer(  );
+
+void	TG_Eff_Remove(gedict_t *pl)
+{
+        gedict_t *te;
+		float healam;
+
+       	if ( strneq( pl->s.v.classname, "player" ) )
+       		return;
+       	if ( pl->s.v.health <= 0 )
+       		return;
+
+     	for ( te=world ;te = find( te, FOFS( s.v.classname ), "timer" );)
+     	{
+     		if ( te->s.v.owner != EDICT_TO_PROG( pl ))
+     			continue;
+     		if ( te->s.v.think != ( func_t ) ConcussionGrenadeTimer && 
+     			te->s.v.think != ( func_t ) OldConcussionGrenadeTimer)
+     			continue;
+     		if ( tf_data.old_grens == 1 )
+     			stuffcmd( pl, "v_idlescale 0\nfov 90\n" );
+     		dremove( te );
+     		break;
+     	}
+     	if ( pl->tfstate & TFSTATE_HALLUCINATING )
+     	{
+     	        for ( te=world ;te = find( te, FOFS( s.v.classname ), "timer" );)
+     		{
+     			if ( te->s.v.owner != EDICT_TO_PROG( pl ))
+     				continue;
+     			if ( te->s.v.think != ( func_t ) HallucinationTimer )
+     				continue;
+
+     			pl->tfstate -= ( pl->tfstate & TFSTATE_HALLUCINATING );
+     			
+     			ResetGasSkins(pl);
+
+     			if ( tf_data.new_gas & GAS_MASK_PALETTE) 
+     				stuffcmd( pl, "v_cshift; wait; bf\n" );
+     			dremove( te );
+     			break;
+     		}
+     		if ( !te )
+     			G_dprint( "Warning: Error in Hallucination Timer logic.\n" );
+     	}
+     	if ( pl->tfstate & TFSTATE_TRANQUILISED )
+     	{
+     		for ( te=world ;te = find( te, FOFS( s.v.classname ), "timer" );)
+     		{
+     			if ( te->s.v.owner != EDICT_TO_PROG( pl ))
+     				continue;
+     			if ( te->s.v.think != ( func_t ) TranquiliserTimer )
+     				continue;
+
+     			pl->tfstate -= ( pl->tfstate & TFSTATE_TRANQUILISED );
+     			TeamFortress_SetSpeed( pl );
+     			dremove( te );
+     			break;
+     		}
+     		if ( !te )
+     			G_dprint( "Warning: Error in Tranquilisation Timer logic.\n" );
+     	}
+     	if ( pl->FlashTime > 0 )
+     	{
+     	        for ( te=world ;te = find( te, FOFS( s.v.netname ), "flashtimer" );)
+     		{
+     			if ( te->s.v.owner != EDICT_TO_PROG( pl ))
+     				continue;
+     			if ( strneq( te->s.v.classname, "timer" ) )
+     				continue;
+
+     			pl->FlashTime = 0;
+     			if ( tf_data.new_flash )
+     				disableupdates( pl, -1 );	/* server-side flash */
+     			break;
+     		}
+     		if ( !te )
+     		{
+     			G_dprint( "Warning: Error in Flash Timer logic.\n" );
+     			pl->FlashTime = 0;
+     		}
+     	}
+     	if ( pl->tfstate & TFSTATE_INFECTED )
+     	{
+     		healam = floor( pl->s.v.health / 2 );
+     		pl->tfstate -= ( pl->tfstate & TFSTATE_INFECTED );
+     		tf_data.deathmsg = DMSG_MEDIKIT;
+     		T_Damage( pl, self, self, healam );
+     		return;
+     	}
+     	if ( pl->numflames > 0 )
+     	{
+     		sound( pl, 1, "items/r_item1.wav", 1, 1 );
+     		pl->numflames = 0;
+     		return;
+     	}
+}
+#endif

@@ -928,13 +928,22 @@
 
 ///Angel TF consts
 //Sentry types
-#define SENTRY_OLD 0
+typedef enum {
+ SENTRY_OLD,
+ SENTRY_MTFL,
+ SENTRY_FIX,
+ SENTRY_NEW,
+ SENTRY_MTFL_NEWFIND,
+ SENTRY_OLD_NEWFIND,
+ MAX_SENTRY_TYPES
+}sentry_types_t;
+/*#define SENTRY_OLD 0
 #define SENTRY_FIX 2
 #define SENTRY_NEW 3
 #define SENTRY_MTFL 1
 #define SENTRY_MTFL_NEWFIND 4
 #define SENTRY_OLD_NEWFIND 5
-#define MAX_SENTRY_TYPES 5
+#define MAX_SENTRY_TYPES 5*/
 
 #define TF_AUTOIDTIME 1.0
 #define TF_AUTOSCAN_TIME 0.5

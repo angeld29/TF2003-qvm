@@ -97,27 +97,30 @@ void MirvGrenadeLaunch( vec3_t org, gedict_t * shooter )
 }
 
 #ifdef TG
+
 void Detpack_SetClip(  )
 {
 	gedict_t *te;
-	gedict_t *pl;
+//	gedict_t *pl;
 
 	for ( te = world; te = find( te, FOFS( s.v.classname ), "detpack" ); )
 	{
-		if ( tg_data.detpack_clip == 2 )
-		{
-			te->s.v.solid = SOLID_BBOX;
-			te->s.v.owner = EDICT_TO_PROG( world );
-		} else
-		{
-			if ( tg_data.detpack_clip == 0 )
-				te->s.v.solid = SOLID_NOT;
-			else
-			{
+	        switch(tg_data.detpack_clip)
+	        {
+	        	case TG_DETPACK_CLIP_ALL:
+	        		te->s.v.solid = SOLID_NOT;
+	        		break;
+	        	case TG_DETPACK_SOLID_ALL:
+				te->s.v.solid = SOLID_BBOX;
+				te->s.v.owner = EDICT_TO_PROG( world );
+	        		break;
+
+	        	case TG_DETPACK_CLIP_OWNER:
+	        	default:	
 				te->s.v.solid = SOLID_BBOX;
 				te->s.v.owner = EDICT_TO_PROG( te->real_owner );
-			}
-		}
+				break;
+	        }
 	}
 }
 #endif
@@ -439,7 +442,7 @@ void TeamFortress_DetpackTouch(  )
 		CheckBelowBuilding( self );
 #endif
 #ifdef TG
-	if ( !tg_data.detpack_disarm )
+	if ( tg_data.disable_disarm )
 		return;
 #endif
 	if ( strneq( other->s.v.classname, "player" ) )

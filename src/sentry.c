@@ -1,8 +1,8 @@
 #include "g_local.h"
 #include "sentry.h"
 
-//void    CheckBelowBuilding( gedict_t * bld );
-//void    CheckSentry( gedict_t * gunhead );
+void    FireSentryLighting( gedict_t * targ )  ;
+
 void    FireBullets( float shotcount, vec3_t dir, float spread_x, float spread_y, float spread_z );
 
 
@@ -521,7 +521,8 @@ void    FireSentryLighting( gedict_t * targ )
 {
 	vec3_t  src;
 	vec3_t  dst;
-	vec3_t  dir, end;
+	vec3_t  dir, end,direction;
+	gedict_t*trace_ent;
 	float   rs;
 
 	if ( tf_data.sentry_type == SENTRY_FIX || tf_data.sentry_type == SENTRY_NEW )
@@ -543,7 +544,6 @@ void    FireSentryLighting( gedict_t * targ )
 		VectorAdd( self->s.v.origin, src, src );
 		src[2] = self->s.v.absmin[2] + self->s.v.size[2] * 0.7;
 		VectorSubtract( targ->s.v.origin, self->s.v.origin, dir );
-		dir = targ->s.v.origin - self->s.v.origin;
 	}
 	g_globalvars.trace_ent = 0;
 
@@ -557,15 +557,16 @@ void    FireSentryLighting( gedict_t * targ )
 	trap_WriteCoord( 4, src[0] );
 	trap_WriteCoord( 4, src[1] );
 	trap_WriteCoord( 4, src[2] );
-	trap_WriteCoord( 4, trace_endpos[0] );
-	trap_WriteCoord( 4, trace_endpos[1] );
-	trap_WriteCoord( 4, trace_endpos[2] );
+	trap_WriteCoord( 4, g_globalvars.trace_endpos[0] );
+	trap_WriteCoord( 4, g_globalvars.trace_endpos[1] );
+	trap_WriteCoord( 4, g_globalvars.trace_endpos[2] );
 	trap_multicast( PASSVEC3( src ), 1 );
 	if ( g_globalvars.trace_ent )
 	{
+		trace_ent = PROG_TO_EDICT(g_globalvars.trace_ent);
 		if ( streq( trace_ent->s.v.classname, "player" ) )
 		{
-			rs = rint( g_random(  ) * 15 + 1 );
+			rs = (int)( g_random(  ) * 15) + 1 ;
 			trace_ent->s.v.noise = "";
 			if ( rs == 1 )
 				trace_ent->s.v.noise = "player/pain1.wav";
@@ -605,7 +606,7 @@ int Sentry_Fire(  )
 	gedict_t *enemy = PROG_TO_EDICT( self->s.v.enemy );
 
 #ifdef TG
-	if ( !sg_allow_fire )
+	if ( tg_data.sg_disable_fire || !CheckTarget(enemy) )
 		return 0;
 #endif
 	self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & 8 );
@@ -617,7 +618,7 @@ int Sentry_Fire(  )
 		return 0;
 	if ( self->s.v.weapon == 3 && self->s.v.ammo_rockets > 0 && self->super_damage_finished < g_globalvars.time
 #ifdef TG
-	     && ( sg_fire_type == TG_SG_FIRE_NORMAL )
+	     && ( tg_data.sg_fire_type == TG_SG_FIRE_NORMAL )
 #endif
 	     )
 	{
@@ -647,7 +648,7 @@ int Sentry_Fire(  )
 			G_sprint( self->real_owner, 2, "Sentry Gun is low on rockets.\n" );
 	}
 #ifdef TG
-	if ( sg_fire_type != TG_SG_FIRE_LIGHTING )
+	if ( tg_data.sg_fire_type != TG_SG_FIRE_LIGHTING )
 	{
 #endif
 		self->s.v.ammo_shells -= 1;
@@ -663,9 +664,9 @@ int Sentry_Fire(  )
 #endif
 	tf_data.deathmsg = 27;
 #ifdef TG
-	if ( sg_fire_type == TG_SG_FIRE_LIGHTING )
+	if ( tg_data.sg_fire_type == TG_SG_FIRE_LIGHTING )
 	{
-		FireSentryLighting( self->s.v.enemy );
+		FireSentryLighting( PROG_TO_EDICT(self->s.v.enemy) );
 	} else
 	{
 #endif
@@ -723,9 +724,9 @@ void Eng_StaticSG_Activate(  )
 					failed = 1;
 				}
 			}
-			if ( trap_pointcontents( ent->s.v.origin ) == -6 )
+			if ( trap_pointcontents( PASSVEC3(ent->s.v.origin) ) == -6 )
 			{
-				bprint( 2, "ERROR: Sentry gun felt off the level\n" );
+				G_bprint( 2, "ERROR: Sentry gun felt off the level\n" );
 				failed = 1;
 				ent->real_owner->has_sentry = ent->real_owner->has_sentry - 1;
 				dremove( ent->trigger_field );
@@ -750,7 +751,12 @@ void Eng_StaticSG_Activate(  )
 				ent->trigger_field->s.v.movetype = MOVETYPE_TOSS;
 				ent->trigger_field->s.v.solid = SOLID_BBOX;
 				ent->s.v.takedamage = 2;
-				ent->s.v.health = ent.max_health;
+				ent->s.v.health = ent->s.v.max_health;
+
+				ent->trigger_field->s.v.origin[2] += 8;
+				setorigin( ent->trigger_field, PASSVEC3(ent->trigger_field->s.v.origin));
+				SetVector( ent->trigger_field->s.v.velocity, 0, 0, -8 );
+
 				G_sprint( ent->real_owner, 2, "Your Static Sentry Gun rebuilded.\n" );
 			}
 		}

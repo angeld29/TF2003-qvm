@@ -38,6 +38,19 @@ void 	Menu_Spy_Color_Input( int inp );
 void 	Menu_BirthDay( menunum_t menu );
 void 	Menu_BirthDay_Input( int inp );
 
+#ifdef TG
+void 	TG_Main_Menu(menunum_t menu);
+void 	TG_Main_Menu_Input( int inp );
+void 	TG_SGOptions_Menu_Input( int inp );
+void 	TG_SGOptions_Menu(menunum_t menu);
+void 	TG_Detpack_Menu(menunum_t menu);
+void 	TG_Detpack_Menu_Input( int inp );
+void 	TG_Cheats_Menu(menunum_t menu);
+void 	TG_Cheats_Menu_Input( int inp );
+void 	TG_SavePosition_Menu(menunum_t menu);
+void 	TG_SavePosition_Menu_Input( int inp );
+
+#endif
 menu_t  menus[] = {
 	{0, 0, 0, NULL, NULL},	//MENU_NULL,                      
 	{0, 0, 0, NULL, NULL},	//MENU_DEFAULT,                 
@@ -67,6 +80,14 @@ menu_t  menus[] = {
 	{-1, 0, 0, Menu_BirthDay, Menu_BirthDay_Input},	//MENU_BIRTHDAY1
 	{-1, 0, 0, Menu_BirthDay, Menu_BirthDay_Input},	//MENU_BIRTHDAY2
 	{-1, 0, 0, Menu_BirthDay, Menu_BirthDay_Input},	//MENU_BIRTHDAY3
+#ifdef TG
+	{-1, 0,	0, TG_Main_Menu, TG_Main_Menu_Input},
+	{-1, 0,	0, TG_SGOptions_Menu, TG_SGOptions_Menu_Input},
+	{-1, 0,	0, TG_Detpack_Menu, TG_Detpack_Menu_Input},
+	{-1, 0,	0, TG_Cheats_Menu, TG_Cheats_Menu_Input},
+	{-1, 0,	0, TG_SavePosition_Menu, TG_SavePosition_Menu_Input},
+#endif
+	{0, 0, 0, NULL, NULL}
 };
 
 int     NUM_menus = sizeof( menus ) / sizeof( menus[0] );
@@ -743,7 +764,7 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 		if ( am > self->building->maxammo_shells - self->building->s.v.ammo_shells )
 			am = self->building->maxammo_shells - self->building->s.v.ammo_shells;
 #ifdef TG
-		if ( !tf_data.unlimit_ammo )
+		if ( !tg_data.unlimit_ammo )
 #endif
 			self->s.v.ammo_shells = self->s.v.ammo_shells - am;
 		self->building->s.v.ammo_shells = self->building->s.v.ammo_shells + am;
@@ -755,7 +776,7 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 			if ( am > self->building->maxammo_rockets - self->building->s.v.ammo_rockets )
 				am = self->building->maxammo_rockets - self->building->s.v.ammo_rockets;
 #ifdef TG
-			if ( !tf_data.unlimit_ammo )
+			if ( !tg_data.unlimit_ammo )
 #endif
 				self->s.v.ammo_rockets = self->s.v.ammo_rockets - am;
 			self->building->s.v.ammo_rockets = self->building->s.v.ammo_rockets + am;
@@ -792,12 +813,12 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 			metalcost = ( self->building->s.v.max_health - self->building->s.v.health ) / 5;
 
 #ifdef TG
-			if ( !tf_data.unlimit_ammo )
+			if ( !tg_data.unlimit_ammo )
 #endif
 				if ( metalcost > self->s.v.ammo_cells )
 					metalcost = self->s.v.ammo_cells;
 #ifdef TG
-			if ( !tf_data.unlimit_ammo )
+			if ( !tg_data.unlimit_ammo )
 #endif
 				self->s.v.ammo_cells = self->s.v.ammo_cells - metalcost;
 			self->building->s.v.health = self->building->s.v.health + metalcost * 5;
@@ -1251,3 +1272,396 @@ void 	Menu_BirthDay_Input( int inp )
                   break;	
   }
 }
+
+#ifdef TG
+void TG_Main_Menu( menunum_t menu )
+{
+ CenterPrint(self, "Options:\n"
+ 		   "1) SG options                 \n"
+ 		   "2) Detpack option             \n"
+ 		   "3) Cheats                     \n"
+ 		   "4) Load defaults              \n"
+ 		   "5) Saved position             \n"
+ 		   "7) Nothing                    \n");
+}
+
+void 	TG_Main_Menu_Input( int inp )
+{
+  switch( inp )
+  {
+  	case 1:
+  		self->current_menu = TG_MENU_SG;
+  		break;
+  	case 2:
+  		self->current_menu = TG_MENU_DETPACK;
+  		break;
+  	case 3:
+  		self->current_menu = TG_MENU_CHEATS;
+  		break;
+  	case 4: 
+  		TG_LoadSettings();
+  		break;
+  	case 5:
+  		self->current_menu = TG_MENU_POSITION;
+  		break;
+	case 7:
+		ResetMenu(  );
+		self->s.v.impulse = 0;
+		break;
+	default:
+		return;
+  }
+
+  self->s.v.impulse = 0;
+  self->menu_count = 23;
+
+}
+char* sentry_type_names[]=
+{
+ "Sentry: 2.8.1",
+ "Sentry: 2.8.1 fixed(mtfl)",
+ "Sentry: 2.8.1 fixed new",
+ "Sentry: NEW, SGPPL = ",
+ "Sentry: MTFL new find,SGPPL = ",
+ "Sentry: 2.8.1 new find,SGPPL = ",
+ "Unknown Sentry type"
+};
+
+char* sentry_find_names[]=
+{
+  "5)†ignore teammates           \n",
+  "5)ˆignore owner               \n",
+  "5)‰ignore OFF                 \n",
+  "5)‡ignore all targets         \n",
+};
+
+char* sentry_firetype_names[]=
+{
+ "6) Fire bullets & rockets     \n",
+ "6) Fire bullets               \n",
+ "6) Fire lightning (no damage) \n"
+};
+void 	TG_SGOptions_Menu(menunum_t menu)
+{
+  char *s_sgtype, s_sgppl[10], *s_sg_fire,*s_sg_find,*s_sgfiretype,*s_sbar,*s_change_sgppl;
+  switch( tf_data.sentry_type )
+  {
+  	case SENTRY_OLD:
+  	case SENTRY_MTFL:
+  	case SENTRY_FIX:
+  	                sprintf(s_sgppl,"\n");
+  			s_change_sgppl = "                              \n"
+  					 "                              \n";
+			break;
+  	case SENTRY_NEW:
+  	case SENTRY_MTFL_NEWFIND:
+  	case SENTRY_OLD_NEWFIND:
+  			s_change_sgppl = "2) Increase SGPPL             \n"
+  					 "3) Decrease SGPPL             \n";
+  			sprintf(s_sgppl,"%d\n", tf_data.sgppl);
+  			break;
+  	default: 
+  		tf_data.sentry_type = MAX_SENTRY_TYPES;
+  		sprintf(s_sgppl,"\n");
+  		break;
+  }
+  s_sgtype = sentry_type_names[tf_data.sentry_type];
+  if ( !tg_data.sg_disable_fire)
+  	s_sg_fire = "4)‰fire ON                    \n";
+  else
+  	s_sg_fire = "4)‡fire OFF                   \n";
+  if(tg_data.sg_allow_find >= TG_SG_FIND_IGNORE_NUM)
+  	tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
+  
+  s_sg_find = sentry_find_names[tg_data.sg_allow_find];
+
+  if(tg_data.sg_fire_type >= TG_SG_FIRE_NUM)
+  	tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;
+  s_sgfiretype = sentry_firetype_names[tg_data.sg_fire_type];
+  if( tg_data.tg_sbar )
+  	s_sbar = "7)‰Eng Sbar for All           \n";
+  else
+  	s_sbar = "7)‡Limited Eng Sbar           \n";
+
+  CenterPrint(self,"Sentry Gun Options:\n"
+  		   "%s%s"
+  		   "1) Change SG type             \n"
+  		   "%s%s%s%s%s"
+  		   "8) Nothing                    \n",
+  		   s_sgtype, s_sgppl, s_change_sgppl,
+  		   s_sg_fire, s_sg_find, s_sgfiretype, s_sbar );
+}
+void 	TG_SGOptions_Menu_Input( int inp )
+{
+	switch(inp)
+	{
+		case 1:
+			if( ++(tf_data.sentry_type) >= MAX_SENTRY_TYPES	)
+				tf_data.sentry_type = 0;
+		       break;
+		case 2:
+			if(tf_data.sentry_type == SENTRY_NEW || 
+				tf_data.sentry_type == SENTRY_MTFL_NEWFIND || 
+				tf_data.sentry_type == SENTRY_OLD_NEWFIND)
+				tf_data.sgppl++;
+			break;	
+		case 3:
+			if(tf_data.sentry_type == SENTRY_NEW || 
+				tf_data.sentry_type == SENTRY_MTFL_NEWFIND || 
+				tf_data.sentry_type == SENTRY_OLD_NEWFIND)
+				{
+				 if(tf_data.sgppl)
+				 	tf_data.sgppl--;
+				}
+			break;	
+		case 4:
+			tg_data.sg_disable_fire = (tg_data.sg_disable_fire)?0:1;
+			break;
+		case 5:
+			if( ++(tg_data.sg_allow_find) >= TG_SG_FIND_IGNORE_NUM)
+				tg_data.sg_allow_find = 0;
+		       break;
+		case 6:
+			if( ++(tg_data.sg_fire_type) >= TG_SG_FIRE_NUM)
+				tg_data.sg_fire_type = 0;
+		       break;
+		case 7:
+			tg_data.tg_sbar = (tg_data.tg_sbar)?0:1;
+			break;
+		case 8:
+			ResetMenu(  );
+			self->s.v.impulse = 0;
+			break;
+		default:
+			return;
+	}
+
+  self->s.v.impulse = 0;
+  self->menu_count = 23;
+}
+void 	TG_Detpack_Menu(menunum_t menu)
+{
+	char* s_clip,*s_disarm,*s_drop,*s_block;
+	
+        switch(tg_data.detpack_clip)
+        {
+        	case TG_DETPACK_CLIP_ALL:
+        		s_clip = "1)‰detpack clip is ALL        \n";
+        		break;
+
+        	case TG_DETPACK_SOLID_ALL:
+        		s_clip = "1)‡detpack clip is OFF        \n";
+        		break;
+
+        	case TG_DETPACK_CLIP_OWNER:
+        	default:
+        		s_clip = "1)ˆdetpack clip is ON         \n";	
+			break;
+        }
+        if( tg_data.disable_disarm)
+        	s_disarm = "2)‡don't disarm detpacks      \n";
+        else
+        	s_disarm = "2)‰disarm detpacks            \n";
+
+        if( tg_data.detpack_drop )
+        	s_drop = "3)‰drop detpacks              \n";
+        else
+        	s_drop = "3)‡don't drop detpacks        \n";
+
+	if( tf_data.detpack_block )
+		s_block = "4)‡Stack detpacks: TF2003     \n";
+	else
+		s_block = "4)‰Stack detpacks: TF 2.8.1   \n";
+
+       CenterPrint(self, "Detpack options:\n"
+       			 "%s%s%s%s"
+       			 "5) Nothing                    \n",
+       			 s_clip,s_disarm,s_drop,s_block);
+}
+
+void Detpack_SetClip(  );
+void 	TG_Detpack_Menu_Input( int inp )
+{
+	switch(inp)
+	{
+		case 1:
+			if( ++(tg_data.detpack_clip) >= TG_DETPACK_CLIP_NUM )
+				tg_data.detpack_clip = 0;
+			Detpack_SetClip();
+		       break;
+		case 2:
+		        tg_data.disable_disarm = (tg_data.disable_disarm)?0:1;
+			break;	
+		case 3:
+			tg_data.detpack_drop = (tg_data.detpack_drop)?0:1;
+			break;	
+		case 4:
+			tf_data.detpack_block = (tf_data.detpack_block)?0:1;
+			break;
+		case 5:
+			ResetMenu(  );
+			self->s.v.impulse = 0;
+			break;
+		default:
+			return;
+	}
+
+  self->s.v.impulse = 0;
+  self->menu_count = 23;
+}
+
+void 	TG_Cheats_Menu(menunum_t menu)
+{
+	char *s_gren_effect, *s_gren_time;
+
+	switch( tg_data.gren_effect )
+	{
+		case TG_GREN_EFFECT_OFF:
+		        s_gren_effect = "3)‡Grenade effect OFF         \n";
+			break;
+			
+		case TG_GREN_EFFECT_OFF_FORSELF:
+			s_gren_effect = "3)ˆGrenade effect OFF for self\n";
+			break;
+		
+		case TG_GREN_EFFECT_ON:
+		default:
+			s_gren_effect = "3)‰Grenade effect ON          \n";
+			break;
+	
+	}
+	switch( tg_data.gren_time )
+	{
+		case 0:
+			s_gren_time = "4)‰Grenade effect time: full  \n";
+			break;
+		case 5:
+			s_gren_time = "4)‡Grenade effect time: 5 sec \n";
+			break;
+		case 10:
+			s_gren_time = "4)ˆGrenade effect time: 10 sec\n";
+			break;
+	
+	}
+	CenterPrint( self, "Cheats menu:\n"
+			   "%s%s%s%s%s%s"
+			   "7) Nothing                    \n",
+    (tg_data.unlimit_ammo )?"1)‰Unlimited ammo ON          \n":"1)‡Unlimited ammo OFF         \n",
+    (tg_data.unlimit_grens)?"2)‰Unlimited grenades ON      \n":"2)‡Unlimited grenades OFF     \n",
+                             s_gren_effect,
+                             s_gren_time,
+    (tg_data.godmode )?     "5)‰God Mode ON                \n":"5)‡God Mode OFF               \n",
+    (tg_data.disable_reload )?"6)‰Reload Disabled            \n":"6)‡Reload Enabled             \n");
+}
+
+void 	TG_Cheats_Menu_Input( int inp )
+{
+	switch(inp)
+	{
+		case 1:
+		        tg_data.unlimit_ammo = (tg_data.unlimit_ammo)?0:1;
+		       break;
+		case 2:
+		        tg_data.unlimit_grens = (tg_data.unlimit_grens)?0:1;
+			break;	
+		case 3:
+			if( ++(tg_data.gren_effect) >= TG_GREN_EFFECT_NUM )
+				tg_data.gren_effect = 0;
+			break;	
+		case 4:
+		        tg_data.gren_time += 5;
+		        if( tg_data.gren_time > 10) 
+		        	tg_data.gren_time = 0;
+			break;
+		case 5:
+		        tg_data.godmode = (tg_data.godmode)?0:1;
+			break;	
+		case 6:
+		        tg_data.disable_reload = (tg_data.disable_reload)?0:1;
+			break;	
+		case 7:
+			ResetMenu(  );
+			self->s.v.impulse = 0;
+			break;
+		default:
+			return;
+	}
+
+  self->s.v.impulse = 0;
+  self->menu_count = 23;
+
+}
+
+vec3_t savepos={0,0,0},saveangle,savevel;
+void 	TG_SavePosition_Menu(menunum_t menu)
+{
+	if ( VectorCompareF( savepos, 0, 0, 0 ) )
+		CenterPrint(self,"\n1) Save Position              \n"
+				   "                              \n"
+				   "                              \n"
+				   "                              \n"
+				   "5) Nothing                    ");
+	else
+		CenterPrint(self,"\n1) Save Position              \n"
+				   "2) Show Position              \n"
+				   "3) Restore Position           \n"
+				   "4) Delete saved position      \n"
+				   "5) Nothing                    ");
+}
+
+
+void 	TG_SavePosition_Menu_Input( int inp )
+{
+	switch(inp)
+	{
+		case 1:
+		        VectorCopy( self->s.v.origin, savepos);
+		        VectorCopy( self->s.v.angles, saveangle);
+		        VectorCopy( self->s.v.velocity, savevel);
+			trap_WriteByte(MULTICAST_PHS_R, SVC_TEMPENTITY);
+			trap_WriteByte(MULTICAST_PHS_R, TE_TAREXPLOSION);
+			trap_WriteCoord(MULTICAST_PHS_R, savepos[0]);
+			trap_WriteCoord(MULTICAST_PHS_R, savepos[1]);
+			trap_WriteCoord(MULTICAST_PHS_R, savepos[2]);
+			trap_multicast( PASSVEC3(savepos), 1);
+			ResetMenu(  );
+		        break;
+		case 2:
+			if ( VectorCompareF( savepos, 0, 0, 0 ) )
+				break;
+			trap_WriteByte(MULTICAST_PHS_R, SVC_TEMPENTITY);
+			trap_WriteByte(MULTICAST_PHS_R, TE_TAREXPLOSION);
+			trap_WriteCoord(MULTICAST_PHS_R, savepos[0]);
+			trap_WriteCoord(MULTICAST_PHS_R, savepos[1]);
+			trap_WriteCoord(MULTICAST_PHS_R, savepos[2]);
+			trap_multicast(PASSVEC3(savepos), 1);
+			G_sprint( self, 2, "Saved position: '%.0f %.0f %.0f'\n",savepos[0],savepos[1],savepos[2]);
+			G_sprint( self, 2, "angle: '%.0f %.0f %.0f'\n",saveangle[0],saveangle[1],saveangle[2]);
+			G_sprint( self, 2, "speed: '%.0f %.0f %.0f'\n",savevel[0],savevel[1],savevel[2]);
+			break;	
+		case 3:
+		        VectorCopy( savepos  , self->s.v.origin  );
+		        VectorCopy( saveangle, self->s.v.angles   );
+		        VectorCopy( savevel  , self->s.v.velocity);
+		        setorigin(self, PASSVEC3(savepos));
+		        self->s.v.fixangle=1;
+		        ResetMenu(  );
+			break;	
+		case 4:
+		        SetVector( savepos, 0, 0, 0 );
+		        ResetMenu(  );
+			break;
+		case 5:
+			ResetMenu(  );
+			self->s.v.impulse = 0;
+			break;
+		default:
+			return;
+	}
+
+  self->s.v.impulse = 0;
+  self->menu_count = 23;
+
+}
+
+#endif

@@ -2626,7 +2626,7 @@ void DropGoalItems(  )
 {
 	gedict_t *te;
 
-	newmis = spawn();
+	newmis = spawn(); //FIX ME??? no need this?
 	g_globalvars.newmis = EDICT_TO_PROG( newmis );
 	makevectors( self->s.v.v_angle );
 	VectorNormalize( g_globalvars.v_forward );

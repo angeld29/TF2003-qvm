@@ -28,5 +28,9 @@ disable_reload
 
 fix TeamFortress_TeamGetColor чтобы возвращал реальный цвет а не цвет+1
 
-//fixe API
-on walk move save globals
+//fixed API
++on walk move save globals
+
+
+watervis действует на id
+scanner на sentry, флаги

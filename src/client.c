@@ -481,7 +481,6 @@ void DecodeLevelParms()
 		if ( !strcmp( st, "on" ) )
 			tf_data.random_tf_spawn = 1;
 #ifdef TG
-//  if(!defaults_loaded)
 		TG_LoadSettings();
 #endif
 
