@@ -64,13 +64,9 @@ void RefreshStatusBar( gedict_t * pl )
 
 	sbar_p = AddStatusSize( pl, sbar_str );
 
-#ifndef TG
-	if ( pl->playerclass == 9 )
-#else
 	if ( pl->playerclass == 9 || ( (pl->playerclass == 2 ||
 	     pl->playerclass == 3 || pl->playerclass == 5 || 
 	     pl->playerclass == 6 || pl->playerclass == 7 || tg_data.tg_sbar) && tg_data.tg_enabled) )
-#endif
 	{			/// eng sbar
 		if ( pl->has_dispenser )
 		{
@@ -290,13 +286,11 @@ char   *SentryInfoToSBar( gedict_t * pl, char *str )
 	{
 		if ( te->real_owner != pl )
 			continue;
-#ifdef TG
 		if ( (te->has_sentry && te->s.v.health <= 0 ) && tg_data.tg_enabled )
 		{
 			sprintf( str, "SENTRY:dead" );
 			break;
 		}
-#endif
 		if ( te->s.v.health > 0 )
 			sprintf( str, " SENTRY: %3d ", ( int ) te->s.v.health );
 		while ( *( ++str ) );

@@ -396,13 +396,8 @@ void TeamFortress_ID_Sentry( gedict_t * te )
 
 	if ( self == te->real_owner )
 	{
-#ifndef  TG
-		if ( self->playerclass == PC_ENGINEER )
-		{
-#else
 		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )
 		{
-#endif
 			if ( te->s.v.weapon != 3 )
 				G_centerprint( self, "\n\n\nYour SentryGun Level %.0f\nHealth: %.0f\nShells: %.0f\n",
 					       te->s.v.weapon, te->s.v.health, te->s.v.ammo_shells );

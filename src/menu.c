@@ -38,7 +38,6 @@ void 	Menu_Spy_Color_Input( int inp );
 void 	Menu_BirthDay( menunum_t menu );
 void 	Menu_BirthDay_Input( int inp );
 
-#ifdef TG
 void 	TG_Main_Menu(menunum_t menu);
 void 	TG_Main_Menu_Input( int inp );
 void 	TG_SGOptions_Menu_Input( int inp );
@@ -50,7 +49,6 @@ void 	TG_Cheats_Menu_Input( int inp );
 void 	TG_SavePosition_Menu(menunum_t menu);
 void 	TG_SavePosition_Menu_Input( int inp );
 
-#endif
 menu_t  menus[] = {
 	{0, 0, 0, NULL, NULL},	//MENU_NULL,                      
 	{0, 0, 0, NULL, NULL},	//MENU_DEFAULT,                 
@@ -80,13 +78,13 @@ menu_t  menus[] = {
 	{-1, 0, 0, Menu_BirthDay, Menu_BirthDay_Input},	//MENU_BIRTHDAY1
 	{-1, 0, 0, Menu_BirthDay, Menu_BirthDay_Input},	//MENU_BIRTHDAY2
 	{-1, 0, 0, Menu_BirthDay, Menu_BirthDay_Input},	//MENU_BIRTHDAY3
-#ifdef TG
+
 	{-1, 0,	0, TG_Main_Menu, TG_Main_Menu_Input},
 	{-1, 0,	0, TG_SGOptions_Menu, TG_SGOptions_Menu_Input},
 	{-1, 0,	0, TG_Detpack_Menu, TG_Detpack_Menu_Input},
 	{-1, 0,	0, TG_Cheats_Menu, TG_Cheats_Menu_Input},
 	{-1, 0,	0, TG_SavePosition_Menu, TG_SavePosition_Menu_Input},
-#endif
+
 	{0, 0, 0, NULL, NULL}
 };
 
@@ -524,26 +522,16 @@ void Menu_Engineer( menunum_t menu )
 	if ( self->has_dispenser )
 	{
 		s_detdisp = menu_eng_detdisp;
-#ifdef TG
                 if( tg_data.tg_enabled )
 			s_bdisp = menu_eng_builddisp;
                 else 
                 	s_bdisp = "";
-#else
-		s_bdisp = "";
-#endif
 	} else
 	{
 
-#ifndef TG
-		if ( self->s.v.ammo_cells < BUILD_COST_DISPENSER )
-			s_bdisp = "\n";
-		else
-#else
 		if ( (self->s.v.ammo_cells < BUILD_COST_DISPENSER) && !tg_data.tg_enabled)
 			s_bdisp = "\n";
 		else
-#endif
 			s_bdisp = menu_eng_builddisp;
 
 		s_detdisp = "";
@@ -552,25 +540,15 @@ void Menu_Engineer( menunum_t menu )
 	if ( self->has_sentry )
 	{
 		s_detsentry = menu_eng_detsentry;
-#ifdef TG
                 if( tg_data.tg_enabled )
 			s_bsentry = menu_eng_buildsentry;
                 else
                 	s_bsentry = "";
-#else
-		s_bsentry = "";
-#endif
 	} else
 	{
-#ifndef TG
-		if ( self->s.v.ammo_cells < BUILD_COST_SENTRYGUN )
-			s_bsentry = "\n";
-		else
-#else
 		if ( (self->s.v.ammo_cells < BUILD_COST_SENTRYGUN) && !tg_data.tg_enabled)
 			s_bsentry = "\n";
 		else
-#endif
 			s_bsentry = menu_eng_buildsentry;
 
 		s_detsentry = "";
@@ -584,11 +562,7 @@ void Menu_Engineer_Input( int inp )
 	switch ( inp )
 	{
 	case 1:
-#ifndef TG
-		if ( self->s.v.ammo_cells >= BUILD_COST_DISPENSER && self->has_dispenser == 0 )
-#else
 		if ( (self->s.v.ammo_cells >= BUILD_COST_DISPENSER && self->has_dispenser == 0) || tg_data.tg_enabled )
-#endif
 		{
 			TeamFortress_Build( 1 );
 			ResetMenu(  );
@@ -596,11 +570,7 @@ void Menu_Engineer_Input( int inp )
 		}
 		break;
 	case 2:
-#ifndef TG
-		if ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN && self->has_sentry == 0 )
-#else
 		if ( (self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN && self->has_sentry == 0) || tg_data.tg_enabled )
-#endif
 		{
 			TeamFortress_Build( 2 );
 			ResetMenu(  );
@@ -710,11 +680,7 @@ void Menu_EngineerFix_Dispenser_Input( int inp )
 				    "'s Dispenser.\n" );
 		}
 		dremove( self->building );
-#ifndef TG
-		self->building->real_owner->has_dispenser = 0;
-#else
 		self->building->real_owner->has_dispenser -= 1;
-#endif
 		break;
 	case 5:
 		break;
@@ -747,7 +713,7 @@ void Menu_EngineerFix_SentryGun( menunum_t menu )
 
 	if ( self->building->s.v.weapon < 3 && self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN )
 		s_upgrade = menu_eng_fixsg_upgrade;
-#ifdef TG
+
         if( tg_data.tg_enabled )
         {
 	 	if ( self->building->has_sentry )
@@ -755,7 +721,6 @@ void Menu_EngineerFix_SentryGun( menunum_t menu )
  		else
 			s_static = menu_eng_fixsg_static;
         }
-#endif
 	CenterPrint( self, "Action:                            \n"
 		     "“‘ Put Ammo into Sentry Gun    \n"
 		     "%s"
@@ -769,7 +734,7 @@ void Menu_EngineerFix_SentryGun( menunum_t menu )
 void Menu_EngineerFix_SentryGun_Input( int inp )
 {
 	float   am;
-	float   metalcost;
+	float   metalcost = 0;
 
 	if ( !self->building->real_owner->has_sentry )
 		return;
@@ -785,9 +750,7 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 			am = self->s.v.ammo_shells;
 		if ( am > self->building->maxammo_shells - self->building->s.v.ammo_shells )
 			am = self->building->maxammo_shells - self->building->s.v.ammo_shells;
-#ifdef TG
 		if ( !tg_data.unlimit_ammo )
-#endif
 			self->s.v.ammo_shells = self->s.v.ammo_shells - am;
 		self->building->s.v.ammo_shells = self->building->s.v.ammo_shells + am;
 		if ( self->building->s.v.weapon == 3 )
@@ -797,24 +760,16 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 				am = self->s.v.ammo_rockets;
 			if ( am > self->building->maxammo_rockets - self->building->s.v.ammo_rockets )
 				am = self->building->maxammo_rockets - self->building->s.v.ammo_rockets;
-#ifdef TG
 			if ( !tg_data.unlimit_ammo )
-#endif
 				self->s.v.ammo_rockets = self->s.v.ammo_rockets - am;
 			self->building->s.v.ammo_rockets = self->building->s.v.ammo_rockets + am;
 			break;
 	case 2:
 			if ( self->building->s.v.weapon < 3
-#ifndef TG
-			     && self->s.v.ammo_cells >= 130
-#else
 			     && (self->s.v.ammo_cells >= 130 || tg_data.tg_enabled )
-#endif
 			     )
 			{
-#ifdef TG
 				if( !tg_data.tg_enabled )
-#endif
 					self->s.v.ammo_cells = self->s.v.ammo_cells - 130;
 
 				self->building->s.v.weapon = self->building->s.v.weapon + 1;
@@ -838,15 +793,13 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 	case 3:
 			metalcost = ( self->building->s.v.max_health - self->building->s.v.health ) / 5;
 
-#ifdef TG
 			if ( !tg_data.unlimit_ammo )
-#endif
+			{
 				if ( metalcost > self->s.v.ammo_cells )
 					metalcost = self->s.v.ammo_cells;
-#ifdef TG
-			if ( !tg_data.unlimit_ammo )
-#endif
+
 				self->s.v.ammo_cells = self->s.v.ammo_cells - metalcost;
+			}
 			self->building->s.v.health = self->building->s.v.health + metalcost * 5;
 
 			break;
@@ -868,11 +821,7 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 			}
 			dremove( self->building->trigger_field );
 			dremove( self->building );
-#ifndef TG
-			self->building->real_owner->has_sentry = 0;
-#else
 			self->building->real_owner->has_sentry -= 1;
-#endif
 		}
 
 		break;
@@ -881,7 +830,6 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 		self->building->waitmin = anglemod( self->building->waitmin + 45 );
 		self->building->waitmax = anglemod( self->building->waitmax + 45 );
 		break;
-#ifdef TG
 	case 7:
 	        if( !tg_data.tg_enabled )
 	        	return;
@@ -892,7 +840,6 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 			self->building->has_sentry = 1;
 		ResetMenu(  );
 		break;
-#endif
 	default:
 		return;
 	}
@@ -1300,7 +1247,6 @@ void 	Menu_BirthDay_Input( int inp )
   }
 }
 
-#ifdef TG
 void TG_Main_Menu( menunum_t menu )
 {
  CenterPrint(self, "Options:\n"
@@ -1691,4 +1637,3 @@ void 	TG_SavePosition_Menu_Input( int inp )
 
 }
 
-#endif

@@ -81,3 +81,9 @@ void	TG_Eff_Conc(gedict_t *head);
 void	TG_Eff_Flash(gedict_t *te, gedict_t *attaker);
 void	TG_Eff_Remove(gedict_t *pl);
 void 	TG_LoadSettings();
+
+void    Eng_StaticSG_Activate(  );
+void    Eng_SGUp(  );
+void    Eng_SGReload(  );
+void    Eng_DispLoad(  );
+void    Eng_DispUnload(  );

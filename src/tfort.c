@@ -976,7 +976,7 @@ void TeamFortress_ShowTF(  )
 	if ( tf_data.mtfl )
 		G_sprint( self, 2, "Õ‘∆Ã Settings œŒ\n" );
 
-#ifdef TG
+/*#ifdef TG
 #ifdef LAN_SERVER
 	G_sprint( self, 2, "TF2003(QWLAN TF) Training Ground by êsdë angel for Õ‘∆Ã\n" );
 #else
@@ -985,14 +985,14 @@ void TeamFortress_ShowTF(  )
 #else
 #ifdef LAN_SERVER
 	G_sprint( self, 2, "TF2003(QWLAN TF) by êsdë angel for Õ‘∆Ã\n" );
-#else
+#else*/
 	G_sprint( self, 2, "TF2003 by êsdë angel for Õ‘∆Ã\n" );
-#endif
-#endif
-#ifdef TG
+/*#endif
+#endif*/
+
         if( tg_data.tg_enabled )
         	G_sprint( self, 2, "Training Ground enabled\n" );
-#endif
+
         if( tf_data.lan_mode )
         	G_sprint( self, 2, "Lan mode enabled\n" );
 
@@ -1023,16 +1023,11 @@ void TeamFortress_PrimeGrenade(  )
 		if ( tf_data.disable_grens & ( 1 << gtype ) )
 			return;
 
-#ifndef TG
-		if ( self->no_grenades_1 > 0 )
-		{
-			self->no_grenades_1--;
-#else
 		if ( self->no_grenades_1 > 0 || tg_data.unlimit_grens )
 		{
 			if ( !tg_data.unlimit_grens )
 				self->no_grenades_1--;
-#endif
+
 			switch ( gtype )
 			{
 
@@ -1086,16 +1081,10 @@ void TeamFortress_PrimeGrenade(  )
 		if ( tf_data.disable_grens & ( 1 << gtype ) )
 			return;
 
-#ifndef TG
-		if ( self->no_grenades_2 > 0 )
-		{
-			self->no_grenades_2--;
-#else
 		if ( self->no_grenades_2 > 0 || tg_data.unlimit_grens )
 		{
 			if ( !tg_data.unlimit_grens )
 				self->no_grenades_2--;
-#endif
 			switch ( gtype )
 			{
 
@@ -1569,13 +1558,13 @@ void TeamFortress_SetEquipment(  )
 	if ( pc > 11 )
 		pc = 0;
 	self->weapons_carried |= class_set[pc].weapons_carried;
-#ifdef TG
+
         if( tg_data.tg_enabled )
         {
 		self->weapons_carried |= WEAP_SPANNER;
 		self->weapons_carried -= self->weapons_carried & WEAP_AXE;
         }
-#endif
+
 	self->s.v.ammo_rockets = class_set[pc].ammo_rockets;
 	self->s.v.ammo_nails = class_set[pc].ammo_nails;
 	self->s.v.ammo_shells = class_set[pc].ammo_shells;

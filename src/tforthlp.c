@@ -22,7 +22,7 @@ void TeamFortress_MOTD(  )
 		if ( !self->got_aliases )
 			G_sprint( self, 2, "\n\n\n" );
 		G_sprint( self, 2, "Type help for more info.\n" );
-#ifdef TG
+/*#ifdef TG
 #ifdef LAN_SERVER
 		G_sprint( self, 2, "Ñõáëå×ïòìä ÔåáíÆïòôòåóó ”’’•(QWLAN TF) Training Ground\n" );
 #else
@@ -31,11 +31,11 @@ void TeamFortress_MOTD(  )
 #else
 #ifdef LAN_SERVER
 		G_sprint( self, 2, "Ñõáëå×ïòìä ÔåáíÆïòôòåóó ”’’•(QWLAN TF)\n" );
-#else
+#else*/
 		G_sprint( self, 2, "Ñõáëå×ïòìä ÔåáíÆïòôòåóó ”’’•\n" );
 //		G_sprint(self, 2, "Official ÍÔÆÌ version\n");
-#endif
-#endif
+//#endif
+//#endif
 		G_sprint( self, 2, "by sd‘ angel for ÍÔÆÌ\n" );
 		G_sprint( self, 2, "Bug reports to angel_death@mail.ru\n" );
 		G_sprint( self, 2, "http://íôæì®óä®òõ\n" );
@@ -147,7 +147,6 @@ void TeamFortress_MOTD(  )
 	}
 	if ( self->motd == 85 )
 	{
-#ifdef TG
               if(tg_data.tg_enabled)
               {
 		TeamFortress_Alias( "mod_menu", TG_MAINMENU_IMPULSE, 0 );
@@ -160,7 +159,6 @@ void TeamFortress_MOTD(  )
 		TeamFortress_Alias( "eff_flash", TG_FLASH_IMPULSE, 0);
 		TeamFortress_Alias( "eff_remove", TG_EFF_REMOVE_IMPULSE, 0);
               }
-#endif
 		return;
 	}
 	if ( self->motd == 95 )

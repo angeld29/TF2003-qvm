@@ -102,7 +102,6 @@ void MirvGrenadeLaunch( vec3_t org, gedict_t * shooter )
 	setorigin( newmis, PASSVEC3( org ) );
 }
 
-#ifdef TG
 
 void Detpack_SetClip(  )
 {
@@ -129,7 +128,7 @@ void Detpack_SetClip(  )
 	        }
 	}
 }
-#endif
+
 void TeamFortress_SetDetpack( float timer )
 {
 	gedict_t *te;
@@ -137,21 +136,14 @@ void TeamFortress_SetDetpack( float timer )
 
 	self->s.v.impulse = 0;
 	self->last_impulse = 0;
-#ifndef TG
-	if ( !( self->weapons_carried & WEAP_DETPACK ) )
-		return;
-	if ( (tf_data.disable_grens & DG_TYPE_DETPACK) )
-		return;
-	if ( self->ammo_detpack <= 0 )
-		return;
-#else
+
 	if ( !( self->weapons_carried & WEAP_DETPACK ) && !tg_data.tg_enabled )
 		return;
 	if ( (tf_data.disable_grens & DG_TYPE_DETPACK) && !tg_data.tg_enabled )
 		return;
 	if ( self->ammo_detpack <= 0 && !tg_data.tg_enabled )
 		return;
-#endif
+
 	for ( at_spot = world; at_spot = findradius( at_spot, self->s.v.origin, 65 ); )
 	{
 		if ( streq( at_spot->s.v.classname, "player" ) && self != at_spot )
@@ -201,18 +193,17 @@ void TeamFortress_SetDetpack( float timer )
 		G_sprint( self, 2, "You can't set detpacks in the air!\n" );
 		return;
 	}
-#ifdef TG
         if( !tg_data.tg_enabled )
-#endif
-	for ( te = world; te = find( te, FOFS( s.v.classname ), "detpack" ); )
-	{
-		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
-		{
-			G_sprint( self, 2, "You can only have 1 detpack active at a time.\n" );
-			return;
-		}
-	}
-
+        {
+        	for ( te = world; te = find( te, FOFS( s.v.classname ), "detpack" ); )
+        	{
+        		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
+        		{
+        			G_sprint( self, 2, "You can only have 1 detpack active at a time.\n" );
+        			return;
+        		}
+        	}
+        }
 	if ( timer < 5 )
 	{
 		G_sprint( self, 2, "You can't set detpacks for less that 5 seconds.\n" );
@@ -230,11 +221,10 @@ void TeamFortress_SetDetpack( float timer )
 	G_sprint( self, 2, "Setting detpack for %.0f seconds...\n", timer );
 	newmis = spawn(  );
 	g_globalvars.newmis = EDICT_TO_PROG( newmis );
+
 	newmis->s.v.owner = EDICT_TO_PROG( self );
-#ifdef TG
 	newmis->real_owner = self;
-//	VectorCopy( self->s.v.origin, newmis->s.v.origin );
-#endif
+
 	newmis->s.v.classname = "timer";
 	newmis->s.v.netname = "detpack_timer";
 	newmis->s.v.nextthink = g_globalvars.time + WEAP_DETPACK_SETTIME;
@@ -287,9 +277,9 @@ void TeamFortress_DetpackSet(  )
 	newmis->s.v.owner = self->s.v.owner;
 	VectorCopy( owner->s.v.origin, newmis->s.v.origin );
 	newmis->s.v.origin[2] -= 23;
-#ifdef TG
+
 	newmis->real_owner = self->real_owner;
-#endif
+
 	newmis->s.v.movetype = MOVETYPE_BOUNCE;
 	newmis->s.v.solid = SOLID_BBOX;
 	newmis->s.v.classname = "detpack";
@@ -337,26 +327,15 @@ void TeamFortress_DetpackExplode(  )
 
 	owner = PROG_TO_EDICT( self->s.v.owner );
 	G_bprint( 1, "FIRE IN THE HOLE!\n" );
-/*#ifndef TG
-	G_sprint( owner, 2, "Your detpack exploded\n" );
-#else
-	G_sprint( self->real_owner, 2, "Your detpack exploded\n" );
-#endif*/
+
 	sound( self, 1, "weapons/detpack.wav", 1, 0 );
 	if ( tf_data.birthday == 1 )
-#ifndef TG
-		G_bprint( 1, "%s spreads good cheer!\n", owner->s.v.netname );
-#else
 		G_bprint( 1, "%s spreads good cheer!\n", self->real_owner->s.v.netname );
-#endif
+
 	pos = trap_pointcontents( PASSVEC3( self->s.v.origin ) );
-#ifndef TG
-	if ( pos != -2 && pos != -6 && owner->has_disconnected != 1 )
-	{
-#else
+
 	if ( pos != -2 && pos != -6 && self->real_owner->has_disconnected != 1 )
 	{
-#endif
 		tf_data.deathmsg = 12;
 		for ( head = world; head = findradius( head, self->s.v.origin, WEAP_DETPACK_SIZE ); )
 		{
@@ -368,24 +347,15 @@ void TeamFortress_DetpackExplode(  )
 						   self );
 					if ( g_globalvars.trace_fraction == 1 )
 					{
-#ifndef TG
-						if ( Activated( head, owner ) )
-							DoResults( head, owner, 1 );
-#else
 						if ( Activated( head, self->real_owner ) )
 							DoResults( head, self->real_owner, 1 );
-#endif
 						else
 						{
 							if ( head->else_goal )
 							{
 								te = Findgoal( head->else_goal );
 								if ( te )
-#ifndef TG
-									AttemptToActivate( te, owner, head );
-#else
 									AttemptToActivate( te, self->real_owner, head );
-#endif
 							}
 						}
 					}
@@ -406,11 +376,7 @@ void TeamFortress_DetpackExplode(  )
 					if ( points )
 					{
 						if ( CanDamage( head, self ) )
-#ifndef TG
-							TF_T_Damage( head, self, owner, points * 2, 2, 4 );
-#else
 							TF_T_Damage( head, self, self->real_owner, points * 2, 2, 4 );
-#endif
 					}
 				}
 			}
@@ -422,11 +388,7 @@ void TeamFortress_DetpackExplode(  )
 		trap_WriteCoord( 4, self->s.v.origin[2] );
 		trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
 	} else
-#ifndef TG
-		G_sprint( owner, 2, "Your detpack fizzled out.\n" );
-#else
 		G_sprint( self->real_owner, 2, "Your detpack fizzled out.\n" );
-#endif
 	if ( self->weaponmode == 1 )
 	{
 		TeamFortress_SetSpeed( PROG_TO_EDICT( self->s.v.enemy ) );
@@ -446,18 +408,12 @@ void TeamFortress_DetpackTouch(  )
 //      vec3_t  def;
 
 
-#ifndef TG
-#ifndef FIXDETPACKDROP
-	CheckBelowBuilding( self );
-#endif
-#else
 	if ( tg_data.detpack_drop )
 		CheckBelowBuilding( self );
-#endif
-#ifdef TG
+
 	if ( tg_data.disable_disarm )
 		return;
-#endif
+
 	if ( strneq( other->s.v.classname, "player" ) )
 		return;
 	if ( other->playerclass != PC_SCOUT )
@@ -467,13 +423,10 @@ void TeamFortress_DetpackTouch(  )
 	if ( self->weaponmode == 1 )
 		return;
 	owner = PROG_TO_EDICT( self->s.v.owner );
-#ifdef TG
+
 	if ( (other->team_no == owner->team_no && owner->team_no ) && !tg_data.tg_enabled )
 		return;
-#else
-	if ( other->team_no == owner->team_no && owner->team_no )
-		return;
-#endif
+
 	makevectors( other->s.v.v_angle );
 	VectorCopy( other->s.v.origin, source );
 	source[2] += 16;
@@ -510,20 +463,10 @@ void TeamFortress_DetpackDisarm(  )
 	}
 	if ( tf_data.birthday == 1 )
 	{
-#ifndef TG
-		G_bprint( 1, "%s stole %s's birthday present!\n", owner->s.v.netname,
-			  PROG_TO_EDICT( enemy->s.v.owner )->s.v.netname );
-#else
 		G_bprint( 1, "%s stole %s's birthday present!\n", owner->s.v.netname, enemy->real_owner->s.v.netname );
-#endif
 	} else
 	{
-#ifndef TG
-		G_bprint( 1, "%s's detpack was defused by %s\n", PROG_TO_EDICT( enemy->s.v.owner )->s.v.netname,
-			  owner->s.v.netname );
-#else
 		G_bprint( 1, "%s's detpack was defused by %s\n", enemy->real_owner->s.v.netname, owner->s.v.netname );
-#endif
 	}
 	owner->tfstate = owner->tfstate - ( owner->tfstate & TFSTATE_CANT_MOVE );
 	TF_AddFrags( owner, 1 );
@@ -538,14 +481,8 @@ void TeamFortress_DetpackCountDown(  )
 	gedict_t *owner = PROG_TO_EDICT( self->s.v.owner );
 	gedict_t *enemy = PROG_TO_EDICT( self->s.v.enemy );
 
-#ifndef TG
-#ifndef FIXDETPACKDROP
-	CheckBelowBuilding( self );
-#endif
-#else
 	if ( tg_data.detpack_drop )
 		CheckBelowBuilding( self );
-#endif
 
 	self->s.v.nextthink = g_globalvars.time + 1;
 	self->s.v.health = self->s.v.health - 1;

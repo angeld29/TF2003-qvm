@@ -1,7 +1,5 @@
 #include "g_local.h"
-#ifdef TG
-void    TG_LoadSettings();
-#endif
+
 void    CTF_FlagCheck();
 void    BirthdayTimer();
 void    CeaseFire_think();
@@ -484,16 +482,10 @@ void DecodeLevelParms()
 			tf_data.lan_mode = 1;
 
 
-#ifdef TG
 		memset( &tg_data, 0, sizeof(tg_data));
 		GetSVInfokeyString( "tg", "training_ground", st, sizeof( st ), "off" );
 		if ( !strcmp( st, "on" ) )
 			tg_data.tg_enabled = 1;
-
-
-                
-#endif
-
 //////////////
 		tf_data.respawn_delay_time = GetSVInfokeyFloat( "rd", "respawn_delay", 0 );
 
@@ -539,9 +531,7 @@ void DecodeLevelParms()
 			tf_data.gren2box = 0;
 			tf_data.random_tf_spawn = 1;
 			tf_data.lan_mode = 0;
-#ifdef TG
 			tg_data.tg_enabled = 0;
-#endif
 		} else
 			tf_data.mtfl = 0;
 
@@ -561,10 +551,8 @@ void DecodeLevelParms()
 			GR_TYPE_MIRV_NO		=12;	 	// Number of Mirvs a Mirv Grenade breaks into
 			GR_TYPE_NAPALM_NO	=12; 	 	// Number of flames napalm grenade breaks into (unused if net server)
 		}
-#ifdef TG
                 if( tg_data.tg_enabled )
 			TG_LoadSettings();
-#endif
 	}
 	if ( g_globalvars.parm11 )
 		self->tfstate = g_globalvars.parm11;
@@ -1302,13 +1290,9 @@ void PutClientInServer()
 
 	if ( iszoom == 1 )
 		self->tfstate |= TFSTATE_ZOOMOFF;
-#ifndef TG
-	if ( self->playerclass != PC_ENGINEER )
-		Engineer_RemoveBuildings( self );
-#else
 	if ( self->playerclass != PC_ENGINEER && !tg_data.tg_enabled )
 		Engineer_RemoveBuildings( self );
-#endif
+
 	self->s.v.takedamage = 2;
 	TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & 8 );
 	TeamFortress_SetEquipment();
@@ -2246,10 +2230,8 @@ void ClientConnect()
 	}
 	if ( tf_data.cb_prematch_time > g_globalvars.time )
 		G_sprint( self, 2, "CURRENTLY IN PREMATCH TIME\n" );
-#ifdef TG
         if( tg_data.tg_enabled )
 		stuffcmd( self, "exec tg.cfg\n" );
-#endif
 }
 
 ////////////////
@@ -2290,13 +2272,8 @@ void ClientDisconnect()
 	te = find( world, FOFS( s.v.classname ), "detpack" );
 	while ( te )
 	{
-#ifndef TG
-		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
-		{
-#else
 		if ( te->real_owner == self )
 		{
-#endif
 			if ( te->weaponmode == 1 )
 			{
 				TeamFortress_SetSpeed( PROG_TO_EDICT( te->s.v.enemy ) );

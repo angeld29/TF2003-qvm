@@ -223,10 +223,8 @@ int CheckTarget( gedict_t * Target )
 {
 	int     r;
 
-#ifdef TG
 	if ( tg_data.sg_allow_find == TG_SG_FIND_IGNORE_ALL )
 		return 0;
-#endif
 	if ( !Target )
 		return 0;
 	if ( Target == self )
@@ -252,33 +250,25 @@ int CheckTarget( gedict_t * Target )
 			return 0;
 	}
 
-#ifdef TG
 	if ( tg_data.sg_allow_find == TG_SG_FIND_IGNORE_OFF )
 		return 1;
-#endif
 
 	if ( teamplay )
 	{
 		if ( Target->team_no == self->team_no && self->team_no )
 		{
-#ifdef TG
 			if ( tg_data.sg_allow_find == TG_SG_FIND_IGNORE_TEAM )
-#endif
 				return 0;
 		}
 		if ( Target->undercover_team == self->team_no && self->team_no )
 		{
-#ifdef TG
 			if ( tg_data.sg_allow_find == TG_SG_FIND_IGNORE_TEAM )
-#endif
 				return 0;
 		}
 	}
 	if ( Target == self->real_owner )
 	{
-#ifdef TG
 		if ( tg_data.sg_allow_find == TG_SG_FIND_IGNORE_OWNER )
-#endif
 			return 0;
 	}
 
@@ -416,15 +406,6 @@ void Sentry_Explode(  )
 	BecomeExplosion(  );
 }
 
-#ifndef TG
-void Sentry_Die(  )
-{
-	G_sprint( self->real_owner, 2, "Your sentry gun was destroyed.\n" );
-	self->real_owner->has_sentry = 0;
-	self->s.v.think = ( func_t ) Sentry_Explode;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-}
-#else
 void SG_Static(  )
 {
 	if ( self->s.v.health == 0 )
@@ -472,7 +453,7 @@ void Sentry_Die(  )
 		self->s.v.nextthink = g_globalvars.time + 0.1;
 	}
 }
-#endif
+
 void FireSentryBullets( int shotcount, gedict_t * targ, float spread_x, float spread_y, float spread_z )
 {
 	vec3_t  direction;
@@ -560,7 +541,6 @@ void FireSentryBulletsOld( int shotcount, gedict_t * targ, float spread_x, float
 }
 
 //////////////////////////////////////////////////////////////////////////////
-#ifdef TG
 void    FireSentryLighting( gedict_t * targ )  
 {
 	vec3_t  src;
@@ -651,7 +631,6 @@ void    FireSentryLighting( gedict_t * targ )
 		}
 	}
 }
-#endif
 //////////////////////////////////////////////////////////////////////////////
 int Sentry_Fire(  )
 {
@@ -659,10 +638,9 @@ int Sentry_Fire(  )
 
 	gedict_t *enemy = PROG_TO_EDICT( self->s.v.enemy );
 
-#ifdef TG
 	if ( tg_data.sg_disable_fire )
 		return 0;
-#endif
+
 	self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & 8 );
 	VectorSubtract( enemy->s.v.origin, self->s.v.origin, dir );
 	if ( self->s.v.ideal_yaw - anglemod( self->s.v.angles[1] ) < -10
@@ -670,11 +648,9 @@ int Sentry_Fire(  )
 		return 0;
 	if ( enemy->is_feigning == 1 )
 		return 0;
-	if ( self->s.v.weapon == 3 && self->s.v.ammo_rockets > 0 && self->super_damage_finished < g_globalvars.time
-#ifdef TG
-	     && ( tg_data.sg_fire_type == TG_SG_FIRE_NORMAL )
-#endif
-	     )
+	if ( self->s.v.weapon == 3 && self->s.v.ammo_rockets > 0 
+		&& self->super_damage_finished < g_globalvars.time
+	     	&& ( tg_data.sg_fire_type == TG_SG_FIRE_NORMAL )  )
 	{
 		Sentry_MuzzleFlash(  );
 		sound( self, 1, "weapons/rocket1i.wav", 1, 1 );
@@ -711,10 +687,8 @@ int Sentry_Fire(  )
 		if ( self->s.v.ammo_rockets == 10 )
 			G_sprint( self->real_owner, 2, "Sentry Gun is low on rockets.\n" );
 	}
-#ifdef TG
 	if ( tg_data.sg_fire_type != TG_SG_FIRE_LIGHTING )
 	{
-#endif
 		self->s.v.ammo_shells -= 1;
 		if ( self->s.v.ammo_shells < 0 )
 		{
@@ -723,17 +697,13 @@ int Sentry_Fire(  )
 		}
 		Sentry_MuzzleFlash(  );
 		sound( self, 1, "weapons/sniper.wav", 1, 1 );
-#ifdef TG
 	}
-#endif
 	tf_data.deathmsg = 27;
-#ifdef TG
 	if ( tg_data.sg_fire_type == TG_SG_FIRE_LIGHTING )
 	{
 		FireSentryLighting( PROG_TO_EDICT(self->s.v.enemy) );
 	} else
 	{
-#endif
 		if ( tf_data.sentry_type == SENTRY_MTFL || tf_data.sentry_type == SENTRY_MTFL_NEWFIND )
 		{		//mtfl sentry
 			VectorCopy( self->s.v.angles, self->s.v.v_angle );
@@ -747,9 +717,7 @@ int Sentry_Fire(  )
 			} else
 				FireBullets( 4, dir, 0.1, 0.1, 0 );
 		}
-#ifdef TG
 	}
-#endif
 //////
 	if ( !self->s.v.ammo_shells && g_random(  ) < 0.1 )
 		G_sprint( self->real_owner, 2, "Sentry Gun is out of shells.\n" );
@@ -768,7 +736,6 @@ void Sentry_MuzzleFlash(  )
 	self->s.v.effects = ( int ) self->s.v.effects | 8;
 }
 
-#ifdef TG
 void Eng_StaticSG_Activate(  )
 {
 	gedict_t *ent;
@@ -826,4 +793,3 @@ void Eng_StaticSG_Activate(  )
 		}
 	}
 }
-#endif

@@ -277,14 +277,14 @@ void TeamFortress_EngineerBuild(  )
     }
     if ( !self->is_building )
     {
-#ifdef TG
         if(!tg_data.tg_enabled)
-#endif
-	if ( self->s.v.ammo_cells < 100 && !self->has_dispenser && !self->has_sentry )
-	{
-	    CenterPrint( self, "You don't have enough metal to \nbuild anything.\n\n" );
-	    return;
-	}
+        {
+        	if ( self->s.v.ammo_cells < 100 && !self->has_dispenser && !self->has_sentry )
+        	{
+        	    CenterPrint( self, "You don't have enough metal to \nbuild anything.\n\n" );
+        	    return;
+        	}
+        }
 	self->current_menu = MENU_ENGINEER;
 	self->menu_count = MENU_REFRESH_RATE;
     } else
@@ -405,11 +405,7 @@ void TeamFortress_Build( int objtobuild )
     VectorAdd( self->s.v.origin, g_globalvars.v_forward, newmis->s.v.origin );
     if ( objtobuild == BUILD_DISPENSER )
     {
-#ifndef TG
-	if ( self->has_dispenser )
-#else
         if( self->has_dispenser && !tg_data.tg_enabled)
-#endif		
 	{
 	    G_sprint( self, 2, "You can only have one dispenser.\nTry dismantling your old one.\n" );
 	    return;
@@ -419,19 +415,13 @@ void TeamFortress_Build( int objtobuild )
 	newmis->mdl = "progs/disp.mdl";
 	newmis->s.v.netname = "dispenser";
 	btime = g_globalvars.time + BUILD_TIME_DISPENSER;
-#ifdef TG
 	if( tg_data.tg_enabled )
 		btime = g_globalvars.time;
-#endif
     } else
     {
 	if ( objtobuild == BUILD_SENTRYGUN )
 	{
-#ifndef TG
-	   if ( self->has_sentry )
-#else
            if( self->has_sentry && !tg_data.tg_enabled)
-#endif		
 	    {
 		G_sprint( self, 2, "You can only have one sentry gun.\nTry dismantling your old one.\n" );
 		return;
@@ -441,10 +431,8 @@ void TeamFortress_Build( int objtobuild )
 	    newmis->mdl = "progs/turrbase.mdl";
 	    newmis->s.v.netname = "sentrygun";
 	    btime = g_globalvars.time + BUILD_TIME_SENTRYGUN;
-#ifdef TG
 	    if( tg_data.tg_enabled )
 	    	btime = g_globalvars.time;
-#endif
 	}
     }
 
@@ -542,12 +530,10 @@ void TeamFortress_FinishedBuilding(  )
     owner = PROG_TO_EDICT( self->s.v.owner );
     if ( owner->is_building != 1 )
 	return;
-#ifdef TG
     if ( self->s.v.weapon == BUILD_SENTRYGUN && tg_data.tg_enabled )
     {
 	droptofloor( self );
     }
-#endif
     oldself = self;
     self = owner;
     oldself->s.v.owner = 0;
@@ -559,18 +545,13 @@ void TeamFortress_FinishedBuilding(  )
     TeamFortress_SetSpeed( self );
     if ( oldself->s.v.weapon == BUILD_DISPENSER )
     {
-#ifndef TG
-	self->has_dispenser = 1;
-#else
 	self->has_dispenser = self->has_dispenser + 1;
-#endif
 	G_sprint( self, 2, "You finish building the dispenser.\n" );
 	teamsprint( self->team_no, self, self->s.v.netname );
 	teamsprint( self->team_no, self, " has built a Dispenser.\n" );
-#ifdef TG
+
         if( !tg_data.tg_enabled )
-#endif        	
-	self->s.v.ammo_cells = self->s.v.ammo_cells - 100;
+		self->s.v.ammo_cells = self->s.v.ammo_cells - 100;
 
 	oldself->s.v.classname = "building_dispenser";
 	oldself->s.v.netname = "dispenser";
@@ -610,11 +591,8 @@ void TeamFortress_FinishedBuilding(  )
     {
 	if ( oldself->s.v.weapon == BUILD_SENTRYGUN )
 	{
-#ifndef TG
-	    self->has_sentry = 1;
-#else
 	    self->has_sentry = self->has_sentry + 1;
-#endif
+
 	    G_sprint( self, 2, "You finish building the sentry gun.\n" );
 	    teamsprint( self->team_no, self, self->s.v.netname );
 	    teamsprint( self->team_no, self, " has built a Sentry Gun.\n" );
@@ -623,10 +601,8 @@ void TeamFortress_FinishedBuilding(  )
 	    oldself->s.v.takedamage = 0;
 	    oldself->th_die = Sentry_Die;
 	    oldself->team_no = self->team_no;
-#ifdef TG
             if( !tg_data.tg_enabled )
-#endif
-	    self->s.v.ammo_cells = self->s.v.ammo_cells - 130;
+		    self->s.v.ammo_cells = self->s.v.ammo_cells - 130;
 
 	    setsize( oldself, -16, -16, 0, 16, 16, 4 );
 	    newmis = spawn(  );
@@ -736,11 +712,9 @@ void Dispenser_Explode(  )
 void Dispenser_Die(  )
 {
     G_sprint( self->real_owner, 2, "Your dispenser was destroyed.\n" );
-#ifndef TG
-    self->real_owner->has_dispenser = 0;
-#else
-    self->real_owner->has_dispenser = self->real_owner->has_dispenser - 1;
-#endif
+
+    self->real_owner->has_dispenser -= 1;
+
     self->s.v.think = ( func_t ) Dispenser_Explode;
     self->s.v.nextthink = g_globalvars.time + 0.1;
 }
@@ -774,10 +748,10 @@ void Engineer_UseSentryGun( gedict_t * gun )
     {
 	G_sprint( self, 2, ", %.0f rockets", gun->s.v.ammo_rockets );
     }
-#ifdef TG
+
     if ( gun->has_sentry &&  tg_data.tg_enabled )
 	G_sprint( self, 2, ", static" );
-#endif
+
     G_sprint( self, 2, "\n" );
     self->current_menu = MENU_ENGINEER_FIX_SENTRYGUN;
     self->menu_count = MENU_REFRESH_RATE;
@@ -863,10 +837,8 @@ void DestroyBuilding( gedict_t * eng, char *bld )
 		te->real_owner->current_menu = MENU_DEFAULT;
 		te->real_owner->building = world;
 	    }
-#ifdef TG
           if( tg_data.tg_enabled )
-	    te->has_sentry = 0;
-#endif
+	    	te->has_sentry = 0;
 	    TF_T_Damage( te, world, world, 500, 0, 0 );
 	}
     }
@@ -879,7 +851,6 @@ void Engineer_RemoveBuildings( gedict_t * eng )
 }
 
 
-#ifdef TG
 void Eng_SGUp(  )
 {
     gedict_t *sg;
@@ -973,4 +944,3 @@ void Eng_SGReload(  )
 }
 
 
-#endif

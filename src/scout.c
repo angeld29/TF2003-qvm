@@ -124,13 +124,8 @@ void FlashTimer(  )
 
 	te = PROG_TO_EDICT( self->s.v.owner );
 	te->FlashTime = te->FlashTime - 0.6;
-#ifndef TG
-	if ( te->FlashTime < 5 )
-	{
-#else
 	if ( te->FlashTime < 5 || ( self->gren_eff_time <= g_globalvars.time && tg_data.gren_time ) )
 	{
-#endif
 		te->FlashTime = 0;
 		stuffcmd( te, "v_cshift; wait; bf\n" );
 		ent_remove( self );
@@ -147,13 +142,8 @@ void FlashTimerNew(  )
 
 	te = PROG_TO_EDICT( self->s.v.owner );
 	te->FlashTime = te->FlashTime - 0.6;
-#ifndef TG
-	if ( te->FlashTime < 5 )
-	{
-#else
 	if ( te->FlashTime < 5 || ( self->gren_eff_time <= g_globalvars.time && tg_data.gren_time ) )
 	{
-#endif
 		te->FlashTime = 0;
 		stuffcmd( te, "v_cshift; wait; bf\n" );
 		ent_remove( self );
@@ -197,13 +187,12 @@ void FlashGrenadeExplode(  )
 			tf_data.deathmsg = 35;
 			TF_T_Damage( te, self, owner, 60, 2, 16 | 4 );
 		}
-#ifdef TG
 		if ( tg_data.gren_effect == TG_GREN_EFFECT_OFF )
 			continue;
 
 		if ( te == owner && tg_data.gren_effect == TG_GREN_EFFECT_OFF_FORSELF )
 			continue;
-#endif
+
                 G_sprint(te, 2, "You are flashed\n");
 		if ( tf_data.new_flash )
 		{
@@ -251,10 +240,8 @@ void FlashGrenadeExplode(  )
 			stuffcmd( te, "v_cshift %.0f %.0f %.0f %.0f\n", te->FlashTime * 10, te->FlashTime * 10,
 				  te->FlashTime * 10, te->FlashTime * 10 );
 		}
-#ifdef TG
        		if ( tg_data.gren_time )
        			newmis->gren_eff_time = g_globalvars.time + tg_data.gren_time;
-#endif
 	}
 	dremove( self );
 }
@@ -289,10 +276,9 @@ void OldConcussionGrenadeTimer(  )
 		dremove( self );
 		return;
 	}
-#ifdef TG
 	if ( tg_data.gren_time && self->gren_eff_time <= g_globalvars.time )
 		self->s.v.health = 0;
-#endif
+
 	newmis = spawn(  );
 	g_globalvars.newmis = EDICT_TO_PROG( newmis );
 	setmodel( newmis, "progs/s_bubble.spr" );
@@ -337,10 +323,8 @@ void ConcussionGrenadeTimer(  )
 		dremove( self );
 		return;
 	}
-#ifdef TG
 	if ( tg_data.gren_time && self->gren_eff_time <= g_globalvars.time )
 		self->s.v.health = 0;
-#endif
 	if ( self->s.v.health == 200 || self->s.v.health == 400 || self->s.v.health == 600 || self->s.v.health == 800
 	     || self->s.v.health == 1000 )
 	{
@@ -475,13 +459,12 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 				head->s.v.flags = ( int ) head->s.v.flags - FL_ONGROUND;
 		} else
 		{
-#ifdef TG
 			if ( tg_data.gren_effect == TG_GREN_EFFECT_OFF )
 				continue;
 
 			if ( head == PROG_TO_EDICT( inflictor->s.v.owner ) && tg_data.gren_effect == TG_GREN_EFFECT_OFF_FORSELF )
 				continue;
-#endif
+
 			G_sprint( head, 2, "You are conced\n");
 			for ( te = world; te = find( te, FOFS( s.v.classname ), "timer" ); )
 			{
@@ -505,10 +488,8 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 					te->s.v.health = 800;
 					te->s.v.nextthink = g_globalvars.time + 0.25;
 				}
-#ifdef TG
 				if ( tg_data.gren_time )
 					te->gren_eff_time = g_globalvars.time + tg_data.gren_time;
-#endif
 			} else
 			{
 				if ( tf_data.old_grens == 1 )
@@ -533,10 +514,8 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 					te->s.v.owner = EDICT_TO_PROG( head );
 					te->s.v.health = 800;
 				}
-#ifdef TG
 				if ( tg_data.gren_time )
 					te->gren_eff_time = g_globalvars.time + tg_data.gren_time;
-#endif
 			}
 		}
 	}
@@ -777,7 +756,6 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 	return;
 }
 
-#ifdef TG
 void	TG_Eff_Flash(gedict_t *te, gedict_t *attaker)
 {
        	if ( strneq( te->s.v.classname, "player" ) )
@@ -995,4 +973,3 @@ void	TG_Eff_Remove(gedict_t *pl)
      		return;
      	}
 }
-#endif

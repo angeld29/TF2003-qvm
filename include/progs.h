@@ -275,9 +275,7 @@ typedef struct gedict_s {
 
 	float		allow_snip_time;
 	int		has_fake_gas_setinfo;
-#ifdef TG
 	float		gren_eff_time;
-#endif
 } gedict_t;
 extern  int 		skill;
 extern  int 		number_of_teams; 

@@ -41,15 +41,17 @@ void NailGrenadeExplode(  )
 	neworigin[0] = 0;
 	neworigin[1] = 0;
 	neworigin[2] = 32;
-#ifndef	TG
-	traceline( PASSVEC3( self->s.v.origin ), self->s.v.origin[0] + neworigin[0],
-		   self->s.v.origin[1] + neworigin[1], self->s.v.origin[2] + neworigin[2], 1, self );
 
-	if ( g_globalvars.trace_fraction != 1 )
+	if(!tg_data.tg_enabled)
 	{
-		neworigin[2] = neworigin[2] * g_globalvars.trace_fraction - 1;
+        	traceline( PASSVEC3( self->s.v.origin ), self->s.v.origin[0] + neworigin[0],
+        		   self->s.v.origin[1] + neworigin[1], self->s.v.origin[2] + neworigin[2], 1, self );
+
+        	if ( g_globalvars.trace_fraction != 1 )
+        	{
+        		neworigin[2] = neworigin[2] * g_globalvars.trace_fraction - 1;
+        	}
 	}
-#endif
         VectorAdd( self->s.v.origin , neworigin, neworigin);
 	setorigin( self, PASSVEC3(neworigin) );
 

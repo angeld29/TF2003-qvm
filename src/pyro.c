@@ -677,10 +677,9 @@ void W_FireFlame(  )
 			sound( self, 1, "misc/water2.wav", 1, 1 );
 		return;
 	}
-#ifdef TG
 	if ( !tg_data.unlimit_ammo )
-#endif
 		self->s.v.currentammo = --( self->s.v.ammo_cells );
+
 	sound( self, 0, "weapons/flmfire2.wav", 1, 1 );
 	flame = spawn(  );
 	flame->s.v.owner = EDICT_TO_PROG( self );
@@ -764,9 +763,7 @@ void W_FireIncendiaryCannon(  )
 
 	if ( self->s.v.ammo_rockets < 3 )
 		return;
-#ifdef TG
 	if ( !tg_data.unlimit_ammo )
-#endif
 		self->s.v.currentammo = self->s.v.ammo_rockets = self->s.v.ammo_rockets - 3;
 
 	sound( self, 1, "weapons/sgun1.wav", 1, 1 );

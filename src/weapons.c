@@ -1,13 +1,6 @@
 #include "g_local.h"
 void    item_megahealth_rot(  );
 
-#ifdef TG
-void    Eng_StaticSG_Activate(  );
-void    Eng_SGUp(  );
-void    Eng_SGReload(  );
-void    Eng_DispLoad(  );
-void    Eng_DispUnload(  );
-#endif
 void    player_run(  );
 void    TeamFortress_DisplayDetectionItems(  );
 float   crossproduct( vec3_t veca, vec3_t vecb );
@@ -301,9 +294,7 @@ void W_FireSpanner(  )
 								    armorvalue = trace_ent->s.v.armorvalue + healam * 4;
 								if ( trace_ent->s.v.armorvalue > trace_ent->maxarmor )
 									trace_ent->s.v.armorvalue = trace_ent->maxarmor;
-#ifdef TG
 								if ( !tg_data.unlimit_ammo )
-#endif
 									self->s.v.
 									    ammo_cells = self->s.v.ammo_cells - healam;
 								sound( trace_ent,
@@ -931,9 +922,7 @@ void W_FireShotgun(  )
 
 	sound( self, CHAN_WEAPON, "weapons/guncock.wav", 1, ATTN_NORM );
 	KickPlayer( -2, self );
-#ifdef TG
 	if ( !tg_data.unlimit_ammo )
-#endif
 		self->s.v.currentammo = --( self->s.v.ammo_shells );
 	aim( dir );
 	tf_data.deathmsg = 1;
@@ -956,9 +945,7 @@ void W_FireSuperShotgun(  )
 	}
 	sound( self, CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM );
 	KickPlayer( -4, self );
-#ifdef TG
 	if ( !tg_data.unlimit_ammo )
-#endif
 		self->s.v.currentammo = self->s.v.ammo_shells = self->s.v.ammo_shells - 2;
 	aim( dir );
 	tf_data.deathmsg = 2;
@@ -1020,9 +1007,7 @@ void W_FireSniperRifle(  )
 
 	sound( self, 1, "weapons/sniper.wav", 1, 1 );
 	KickPlayer( -2, self );
-#ifdef TG
 	if ( !tg_data.unlimit_ammo )
-#endif
 		self->s.v.currentammo = ( self->s.v.ammo_shells -= tf_data.snip_ammo);
 	makevectors( self->s.v.v_angle );
 	if ( tf_data.snip_range_fix )
@@ -1126,9 +1111,7 @@ void W_FireAutoRifle(  )
 
 	sound( self, 1, "weapons/sniper.wav", 1, 1 );
 	KickPlayer( -1, self );
-#ifdef TG
 	if ( !tg_data.unlimit_ammo )
-#endif
 		self->s.v.currentammo = --( self->s.v.ammo_shells );
 	makevectors( self->s.v.v_angle );
 	VectorCopy( g_globalvars.v_forward, dir );
@@ -1155,9 +1138,7 @@ void W_FireAssaultCannon(  )
 #endif
 	KickPlayer( -4, self );
 
-#ifdef TG
 		if ( !tg_data.unlimit_ammo )
-#endif
 			self->s.v.currentammo = --( self->s.v.ammo_shells );
 
 	aim( dir );
@@ -1287,9 +1268,7 @@ W_FireRocket
 */
 void W_FireRocket(  )
 {
-#ifdef TG
 	if ( !tg_data.unlimit_ammo )
-#endif
 		self->s.v.currentammo = --( self->s.v.ammo_rockets );
 	sound( self, CHAN_WEAPON, "weapons/sgun1.wav", 1, ATTN_NORM );
 	KickPlayer( -2, self );
@@ -1415,9 +1394,7 @@ void W_FireLightning(  )
 		self->t_width = g_globalvars.time + 0.6;
 	}
 	KickPlayer( -2, self );
-#ifdef TG
 	if ( !tg_data.unlimit_ammo )
-#endif
 		self->s.v.currentammo = --( self->s.v.ammo_cells );
 
 	VectorCopy( self->s.v.origin, org );	//org = self->s.v.origin + '0 0 16';
@@ -1655,9 +1632,7 @@ void W_FireGrenade(  )
 	int     num_pipes;
 	int     num_team_pipes;
 
-#ifdef TG
 	if ( !tg_data.unlimit_ammo  )
-#endif
 		self->s.v.currentammo = --( self->s.v.ammo_rockets );
 
 	sound( self, 1, "weapons/grenade.wav", 1, 1 );
@@ -1781,9 +1756,7 @@ void W_FireSuperSpikes(  )
 	vec3_t  dir, tmp;
 
 	sound( self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM );
-#ifdef TG
 	if ( !tg_data.unlimit_ammo  )
-#endif
 		self->s.v.currentammo = self->s.v.ammo_nails = self->s.v.ammo_nails - 4;
 	aim( dir );		//dir = aim (self, 1000);
 
@@ -1819,15 +1792,11 @@ void W_FireSpikes( float ox )
 	sound( self, 1, "weapons/rocket1i.wav", 1, 1 );
 	if ( self->s.v.ammo_nails == 1 )
 	{
-#ifdef TG
 		if ( !tg_data.unlimit_ammo  )
-#endif
 			self->s.v.currentammo = self->s.v.ammo_nails = self->s.v.ammo_nails - 1;
 	} else
 	{
-#ifdef TG
 		if ( !tg_data.unlimit_ammo  )
-#endif
 			self->s.v.currentammo = self->s.v.ammo_nails = self->s.v.ammo_nails - 2;
 	}
 	aim( dir );		// dir = aim (self, 1000);
@@ -2298,7 +2267,6 @@ float CheckForReload(  )
 {
 	gedict_t *tWeapon;
 
-#ifdef TG
  	if( tg_data.disable_reload )
 	{
 		self->reload_shotgun = 0;
@@ -2307,7 +2275,6 @@ float CheckForReload(  )
 		self->reload_rocket_launcher = 0;
 		return 0;
 	}
-#endif
 
 	switch ( self->current_weapon )
 	{
@@ -2528,10 +2495,9 @@ void W_Attack(  )
 			G_sprint( self, 1, "Insufficient cells to power up the Assault Cannon.\n" );
 		else
 		{
-#ifdef TG
                         if( !tg_data.unlimit_ammo )
-			self->s.v.ammo_cells -= 4;
-#endif
+				self->s.v.ammo_cells -= 4;
+
 			self->heat = 1;
 			self->tfstate |= TFSTATE_AIMING;
 			TeamFortress_SetSpeed( self );
@@ -3284,7 +3250,6 @@ void ImpulseCommands(  )
 	if ( self->s.v.impulse == 171 )
 		UseSpecialSkill(  );
 
-#ifdef TG
         if( tg_data.tg_enabled )
         {
          	switch ( ( int ) self->s.v.impulse )
@@ -3327,7 +3292,7 @@ void ImpulseCommands(  )
          		break;
          	}
         }
-#endif
+
 	if ( !self->is_building && !self->is_detpacking && !self->is_feigning )
 	{
 		switch ( ( int ) self->s.v.impulse )
@@ -3420,35 +3385,19 @@ void ImpulseCommands(  )
 		TeamFortress_DetpackStop(  );
 		break;
 	case 188:
-#ifndef TG
-		if ( self->playerclass == PC_ENGINEER )
-#else
 		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
-#endif
 			DestroyBuilding( self, "building_sentrygun" );
 		break;
 	case 187:
-#ifndef TG
-		if ( self->playerclass == PC_ENGINEER )
-#else
 		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
-#endif
 			DestroyBuilding( self, "building_dispenser" );
 		break;
 	case 196:
-#ifndef TG
-		if ( self->playerclass == PC_ENGINEER )
-#else
 		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
-#endif
 			DestroyBuilding( self, "building_teleporter_exit" );
 		break;
 	case 197:
-#ifndef TG
-		if ( self->playerclass == PC_ENGINEER )
-#else
 		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
-#endif
 			DestroyBuilding( self, "building_teleporter_entrance" );
 		break;
 	case 177:
@@ -3464,11 +3413,7 @@ void ImpulseCommands(  )
 			TeamFortress_SpyFeignDeath( 1 );
 		break;
 	case 179:
-#ifndef TG
-		if ( self->playerclass == PC_ENGINEER )
-#else
 		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
-#endif
 			TeamFortress_EngineerBuild(  );
 		break;
 	case AUTOSCAN_IMPULSE:

@@ -209,6 +209,10 @@ cd VM
 
 @if errorlevel 1 goto quit
 
+%CC% %CFLAGS% %INCFLAGS% %SRC%\tg.c
+
+@if errorlevel 1 goto quit
+
 copy %SRC%\g_syscalls.asm .
 
 @if errorlevel 1 goto quit

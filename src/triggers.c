@@ -375,14 +375,8 @@ void tdeath_touch(  )
 		other->s.v.solid = SOLID_NOT;
 		other->s.v.nextthink = g_globalvars.time + 1 + g_random(  ) * 2;
 		dremove( other->oldenemy );
-#ifndef TG
-		G_bprint( 1, "%s's detpack was telefragged by %s\n",
-			  PROG_TO_EDICT( self->s.v.owner )->s.v.netname,
-			  PROG_TO_EDICT( self->s.v.owner )->s.v.netname );
-#else
 		G_bprint( 1, "%s's detpack was telefragged by %s\n",
 			  other->real_owner->s.v.netname, PROG_TO_EDICT( self->s.v.owner )->s.v.netname );
-#endif
 	}
 }
 

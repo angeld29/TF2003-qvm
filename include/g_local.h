@@ -16,10 +16,8 @@
 
 #include "menu.h"
 #define NEWHWGUY
-#define FIXDETPACKDROP
-#ifdef TG
+
 #include "tg.h"
-#endif
 
 #ifdef DEBUG
 #define DebugTrap(x) *(char*)0=x

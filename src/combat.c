@@ -226,10 +226,9 @@ void T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker, float
 
 		}
 	}
-#ifdef TG
 	if ( streq( targ->s.v.classname, "player" ) && tg_data.godmode )
 		return;
-#endif
+
 // check for godmode or invincibility
 	if ( ( int ) targ->s.v.flags & FL_GODMODE )
 		return;
@@ -450,10 +449,8 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 			}
 		}
 	}
-#ifdef TG
 	if ( streq( targ->s.v.classname, "player" ) && tg_data.godmode )
 		return;
-#endif
 // check for godmode or invincibility
 	if ( ( int ) targ->s.v.flags & FL_GODMODE )
 		return;
