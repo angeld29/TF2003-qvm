@@ -3240,11 +3240,7 @@ void CycleWeaponCommand(  )
 
 void ImpulseCommands(  )
 {
-
-	// local 168
-	// local 159
-	// local 242
-
+        char st[20];
 
 	if ( self->last_impulse == TF_DETPACK && self->s.v.impulse )
 		TeamFortress_SetDetpack( self->s.v.impulse );
@@ -3262,17 +3258,19 @@ void ImpulseCommands(  )
 		self->menu_count = MENU_REFRESH_RATE;
 		self->menu_displaytime = 0;
 	}
-//FIX ME!!!!
-	/*if (self->s.v.impulse == 242 && !birthday) {
-	   st = infokey(world, "birthday");
-	   if (st != "off") {
-	   self.current_menu = 23;
-	   self.menu_count = 25;
-	   self.menu_displaytime = 0;
-	   self->s.v.impulse = 0;
-	   return;
-	   }
-	   } */
+
+	if ( self->s.v.impulse == 242 && !tf_data.birthday )
+	{
+		GetSVInfokeyString( "bd", "birthday", st, sizeof( st ), "" );
+		if ( strneq( st, "off" ) )
+		{
+			self->current_menu = MENU_BIRTHDAY1;
+			self->menu_count = MENU_REFRESH_RATE;
+			self->menu_displaytime = 0;
+			self->s.v.impulse = 0;
+			return;
+		}
+	}
 	if ( tf_data.cb_prematch_time > g_globalvars.time || tf_data.cease_fire )
 	{
 		PreMatchImpulses(  );

@@ -385,12 +385,6 @@ void UseSpecialSkill(  )
 						self->camangle );
 				self->camangle[2] = -self->camangle[2];
 				vectoangles( self->camangle, self->camangle );
-				/*FIX ME
-				   self->camdist = vlen(self->s.v.enemy->s.v.origin - self->s.v.origin);
-				   self->camangle = self->s.v.origin - self->s.v.enemy->s.v.origin;
-				   self->camangle[2] = 0 - self.camangle[2];
-				   self->camangle = vectoangles(self.camangle);
-				 */
 			}
 		} else
 		{
@@ -1775,9 +1769,7 @@ void TeamFortress_RemoveTimers(  )
 		}
 	}
 
-	te = world;
-	//FIX ME !!!!!!!!!!!!!!!!!!!!
-	while ( te = find( te, FOFS( s.v.classname ), "item_tfgoal" ) )
+	for( te = world;te = find( te, FOFS( s.v.classname ), "item_tfgoal" ); )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
@@ -1795,27 +1787,23 @@ void TeamFortress_RemoveTimers(  )
 			}
 		}
 	}
-	te = find( world, FOFS( s.v.classname ), "detpack" );
-	while ( te )
+	for( te = world; te = find( te, FOFS( s.v.classname ), "detpack" );)
 	{
 		if ( te->weaponmode == 1 && te->s.v.enemy == EDICT_TO_PROG( self ) )
 			te->weaponmode = 0;
-		te = find( te, FOFS( s.v.classname ), "detpack" );
 	}
 
 	TeamFortress_DetonatePipebombs(  );
 
 	if ( self->has_disconnected == 1 )
 	{
-		te = find( world, FOFS( s.v.classname ), "grenade" );
-		while ( te )
+		for(te = world;te = find( te, FOFS( s.v.classname ), "grenade" );)
 		{
 			if ( te->s.v.owner == EDICT_TO_PROG( self ) && streq(te->s.v.model , "progs/caltrop.mdl") )
 			{
 				dremove( te );
-				te = find( world, FOFS( s.v.classname ), "grenade" );
-			} else
-				te = find( te, FOFS( s.v.classname ), "grenade" );
+				te = world;
+			}
 		}
 	}
 	if ( (tf_data.old_grens == 1) || (tf_data.new_gas & GAS_MASK_PALETTE) )

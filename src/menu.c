@@ -35,6 +35,8 @@ void 	Menu_Spy_Skin( menunum_t menu );
 void 	Menu_Spy_Skin_Input( int inp );
 void 	Menu_Spy_Color( menunum_t menu );
 void 	Menu_Spy_Color_Input( int inp );
+void 	Menu_BirthDay( menunum_t menu );
+void 	Menu_BirthDay_Input( int inp );
 
 menu_t  menus[] = {
 	{0, 0, 0, NULL, NULL},	//MENU_NULL,                      
@@ -59,7 +61,12 @@ menu_t  menus[] = {
 	           Menu_EngineerFix_SentryGun_Input},	//MENU_ENGINEER_FIX_SENTRYGUN,
 	{0, 0, 0, Menu_NULL, NULL},	//MENU_ENGINEER_FIX_MORTAR,     
 	{-1, 0, 0, Menu_Dispenser, Menu_Dispenser_Input},	//MENU_DISPENSER,                       
-	{-1, 0, 0, Menu_Class, Menu_Class_Input}	//MENU_CHANGECLASS              
+	{-1, 0, 0, Menu_Class, Menu_Class_Input},	//MENU_CHANGECLASS              
+	{0, 0, 0, Menu_NULL, NULL},	//21
+	{0, 0, 0, Menu_NULL, NULL},	//22
+	{-1, 0, 0, Menu_BirthDay, Menu_BirthDay_Input},	//MENU_BIRTHDAY1
+	{-1, 0, 0, Menu_BirthDay, Menu_BirthDay_Input},	//MENU_BIRTHDAY2
+	{-1, 0, 0, Menu_BirthDay, Menu_BirthDay_Input},	//MENU_BIRTHDAY3
 };
 
 int     NUM_menus = sizeof( menus ) / sizeof( menus[0] );
@@ -1196,4 +1203,51 @@ void BirthdayTimer(  )
           }
           	
         }
+}
+
+void 	Menu_BirthDay( menunum_t menu )
+{
+ if (self->current_menu == MENU_BIRTHDAY2) 
+  CenterPrint(self, "3rd Impulse\n");
+ else {
+  if (self->current_menu == MENU_BIRTHDAY3) 
+   CenterPrint(self, "4th Impulse\n");
+ }
+
+}
+
+void 	Menu_BirthDay_Input( int inp )
+{
+  gedict_t *te;
+  switch(self->current_menu)
+  {
+  	case MENU_BIRTHDAY1:
+  		  ResetMenu();
+                  self->s.v.impulse = 0;
+                  if(inp == 98)
+                  	self->current_menu = MENU_BIRTHDAY2;
+                  break;	
+  	case MENU_BIRTHDAY2:
+  		  ResetMenu();
+                  self->s.v.impulse = 0;
+                  if(inp == 156)
+                  	self->current_menu = MENU_BIRTHDAY3;
+                  break;	
+
+  	case MENU_BIRTHDAY3:
+  		  ResetMenu();
+                  self->s.v.impulse = 0;
+                  if(inp != 96)
+                  	break;
+                  tf_data.birthday = 1;
+                  localcmd("localinfo birthday on\n");
+                  G_bprint(2, "IT'S PARTY TIME\n");
+                  for(te = world; te = find( te, FOFS(s.v.classname), "player");)
+                  	CenterPrint(te, "\n\nHAPPY BIRTHDAY TEAMFORTRESS!\n");
+                  te = spawn();
+                  te->s.v.weapon = 10;
+                  te->s.v.nextthink = g_globalvars.time + 60;
+                  te->s.v.think = (func_t)BirthdayTimer;
+                  break;	
+  }
 }
