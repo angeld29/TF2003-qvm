@@ -321,11 +321,20 @@ void Menu_Class_Input( int imp )
 	ResetMenu(  );
 	if ( self->playerclass && new_class != 1 )
 	{
-		opt = GetInfokeyInt( self, "s", NULL, 0 );
-		GetInfokeyString( self, "ch", "classhelp", st, sizeof( st ), "on" );
-		if ( strcmp( st, "off" ) || ( opt & TF_CLASS_HELP_MASK ) != 0 )
+
+		if( GetInfokeyString( self, "ch", "classhelp", st, sizeof( st ), "" ) )
 		{
-			self->current_menu = MENU_CLASSHELP;
+			if( strcmp(st,"off") )
+			{
+				self->current_menu = MENU_CLASSHELP;
+			}
+		}else
+		{
+			opt = GetInfokeyInt( self, "s", NULL, TF_CLASS_HELP_MASK );
+		        if( ( opt & TF_CLASS_HELP_MASK ) != 0 )
+		        {
+		        	self->current_menu = MENU_CLASSHELP;
+		        }
 		}
 	}
 	self->menu_displaytime = 0;
