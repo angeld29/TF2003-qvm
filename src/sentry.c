@@ -395,8 +395,8 @@ void Sentry_Explode(  )
 			dremove( self->oldenemy );
 	} else
 		dremove( self->trigger_field );
-	trap_WriteByte( 4, 23 );
-	trap_WriteByte( 4, 3 );
+	trap_WriteByte( 4, SVC_TEMPENTITY );
+	trap_WriteByte( 4, TE_EXPLOSION );
 	trap_WriteCoord( 4, self->s.v.origin[0] );
 	trap_WriteCoord( 4, self->s.v.origin[1] );
 	trap_WriteCoord( 4, self->s.v.origin[2] );
@@ -438,8 +438,8 @@ void Sentry_Die(  )
 		ThrowGib( "progs/tgib3.mdl", -70 );
 		tf_data.deathmsg = 38;
 		T_RadiusDamage( self, self->real_owner, 75 + self->s.v.ammo_rockets * 8, self );
-		trap_WriteByte( 4, 23 );
-		trap_WriteByte( 4, 3 );
+		trap_WriteByte( 4, SVC_TEMPENTITY );
+		trap_WriteByte( 4, TE_EXPLOSION );
 		trap_WriteCoord( 4, self->s.v.origin[0] );
 		trap_WriteCoord( 4, self->s.v.origin[1] );
 		trap_WriteCoord( 4, self->s.v.origin[2] );
@@ -609,8 +609,8 @@ void    FireSentryLighting( gedict_t * targ )
 	traceline( PASSVEC3( src ), PASSVEC3( end ), 0, self );
 	
 
-	trap_WriteByte( 4, 23 );
-	trap_WriteByte( 4, 5 );
+	trap_WriteByte( 4, SVC_TEMPENTITY );
+	trap_WriteByte( 4, TE_LIGHTNING1 );
 	WriteEntity( 4, self );
 	trap_WriteCoord( 4, src[0] );
 	trap_WriteCoord( 4, src[1] );

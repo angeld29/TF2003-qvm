@@ -1276,8 +1276,8 @@ void GasGrenadeMakeGas(  )
 	self->heat = self->heat + 1;
 	if ( self->heat == 1 )
 	{
-		trap_WriteByte( 4, 23 );
-		trap_WriteByte( 4, 4 );
+		trap_WriteByte( 4, SVC_TEMPENTITY );
+		trap_WriteByte( 4, TE_TAREXPLOSION );
 		trap_WriteCoord( 4, self->s.v.origin[0] );
 		trap_WriteCoord( 4, self->s.v.origin[1] );
 		trap_WriteCoord( 4, self->s.v.origin[2] );
@@ -1289,8 +1289,8 @@ void GasGrenadeMakeGas(  )
 		self->s.v.weapon = self->s.v.weapon + 1;
 		if ( self->s.v.weapon == 1 )
 		{
-			trap_WriteByte( 4, 23 );
-			trap_WriteByte( 4, 10 );
+			trap_WriteByte( 4, SVC_TEMPENTITY );
+			trap_WriteByte( 4, TE_LAVASPLASH );
 			trap_WriteCoord( 4, self->s.v.origin[0] );
 			trap_WriteCoord( 4, self->s.v.origin[1] );
 			trap_WriteCoord( 4, self->s.v.origin[2] - 24 );
@@ -1535,15 +1535,15 @@ void T_TranqDartTouch(  )
 		}
 	} else
 	{
-		trap_WriteByte( 4, 23 );
+		trap_WriteByte( 4, SVC_TEMPENTITY );
 		if ( streq( self->s.v.classname, "wizspike" ) )
-			trap_WriteByte( 4, 7 );
+			trap_WriteByte( 4, TE_WIZSPIKE );
 		else
 		{
 			if ( streq( self->s.v.classname, "knightspike" ) )
-				trap_WriteByte( 4, 8 );
+				trap_WriteByte( 4, TE_KNIGHTSPIKE );
 			else
-				trap_WriteByte( 4, 0 );
+				trap_WriteByte( 4, TE_SPIKE );
 		}
 		trap_WriteCoord( 4, self->s.v.origin[0] );
 		trap_WriteCoord( 4, self->s.v.origin[1] );

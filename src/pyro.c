@@ -143,8 +143,8 @@ void NapalmGrenadeNetThink(  )
 				stuffcmd( other, "bf\nbf\n" );
 		}
 	}
-	trap_WriteByte( 4, 23 );
-	trap_WriteByte( 4, 3 );
+	trap_WriteByte( 4, SVC_TEMPENTITY );
+	trap_WriteByte( 4, TE_EXPLOSION );
 	trap_WriteCoord( 4, self->s.v.origin[0] );
 	trap_WriteCoord( 4, self->s.v.origin[1] );
 	trap_WriteCoord( 4, self->s.v.origin[2] );
@@ -185,8 +185,8 @@ void NapalmGrenadeExplode(  )
         				stuffcmd( other, "bf\nbf\n" );
         		}
         	}
-        	trap_WriteByte( 4, 23 );
-        	trap_WriteByte( 4, 3 );
+        	trap_WriteByte( 4, SVC_TEMPENTITY );
+        	trap_WriteByte( 4, TE_EXPLOSION );
         	trap_WriteCoord( 4, self->s.v.origin[0] );
         	trap_WriteCoord( 4, self->s.v.origin[1] );
         	trap_WriteCoord( 4, self->s.v.origin[2] );
@@ -750,8 +750,8 @@ void T_IncendiaryTouch(  )
 	normalize( self->s.v.velocity, vtemp );
 	VectorScale( vtemp, 8, vtemp );
 	VectorSubtract( self->s.v.origin, vtemp, self->s.v.origin );
-	trap_WriteByte( 4, 23 );
-	trap_WriteByte( 4, 3 );
+	trap_WriteByte( 4, SVC_TEMPENTITY );
+	trap_WriteByte( 4, TE_EXPLOSION );
 	trap_WriteCoord( 4, self->s.v.origin[0] );
 	trap_WriteCoord( 4, self->s.v.origin[1] );
 	trap_WriteCoord( 4, self->s.v.origin[2] );

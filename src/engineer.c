@@ -52,8 +52,8 @@ void LaserBolt_Touch(  )
 	return;
     } else
     {
-	trap_WriteByte( 4, 23 );
-	trap_WriteByte( 4, 0 );
+	trap_WriteByte( 4, SVC_TEMPENTITY );
+	trap_WriteByte( 4, TE_SPIKE );
 	trap_WriteCoord( 4, self->s.v.origin[0] );
 	trap_WriteCoord( 4, self->s.v.origin[1] );
 	trap_WriteCoord( 4, self->s.v.origin[2] );
@@ -132,8 +132,8 @@ void EMPExplode(  )
     }
     tf_data.deathmsg = 31;
     T_RadiusDamage( self, PROG_TO_EDICT( self->s.v.enemy ), expsize, world );
-    trap_WriteByte( 4, 23 );
-    trap_WriteByte( 4, 3 );
+    trap_WriteByte( 4, SVC_TEMPENTITY );
+    trap_WriteByte( 4, TE_EXPLOSION );
     trap_WriteCoord( 4, self->s.v.origin[0] );
     trap_WriteCoord( 4, self->s.v.origin[1] );
     trap_WriteCoord( 4, self->s.v.origin[2] );
@@ -154,8 +154,8 @@ void EMPGrenadeExplode(  )
     gedict_t *te;
     gedict_t *oldself;
 
-    trap_WriteByte( 4, 23 );
-    trap_WriteByte( 4, 4 );
+    trap_WriteByte( 4, SVC_TEMPENTITY );
+    trap_WriteByte( 4, TE_TAREXPLOSION );
     trap_WriteCoord( 4, self->s.v.origin[0] );
     trap_WriteCoord( 4, self->s.v.origin[1] );
     trap_WriteCoord( 4, self->s.v.origin[2] );
@@ -207,8 +207,8 @@ void EMPGrenadeExplode(  )
 		T_RadiusDamage( te, PROG_TO_EDICT( self->s.v.owner ), expsize, te );
 		te->s.v.think = ( func_t ) TeamFortress_AmmoboxRemove;//SUB_Remove;
 		te->s.v.nextthink = g_globalvars.time + 0.1;
-		trap_WriteByte( 4, 23 );
-		trap_WriteByte( 4, 3 );
+		trap_WriteByte( 4, SVC_TEMPENTITY );
+		trap_WriteByte( 4, TE_EXPLOSION );
 		trap_WriteCoord( 4, te->s.v.origin[0] );
 		trap_WriteCoord( 4, te->s.v.origin[1] );
 		trap_WriteCoord( 4, te->s.v.origin[2] );
@@ -245,8 +245,8 @@ void EMPGrenadeExplode(  )
 			te->s.v.think = ( func_t ) SUB_Remove;
 			te->s.v.nextthink = g_globalvars.time + 0.1;
 		    }
-		    trap_WriteByte( 4, 23 );
-		    trap_WriteByte( 4, 3 );
+		    trap_WriteByte( 4, SVC_TEMPENTITY );
+		    trap_WriteByte( 4, TE_EXPLOSION );
 		    trap_WriteCoord( 4, te->s.v.origin[0] );
 		    trap_WriteCoord( 4, te->s.v.origin[1] );
 		    trap_WriteCoord( 4, te->s.v.origin[2] );
@@ -696,8 +696,8 @@ void Dispenser_Explode(  )
     ThrowGib( "progs/dgib1.mdl", -30 );
     ThrowGib( "progs/dgib2.mdl", -50 );
     ThrowGib( "progs/dgib3.mdl", -50 );
-    trap_WriteByte( 4, 23 );
-    trap_WriteByte( 4, 3 );
+    trap_WriteByte( 4, SVC_TEMPENTITY );
+    trap_WriteByte( 4, TE_EXPLOSION );
     trap_WriteCoord( 4, self->s.v.origin[0] );
     trap_WriteCoord( 4, self->s.v.origin[1] );
     trap_WriteCoord( 4, self->s.v.origin[2] );

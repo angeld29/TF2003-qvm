@@ -281,8 +281,8 @@ void TeamFortress_SaveMe(  )
 					tl = spawn(  );
 					VectorCopy( self->s.v.origin, tl->s.v.origin );
 					tl->s.v.origin[2] += 32;
-					trap_WriteByte( 1, 23 );
-					trap_WriteByte( 1, 9 );
+					trap_WriteByte( 1, SVC_TEMPENTITY );
+					trap_WriteByte( 1, TE_LIGHTNING3 );
 					WriteEntity( 1, tl );
 					trap_WriteCoord( 1, tl->s.v.origin[0] );
 					trap_WriteCoord( 1, tl->s.v.origin[1] );

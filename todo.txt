@@ -1,6 +1,6 @@
 camera
 +localinfo mtfl on
-+suicide body
+suicide body
 +watervis действует на id
 +telefrag check on respawn
 +fix explode grenade after disconnect
