@@ -306,6 +306,7 @@ void Player_Menu();
 void Menu_Input(int impulse);
 void Menu_Team_Input(int impulse);
 void Menu_Class_Input(int impulse);
+void CheckAutoKick( gedict_t * p );
 
 #endif
 

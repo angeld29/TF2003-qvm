@@ -1697,23 +1697,23 @@ void BackpackTouch(  )
 	G_sprint( other, 0, "You get " );
 	if ( self->s.v.ammo_shells )
 	{
-		G_sprint( other, 0, "%.0f shells  ", self->s.v.ammo_shells );
+		G_sprint( other, 0, "%.0f shells ", self->s.v.ammo_shells );
 	}
 	if ( self->s.v.ammo_nails )
 	{
-		G_sprint( other, 0, "%.0f  nails ", self->s.v.ammo_nails );
+		G_sprint( other, 0, "%.0f nails ", self->s.v.ammo_nails );
 	}
 	if ( self->s.v.ammo_rockets )
 	{
-		G_sprint( other, 0, "%.0f rockets  ", self->s.v.ammo_rockets );
+		G_sprint( other, 0, "%.0f rockets ", self->s.v.ammo_rockets );
 	}
 	if ( self->s.v.ammo_cells )
 	{
-		G_sprint( other, 0, "%.0f cells  ", self->s.v.ammo_cells );
+		G_sprint( other, 0, "%.0f cells ", self->s.v.ammo_cells );
 	}
 	if ( self->s.v.armorvalue && other->playerclass == PC_ENGINEER && other->s.v.ammo_cells < other->maxammo_cells )
 	{
-		G_sprint( other, 0, "%.0f metal  ", self->s.v.armorvalue );
+		G_sprint( other, 0, "%.0f metal ", self->s.v.armorvalue );
 		other->s.v.ammo_cells += self->s.v.armorvalue;
 		if ( other->s.v.ammo_cells > other->maxammo_cells )
 			other->s.v.ammo_cells = other->maxammo_cells;

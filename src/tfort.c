@@ -1774,6 +1774,17 @@ void TeamFortress_RemoveTimers(  )
 			te = world;
 		}
 	}
+
+	for ( te = world;te = find( te, FOFS( s.v.classname ), "primer" ) ;)
+	{
+		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
+		{
+		        //FIX ME drop grenade???
+			dremove( te );
+			te = world;
+		}
+	}
+
 	te = world;
 	//FIX ME !!!!!!!!!!!!!!!!!!!!
 	while ( te = find( te, FOFS( s.v.classname ), "item_tfgoal" ) )
@@ -1973,8 +1984,8 @@ void TeamFortress_DropAmmo( int type )
 					    self->s.v.ammo_cells - ( ammo - self->s.v.ammo_shells ) * AMMO_COST_SHELLS;
 					self->s.v.ammo_shells = ammo;
 				}
-			} else
-//   if (self.ammo_shells < ammo) 
+			}
+   			if (self->s.v.ammo_shells < ammo) 
 				return;
 		}
 		self->s.v.ammo_shells = self->s.v.ammo_shells - ammo;

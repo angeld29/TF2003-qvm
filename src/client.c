@@ -1,13 +1,13 @@
 #include "g_local.h"
 #ifdef TG
-void    TG_LoadSettings(  );
+void    TG_LoadSettings();
 #endif
-void    CTF_FlagCheck(  );
-void    BirthdayTimer(  );
-void    CeaseFire_think(  );
-void    PreMatch_Think(  );
+void    CTF_FlagCheck();
+void    BirthdayTimer();
+void    CeaseFire_think();
+void    PreMatch_Think();
 void    player_pain( gedict_t * attacker, float take );
-void    PlayerDie(  );
+void    PlayerDie();
 
 //===========================================================================
 // Client
@@ -39,9 +39,9 @@ char    nextmap[64] = "";
 This is the camera point for the intermission.
 Use mangle instead of angle, so you can set pitch or roll as well as yaw.  'pitch roll yaw'
 */
-void SP_info_intermission(  )
+void SP_info_intermission()
 {
-	if ( !CheckExistence(  ) )
+	if ( !CheckExistence() )
 	{
 		dremove( self );
 		return;
@@ -69,12 +69,12 @@ void SetNewParms( void )
 	g_globalvars.parm15 = 0;
 }
 
-void SetChangeParms(  )
+void SetChangeParms()
 {
 
 	if ( self->s.v.health <= 0 )
 	{
-		SetNewParms(  );
+		SetNewParms();
 		return;
 	}
 // remove items
@@ -113,19 +113,19 @@ void SetChangeParms(  )
 }
 
 
-void autoteam_think(  )
+void autoteam_think()
 {
 	tf_data.toggleflags |= TFLAG_AUTOTEAM;
 	dremove( self );
 }
 
-void autokick_think(  )
+void autokick_think()
 {
 	PROG_TO_EDICT( self->s.v.owner )->teamkills = 0;
 	dremove( self );
 }
 
-void DecodeLevelParms(  )
+void DecodeLevelParms()
 {
 	char    st[10];
 	gedict_t *ent;
@@ -140,7 +140,7 @@ void DecodeLevelParms(  )
 	if ( g_globalvars.serverflags )
 	{
 		if ( streq( world->s.v.model, "maps/start.bsp" ) )
-			SetNewParms(  );	// take away all stuff on starting new episode
+			SetNewParms();	// take away all stuff on starting new episode
 	}
 	self->s.v.items = g_globalvars.parm1;
 	self->s.v.health = g_globalvars.parm2;
@@ -181,7 +181,7 @@ void DecodeLevelParms(  )
 				CTF_Map = 1;
 				if ( !teamplay )
 					trap_cvar_set( "teamplay", "21?TeamFortress" );
-				ent = spawn(  );
+				ent = spawn();
 				ent->s.v.nextthink = g_globalvars.time + 30;
 				ent->s.v.think = ( func_t ) CTF_FlagCheck;
 				number_of_teams = 2;
@@ -209,7 +209,7 @@ void DecodeLevelParms(  )
 			civilianteams = 0;
 		}
 		G_bprint( 2, "Mapname: %s\n", g_globalvars.mapname );
-		SetupTeamEqualiser(  );
+		SetupTeamEqualiser();
 		teamfrags[0] = 0;
 		teamfrags[1] = 0;
 		teamfrags[2] = 0;
@@ -237,7 +237,7 @@ void DecodeLevelParms(  )
 		if ( !strcmp( st, "on" ) )
 		{
 			tf_data.birthday = 1;
-			te = spawn(  );
+			te = spawn();
 			te->s.v.weapon = 10;
 			te->s.v.nextthink = g_globalvars.time + 60;
 			te->s.v.think = ( func_t ) BirthdayTimer;
@@ -261,7 +261,7 @@ void DecodeLevelParms(  )
 			if ( tf_data.cb_prematch_time > g_globalvars.time )
 			{
 				tf_data.cb_prematch_time += 5;
-				ent = spawn(  );
+				ent = spawn();
 				ent->s.v.think = ( func_t ) PreMatch_Think;
 				ent->s.v.nextthink = g_globalvars.time + 5;
 			}
@@ -290,7 +290,7 @@ void DecodeLevelParms(  )
 					TeamFortress_SetSpeed( te );
 					te = find( te, FOFS( s.v.classname ), "player" );
 				}
-				te = spawn(  );
+				te = spawn();
 				te->s.v.classname = "ceasefire";
 				te->s.v.think = ( func_t ) CeaseFire_think;
 				te->s.v.nextthink = g_globalvars.time + 5;
@@ -402,7 +402,7 @@ void DecodeLevelParms(  )
 		else
 			tf_data.allow_drop_goal = 0;
 
-		GetSVInfokeyString( "add_pipe", NULL , st, sizeof( st ), "on" );
+		GetSVInfokeyString( "add_pipe", NULL, st, sizeof( st ), "on" );
 		if ( !strcmp( st, "on" ) )
 			tf_data.add_pipe = 1;
 		else
@@ -414,8 +414,8 @@ void DecodeLevelParms(  )
 		else
 			tf_data.new_flash = 0;
 
-		tf_data.new_gas = GetSVInfokeyInt( "new_gas", NULL,  GAS_DEFAULT );
-		
+		tf_data.new_gas = GetSVInfokeyInt( "new_gas", NULL, GAS_DEFAULT );
+
 
 		tf_data.sentry_type = SENTRY_NEW;
 
@@ -482,7 +482,7 @@ void DecodeLevelParms(  )
 			tf_data.random_tf_spawn = 1;
 #ifdef TG
 //  if(!defaults_loaded)
-		TG_LoadSettings(  );
+		TG_LoadSettings();
 #endif
 
 //////////////
@@ -495,7 +495,7 @@ void DecodeLevelParms(  )
 		if ( tf_data.toggleflags & TFLAG_AUTOTEAM )
 		{
 			tf_data.toggleflags -= ( tf_data.toggleflags & TFLAG_AUTOTEAM );
-			ent = spawn(  );
+			ent = spawn();
 			ent->s.v.nextthink = g_globalvars.time + autoteam_time;
 			ent->s.v.think = ( func_t ) autoteam_think;
 		}
@@ -509,8 +509,8 @@ void DecodeLevelParms(  )
 			tf_data.invis_only = 0;
 			tf_data.cheat_pause = 1;
 			tf_data.topcolor_check = 1;
-//			tf_data.tc1 = 13;
-//			tf_data.tc2 = 4;
+//                      tf_data.tc1 = 13;
+//                      tf_data.tc2 = 4;
 			tf_data.allow_drop_goal = 0;
 			tf_data.add_pipe = 1;
 			tf_data.new_flash = 1;
@@ -555,7 +555,7 @@ FindIntermission
 Returns the entity to view from
 ============
 */
-gedict_t *FindIntermission(  )
+gedict_t *FindIntermission()
 {
 	gedict_t *spot;
 	int     cyc;
@@ -564,7 +564,7 @@ gedict_t *FindIntermission(  )
 	spot = find( world, FOFS( s.v.classname ), "info_intermission" );
 	if ( spot )
 	{			// pick a random one
-		cyc = g_random(  ) * 1;
+		cyc = g_random() * 1;
 /*		while ( cyc > 1 )
 		{
 			spot = find( spot, FOFS( s.v.classname ), "info_intermission" );
@@ -582,7 +582,7 @@ gedict_t *FindIntermission(  )
 	spot = find( world, FOFS( s.v.classname ), "info_player_deathmatch" );
 	if ( spot )
 	{			// pick a random one
-		cyc = g_random(  ) * 7;
+		cyc = g_random() * 7;
 		while ( cyc > 1 )
 		{
 			spot = find( spot, FOFS( s.v.classname ), "info_player_deathmatch" );
@@ -633,10 +633,10 @@ gedict_t *FindNextIntermission( gedict_t * start_point )
 		if ( spot )
 			return spot;
 	}
-	return FindIntermission(  );
+	return FindIntermission();
 }
 
-void TF_MovePlayer(  )
+void TF_MovePlayer()
 {
 	gedict_t *place;
 
@@ -647,7 +647,7 @@ void TF_MovePlayer(  )
 	self->s.v.fixangle = 1;
 }
 
-void GotoNextMap(  )
+void GotoNextMap()
 {
 	int     nextlevel;
 	char    str[64];
@@ -681,13 +681,13 @@ void GotoNextMap(  )
 		tf_data.already_chosen_map = 0;
 }
 
-void ExitIntermission(  )
+void ExitIntermission()
 {
 	G_dprint( "Exiting intermission...\n" );
 	if ( deathmatch )
 	{
 		G_dprint( "Exit Intermission in Deathmatch.\n" );
-		GotoNextMap(  );
+		GotoNextMap();
 		return;
 	}
 	intermission_exittime = g_globalvars.time + 1;
@@ -748,7 +748,7 @@ void ExitIntermission(  )
 				}
 			}
 		}
-		GotoNextMap(  );
+		GotoNextMap();
 	}
 	if ( intermission_running == 3 )
 	{
@@ -766,10 +766,10 @@ void ExitIntermission(  )
 		}
 	}
 	G_dprint( "Exit Intermission.\n" );
-	GotoNextMap(  );
+	GotoNextMap();
 }
 
-void IntermissionThink(  )
+void IntermissionThink()
 {
 	int     minp;
 	int     maxp;
@@ -784,13 +784,13 @@ void IntermissionThink(  )
 
 
 	G_dprint( "Intermission think.\n" );
-	GotoNextMap(  );
+	GotoNextMap();
 
 	if ( GetSVInfokeyString( "nmap", NULL, sl, sizeof( sl ), "" ) )
 	{
 		minp = GetSVInfokeyInt( "minp", NULL, 0 );
 		maxp = GetSVInfokeyInt( "maxp", NULL, 0 );
-		currp = TeamFortress_GetNoPlayers(  );
+		currp = TeamFortress_GetNoPlayers();
 		G_dprint( "MAP CYCLING: Player Counting... " );
 		if ( currp >= minp && currp <= maxp )
 		{
@@ -809,7 +809,7 @@ void IntermissionThink(  )
 	}
 }
 
-void execute_changelevel(  )
+void execute_changelevel()
 {
 	gedict_t *pos;
 
@@ -820,7 +820,7 @@ void execute_changelevel(  )
 // enforce a wait time before allowing changelevel
 	intermission_exittime = g_globalvars.time + 5;
 
-	pos = FindIntermission(  );
+	pos = FindIntermission();
 
 // play intermission music
 	trap_WriteByte( MSG_ALL, SVC_CDTRACK );
@@ -845,12 +845,12 @@ void execute_changelevel(  )
 
 	if ( !tf_data.clan_scores_dumped )
 	{
-		DumpClanScores(  );
+		DumpClanScores();
 		tf_data.clan_scores_dumped = 1;
 	}
 }
 
-void changelevel_touch(  )
+void changelevel_touch()
 {
 //      gedict_t *pos;
 //      float   ne;
@@ -869,11 +869,11 @@ void changelevel_touch(  )
 	G_bprint( PRINT_HIGH, "%s exited the level\n", other->s.v.netname );
 	strcpy( nextmap, self->map );
 
-	SUB_UseTargets(  );
+	SUB_UseTargets();
 
 	if ( ( ( int ) ( self->s.v.spawnflags ) & 1 ) && !deathmatch )
 	{
-		GotoNextMap(  );
+		GotoNextMap();
 		return;
 	}
 	self->s.v.touch = ( func_t ) SUB_Null;
@@ -888,9 +888,9 @@ void changelevel_touch(  )
 When the player touches this, he gets sent to the map listed in the "map" variable.  Unless the NO_INTERMISSION flag is set, the view will go to the info_intermission spot and display stats.
 */
 
-void SP_trigger_changelevel(  )
+void SP_trigger_changelevel()
 {
-	if ( !CheckExistence(  ) )
+	if ( !CheckExistence() )
 	{
 		dremove( self );
 		return;
@@ -898,7 +898,7 @@ void SP_trigger_changelevel(  )
 	if ( !self->map )
 		G_Error( "chagnelevel trigger doesn't have map" );
 
-	InitTrigger(  );
+	InitTrigger();
 	self->s.v.touch = ( func_t ) changelevel_touch;
 }
 
@@ -910,9 +910,9 @@ void SP_trigger_changelevel(  )
 =============================================================================
 */
 
-void    set_suicide_frame(  );
+void    set_suicide_frame();
 
-void respawn(  )
+void respawn()
 {
 	if ( self->has_disconnected == 1 )
 		return;
@@ -923,9 +923,9 @@ void respawn(  )
 		// make a copy of the dead body for appearances sake
 		CopyToBodyQue( self );
 		// set default spawn parms
-		SetNewParms(  );
+		SetNewParms();
 		// respawn              
-		PutClientInServer(  );
+		PutClientInServer();
 	} else
 	{
 		if ( deathmatch )
@@ -933,9 +933,9 @@ void respawn(  )
 			// make a copy of the dead body for appearances sake
 			CopyToBodyQue( self );
 			// set default spawn parms
-			SetNewParms(  );
+			SetNewParms();
 			// respawn              
-			PutClientInServer(  );
+			PutClientInServer();
 		} else
 			localcmd( "restart\n" );
 	}
@@ -949,7 +949,7 @@ Player entered the suicide command
 ============
 */
 
-void ClientKill(  )
+void ClientKill()
 {
 	gedict_t *te;
 
@@ -961,10 +961,10 @@ void ClientKill(  )
 		return;
 	if ( !self->playerclass )
 		return;
-	self->suicide_time = g_globalvars.time + 5 + g_random(  ) * 5;
+	self->suicide_time = g_globalvars.time + 5 + g_random() * 5;
 	G_bprint( PRINT_MEDIUM, "%s suicides\n", self->s.v.netname );
 
-	set_suicide_frame(  );
+	set_suicide_frame();
 	self->s.v.modelindex = modelindex_player;
 
 	if ( self->tfstate & TFSTATE_INFECTED )
@@ -986,10 +986,10 @@ void ClientKill(  )
 
 	SetVector( self->s.v.view_ofs, 0, 0, -8 );
 	self->s.v.movetype = MOVETYPE_NONE;
-	TeamFortress_RemoveTimers(  );
+	TeamFortress_RemoveTimers();
 	TeamFortress_SetupRespawn( 1 );
 	self->s.v.health = -1;
-	self->th_die(  );
+	self->th_die();
 	self->s.v.deadflag = 3;
 	self->tfstate |= TFSTATE_RESPAWN_READY;
 	self->s.v.takedamage = 0;
@@ -1050,56 +1050,56 @@ gedict_t *FindRandomTeamSpawnPoint( int team_num )
 	gedict_t *spot;
 
 	int     numspots = 0, numallspots = 0;
-	int		rndspot;
+	int     rndspot;
 
-	for(spot = world;spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] );)
+	for ( spot = world; spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] ); )
 	{
-     if(!Activated( spot, self )) 
-		 continue;
-	 numallspots++;
-	 if(CheckTelefragSpot( spot->s.v.origin ))
-		 numspots++;
+		if ( !Activated( spot, self ) )
+			continue;
+		numallspots++;
+		if ( CheckTelefragSpot( spot->s.v.origin ) )
+			numspots++;
 	}
-	if( !numallspots)
+	if ( !numallspots )
 		return world;
-	if(numspots)
+	if ( numspots )
 	{
 		rndspot = g_random() * numspots;
-		for(spot = world;spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] );)
+		for ( spot = world; spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] ); )
 		{
 
-			if(!Activated( spot, self )) 
+			if ( !Activated( spot, self ) )
 				continue;
-			if(!CheckTelefragSpot( spot->s.v.origin ))
+			if ( !CheckTelefragSpot( spot->s.v.origin ) )
 				continue;
-			if(!rndspot)
+			if ( !rndspot )
 				break;
 			rndspot--;
 		}
-	}else // not found no telefrag spot
+	} else			// not found no telefrag spot
 	{
 		rndspot = g_random() * numallspots;
-		for(spot = world;spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] );)
+		for ( spot = world; spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] ); )
 		{
 
-			if(!Activated( spot, self )) 
+			if ( !Activated( spot, self ) )
 				continue;
-			if(!rndspot)
+			if ( !rndspot )
 				break;
 			rndspot--;
 		}
 	}
-	if(spot)
+	if ( spot )
 		return spot;
-	
-    G_dprint("FindRandomTeamSpawnPoint: error\n");
+
+	G_dprint( "FindRandomTeamSpawnPoint: error\n" );
 
 	return world;
 }
 
 gedict_t *lastspawn;
 
-gedict_t *FindDeathmatchSpawnPoint(  )
+gedict_t *FindDeathmatchSpawnPoint()
 {
 	gedict_t *spot;
 
@@ -1111,9 +1111,9 @@ gedict_t *FindDeathmatchSpawnPoint(  )
 		spot = world;
 	for ( attempts = 0;; attempts++ )
 	{
-		spot = find( spot, FOFS( s.v.classname ), "info_player_deathmatch"  );
+		spot = find( spot, FOFS( s.v.classname ), "info_player_deathmatch" );
 		if ( !spot )
-			spot = find( world, FOFS( s.v.classname ), "info_player_deathmatch"  );
+			spot = find( world, FOFS( s.v.classname ), "info_player_deathmatch" );
 		if ( !spot )
 			return world;
 
@@ -1135,7 +1135,7 @@ void ValidateUser( gedict_t * e )
 }
 
 
-gedict_t *SelectSpawnPoint(  )
+gedict_t *SelectSpawnPoint()
 {
 	gedict_t *spot;
 
@@ -1197,7 +1197,7 @@ gedict_t *SelectSpawnPoint(  )
 // called after ClientConnect
 ///////////////
 
-void PutClientInServer(  )
+void PutClientInServer()
 {
 	int     iszoom;
 	int     oldclass;
@@ -1232,13 +1232,13 @@ void PutClientInServer(  )
 	self->on_hook = 0;
 	self->hook_out = 0;
 	self->fire_held_down = 0;
-	DecodeLevelParms(  );
+	DecodeLevelParms();
 	if ( !self->playerclass )
 	{
 		if ( TeamFortress_TeamIsCivilian( self->team_no ) )
 		{
 			self->s.v.impulse = 1;
-			TeamFortress_ChangeClass(  );
+			TeamFortress_ChangeClass();
 		}
 	}
 	if ( deathmatch == 3 && self->nextpc )
@@ -1259,10 +1259,10 @@ void PutClientInServer(  )
 	if ( self->tfstate & TFSTATE_RANDOMPC )
 	{
 		oldclass = self->playerclass;
-		self->playerclass = 1 + (int)( g_random(  ) * ( 10 - 1 ) );
+		self->playerclass = 1 + ( int ) ( g_random() * ( 10 - 1 ) );
 		while ( !IsLegalClass( self->playerclass )
 			|| self->playerclass == oldclass || ClassIsRestricted( self->team_no, self->playerclass ) )
-			self->playerclass = 1 + (int)( g_random(  ) * ( 10 - 1 ) );
+			self->playerclass = 1 + ( int ) ( g_random() * ( 10 - 1 ) );
 		self->tfstate = TFSTATE_RANDOMPC;
 		TeamFortress_ExecClassScript( self );
 	} else
@@ -1276,14 +1276,14 @@ void PutClientInServer(  )
 #endif
 	self->s.v.takedamage = 2;
 	TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & 8 );
-	TeamFortress_SetEquipment(  );
-	TeamFortress_SetHealth(  );
+	TeamFortress_SetEquipment();
+	TeamFortress_SetHealth();
 	TeamFortress_SetSpeed( self );
 	TeamFortress_SetSkin( self );
 	stuffcmd( self, "v_idlescale 0\nfov 90\n" );
 	stuffcmd( self, "v_cshift; wait; bf\n" );
 	SetTeamName( self );
-	W_SetCurrentAmmo(  );
+	W_SetCurrentAmmo();
 	self->attack_finished = g_globalvars.time + 0.3;
 	self->th_pain = player_pain;
 	self->th_die = PlayerDie;
@@ -1294,7 +1294,7 @@ void PutClientInServer(  )
 	}
 	self->s.v.deadflag = 0;
 	self->pausetime = 0;
-	spot = SelectSpawnPoint(  );
+	spot = SelectSpawnPoint();
 	if ( self->playerclass )
 		spawn_tdeath( spot->s.v.origin, self );
 	self->observer_list = spot;
@@ -1352,7 +1352,7 @@ void PutClientInServer(  )
 	SetVector( self->s.v.view_ofs, 0, 0, 22 );
 	SetVector( self->s.v.velocity, 0, 0, 0 );
 
-	player_stand1(  );
+	player_stand1();
 	if ( deathmatch || coop )
 	{
 		makevectors( self->s.v.angles );
@@ -1379,9 +1379,9 @@ void PutClientInServer(  )
 }
 
 
-void SP_Null_tf_spawn(  )
+void SP_Null_tf_spawn()
 {
-	if ( !CheckExistence(  ) )
+	if ( !CheckExistence() )
 	{
 		dremove( self );
 		return;
@@ -1395,7 +1395,7 @@ void PrintClientScore( gedict_t * c )
 }
 
 
-void DumpScore(  )
+void DumpScore()
 {
 ///FIX ME !!!!!!!! not used???
 /* gedict_t* e;
@@ -1458,14 +1458,14 @@ int     already_cycled;
 go to the next level 
 */
 
-void NextLevel(  )
+void NextLevel()
 {
 	gedict_t *o;
 
 	if ( already_cycled )
 		return;
 	already_cycled = 1;
-	o = spawn(  );
+	o = spawn();
 	o->map = nextmap;
 
 	o->s.v.think = ( func_t ) execute_changelevel;
@@ -1480,18 +1480,18 @@ Exit games upon conditions
 ============
 */
 
-void CheckRules(  )
+void CheckRules()
 {
 	if ( timelimit && g_globalvars.time >= timelimit )
-		NextLevel(  );
+		NextLevel();
 
 	if ( fraglimit && self->s.v.frags >= fraglimit )
-		NextLevel(  );
+		NextLevel();
 }
 
 //============================================================================
 
-void PlayerDeathThink(  )
+void PlayerDeathThink()
 {
 	//gedict_t* old_self;
 	float   forward;
@@ -1527,7 +1527,7 @@ void PlayerDeathThink(  )
 				self->s.v.button0 = 0;
 				self->s.v.button1 = 0;
 				self->s.v.button2 = 0;
-				respawn(  );
+				respawn();
 			}
 		}
 		return;
@@ -1539,13 +1539,13 @@ void PlayerDeathThink(  )
 			self->s.v.button0 = 0;
 			self->s.v.button1 = 0;
 			self->s.v.button2 = 0;
-			respawn(  );
+			respawn();
 		}
 		return;
 	}
 }
 
-void PlayerJump(  )
+void PlayerJump()
 {
 //      vec3_t  start;
 //      vec3_t  end;
@@ -1569,7 +1569,7 @@ void PlayerJump(  )
 		if ( self->swim_flag < g_globalvars.time )
 		{
 			self->swim_flag = g_globalvars.time + 1;
-			if ( g_random(  ) < 0.5 )
+			if ( g_random() < 0.5 )
 				sound( self, 4, "misc/water1.wav", 1, 1 );
 			else
 				sound( self, 4, "misc/water2.wav", 1, 1 );
@@ -1608,7 +1608,7 @@ void PlayerJump(  )
 
 
 
-void WaterMove(  )
+void WaterMove()
 {
 	if ( self->s.v.movetype == MOVETYPE_NOCLIP )
 		return;
@@ -1688,7 +1688,7 @@ void WaterMove(  )
 	}
 }
 
-void CheckWaterJump(  )
+void CheckWaterJump()
 {
 	vec3_t  start;
 	vec3_t  end;
@@ -1739,7 +1739,7 @@ PlayerPreThink
 Called every frame before physics are run
 ================
 */
-void PlayerPreThink(  )
+void PlayerPreThink()
 {
 //      float   mspeed;
 //      float   aspeed;
@@ -1756,7 +1756,7 @@ void PlayerPreThink(  )
 
 	if ( intermission_running )
 	{
-		IntermissionThink(  );	// otherwise a button could be missed between
+		IntermissionThink();	// otherwise a button could be missed between
 		return;		// the think tics
 	}
 
@@ -1766,7 +1766,7 @@ void PlayerPreThink(  )
 	{
 		if ( self->s.v.button2 && self->current_menu == MENU_TEAM && !self->team_no )
 		{
-			if ( TeamFortress_TeamPutPlayerInTeam(  ) )
+			if ( TeamFortress_TeamPutPlayerInTeam() )
 			{
 				self->current_menu = MENU_CLASS;
 				self->menu_count = MENU_REFRESH_RATE;
@@ -1776,12 +1776,12 @@ void PlayerPreThink(  )
 	if ( self->s.v.view_ofs[0] == 0 && self->s.v.view_ofs[1] == 0 && self->s.v.view_ofs[2] == 0 )
 		return;		// intermission or finale
 
-	CheckRules(  );
+	CheckRules();
 	if ( self->playerclass )
-		WaterMove(  );
+		WaterMove();
 	if ( self->s.v.deadflag >= DEAD_DEAD )
 	{
-		PlayerDeathThink(  );
+		PlayerDeathThink();
 		return;
 	}
 
@@ -1798,7 +1798,7 @@ void PlayerPreThink(  )
 	if ( !self->is_feigning )
 	{
 		if ( self->s.v.button2 )
-			PlayerJump(  );
+			PlayerJump();
 		else
 			self->s.v.flags = ( int ) self->s.v.flags | FL_JUMPRELEASED;
 	} else
@@ -1810,11 +1810,11 @@ void PlayerPreThink(  )
 		SetVector( self->s.v.velocity, 0, 0, 0 );
 	if ( g_globalvars.time > self->attack_finished && !self->s.v.currentammo && self->s.v.weapon > 16 )
 	{
-		self->s.v.weapon = W_BestWeapon(  );
-		W_SetCurrentAmmo(  );
+		self->s.v.weapon = W_BestWeapon();
+		W_SetCurrentAmmo();
 	}
 	if ( self->on_hook )
-		Service_Grapple(  );
+		Service_Grapple();
 }
 
 /////////////////////////////////////////////////////////////////
@@ -1825,7 +1825,7 @@ CheckPowerups
 Check for turning off powerups
 ================
 */
-void CheckPowerups(  )
+void CheckPowerups()
 {
 	float   lighton;
 	gedict_t *te;
@@ -1853,7 +1853,7 @@ void CheckPowerups(  )
 				if ( self->invisible_sound < g_globalvars.time )
 				{
 					sound( self, 0, "items/inv3.wav", 0.5, 2 );
-					self->invisible_sound = g_globalvars.time + g_random(  ) * 3 + 1;
+					self->invisible_sound = g_globalvars.time + g_random() * 3 + 1;
 				}
 				if ( self->invisible_finished < g_globalvars.time + 3 )
 				{
@@ -2023,7 +2023,7 @@ void CheckPowerups(  )
 // time
 // self
 ///////////////
-void PlayerPostThink(  )
+void PlayerPostThink()
 {
 //      float   mspeed;
 //      float   aspeed;
@@ -2034,7 +2034,7 @@ void PlayerPostThink(  )
 		return;		// intermission or finale
 	if ( self->s.v.deadflag )
 	{
-		DeadImpulses(  );
+		DeadImpulses();
 		self->s.v.impulse = 0;
 		return;
 	}
@@ -2064,10 +2064,10 @@ void PlayerPostThink(  )
 		}
 	}
 	self->jump_flag = self->s.v.velocity[2];
-	CheckPowerups(  );
-	W_WeaponFrame(  );
+	CheckPowerups();
+	W_WeaponFrame();
 	if ( self->motd <= 95 )
-		TeamFortress_MOTD(  );
+		TeamFortress_MOTD();
 	else
 	{
 		if ( !self->cheat_check )
@@ -2083,7 +2083,7 @@ void PlayerPostThink(  )
 	}
 	if ( self->cheat_check <= g_globalvars.time )
 	{
-		TeamFortress_CheckTeamCheats(  );
+		TeamFortress_CheckTeamCheats();
 		self->cheat_check = g_globalvars.time + 3;
 	}
 }
@@ -2095,7 +2095,7 @@ void PlayerPostThink(  )
 // params
 ///////////////
 
-void ClientConnect(  )
+void ClientConnect()
 {
 	gedict_t *te;
 	int     sbres;
@@ -2151,7 +2151,7 @@ void ClientConnect(  )
 	self->has_disconnected = 0;
 
 	if ( intermission_running )
-		GotoNextMap(  );
+		GotoNextMap();
 
 	GetSVInfokeyString( "apw", "adminpwn", st2, sizeof( st2 ), "" );
 	GetInfokeyString( self, "apw", "adminpwn", st, sizeof( st ), "" );
@@ -2203,8 +2203,8 @@ void ClientConnect(  )
 				KickCheater( self );
 				return;
 			}
-			last_id = last_id + 20 + g_random(  ) * 10;
-			self->tf_id = floor( g_random(  ) * 10 + last_id );
+			last_id = last_id + 20 + g_random() * 10;
+			self->tf_id = floor( g_random() * 10 + last_id );
 			stuffcmd( self, "setinfo tf_id %d\n", self->tf_id );
 			G_sprint( self, 2, "Your Battle ID is %d\n", self->tf_id );
 		}
@@ -2222,7 +2222,7 @@ void ClientConnect(  )
 ///////////////
 
 
-void ClientDisconnect(  )
+void ClientDisconnect()
 {
 	gedict_t *te;
 
@@ -2233,7 +2233,7 @@ void ClientDisconnect(  )
 	sound( self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_NONE );
 
 	self->has_disconnected = 1;
-	TeamFortress_RemoveTimers(  );
+	TeamFortress_RemoveTimers();
 	Engineer_RemoveBuildings( self );
 	te = find( world, FOFS( s.v.classname ), "detpack" );
 	while ( te )
@@ -2258,7 +2258,7 @@ void ClientDisconnect(  )
 	}
 	if ( tf_data.clanbattle && self->tf_id )
 	{
-		te = spawn(  );
+		te = spawn();
 		te->s.v.classname = "ghost";
 		te->tf_id = self->tf_id;
 		te->team_no = self->team_no;
@@ -2269,7 +2269,7 @@ void ClientDisconnect(  )
 		if ( self->tfstate & 8 )
 			te->tfstate = 8;
 	}
-	set_suicide_frame(  );
+	set_suicide_frame();
 	//self->s.v.netname = "";
 	self->team_no = 0;
 	self->s.v.solid = 0;
@@ -2284,1004 +2284,755 @@ called when a player dies
 ============
 */
 
-//FIX ME
 void ClientObituary( gedict_t * targ, gedict_t * attacker )
 {
- /*float rnum;
- string deathstring;
- string deathstring2;
- float attackerteam;
- float targteam;
- gedict_t* te;
+	float   rnum;
+	char   *deathstring = "";
+	//char   *deathstring2 = "";
+	//float   attackerteam;
+	//float   targteam;
+	//gedict_t *te;
 
- rnum = g_random();
- if (cb_prematch_time + 3 > g_globalvars.time) 
-  return;
- if (streq(targ->s.v.classname, "player")) {
-  if (streq(attacker->s.v.classname, "teledeath")) {
-   bprint(1, targ.netname);
-   bprint(1, " was telefragged by ");
-   bprint(1, attacker->s.v.owner.netname);
-   bprint(1, "\n");
-   if (attacker->s.v.owner.team_no != targ.team_no || attacker->s.v.owner.team_no < 1) 
-    TF_AddFrags(attacker->s.v.owner, 1);
-   return;
-  }
-  if (streq(attacker->s.v.classname, "teledeath2")) {
-   bprint(1, "Satan's power deflects ");
-   bprint(1, targ.netname);
-   bprint(1, "'s telefrag\n");
-   TF_AddFrags(targ, -1);
-   logfrag(targ, targ);
-   return;
-  }
-  if (deathmsg == 37) {
-   bprint(1, targ.netname);
-   bprint(1, " shoots his teammate one too many times.\n");
-   return;
-  }
-  if (streq(attacker->s.v.classname, "info_tfgoal") || attacker->s.v.classname  == "item_tfgoal") {
-   if (attacker->deathtype != "") {
-    bprint(1, targ.netname);
-    bprint(1, attacker->deathtype);
-   }
-   logfrag(targ, targ);
-   return;
-  }
-  if (streq(attacker->s.v.classname, "player") || attacker->s.v.classname  == "bot") {
-   if (targ == attacker) {
-    TF_AddFrags(attacker, -1);
-    if (birthday == 1 && random() < 0.3) {
-     if (random() < 0.1) {
-      bprint(1, "It's ");
-      bprint(1, targ.netname);
-      bprint(1, "'s party and he'll cry if he wants to!\n");
-      return;
-     }
-     bprint(1, targ.netname);
-     if (random() < 0.5) 
-      bprint(1, " gets too selfish with his gifts\n");
-     else 
-      bprint(1, " wasn't born so beautiful after all\n");
-     return;
-    }
-    bprint(1, targ.netname);
-    if (deathmsg == 8) {
-     if (targ->playerclass == 2) 
-      deathstring = " got splattered by his own grenade\n";
-     else {
-      if (targ->playerclass == 3) 
-       deathstring = " sat on his own grenade\n";
-      else {
-       if (targ->playerclass == 4) 
-        deathstring = " got to know his grenade too well\n";
-       else {
-        if (targ->playerclass == 5) 
-         deathstring = " caught the end of his own grenade\n";
-        else {
-         if (targ->playerclass == 6) 
-          deathstring = " got too close to his own grenade\n";
-         else {
-          if (targ->playerclass == 7) 
-           deathstring = " let his own grenade get the best of him\n";
-          else {
-           if (targ->playerclass == 8) 
-            deathstring = " tiptoed over his own grenade\n";
-           else {
-            if (targ->playerclass == 9) 
-             deathstring = " stared at his grenade too long\n";
-            else 
-             deathstring = " grenades himself\n";
-           }
-          }
-         }
-        }
-       }
-      }
-     }
-    }
-    else {
-     if (deathmsg == 9) 
-      deathstring = " hammers himself\n";
-     else {
-      if (deathmsg == 10) {
-       if (targ->playerclass == 4) 
-        deathstring = " practiced his own Mirv dance\n";
-       else {
-        if (targ->playerclass == 6) 
-         deathstring = " allowed his Mirv to turn against him\n";
-        else 
-         deathstring = " goes to pieces\n";
-       }
-      }
-      else {
-       if (deathmsg == 11) 
-        deathstring = " ambushes himself with his own pipebombs\n";
-       else {
-        if (deathmsg == 40) 
-         deathstring = " tried to juggle his own pipebombs\n";
-        else {
-         if (deathmsg == 24) 
-          deathstring = " chokes on his own gas\n";
-         else {
-          if (deathmsg == 30) 
-           deathstring = " explodes his ammo and body\n";
-          else {
-           if (deathmsg == 41) 
-            deathstring = " stepped on too many of his own caltrops\n";
-           else {
-            if (deathmsg == 35) 
-             deathstring = " is charred by his own flash grenade\n";
-            else {
-             if (deathmsg == 31) 
-              deathstring = " detonates an ammo box too close to him\n";
-             else {
-              if (deathmsg == 12) 
-               deathstring = " set the detpack and forgot to run\n";
-              else {
-               if (deathmsg == 13) 
-                deathstring = " died impossibly!\n";
-               else {
-                if (deathmsg == 6) {
-                 if (rnum) 
-                  deathstring = " becomes bored with life\n";
-                 else 
-                  deathstring = " checks if his weapon is loaded\n";
-                }
-                else {
-                 if (deathmsg == 33) 
-                  deathstring = " chars himself with an incendiary rocket\n";
-                 else {
-                  if (deathmsg == 5) 
-                   deathstring = " tries to put the pin back in\n";
-                  else {
-                   if (deathmsg == 15) 
-                    deathstring = " torches himself\n";
-                   else {
-                    if (deathmsg == 7 && targ->s.v.waterlevel > 1) {
-                     bprint(1, " discharges into the water.\n");
-                     return;
-                    }
-                    else {
-                     if (deathmsg == 38) 
-                      deathstring = " gets too friendly with his sentrygun.\n";
-                     else {
-                      if (deathmsg == 39) 
-                       deathstring = " dispenses with himself.\n";
-                     }
-                    }
-                   }
-                  }
-                 }
-                }
-               }
-              }
-             }
-            }
-           }
-          }
-         }
-        }
-       }
-      }
-     }
-    }
-    bprint(1, deathstring);
-    return;
-   }
-   else {
-    if (teamplay && attacker.team_no == targ.team_no && attacker.team_no > 0) {
-     TF_AddFrags(attacker, -1);
-     if (!targ.undercover_team) 
-      attacker.teamkills = attacker.teamkills + 1;
-     if (birthday == 1 && random() < 0.3) {
-      if (random() < 0.3) 
-       bprint2(1, targ.netname, " is a party-pooper!\n");
-      else 
-       bprint2(1, targ.netname, " gives gifts to his teammates!\n");
-      return;
-     }
-     deathstring2 = "\n";
-     if (rnum < 0.25) {
-      deathstring = " mows down teammate ";
-      deathstring2 = "\n";
-     }
-     else {
-      if (rnum < 0.5) {
-       deathstring = " checks his glasses after killing ";
-       deathstring2 = "\n";
-      }
-      else {
-       if (rnum < 0.75) {
-        deathstring = " gets a frag for the other team with ";
-        deathstring2 = "'s death\n";
-       }
-       else {
-        deathstring = " killed his supposed friend ";
-        deathstring2 = "\n";
-       }
-      }
-     }
-     if (deathmsg == 23) {
-      bprint(1, targ.netname);
-      bprint(1, " didn't survive the operation by ");
-      bprint(1, attacker.netname);
-      bprint(1, "\n");
-      return;
-     }
-     bprint(1, attacker.netname);
-     bprint(1, deathstring);
-     bprint(1, targ.netname);
-     bprint(1, deathstring2);
-     CheckAutoKick(attacker);
-     return;
-    }
-    else {
-     TF_AddFrags(attacker, 1);
-     logfrag(attacker, targ);
-     if (birthday == 1 && random() < 0.5) {
-      if (deathmsg == 9) {
-       deathstring = " chews on ";
-       deathstring2 = "'s nails!\n";
-      }
-      else {
-       if (deathmsg == 10) {
-        deathstring = " gathers the darling buds of ";
-        deathstring2 = "'s Mirv grenade\n";
-       }
-       else {
-        if (deathmsg == 30) {
-         deathstring = "'s presents go up in ";
-         deathstring2 = "'s EMP presence.\n";
-        }
-        else {
-         if (deathmsg == 35) {
-          bprint(1, targ.netname);
-          bprint(1, " goes POP!\n");
-          return;
-         }
-         else {
-          if (deathmsg == 31) {
-           deathstring = " stands to near ";
-           deathstring2 = "'s birthday surprise\n";
-          }
-          else {
-           if (deathmsg == 12) {
-            deathstring = " eats ";
-            deathstring2 = "'s good cheer!\n";
-            if (random() < 0.1) 
-             bprint(1, "Damn that jokey smurf!\n");
-           }
-           else {
-            if (deathmsg == 16) {
-             deathstring = " cut the red ribbon of ";
-             deathstring2 = "'s detpack\n";
-            }
-            else {
-             if (deathmsg == 5) {
-              deathstring = " recieves a gift from ";
-              deathstring2 = "\n";
-              if (targ->s.v.health < -40) {
-               deathstring = " plays pass-the-parcel with ";
-               deathstring2 = "\n";
-              }
-             }
-             else {
-              if (deathmsg == 6) {
-               deathstring = " rides ";
-               deathstring2 = "'s firecracker\n";
-               if (targ->s.v.health < -40) {
-                bprint(1, targ.netname);
-                bprint(1, " gets turned into little ");
-                bprint(1, targ.netname);
-                bprint(1, "'s by ");
-                bprint(1, attacker.netname);
-                bprint(1, deathstring2);
-                return;
-               }
-              }
-              else {
-               if (deathmsg == 15) {
-                if (rnum < 0.5) {
-                 deathstring = " gets too close to ";
-                 deathstring2 = "'s kitchen\n";
-                }
-                else {
-                 deathstring = " plays with ";
-                 deathstring2 = "'s fire\n";
-                }
-               }
-               else {
-                if (deathmsg == 18) {
-                 if (rnum <= 0.3) {
-                  deathstring = " blocks ";
-                  deathstring2 = "'s birthday bullet with his chest\n";
-                 }
-                 else {
-                  deathstring = " gets party popped by ";
-                  deathstring2 = "\n";
-                 }
-                }
-                else {
-                 if (deathmsg == 29) {
-                  if (rnum <= 0.5) {
-                   deathstring = " ALMOST catches ";
-                   deathstring2 = "'s bullet between his teeth!\n";
-                  }
-                  else {
-                   deathstring = " loves snipers like ";
-                   deathstring2 = "\n";
-                  }
-                 }
-                 else {
-                  if (deathmsg == 28) {
-                   deathstring = " won't run crying to ";
-                   deathstring2 = " anymore\n";
-                  }
-                  else {
-                   if (deathmsg == 19) {
-                    deathstring = " collects ";
-                    deathstring2 = "'s highspeed gifts.\n";
-                   }
-                   else {
-                    if (deathmsg == 20) {
-                     deathstring = " died. I blame ";
-                     deathstring2 = "\n";
-                    }
-                    else {
-                     if (deathmsg == 22) {
-                      deathstring = " gets a gift in the back from ";
-                      deathstring2 = "\n";
-                     }
-                     else {
-                      if (deathmsg == 2) {
-                       deathstring = " gets a double of ";
-                       deathstring2 = "'s buck\n";
-                      }
-                      else {
-                       if (deathmsg == 25) {
-                        deathstring = " is all partied out by ";
-                        deathstring2 = "\n";
-                       }
-                       else {
-                        if (deathmsg == 26) {
-                         deathstring = " gets derailed by ";
-                         deathstring2 = "\n";
-                        }
-                        else {
-                         if (deathmsg == 3) {
-                          deathstring = " gets no say in it, no say in it at all! sings ";
-                          deathstring2 = "\n";
-                         }
-                         else {
-                          if (deathmsg == 33) {
-                           deathstring = " gets all fired up by ";
-                           deathstring2 = "\n";
-                          }
-                          else {
-                           if (random() < 0.5) 
-                            deathstring = " recieves a gift from ";
-                           else 
-                            deathstring = " has a happy birthday, thanks to ";
-                           deathstring2 = "\n";
-                          }
-                         }
-                        }
-                       }
-                      }
-                     }
-                    }
-                   }
-                  }
-                 }
-                }
-               }
-              }
-             }
-            }
-           }
-          }
-         }
-        }
-       }
-      }
-      bprint(1, targ.netname);
-      bprint(1, deathstring);
-      bprint(1, attacker.netname);
-      bprint(1, deathstring2);
-      return;
-     }
-     if (deathmsg == 8) {
-      if (attacker->playerclass == 2) {
-       deathstring = " got up-close and personal with ";
-       deathstring2 = "'s grenade\n";
-      }
-      else {
-       if (attacker->playerclass == 3) {
-        deathstring = " played catch with ";
-        deathstring2 = "'s grenade\n";
-       }
-       else {
-        if (attacker->playerclass == 4) {
-         deathstring = " received a pineapple enema from ";
-         deathstring2 = "\n";
-        }
-        else {
-         if (attacker->playerclass == 5) {
-          deathstring = " fetched ";
-          deathstring2 = "'s pineapple\n";
-         }
-         else {
-          if (attacker->playerclass == 6) {
-           deathstring = " caught too much shrapnel from ";
-           deathstring2 = "'s grenade\n";
-          }
-          else {
-           if (attacker->playerclass == 7) {
-            deathstring = " tried to pick up ";
-            deathstring2 = "'s hot potato\n";
-           }
-           else {
-            if (attacker->playerclass == 8) {
-             deathstring = " thought ";
-             deathstring2 = " was tossing him a spare grenade\n";
-            }
-            else {
-             if (attacker->playerclass == 9) {
-              deathstring = " stops to ponder the technical details of ";
-              deathstring2 = "'s grenade\n";
-             }
-             else {
-              deathstring = " surfs on a grenade from ";
-              deathstring2 = "\n";
-             }
-            }
-           }
-          }
-         }
-        }
-       }
-      }
-     }
-     else {
-      if (deathmsg == 9) {
-       deathstring = " gets flayed by ";
-       deathstring2 = "'s nail grenade\n";
-      }
-      else {
-       if (deathmsg == 10) {
-        if (attacker->playerclass == 4) {
-         deathstring = " does a dance on ";
-         deathstring2 = "'s Mirv grenade\n";
-        }
-        else {
-         deathstring = " gets spammed by ";
-         deathstring2 = "'s Mirv grenade\n";
-        }
-       }
-       else {
-        if (deathmsg == 11) {
-         deathstring = " is caught by ";
-         deathstring2 = "'s pipebomb trap\n";
-        }
-        else {
-         if (deathmsg == 40) {
-          deathstring = " fell victim to ";
-          deathstring2 = "'s fireworks\n";
-         }
-         else {
-          if (deathmsg == 24) {
-           deathstring = " gags on ";
-           deathstring2 = "'s noxious gasses\n";
-          }
-          else {
-           if (deathmsg == 30) {
-            deathstring = "'s ammo detonates him as ";
-            deathstring2 = "'s EMP fries it\n";
-           }
-           else {
-            if (deathmsg == 41) {
-             deathstring = " stepped on too many of ";
-             deathstring2 = "'s caltrops\n";
-            }
-            else {
-             if (deathmsg == 35) {
-              deathstring = " is charred by ";
-              deathstring2 = "'s flash grenade\n";
-             }
-             else {
-              if (deathmsg == 31) {
-               deathstring = " stands near some ammo as ";
-               deathstring2 = "'s EMP nukes it\n";
-              }
-              else {
-               if (deathmsg == 12) {
-                deathstring = " reaches orbit via ";
-                deathstring2 = "'s detpack\n";
-               }
-               else {
-                if (deathmsg == 16) {
-                 deathstring = " cut the red wire of ";
-                 deathstring2 = "'s detpack\n";
-                }
-                else {
-                 if (deathmsg == 13) {
-                  deathstring = " dies from ";
-                  deathstring2 = "'s mysterious tropical disease\n";
-                 }
-                 else {
-                  if (deathmsg == 14) {
-                   deathstring = " escapes infection from ";
-                   deathstring2 = " by dying first\n";
-                  }
-                  else {
-                   if (deathmsg == 5) {
-                    deathstring = " eats ";
-                    deathstring2 = "'s pineapple\n";
-                    if (targ->s.v.health < -40) {
-                     deathstring = " was gibbed by ";
-                     deathstring2 = "'s grenade\n";
-                    }
-                   }
-                   else {
-                    if (deathmsg == 6) {
-                     deathstring = " rides ";
-                     deathstring2 = "'s rocket\n";
-                     if (targ->s.v.health < -40) {
-                      deathstring = " was gibbed by ";
-                      deathstring2 = "'s rocket\n";
-                     }
-                    }
-                    else {
-                     if (deathmsg == 15) {
-                      if (rnum < 0.2) {
-                       deathstring = " is burnt up by ";
-                       deathstring2 = "'s flame\n";
-                      }
-                      else {
-                       if (rnum < 0.4) {
-                        deathstring = " is fried by ";
-                        deathstring2 = "'s fire\n";
-                       }
-                       else {
-                        if (rnum < 0.6) {
-                         deathstring = " feels ";
-                         deathstring2 = "'s fire of wrath\n";
-                        }
-                        else {
-                         if (rnum < 0.8) {
-                          deathstring = " is reduced to ashes by ";
-                          deathstring2 = "\n";
-                         }
-                         else {
-                          deathstring = " is grilled by ";
-                          deathstring2 = "'s flame\n";
-                         }
-                        }
-                       }
-                      }
-                     }
-                     else {
-                      if (deathmsg == 17) {
-                       deathstring2 = "\n";
-                       if (attacker->playerclass == 8) 
-                        deathstring = " was knife-murdered by ";
-                       else {
-                        if (attacker->playerclass == 1) 
-                         deathstring = "'s mellon was split by ";
-                        else {
-                         if (attacker->playerclass == 2) 
-                          deathstring = " was put on the chop block by ";
-                         else {
-                          if (attacker->playerclass == 3) {
-                           deathstring = " was sliced and diced by ";
-                           deathstring2 = "'s blade\n";
-                          }
-                          else {
-                           if (attacker->playerclass == 4) {
-                            deathstring = " is split from crotch to sternum by ";
-                            deathstring2 = "'s axe swing\n";
-                           }
-                           else {
-                            if (attacker->playerclass == 6) 
-                             deathstring = " is split in two with a powerful axe blow from ";
-                            else {
-                             if (attacker->playerclass == 7) {
-                              deathstring = "'s death put another notch on ";
-                              deathstring2 = "'s axe\n";
-                             }
-                             else 
-                              deathstring = " was ax-murdered by ";
-                            }
-                           }
-                          }
-                         }
-                        }
-                       }
-                      }
-                      else {
-                       if (deathmsg == 32) {
-                        deathstring = " was spanner-murdered by ";
-                        deathstring2 = "\n";
-                       }
-                       else {
-                        if (deathmsg == 1) {
-                         if (attacker->playerclass == 1) {
-                          deathstring = " got too close to ";
-                          deathstring2 = "'s muzzleflash\n";
-                         }
-                         else {
-                          if (attacker->playerclass == 3) {
-                           deathstring = " practices being ";
-                           deathstring2 = "'s clay pigeon\n";
-                          }
-                          else {
-                           if (attacker->playerclass == 4) {
-                            deathstring = " was on the receiving end of ";
-                            deathstring2 = "'s shotgun barrel\n";
-                           }
-                           else {
-                            if (attacker->playerclass == 5) {
-                             deathstring = " was fed a lead diet by ";
-                             deathstring2 = "\n";
-                            }
-                            else {
-                             if (attacker->playerclass == 6) {
-                              deathstring = " got blasted by ";
-                              deathstring2 = "'s last resort\n";
-                             }
-                             else {
-                              if (attacker->playerclass == 7) {
-                               deathstring = " got more than a powderburn from ";
-                               deathstring2 = "'s shotgun blast\n";
-                              }
-                              else {
-                               deathstring = " chewed on ";
-                               deathstring2 = "'s boomstick\n";
-                              }
-                             }
-                            }
-                           }
-                          }
-                         }
-                        }
-                        else {
-                         if (deathmsg == 2) {
-                          if (attacker->playerclass == 3) {
-                           deathstring = " was turned into swiss cheese by ";
-                           deathstring2 = "'s buckshot\n";
-                          }
-                          else {
-                           if (attacker->playerclass == 5) {
-                            deathstring = " got a double-dose of ";
-                            deathstring2 = "'s buckshot\n";
-                           }
-                           else {
-                            if (attacker->playerclass == 6) {
-                             deathstring = " unfortunately forgot ";
-                             deathstring2 = " carried a super-shotgun\n";
-                            }
-                            else {
-                             if (attacker->playerclass == 8) {
-                              deathstring = " gets ventilated by ";
-                              deathstring2 = "'s super-shotgun blast\n";
-                             }
-                             else {
-                              if (attacker->playerclass == 9) {
-                               deathstring = "'s body got chuck full of ";
-                               deathstring2 = "'s lead pellets\n";
-                              }
-                              else {
-                               deathstring = " ate 2 loads of ";
-                               deathstring2 = "'s buckshot\n";
-                              }
-                             }
-                            }
-                           }
-                          }
-                         }
-                         else {
-                          if (deathmsg == 3) {
-                           if (attacker->playerclass == 1) {
-                            deathstring = " caught one too many nails from ";
-                            deathstring2 = "\n";
-                           }
-                           else {
-                            if (attacker->playerclass == 2) {
-                             deathstring = " ran into ";
-                             deathstring2 = "'s nails\n";
-                            }
-                            else {
-                             if (attacker->playerclass == 8) {
-                              deathstring = " was turned into ";
-                              deathstring2 = "'s pin-cushion\n";
-                             }
-                             else {
-                              deathstring = " was nailed by ";
-                              deathstring2 = "\n";
-                             }
-                            }
-                           }
-                          }
-                          else {
-                           if (deathmsg == 4) {
-                            deathstring = " was punctured by ";
-                            deathstring2 = "\n";
-                           }
-                           else {
-                            if (deathmsg == 7) {
-                             deathstring = " accepts ";
-                             if (attacker->s.v.waterlevel > 1) 
-                              deathstring2 = "'s discharge\n";
-                             else 
-                              deathstring2 = "'s shaft\n";
-                            }
-                            else {
-                             if (deathmsg == 21) {
-                              deathstring = " grappled with ";
-                              deathstring2 = "\n";
-                             }
-                             else {
-                              if (deathmsg == 18) {
-                               if (rnum <= 0.3) {
-                                deathstring = " takes a bullet in the chest from ";
-                                deathstring2 = "\n";
-                               }
-                               else {
-                                deathstring = " succumbs to sniperfire from ";
-                                deathstring2 = "\n";
-                               }
-                              }
-                              else {
-                               if (deathmsg == 29) {
-                                if (rnum <= 0.5) {
-                                 deathstring = " gets a third eye from ";
-                                 deathstring2 = "\n";
-                                }
-                                else {
-                                 deathstring = " gets his head blown off by ";
-                                 deathstring2 = "\n";
-                                }
-                               }
-                               else {
-                                if (deathmsg == 28) {
-                                 if (rnum <= 0.5) {
-                                  deathstring = " is made legless by ";
-                                  deathstring2 = "\n";
-                                 }
-                                 else {
-                                  deathstring = " gets his legs blown off by ";
-                                  deathstring2 = "\n";
-                                 }
-                                }
-                                else {
-                                 if (deathmsg == 19) {
-                                  deathstring = " collects ";
-                                  deathstring2 = "'s bullet spray.\n";
-                                 }
-                                 else {
-                                  if (deathmsg == 20) {
-                                   deathstring = " gets sawn in half by ";
-                                   deathstring2 = "\n";
-                                  }
-                                  else {
-                                   if (deathmsg == 22) {
-                                    deathstring = " gets knifed from behind by ";
-                                    deathstring2 = "\n";
-                                   }
-                                   else {
-                                    if (deathmsg == 25) {
-                                     deathstring = " is put to sleep by ";
-                                     deathstring2 = "\n";
-                                    }
-                                    else {
-                                     if (deathmsg == 26) {
-                                      deathstring = " gets a hole in his heart from ";
-                                      deathstring2 = "'s railgun\n";
-                                     }
-                                     else {
-                                      if (deathmsg == 33) {
-                                       deathstring = " gets well done by ";
-                                       deathstring2 = "'s incendiary rocket\n";
-                                      }
-                                      else {
-                                       if (deathmsg == 38) {
-                                        deathstring = " gets destroyed by ";
-                                        deathstring2 = "'s exploding sentrygun\n";
-                                       }
-                                       else {
-                                        if (deathmsg == 39) {
-                                         deathstring = " didn't insert the correct change into ";
-                                         deathstring2 = "'s dispenser.\n";
-                                        }
-                                       }
-                                      }
-                                     }
-                                    }
-                                   }
-                                  }
-                                 }
-                                }
-                               }
-                              }
-                             }
-                            }
-                           }
-                          }
-                         }
-                        }
-                       }
-                      }
-                     }
-                    }
-                   }
-                  }
-                 }
-                }
-               }
-              }
-             }
-            }
-           }
-          }
-         }
-        }
-       }
-      }
-     }
-     bprint(1, targ.netname);
-     bprint(1, deathstring);
-     bprint(1, attacker.netname);
-     bprint(1, deathstring2);
-    }
-   }
-   return;
-  }
-  else {
-   if (streq(attacker->s.v.classname, "building_sentrygun")) {
-    if (targ == attacker.real_owner) {
-     if (deathmsg == 34) 
-      deathstring = " intercepts his sentry gun's rocket\n";
-     else {
-      if (deathmsg == 27) 
-       deathstring = " crossed his sentry gun's line of fire\n";
-     }
-     bprint(1, targ.netname);
-     bprint(1, deathstring);
-    }
-    else {
-     if (teamplay && attacker.team_no == targ.team_no && attacker.team_no > 0) {
-      bprint(1, targ.netname);
-      bprint(1, " obstructs his team's sentry gun\n");
-     }
-     else {
-      TF_AddFrags(attacker.real_owner, 1);
-      logfrag(attacker.real_owner, targ);
-      if (deathmsg == 34) {
-       deathstring = " hates ";
-       deathstring2 = "'s sentry gun\n";
-      }
-      else {
-       if (deathmsg == 27) {
-        deathstring = " is mown down by ";
-        deathstring2 = "'s sentry gun\n";
-       }
-      }
-      bprint(1, targ.netname);
-      bprint(1, deathstring);
-      bprint(1, attacker.real_owner.netname);
-      bprint(1, deathstring2);
-     }
-    }
-   }
-   else {
-    logfrag(targ, targ);
-    TF_AddFrags(targ, -1);
-    rnum = targ.watertype;
-    bprint(2, targ.netname);
-    if (rnum == -3) {
-     if (birthday == 1) {
-      if (random() < 0.5) 
-       deathstring = " bobs for apples\n";
-      else 
-       deathstring = " drowns in the punch\n";
-     }
-     else {
-      if (random() < 0.5) 
-       deathstring = " sleeps with the fishes\n";
-      else 
-       deathstring = " sucks it down\n";
-     }
-    }
-    else {
-     if (rnum == -4) {
-      if (random() < 0.5) 
-       deathstring = " gulped a load of slime\n";
-      else 
-       deathstring = " can't exist on slime alone\n";
-     }
-     else {
-      if (rnum == -5) {
-       if (targ->s.v.health < -15) 
-        deathstring = " burst into flames\n";
-       else {
-        if (random() < 0.5) 
-         deathstring = " turned into hot slag\n";
-        else 
-         deathstring = " visits the Volcano God\n";
-       }
-      }
-      else {
-       if (streq(attacker->s.v.classname, "explo_box")) 
-        deathstring = " blew up\n";
-       else {
-        if (attacker->s.v.solid  == 4 && attacker != world) 
-         deathstring = " was squished\n";
-        else {
-         if (targ->deathtype == "falling") {
-          targ->deathtype = string_null;
-          deathstring = " fell to his death\n";
-         }
-         else {
-          if (streq(attacker->s.v.classname, "trap_shooter") || attacker->s.v.classname  == "trap_spikeshooter") 
-           deathstring = " was spiked\n";
-          else {
-           if (streq(attacker->s.v.classname, "fireball")) 
-            deathstring = " ate a lavaball\n";
-           else {
-            if (streq(attacker->s.v.classname, "trigger_changelevel")) 
-             deathstring = " tried to leave\n";
-            else 
-             deathstring = " died\n";
-           }
-          }
-         }
-        }
-       }
-      }
-     }
-    }
-    bprint(1, deathstring);
-   }
-  }
- }
- else {
-  if (streq(targ->s.v.classname, "building_sentrygun")) {
-   if (streq(attacker->s.v.classname, "teledeath")) {
-    bprint(1, targ.real_owner.netname);
-    bprint(1, "'s sentrygun was telefragged by ");
-    bprint(1, attacker->s.v.owner.netname);
-    bprint(1, "\n");
-    return;
-   }
-   if (streq(attacker->s.v.classname, "player")) {
-    if (attacker == targ.real_owner) {
-     bprint(1, targ.real_owner.netname);
-     bprint(1, " destroys his sentrygun\n");
-     return;
-    }
-    bprint(1, targ.real_owner.netname);
-    bprint(1, "'s sentrygun was destroyed by ");
-    bprint(1, attacker.netname);
-    bprint(1, "\n");
-    if (attacker.team_no > 0 && attacker.team_no == targ.real_owner.team_no) {
-     TF_AddFrags(attacker, -1);
-     attacker.teamkills = attacker.teamkills + 1;
-     CheckAutoKick(attacker);
-    }
-    else 
-     TF_AddFrags(attacker, 1);
-    return;
-   }
-  }
-  else {
-   if (streq(targ->s.v.classname, "building_dispenser")) {
-    if (attacker.team_no > 0 && attacker.team_no == targ.real_owner.team_no) {
-     TF_AddFrags(attacker, -1);
-     attacker.teamkills = attacker.teamkills + 1;
-     CheckAutoKick(attacker);
-    }
-   }
-  }
- }*/
+	rnum = g_random();
+	if ( tf_data.cb_prematch_time + 3 > g_globalvars.time )
+		return;
+	if ( strneq( targ->s.v.classname, "player" ) )
+	{
+		if ( streq( targ->s.v.classname, "building_sentrygun" ) )
+		{
+			if ( streq( attacker->s.v.classname, "teledeath" ) )
+			{
+				G_bprint( 1, "%s's sentrygun was telefragged by %s\n", targ->real_owner->s.v.netname,
+					  PROG_TO_EDICT( attacker->s.v.owner )->s.v.netname );
+				return;
+			}
+			if ( streq( attacker->s.v.classname, "player" ) )
+			{
+				if ( attacker == targ->real_owner )
+				{
+					G_bprint( 1, "%s destroys his sentrygun\n", targ->real_owner->s.v.netname );
+					return;
+				}
+				G_bprint( 1, "%s's sentrygun was destroyed by %s\n", targ->real_owner->s.v.netname,
+					  attacker->s.v.netname );
+				if ( attacker->team_no > 0 && attacker->team_no == targ->real_owner->team_no )
+				{
+					TF_AddFrags( attacker, -1 );
+					attacker->teamkills = attacker->teamkills + 1;
+					CheckAutoKick( attacker );
+				} else
+					TF_AddFrags( attacker, 1 );
+				return;
+			}
+		} else
+		{
+			if ( streq( targ->s.v.classname, "building_dispenser" ) )
+			{
+				if ( attacker->team_no > 0 && attacker->team_no == targ->real_owner->team_no )
+				{
+					TF_AddFrags( attacker, -1 );
+					attacker->teamkills = attacker->teamkills + 1;
+					CheckAutoKick( attacker );
+				}
+			}
+		}
+	}
+	if ( strneq( targ->s.v.classname, "player" ) )
+		return;
+//player deaths
+	if ( streq( attacker->s.v.classname, "teledeath" ) )
+	{
+		G_bprint( 1, "%s was telefragged by %s\n", targ->s.v.netname,
+			  PROG_TO_EDICT( attacker->s.v.owner )->s.v.netname );
+		if ( PROG_TO_EDICT( attacker->s.v.owner )->team_no != targ->team_no
+		     || PROG_TO_EDICT( attacker->s.v.owner )->team_no < 1 )
+			TF_AddFrags( PROG_TO_EDICT( attacker->s.v.owner ), 1 );
+		return;
+	}
+	if ( streq( attacker->s.v.classname, "teledeath2" ) )
+	{
+		G_bprint( 1, "Satan's power deflects %s's telefrag\n", targ->s.v.netname );
+		TF_AddFrags( targ, -1 );
+		logfrag( targ, targ );
+		return;
+	}
+	if ( tf_data.deathmsg == DMSG_TEAMKILL )
+	{
+		G_bprint( 1, "%s shoots his teammate one too many times.\n", targ->s.v.netname );
+		return;
+	}
+	if ( streq( attacker->s.v.classname, "info_tfgoal" ) || streq( attacker->s.v.classname, "item_tfgoal" ) )
+	{
+		if ( attacker->deathtype && attacker->deathtype[0] )
+		{
+			G_bprint( 1, "%s%s", targ->s.v.netname, attacker->deathtype );
+		}
+		logfrag( targ, targ );
+		return;
+	}
+//player vs player or bot
+	if ( streq( attacker->s.v.classname, "player" ) || streq( attacker->s.v.classname, "bot" ) )
+	{
+		if ( targ == attacker )
+		{
+			TF_AddFrags( attacker, -1 );
+			if ( tf_data.birthday == 1 && g_random() < 0.3 )
+			{
+				if ( g_random() < 0.1 )
+				{
+					G_bprint( 1, "It's %s's party and he'll cry if he wants to!\n",
+						  targ->s.v.netname );
+					return;
+				}
+				if ( g_random() < 0.5 )
+					G_bprint( 1, "%s gets too selfish with his gifts\n", targ->s.v.netname );
+				else
+					G_bprint( 1, "%s wasn't born so beautiful after all\n", targ->s.v.netname );
+				return;
+			}
+			switch ( tf_data.deathmsg )
+			{
+			case 8:
+				switch ( targ->playerclass )
+				{
+				case 2:
+					deathstring = "%s got splattered by his own grenade\n";
+					break;
+				case 3:
+					deathstring = "%s sat on his own grenade\n";
+					break;
+				case 4:
+					deathstring = "%s got to know his grenade too well\n";
+					break;
+				case 5:
+					deathstring = "%s caught the end of his own grenade\n";
+					break;
+				case 6:
+					deathstring = "%s got too close to his own grenade\n";
+					break;
+				case 7:
+					deathstring = "%s let his own grenade get the best of him\n";
+					break;
+				case 8:
+					deathstring = "%s tiptoed over his own grenade\n";
+					break;
+				case 9:
+					deathstring = "%s stared at his grenade too long\n";
+					break;
+				default:
+					deathstring = "%s grenades himself\n";
+					break;
+				}
+				break;
+			case 9:
+				deathstring = "%s hammers himself\n";
+				break; 
+			case 10:
+				switch ( targ->playerclass )
+				{
+				case 4:
+					deathstring = "%s practiced his own Mirv dance\n";
+					break;
+				case 6:
+					deathstring = "%s allowed his Mirv to turn against him\n";
+					break;
+				default:
+					deathstring = "%s goes to pieces\n";
+					break;
+
+				}
+				break;
+			case 11:
+				deathstring = "%s ambushes himself with his own pipebombs\n";
+				break;
+			case 40:
+				deathstring = "%s tried to juggle his own pipebombs\n";
+				break;
+			case 24:
+				deathstring = "%s chokes on his own gas\n";
+				break;
+			case 30:
+				deathstring = "%s explodes his ammo and body\n";
+				break;
+			case 41:
+				deathstring = "%s stepped on too many of his own caltrops\n";
+				break;
+			case 35:
+				deathstring = "%s is charred by his own flash grenade\n";
+				break;
+			case 31:
+				deathstring = "%s detonates an ammo box too close to him\n";
+				break;
+			case 12:
+				deathstring = "%s set the detpack and forgot to run\n";
+				break;
+			case 13:
+				deathstring = "%s died impossibly!\n";
+				break;
+			case 6:
+				if ( rnum < 0.5 )
+					deathstring = "%s becomes bored with life\n";
+				else
+					deathstring = "%s checks if his weapon is loaded\n";
+				break;
+			case 33:
+				deathstring = "%s chars himself with an incendiary rocket\n";
+				break;
+			case 5:
+				deathstring = "%s tries to put the pin back in\n";
+				break;
+			case 15:
+				deathstring = "%s torches himself\n";
+				break;
+			case 7:
+				if ( targ->s.v.waterlevel > 1 )
+					deathstring = "%s discharges into the water.\n";
+				break;
+			case 38:
+				deathstring = "%s gets too friendly with his sentrygun.\n";
+				break;
+			case 39:
+				deathstring = "%s dispenses with himself.\n";
+				break;
+			}
+			G_bprint( 1, deathstring, targ->s.v.netname );
+			return;
+		}		//end of sucides
+		else
+		{
+			if ( teamplay && attacker->team_no == targ->team_no && attacker->team_no > 0 )
+			{
+				TF_AddFrags( attacker, -1 );
+				if ( !targ->undercover_team )
+					attacker->teamkills = attacker->teamkills + 1;
+				if ( tf_data.birthday == 1 && g_random() < 0.3 )
+				{
+					if ( g_random() < 0.3 )
+						G_bprint( 1, "%s is a party-pooper!\n", targ->s.v.netname );
+					else
+						G_bprint( 1, "%s gives gifts to his teammates!\n", targ->s.v.netname );
+					return;
+				}
+				switch ( ( int ) ( g_random() * 4 ) )
+				{
+				case 0:
+					deathstring = "%s mows down teammate %s\n";
+					break;
+				case 1:
+					deathstring = "%s checks his glasses after killing %s\n";
+					break;
+				case 2:
+					deathstring = "%s gets a frag for the other team with %s's death\n";
+					break;
+				default:
+					deathstring = "%s killed his supposed friend %s\n";
+					break;
+				}
+				if ( tf_data.deathmsg == 23 )
+				{
+					G_bprint( 1, "%s didn't survive the operation by %s\n", targ->s.v.netname,
+						  attacker->s.v.netname );
+					return;
+				}
+				G_bprint( 1, deathstring, attacker->s.v.netname, targ->s.v.netname );
+				CheckAutoKick( attacker );
+				return;
+			}	//end of teamkills
+			else
+			{
+				TF_AddFrags( attacker, 1 );
+				logfrag( attacker, targ );
+				if ( tf_data.birthday == 1 && g_random() < 0.5 )
+				{
+					switch ( tf_data.deathmsg )
+					{
+					case 9:
+						deathstring = "%s chews on %s's nails!\n";
+						break;
+					case 10:
+						deathstring = "%s gathers the darling buds of %s's Mirv grenade\n";
+						break;
+					case 30:
+						deathstring = "'s presents go up in %s's EMP presence.\n";
+						break;
+					case 35:
+						G_bprint( 1, "%s goes POP!\n", targ->s.v.netname );
+						return;
+					case 31:
+						deathstring = "%s stands to near %s's birthday surprise\n";
+						break;
+					case 12:
+						deathstring = "%s eats %s's good cheer!\n";
+						if ( g_random() < 0.1 )
+							G_bprint( 1, "Damn that jokey smurf!\n" );
+						break;
+					case 16:
+						deathstring = "%s cut the red ribbon of %s's detpack\n";
+						break;
+					case 5:
+						deathstring = "%s recieves a gift from %s\n";
+						if ( targ->s.v.health < -40 )
+							deathstring = "%s plays pass-the-parcel with %s\n";
+						break;
+					case 6:
+						deathstring = "%s rides %s's firecracker\n";
+						if ( targ->s.v.health < -40 )
+						{
+							G_bprint( 1,
+								  "%s gets turned into little %s's by %s's firecracker",
+								  targ->s.v.netname, targ->s.v.netname,
+								  attacker->s.v.netname );
+							return;
+						}
+						break;
+					case 15:
+						if ( ( int ) ( g_random() * 2 ) )
+							deathstring = "%s gets too close to %s's kitchen\n";
+						else
+							deathstring = "%s plays with %s's fire\n";
+						break;
+					case 18:
+						if ( ( int ) ( g_random() * 3 ) )
+							deathstring = "%s blocks %s's birthday bullet with his chest\n";
+						else
+							deathstring = "%s gets party popped by %s\n";
+						break;
+					case 29:
+						if ( ( int ) ( g_random() * 2 ) )
+							deathstring =
+							    "%s ALMOST catches %s's bullet between his teeth!\n";
+						else
+							deathstring = "%s loves snipers like %s\n";
+						break;
+					case 28:
+						deathstring = "%s won't run crying to %s anymore\n";
+						break;
+					case 19:
+						deathstring = "%s collects %s's highspeed gifts.\n";
+						break;
+					case 20:
+						deathstring = "%s died. I blame %s\n";
+						break;
+					case 22:
+						deathstring = "%s gets a gift in the back from %s\n";
+						break;
+					case 2:
+						deathstring = "%s gets a double of %s's buck\n";
+						break;
+					case 25:
+						deathstring = "%s is all partied out by %s\n";
+						break;
+					case 26:
+						deathstring = "%s gets derailed by %s\n";
+						break;
+					case 3:
+						deathstring = "%s gets no say in it, no say in it at all! sings %s\n";
+						break;
+					case 33:
+						deathstring = "%s gets all fired up by %s\n";
+						break;
+					default:	//death msg 8??? 
+						if ( ( int ) ( g_random() * 2 ) )
+							deathstring = "%s recieves a gift from %s\n";
+						else
+							deathstring = "%s has a happy birthday, thanks to %s\n";
+						break;
+
+					}
+					G_bprint( 1, deathstring, targ->s.v.netname, attacker->s.v.netname );
+					return;
+				}	//end of player vs player Birthday messages
+//normal player vs player messages
+				switch ( tf_data.deathmsg )
+				{
+				case 8:
+					switch ( attacker->playerclass )
+					{
+					case 2:
+						deathstring = "%s got up-close and personal with " "'s grenade\n";
+						break;
+					case 3:
+						deathstring = "%s played catch with " "'s grenade\n";
+						break;
+					case 4:
+						deathstring = "%s received a pineapple enema from " "\n";
+						break;
+					case 5:
+						deathstring = "%s fetched " "'s pineapple\n";
+						break;
+					case 6:
+						deathstring = "%s caught too much shrapnel from " "'s grenade\n";
+						break;
+					case 7:
+						deathstring = "%s tried to pick up " "'s hot potato\n";
+						break;
+					case 8:
+						deathstring = "%s thought " " was tossing him a spare grenade\n";
+						break;
+					case 9:
+						deathstring =
+						    "%s stops to ponder the technical details of " "'s grenade\n";
+						break;
+					default:
+						deathstring = "%s surfs on a grenade from " "\n";
+						break;
+					}
+					break;
+				case 9:
+					deathstring = "%s gets flayed by %s's nail grenade\n";
+					break;
+				case 10:
+					if ( attacker->playerclass == 4 )
+						deathstring = "%s does a dance on %s's Mirv grenade\n";
+					else
+						deathstring = "%s gets spammed by %s's Mirv grenade\n";
+					break;
+				case 11:
+					deathstring = "%s is caught by %s's pipebomb trap\n";
+					break;
+				case 40:
+					deathstring = "%s fell victim to %s's fireworks\n";
+					break;
+				case 24:
+					deathstring = "%s gags on %s's noxious gasses\n";
+					break;
+				case 30:
+					deathstring = "'s ammo detonates him as %s's EMP fries it\n";
+					break;
+				case 41:
+					deathstring = "%s stepped on too many of %s's caltrops\n";
+					break;
+				case 35:
+					deathstring = "%s is charred by %s's flash grenade\n";
+					break;
+				case 31:
+					deathstring = "%s stands near some ammo as %s's EMP nukes it\n";
+					break;
+				case 12:
+					deathstring = "%s reaches orbit via %s's detpack\n";
+					break;
+				case 16:
+					deathstring = "%s cut the red wire of %s's detpack\n";
+					break;
+				case 13:
+					deathstring = "%s dies from %s's mysterious tropical disease\n";
+					break;
+				case 14:
+					deathstring = "%s escapes infection from %s by dying first\n";
+					break;
+				case 5:
+					deathstring = "%s eats %s's pineapple\n";
+					if ( targ->s.v.health < -40 )
+						deathstring = "%s was gibbed by %s's grenade\n";
+					break;
+				case 6:
+					deathstring = "%s rides %s's rocket\n";
+					if ( targ->s.v.health < -40 )
+						deathstring = "%s was gibbed by %s's rocket\n";
+					break;
+				case 15:
+					switch ( ( int ) ( rnum * 5 ) )
+					{
+					case 0:
+						deathstring = "%s is burnt up by %s's flame\n";
+						break;
+					case 1:
+						deathstring = "%s is fried by %s's fire\n";
+						break;
+					case 2:
+						deathstring = "%s feels %s's fire of wrath\n";
+						break;
+					case 3:
+						deathstring = "%s is reduced to ashes by %s\n";
+						break;
+					default:
+						deathstring = "%s is grilled by %s's flame\n";
+						break;
+					}
+					break;
+				case 17:
+					switch ( attacker->playerclass )
+					{
+					case 8:
+						deathstring = "%s was knife-murdered by %s\n";
+						break;
+					case 1:
+						deathstring = "'s mellon was split by %s\n";
+						break;
+					case 2:
+						deathstring = "%s was put on the chop block by %s\n";
+						break;
+					case 3:
+						deathstring = "%s was sliced and diced by %s's blade\n";
+						break;
+					case 4:
+						deathstring = "%s is split from crotch to sternum by %s's axe swing\n";
+						break;
+					case 6:
+						deathstring = "%s is split in two with a powerful axe blow from %s\n";
+						break;
+					case 7:
+						deathstring = "'s death put another notch on %s's axe\n";
+						break;
+					default:
+						deathstring = "'s death put another notch on %s's axe\n";
+						break;
+					}
+					break;
+
+				case 32:
+					deathstring = "%s was spanner-murdered by %s\n";
+					break;
+				case 1:
+					switch ( attacker->playerclass )
+					{
+					case 1:
+						deathstring = "%s got too close to %s's muzzleflash\n";
+						break;
+					case 3:
+						deathstring = "%s practices being %s's clay pigeon\n";
+						break;
+					case 4:
+						deathstring = "%s was on the receiving end of %s's shotgun barrel\n";
+						break;
+					case 5:
+						deathstring = "%s was fed a lead diet by %s\n";
+						break;
+					case 6:
+						deathstring = "%s got blasted by %s's last resort\n";
+						break;
+					case 7:
+						deathstring = "%s got more than a powderburn from %s's shotgun blast\n";
+						break;
+					default:
+						deathstring = "%s chewed on %s's boomstick\n";
+						break;
+					}
+					break;
+				case 2:
+					switch ( attacker->playerclass )
+					{
+
+					case 3:
+						deathstring = "%s was turned into swiss cheese by %s's buckshot\n";
+						break;
+					case 5:
+						deathstring = "%s got a double-dose of %s's buckshot\n";
+						break;
+					case 6:
+						deathstring = "%s unfortunately forgot %s carried a super-shotgun\n";
+						break;
+					case 8:
+						deathstring = "%s gets ventilated by %s's super-shotgun blast\n";
+						break;
+					case 9:
+						deathstring = "'s body got chuck full of %s's lead pellets\n";
+						break;
+					default:
+						deathstring = "%s ate 2 loads of %s's buckshot\n";
+						break;
+					}
+					break;
+				case 3:
+					switch ( attacker->playerclass )
+					{
+					case 1:
+						deathstring = "%s caught one too many nails from %s\n";
+						break;
+					case 2:
+						deathstring = "%s ran into %s's nails\n";
+						break;
+					case 8:
+						deathstring = "%s was turned into %s's pin-cushion\n";
+						break;
+					default:
+						deathstring = "%s was nailed by %s\n";
+						break;
+					}
+					break;
+				case 4:
+					deathstring = "%s was punctured by %s\n";
+					break;
+				case 7:
+					if ( attacker->s.v.waterlevel > 1 )
+						deathstring = "%s accepts " "'s discharge\n";
+					else
+						deathstring = "%s accepts " "'s shaft\n";
+					break;
+				case 21:
+					deathstring = "%s grappled with %s\n";
+					break;
+				case 18:
+					if ( rnum <= 0.3 )
+					{
+						deathstring = "%s takes a bullet in the chest from %s\n";
+					} else
+					{
+						deathstring = "%s succumbs to sniperfire from %s\n";
+					}
+					break;
+				case 29:
+					if ( rnum <= 0.5 )
+					{
+						deathstring = "%s gets a third eye from %s\n";
+					} else
+					{
+						deathstring = "%s gets his head blown off by %s\n";
+					}
+					break;
+				case 28:
+					if ( rnum <= 0.5 )
+					{
+						deathstring = "%s is made legless by %s\n";
+					} else
+					{
+						deathstring = "%s gets his legs blown off by %s\n";
+					}
+					break;
+				case 19:
+					deathstring = "%s collects %s's bullet spray.\n";
+					break;
+				case 20:
+					deathstring = "%s gets sawn in half by %s\n";
+					break;
+				case 22:
+					deathstring = "%s gets knifed from behind by %s\n";
+					break;
+				case 25:
+					deathstring = "%s is put to sleep by %s\n";
+					break;
+				case 26:
+					deathstring = "%s gets a hole in his heart from %s's railgun\n";
+					break;
+				case 33:
+					deathstring = "%s gets well done by %s's incendiary rocket\n";
+					break;
+				case 38:
+					deathstring = "%s gets destroyed by %s's exploding sentrygun\n";
+					break;
+				case 39:
+					deathstring = "%s didn't insert the correct change into %s's dispenser.\n";
+					break;
+
+				}
+				G_bprint( 1, deathstring, targ->s.v.netname, attacker->s.v.netname );
+			}
+		}
+		return;
+	}			//end of player vs player
+	else
+	{
+		if ( streq( attacker->s.v.classname, "building_sentrygun" ) )
+		{
+			if ( targ == attacker->real_owner )
+			{
+				if ( tf_data.deathmsg == 34 )
+					deathstring = "%s intercepts his sentry gun's rocket\n";
+				else
+				{
+					if ( tf_data.deathmsg == 27 )
+						deathstring = "%s crossed his sentry gun's line of fire\n";
+				}
+				G_bprint( 1, deathstring, targ->s.v.netname );
+			} else
+			{
+				if ( teamplay && attacker->team_no == targ->team_no && attacker->team_no > 0 )
+				{
+					G_bprint( 1, "%s obstructs his team's sentry gun\n", targ->s.v.netname );
+				} else
+				{
+					TF_AddFrags( attacker->real_owner, 1 );
+					logfrag( attacker->real_owner, targ );
+					if ( tf_data.deathmsg == 34 )
+					{
+						deathstring = "%s hates %s's sentry gun\n";
+					} else
+					{
+						if ( tf_data.deathmsg == 27 )
+						{
+							deathstring = "%s is mown down by %s's sentry gun\n";
+						}
+					}
+					G_bprint( 1, deathstring, targ->s.v.netname,
+						  attacker->real_owner->s.v.netname );
+				}
+			}
+		} else
+		{
+			logfrag( targ, targ );
+			TF_AddFrags( targ, -1 );
+			rnum = targ->s.v.watertype;
+			switch ( ( int ) targ->s.v.watertype )
+			{
+			case -3:
+				if ( tf_data.birthday == 1 )
+				{
+					if ( g_random() < 0.5 )
+						deathstring = "%s bobs for apples\n";
+					else
+						deathstring = "%s drowns in the punch\n";
+				} else
+				{
+					if ( g_random() < 0.5 )
+						deathstring = "%s sleeps with the fishes\n";
+					else
+						deathstring = "%s sucks it down\n";
+				}
+				break;
+			case -4:
+				if ( g_random() < 0.5 )
+					deathstring = "%s gulped a load of slime\n";
+				else
+					deathstring = "%s can't exist on slime alone\n";
+				break;
+			case -5:
+				if ( targ->s.v.health < -15 )
+					deathstring = "%s burst into flames\n";
+				else
+				{
+					if ( g_random() < 0.5 )
+						deathstring = "%s turned into hot slag\n";
+					else
+						deathstring = "%s visits the Volcano God\n";
+				}
+				break;
+			default:
+				if ( streq( attacker->s.v.classname, "explo_box" ) )
+				{
+					deathstring = "%s blew up\n";
+					break;
+				}
+				if ( attacker->s.v.solid == 4 && attacker != world )
+				{
+					deathstring = "%s was squished\n";
+					break;
+				}
+				if ( streq( targ->deathtype, "falling" ) )
+				{
+					targ->deathtype = "";
+					deathstring = "%s fell to his death\n";
+					break;
+				}
+				if ( streq( attacker->s.v.classname, "trap_shooter" )
+				     || streq( attacker->s.v.classname, "trap_spikeshooter" ) )
+				{
+					deathstring = "%s was spiked\n";
+					break;
+				}
+				if ( streq( attacker->s.v.classname, "fireball" ) )
+				{
+					deathstring = "%s ate a lavaball\n";
+					break;
+				}
+				if ( streq( attacker->s.v.classname, "trigger_changelevel" ) )
+					deathstring = "%s tried to leave\n";
+				else
+					deathstring = "%s died\n";
+
+				break;
+
+			}
+			G_bprint( 1, deathstring, targ->s.v.netname );
+		}
+	}
 }
