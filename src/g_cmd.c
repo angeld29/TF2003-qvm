@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.6 2004-11-14 07:04:08 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.7 2004-12-17 01:57:46 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -43,7 +43,7 @@ qboolean ClientCommand(  )
 	if ( !strcmp( cmd_command, "test" ) )
 	{
 	     //!!!!!!remove me
-	     Test();
+//	     Test();
 	     return true;
 	}
 	if ( !strcmp( cmd_command, "tg" ) )
@@ -90,58 +90,8 @@ qboolean ClientUserInfoChanged()
 
 }
 
+
 void Test()
 {
-	char    value[1024];
-	float	h;
-	
-	if( trap_CmdArgc() < 2)
-	{
-		G_sprint( self, 2, "health %f %f\n",self->s.v.health, self->s.v.deadflag);
-	        return;
-	}
-	trap_CmdArgv( 1, value, sizeof( value ) );
-	h = atof(value);
-	if(h < 0)
-		h = 1;
-	TF_T_Damage( self, world, world, h, TF_TD_IGNOREARMOUR, 0 );
+
 }
-void Test_q()
-{
-	char    value[1024];
-	int type,dist;
-	vec3_t  src;
-	vec3_t  dst;
-	vec3_t  dir;
-	gedict_t *targ;
-
-	trap_CmdArgv( 1, value, sizeof( value ) );
-	type = atoi(value);
-	trap_CmdArgv( 2, value, sizeof( value ) );
-	dist = atoi(value);
-
-	VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
-	makevectors( self->s.v.v_angle );
-	VectorScale(g_globalvars.v_forward, dist, dir);
-	VectorAdd(src,dir,dst);
-	traceline( PASSVEC3( src ), PASSVEC3( dst ), type, self );
-       	trap_WriteByte( MSG_BROADCAST, SVC_TEMPENTITY );
-       	trap_WriteByte( MSG_BROADCAST, TE_TAREXPLOSION );
-       	trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[0] );
-       	trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[1] );
-       	trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[2] );
-       	trap_multicast( PASSVEC3( g_globalvars.trace_endpos ), MULTICAST_PHS );
-       	G_sprint(self, 2, "fraction %.3f\n",g_globalvars.trace_fraction);
-
-	if(g_globalvars.trace_ent)
-	{
-	        targ = PROG_TO_EDICT(g_globalvars.trace_ent);
-		G_sprint(self, 2, "ent %s\n",targ->s.v.classname);
-//		VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
-//		traceline( PASSVEC3( src ), PASSVEC3( dst ), type, self );
-         	
-	}
-	
-		
-}
-

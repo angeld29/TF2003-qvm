@@ -11,6 +11,7 @@ scanner на sentry, флаги
 sound on grens
 new menu system
 setting через cmd
+flare dmg
 
 Arena Mode
 bot sold like sentry
@@ -33,5 +34,6 @@ vote for classlimit(отдельных игроков)
 ну а голисовалки по картам, админсмкие вещи и 
 прочие менюшки, как я понимаю, ждут уже версию на С. 
 
+(отключаемый) автопроигрыш звуков на гренки
 
-flare dmg
+

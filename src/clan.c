@@ -141,9 +141,9 @@ void DumpClanScores(  )
 	teamfrags_q = tf_data.toggleflags & ( TFLAG_TEAMFRAGS | TFLAG_FULLTEAMSCORE );
 	for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
 	{
-		if ( te->team_no < 0 || te->team_no > 4 )
+		if ( te->team_no <= 0 || te->team_no > 4 )
 			continue;
-		t_unacc[te->team_no] = te->real_frags;
+		t_unacc[te->team_no] += te->real_frags;
 	}
 	for ( i = 1; i <= 4; i++ )
 		t_unacc[i] = teamfrags[i] - t_unacc[i];

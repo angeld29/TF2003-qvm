@@ -1182,7 +1182,7 @@ gedict_t *FindRandomTeamSpawnPoint( int team_num )
 		return world;
 	if ( numspots )
 	{
-		rndspot = g_random() * numspots;
+		rndspot = g_random() * (numspots-1);
 		for ( spot = world; (spot = trap_find( spot, FOFS( team_str_home ), team_spawn_str[team_num] )); )
 		{
 
@@ -1196,7 +1196,7 @@ gedict_t *FindRandomTeamSpawnPoint( int team_num )
 		}
 	} else			// not found no telefrag spot
 	{
-		rndspot = g_random() * numallspots;
+		rndspot = g_random() * (numallspots-1);
 		for ( spot = world; (spot = trap_find( spot, FOFS( team_str_home ), team_spawn_str[team_num] )); )
 		{
 
@@ -2233,7 +2233,7 @@ void ClientConnect()
 	sbres = GetInfokeyInt( self, "sbr", "sbar_res", 200 );
 	switch ( sbres )
 	{
-	case 738:
+	case 768:
 		self->StatusBarRes = 8;
 		break;
 	case 600:

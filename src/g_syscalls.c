@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.c,v 1.5 2004-12-09 14:34:22 AngelD Exp $
+ *  $Id: g_syscalls.c,v 1.6 2004-12-17 01:57:46 AngelD Exp $
  */
 
 //#include "g_local.h"
@@ -220,7 +220,7 @@ int trap_nextent( int n )
 }*/
 gedict_t* trap_find( gedict_t* ent,int fofs, char*str )
 {
-	return syscall( G_Find, (int)ent, fofs, (int)str );
+	return (gedict_t*)syscall( G_Find, (int)ent, fofs, (int)str );
 }
 
 
