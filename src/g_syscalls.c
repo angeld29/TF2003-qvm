@@ -1,5 +1,5 @@
 /*
- *  QWProgs-DM
+ *  QWProgs-QVM
  *  Copyright (C) 2004  [sd] angel
  *
  *  This code is based on Q3 VM code by Id Software, Inc.
@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.c,v 1.6 2004-12-17 01:57:46 AngelD Exp $
+ *  $Id: g_syscalls.c,v 1.7 2004-12-23 03:16:15 AngelD Exp $
  */
 
 //#include "g_local.h"
@@ -70,6 +70,13 @@ void trap_DPrintf( const char *fmt )
 {
 	syscall( G_DPRINT, (int)fmt );
 }
+
+void trap_conprint( const char *fmt )
+{
+	syscall( G_conprint, (int)fmt );
+}
+
+
 void trap_BPrint( int level, const char *fmt )
 {
 	syscall( G_BPRINT, level, (int) fmt );
@@ -159,6 +166,23 @@ void trap_localcmd( const char *fmt )
 {
 	syscall( G_LOCALCMD,(int) fmt );
 }
+
+void trap_executecmd()
+{
+	syscall( G_executecmd );
+}
+
+void trap_readcmd( const char *str, char* buf, int size )
+{
+	syscall( G_readcmd,(int) str, (int)buf, size );
+}
+
+void trap_redirectcmd( gedict_t* ent, char* str )
+{
+	syscall( G_redirectcmd,(int) ent, (int)str);
+}
+
+
 float trap_cvar( const char *var )
 {
 	fi_t tmp;

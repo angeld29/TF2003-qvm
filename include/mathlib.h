@@ -1,5 +1,5 @@
 /*
- *  QWProgs-DM
+ *  QWProgs-QVM
  *  Copyright (C) 2004  [sd] angel
  *
  *  This code is based on QuakeWorld DM mod code by Id Software, Inc.
@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: mathlib.h,v 1.1 2004-09-05 22:48:30 AngelD Exp $
+ *  $Id: mathlib.h,v 1.2 2004-12-23 03:16:14 AngelD Exp $
  */
 
 // mathlib.h

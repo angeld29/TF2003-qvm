@@ -1,3 +1,25 @@
+/*
+ *  QWProgs-TF2003
+ *  Copyright (C) 2004  [sd] angel
+ *
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *
+ *  $Id: client.c,v 1.28 2004-12-23 03:16:15 AngelD Exp $
+ */
 #include "g_local.h"
 
 //===========================================================================
@@ -528,12 +550,14 @@ void DecodeLevelParms()
 //////////////
 		tf_data.respawn_delay_time = GetSVInfokeyFloat( "rd", "respawn_delay", 0 );
 		
-		tf_data.pyrotype = GetSVInfokeyInt( "pyrotype", NULL, 0 )?1:0;
-
 		if ( tf_data.respawn_delay_time )
 			tf_data.toggleflags |= TFLAG_RESPAWNDELAY;
+
 		if ( ( tf_data.toggleflags & TFLAG_RESPAWNDELAY ) && !tf_data.respawn_delay_time )
 			tf_data.respawn_delay_time = 5;
+
+		tf_data.pyrotype = GetSVInfokeyInt( "pyrotype", NULL, 0 )?1:0;
+
 		if ( tf_data.toggleflags & TFLAG_AUTOTEAM )
 		{
 			tf_data.toggleflags -= ( tf_data.toggleflags & TFLAG_AUTOTEAM );
@@ -1182,7 +1206,7 @@ gedict_t *FindRandomTeamSpawnPoint( int team_num )
 		return world;
 	if ( numspots )
 	{
-		rndspot = g_random() * (numspots-1);
+		rndspot = g_random() * (numspots);
 		for ( spot = world; (spot = trap_find( spot, FOFS( team_str_home ), team_spawn_str[team_num] )); )
 		{
 
@@ -1196,7 +1220,7 @@ gedict_t *FindRandomTeamSpawnPoint( int team_num )
 		}
 	} else			// not found no telefrag spot
 	{
-		rndspot = g_random() * (numallspots-1);
+		rndspot = g_random() * (numallspots);
 		for ( spot = world; (spot = trap_find( spot, FOFS( team_str_home ), team_spawn_str[team_num] )); )
 		{
 
@@ -1364,10 +1388,10 @@ void PutClientInServer()
 	if ( self->tfstate & TFSTATE_RANDOMPC )
 	{
 		oldclass = self->playerclass;
-		self->playerclass = 1 + ( int ) ( g_random() * ( 10 - 1 ) );
+		self->playerclass = 1 + ( int ) ( g_random() * ( 9 ) );
 		while ( !IsLegalClass( self->playerclass )
 			|| self->playerclass == oldclass || ClassIsRestricted( self->team_no, self->playerclass ) )
-			self->playerclass = 1 + ( int ) ( g_random() * ( 10 - 1 ) );
+			self->playerclass = 1 + ( int ) ( g_random() * ( 9 ) );
 		self->tfstate = TFSTATE_RANDOMPC;
 		TeamFortress_ExecClassScript( self );
 	} else
@@ -2217,8 +2241,8 @@ void ClientConnect()
 {
 	gedict_t *te;
 	int     sbres;
-	char    st[64];
-	char    st2[64];
+	//char    st[64];
+	//char    st2[64];
 
 	int     got_one;
 
@@ -2271,7 +2295,7 @@ void ClientConnect()
 	if ( intermission_running )
 		GotoNextMap();
 
-	GetSVInfokeyString( "apw", "adminpwn", st2, sizeof( st2 ), "" );
+/*	GetSVInfokeyString( "apw", "adminpwn", st2, sizeof( st2 ), "" );
 	GetInfokeyString( self, "apw", "adminpwn", st, sizeof( st ), "" );
 
 	if ( st2[0] && st[0] && !strcmp( st, st2 ) )
@@ -2284,8 +2308,8 @@ void ClientConnect()
 		TeamFortress_Alias( "yes", 191, 0 );
 		TeamFortress_Alias( "no", 195, 0 );
 		TeamFortress_Alias( "ceasefire", 193, 0 );
-	} else
-		self->is_admin = 0;
+	} else*/
+	self->is_admin = 0;
 	if ( tf_data.clanbattle && self->has_disconnected != 1 )
 	{
 		got_one = 0;
@@ -2337,7 +2361,6 @@ void ClientConnect()
 // GlobalParams:
 // self
 ///////////////
-
 
 void ClientDisconnect()
 {
@@ -2402,6 +2425,9 @@ void ClientDisconnect()
 	self->team_no = 0;
 	self->s.v.solid = 0;
 	setsize( self, 0, 0, 0, 0, 0, 0 );
+//vote
+	if( current_vote != -1 )
+		votes[current_vote].VoteNo();
 }
 
 /*

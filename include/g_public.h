@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_public.h,v 1.5 2004-12-09 14:34:22 AngelD Exp $
+ *  $Id: g_public.h,v 1.6 2004-12-23 03:16:14 AngelD Exp $
  */
 
 #ifndef __G_PUBLIC_H__
@@ -31,7 +31,7 @@
 //
 // g_public.h -- game module information visible to server
 
-#define	GAME_API_VERSION	5
+#define	GAME_API_VERSION	6
 
 
 //===============================================================
@@ -121,7 +121,11 @@ typedef enum
 	G_strncmp,
 	G_stricmp,
 	G_strnicmp,
-	G_Find
+	G_Find,
+	G_executecmd,
+	G_conprint,
+	G_readcmd,
+	G_redirectcmd
 } gameImport_t;
 
 

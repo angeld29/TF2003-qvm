@@ -1,5 +1,5 @@
 /*
- *  QWProgs-DM
+ *  QWProgs-TF2003
  *  Copyright (C) 2004  [sd] angel
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_utils.c,v 1.6 2004-12-09 14:34:22 AngelD Exp $
+ *  $Id: g_utils.c,v 1.7 2004-12-23 03:16:15 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -38,7 +38,7 @@ int NUM_FOR_EDICT( gedict_t * e )
 
 float g_random(  )
 {
-	return ( rand(  ) & 0x7fff ) / ( ( float ) 0x7fff );
+	return ( rand(  ) & 0x7fff ) / ( ( float ) 0x8000 );
 }
 
 float crandom(  )

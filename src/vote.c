@@ -1,8 +1,6 @@
 /*
- *  QWProgs-KTFFA
+ *  QWProgs-TF2003
  *  Copyright (C) 2004  [sd] angel
- *
- *  This code is based on QuakeWorld KTFFA mod code by Cenobite and rc\sturm.
  *
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -20,13 +18,26 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: vote.c,v 1.2 2004-12-09 14:34:23 AngelD Exp $
+ *  $Id: vote.c,v 1.3 2004-12-23 03:16:15 AngelD Exp $
  */
 
 // vote.q: mapchange voting functions
 #include "g_local.h"
-int		k_vote;
+
+void Vote_ChangeMap_Init();
+void Vote_ChangeMap_Yes();
+void Vote_ChangeMap_No();
+vote_t votes[]=
+{
+	{"changemap", Vote_ChangeMap_Init, Vote_ChangeMap_Yes, Vote_ChangeMap_No, 60, 3},
+	{NULL}
+};
+int		k_vote = 0;
+int 		current_vote = -1;
+
+
 void NextLevel();
+
 
 int CountPlayers()
 {
@@ -47,6 +58,7 @@ void VoteThink()
 	G_bprint(2, "The voting has timed out.\n");
 	self->s.v.nextthink = -1;
 	k_vote = 0;
+	current_vote = -1;
         while((p = trap_find(p, FOFS(s.v.classname), "player"))) 
         {
 		if(p->s.v.netname[0] ) p->k_voted = 0;
@@ -54,16 +66,15 @@ void VoteThink()
 	dremove(self);
 }
 
-void VoteChange()
+void Vote_ChangeMap_Init()
 {
 	int f1;
 	gedict_t* voteguard;
 
-	if(k_vote) return;
-
 	f1 = CountPlayers();
 	if(f1 == 1) {
 		G_bprint(2, "%s changes map\n",self->s.v.netname);
+		current_vote = -1;
 		NextLevel();
 		return;	// in case we get back here
 	}
@@ -85,10 +96,10 @@ void VoteChange()
 	voteguard->s.v.owner = EDICT_TO_PROG(world);
 	voteguard->s.v.classname  = "voteguard";
 	voteguard->s.v.think = (func_t) VoteThink;
-	voteguard->s.v.nextthink = g_globalvars.time + 30;
+	voteguard->s.v.nextthink = g_globalvars.time + votes[current_vote].timeout;
 }
 
-void VoteYes()
+void Vote_ChangeMap_Yes()
 {
 	int 		f1, f2;
 	gedict_t* 	p = world;
@@ -108,6 +119,7 @@ void VoteYes()
 	if(k_vote >= f2) {
 		G_bprint(3, "Map changed by majority vote\n");
 		k_vote = 0;
+		current_vote = -1;
         	while((p = trap_find(p, FOFS(s.v.classname), "player"))) 
         	{
 			if(p->s.v.netname[0] ) p->k_voted = 0;
@@ -131,7 +143,7 @@ void VoteYes()
 		G_bprint(2, "%d‘ more vote needed\n",f1);	
 }
 
-void VoteNo()
+void Vote_ChangeMap_No()
 {
 	gedict_t* p;
 	int f1, f2;
@@ -150,6 +162,7 @@ void VoteNo()
 			p->s.v.classname  = "";
 		 	dremove(p);
 		}
+		current_vote = -1;
 		return;
 	}
 	f1 = CountPlayers();
@@ -160,10 +173,12 @@ void VoteNo()
 	else
 		G_bprint(2, "%d‘ more vote needed\n",f1);
 }
+
 void Vote_Cmd()
 {
         char    cmd_command[50];
-        int argc;
+        int argc,i;
+        vote_t*ucmd;
 
 	if ( tf_data.cb_prematch_time > g_globalvars.time )
 	{
@@ -171,32 +186,52 @@ void Vote_Cmd()
 	}
 
 	argc = trap_CmdArgc();
+	
 	if( argc != 2 )
 	{
-	        G_sprint(self, 2, "Usage:\n"
+	        G_sprint( self, 2, "Avaliable votes:\n");
+		for ( ucmd = votes ; ucmd->command  ; ucmd++ )
+		{
+			G_sprint( self, 2, "%s\n",ucmd->command);
+		}
+/*	        G_sprint(self, 2, "Usage:\n"
 	        		  "start vote: γνδ φοτε γθαξηεναπ\n"
 	        		  "vote yes  : γνδ φοτε ωεσ\n"
-	        		  "vote no   : γνδ φοτε ξο\n"
-	        		  );
+	        		  "vote no   : γνδ φοτε ξο\n");*/
 		return;
 	}
 
 	trap_CmdArgv( 1, cmd_command, sizeof( cmd_command ) );
-	if(!strcmp(cmd_command,"changemap"))
+	if( current_vote != -1 )
 	{
-	        VoteChange();
-		return;
-	}
+		if(!strcmp(cmd_command,"yes"))
+		{
+		        votes[current_vote].VoteYes();
+			return;
+		}
 
-	if(!strcmp(cmd_command,"yes"))
+		if(!strcmp(cmd_command,"no"))
+		{
+		        votes[current_vote].VoteNo();
+			return;
+		}
+		G_sprint( self, 2, "Vote %s in progress\n",votes[current_vote].command);
+	        return;
+	}
+	if( g_globalvars.time < self.last_vote_time )
 	{
-	        VoteYes();
+		G_sprint( self, 2, "You cannot vote at this time.\n");
 		return;
 	}
-	
-	if(!strcmp(cmd_command,"no"))
+	for ( ucmd = votes,i=0 ; ucmd->command  ; ucmd++,i++ )
 	{
-	        VoteNo();
-		return;
+		if( !strcmp(cmd_command,ucmd->command) )
+		{
+		        current_vote = i;
+		        self.last_vote_time = g_globalvars.time + votes[current_vote].pause * 60;
+			ucmd->VoteInit();
+			return;
+		}
 	}
+	G_sprint( self, 2, "Unknown vote.\n");
 }

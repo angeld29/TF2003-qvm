@@ -1,5 +1,5 @@
 /*
- *  QWProgs-DM
+ *  QWProgs-TF2003
  *  Copyright (C) 2004  [sd] angel
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.9 2004-12-20 04:21:59 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.10 2004-12-23 03:16:15 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -43,12 +43,14 @@ void	Vote_Cmd();
 void 	TeamFortress_Cmd_Discard(  );
 void 	Engineer_RotateSG(  );
 void 	TeamFortress_Cmd_Detpack();
+void 	Admin_Cmd();
 
 cmd_t cmds[] ={
 	{"kill",ClientKill},
 	{"test",Test},
 	{"tg",TG_Cmd},
 	{"vote",Vote_Cmd,CMD_NOT_PREMATCH},
+	{"admin",Admin_Cmd},
 	{"discard", TeamFortress_Cmd_Discard, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
 	{"sg_rotate",Engineer_RotateSG, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
 	{"detpack",TeamFortress_Cmd_Detpack, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},

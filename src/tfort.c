@@ -1,3 +1,25 @@
+/*
+ *  QWProgs-TF2003
+ *  Copyright (C) 2004  [sd] angel
+ *
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *
+ *  $Id: tfort.c,v 1.28 2004-12-23 03:16:15 AngelD Exp $
+ */
 #include "g_local.h"
 
 tf_server_data_t tf_data;
@@ -2745,6 +2767,7 @@ void TeamFortress_ExecMapScript( gedict_t * p )
 void KickCheater( gedict_t * p )
 {
 	stuffcmd( p, "disconnect\n" );
+	stuffcmd( p, "cmd drop\n" );
 
 	g_globalvars.msg_entity = EDICT_TO_PROG( p );
 	trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );

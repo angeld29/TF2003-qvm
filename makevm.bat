@@ -36,6 +36,10 @@ cd VM
 
 @if errorlevel 1 goto quit
 
+%CC% %CFLAGS% %INCFLAGS% %SRC%\admin_cmd.c
+
+@if errorlevel 1 goto quit
+
 %CC% %CFLAGS% %INCFLAGS% %SRC%\bg_lib.c
 
 @if errorlevel 1 goto quit

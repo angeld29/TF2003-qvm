@@ -1,5 +1,5 @@
 /*
- *  QWProgs-DM
+ *  QWProgs-QVM
  *  Copyright (C) 2004  [sd] angel
  *
  *  This code is based on Q3 VM code by Id Software, Inc.
@@ -20,12 +20,14 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.h,v 1.6 2004-12-09 14:34:22 AngelD Exp $
+ *  $Id: g_syscalls.h,v 1.7 2004-12-23 03:16:14 AngelD Exp $
  */
 
 int     trap_GetApiVersion(  );
 qboolean trap_GetEntityToken( char *token, int size );
 void    trap_DPrintf( const char *fmt );
+void 	trap_conprint( const char *fmt );
+
 void    trap_BPrint( int level, const char *fmt );
 void    trap_SPrint( int edn, int level, const char *fmt );
 void    trap_CenterPrint( int edn, const char *fmt );
@@ -46,6 +48,10 @@ void    trap_traceline( float v1_x, float v1_y, float v1_z, float v2_x, float v2
 			float v2_z, int nomonst, int edn );
 void    trap_stuffcmd( int edn, const char *fmt );
 void    trap_localcmd( const char *fmt );
+void 	trap_executecmd();
+void 	trap_readcmd( const char *str, char* buf, int size );
+void 	trap_redirectcmd( gedict_t* ent, char* str );
+
 float   trap_cvar( const char *var );
 void 	trap_cvar_string( const char *var, char *buffer, int bufsize );
 void    trap_cvar_set( const char *var, const char *val );

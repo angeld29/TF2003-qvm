@@ -82,3 +82,7 @@ equ     strnicmp		 -73
 
 equ     trap_find		 -74
 
+equ     trap_executecmd		 -75
+equ     trap_conprint		 -76
+equ     trap_readcmd		 -77
+equ     trap_redirectcmd         -78

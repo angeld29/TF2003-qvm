@@ -3,6 +3,7 @@ g_main
 g_syscalls
 actions
 admin
+admin_cmd
 bg_lib
 buttons
 clan

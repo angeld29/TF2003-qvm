@@ -129,6 +129,10 @@ SOURCE=.\src\admin.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\admin_cmd.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\bg_lib.c
 # End Source File
 # Begin Source File

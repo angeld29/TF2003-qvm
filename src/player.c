@@ -1,3 +1,25 @@
+/*
+ *  QWProgs-TF2003
+ *  Copyright (C) 2004  [sd] angel
+ *
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *
+ *  $Id: player.c,v 1.9 2004-12-23 03:16:15 AngelD Exp $
+ */
 #include "g_local.h"
 
 void player_touch(  )
@@ -1482,7 +1504,7 @@ void HeadShotThrowHead( char *gibname )
 
 void KillPlayer(  )
 {
-	PROG_TO_EDICT( self->s.v.owner )->s.v.deadflag = 2;
+	PROG_TO_EDICT( self->s.v.owner )->s.v.deadflag = DEAD_DEAD;
 	dremove( self );
 }
 
@@ -1492,14 +1514,15 @@ void GibPlayer(  )
 	ThrowGib( "progs/gib1.mdl", self->s.v.health );
 	ThrowGib( "progs/gib2.mdl", self->s.v.health );
 	ThrowGib( "progs/gib3.mdl", self->s.v.health );
-	if ( tf_data.deathmsg == 36 )
+	if ( tf_data.deathmsg == DMSG_TRIGGER )
 	{
 		newmis = spawn(  );
 		newmis->s.v.owner = EDICT_TO_PROG( self );
 		newmis->s.v.think = ( func_t ) KillPlayer;
 		newmis->s.v.nextthink = g_globalvars.time + 1;
 	} else
-		self->s.v.deadflag = 2;
+		self->s.v.deadflag = DEAD_DEAD;
+
 	TeamFortress_SetupRespawn( 0 );
 	if ( streq( damage_attacker->s.v.classname, "teledeath" ) )
 	{
@@ -1521,7 +1544,7 @@ void GibPlayer(  )
 
 void PlayerDie(  )
 {
-	float   i;
+//	float   i;
 	gedict_t *te;
 	gedict_t *saveself;
 
@@ -1536,6 +1559,10 @@ void PlayerDie(  )
 	self->imp2 = 0;
 	self->imp3 = 0;
 	self->imp4 = 0;
+
+       	self->s.v.button0 = 0;
+       	self->s.v.button1 = 0;
+       	self->s.v.button2 = 0;
 
 	for(te = world; (te = trap_find( te, FOFS( s.v.classname ), "primer" ));)
 	{
@@ -1577,7 +1604,7 @@ void PlayerDie(  )
 		DropBackpack(  );
 	self->s.v.weaponmodel = "";
 	SetVector( self->s.v.view_ofs, 0, 0, -8 );
-	self->s.v.deadflag = 1;
+	self->s.v.deadflag = DEAD_DYING;
 	self->s.v.solid = SOLID_NOT;
 	self->s.v.flags = ( int ) self->s.v.flags - ( ( int ) self->s.v.flags & 512 );
 	self->s.v.movetype = MOVETYPE_TOSS;
@@ -1597,26 +1624,27 @@ void PlayerDie(  )
 		TeamFortress_SetupRespawn( 0 );
 		return;
 	}
-	i = 1 + (int)( g_random(  ) * 6 );
-	if ( i == 1 )
-		player_diea1(  );
-	else
+	//i = 1 + (int)( g_random(  ) * 6 );
+	switch((int)( g_random(  ) * 5 ))
 	{
-		if ( i == 2 )
+		case 0:
+			player_diea1(  );
+			break;
+		case 1:
 			player_dieb1(  );
-		else
-		{
-			if ( i == 3 )
-				player_diec1(  );
-			else
-			{
-				if ( i == 4 )
-					player_died1(  );
-				else
-					player_diee1(  );
-			}
-		}
+			break;
+		case 2:
+			player_diec1(  );
+			break;
+		case 3:
+			player_died1(  );
+			break;
+		default:
+			player_diee1(  );
+			break;
+	
 	}
+
 	TeamFortress_SetupRespawn( 0 );
 }
 

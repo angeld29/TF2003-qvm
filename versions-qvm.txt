@@ -2,7 +2,31 @@ QuakeWorld TeamFortress 2003 (QVM/DDL/SO Versions)
 by [sd] angel for MTFL
 
 ////////////////////////////////////////////////////
-Внесенные изменения (на 19.12.2004 r1) 
+Внесенные изменения (на 2x.12.2004 r1) 
+API6 
+added:
+	G_executecmd,
+	G_conprint,
+	G_readcmd,
+	G_redirectcmd
+
+vote changemap timeout увеличен до  60 сек
+нельзя активировать голосование чаще чем раз в 3 мин
+
+admin
+"auth", 0 пароль из "apw", "adminpwn"
+"kick", 1 по userid 
+"map", 2  аналогично rcon map
+"status", 3 аналогично rcon status
+"ban", 3  по userid 
+"banlist" 3 аналогично rcon listip
+"unban" 3  аналогично rcon removeip
+
+
+
+
+////////////////////////////////////////////////////
+Внесенные изменения (на 20.12.2004 r1) 
 
       
 'cmd discard s 10 n 20 r -10 c 0'

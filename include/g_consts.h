@@ -1,5 +1,5 @@
 /*
- *  QWProgs-DM
+ *  QWProgs-TF2003
  *  Copyright (C) 2004  [sd] angel
  *
  *  This code is based on Q3 VM code by Id Software, Inc.
@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_consts.h,v 1.2 2004-09-06 02:37:37 AngelD Exp $
+ *  $Id: g_consts.h,v 1.3 2004-12-23 03:16:14 AngelD Exp $
  */
 
 //

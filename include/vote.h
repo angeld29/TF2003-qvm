@@ -18,27 +18,17 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: debug.c,v 1.4 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: vote.h,v 1.1 2004-12-23 03:16:14 AngelD Exp $
  */
-#include "g_local.h"
 
-void dremove( gedict_t * te )
-{
-	if ( !te || te == world )
-	{
-		G_dprint( "***BUG BUG BUG BUG BUG BUG BUG BUG BUG BUG***\n" );
-		G_dprint( "WORLD has nearly been removed. Don't worry\n" );
-		G_dprint( "***BUG BUG BUG BUG BUG BUG BUG BUG BUG BUG***\n" );
-		return;
-	}
-	if ( te->is_removed == 1 )
-		return;
-	te->is_removed = 1;
-	ent_remove( te );
-}
+typedef struct {
+	char		*command;
+	void		(*VoteInit) ();
+	void		(*VoteYes) ();
+	void		(*VoteNo) ();
+	int		timeout;
+	int		pause;
+}vote_t;
 
-void display_location(  )
-{
-	G_sprint( self, 2, "Location : '%.0f %.0f %.0f'\n", self->s.v.origin[0], self->s.v.origin[1], self->s.v.origin[2] );
-	G_sprint( self, 2, "Angles   : '%.0f %.0f %.0f'\n", self->s.v.angles[0], self->s.v.angles[1], self->s.v.angles[2] );
-}
+extern vote_t votes[];
+extern int current_vote;
