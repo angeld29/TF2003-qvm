@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.28 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: client.c,v 1.29 2004-12-23 17:50:17 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -630,10 +630,10 @@ void DecodeLevelParms()
   self.StatusBarRes = parm13;
  if (parm14) 
   self.StatusBarSize = parm14;*/
-	if ( g_globalvars.parm15 )
+/*	if ( g_globalvars.parm15 )
 	{
 		self->is_admin = g_globalvars.parm15;
-	}
+	}*/
 }
 
 /*

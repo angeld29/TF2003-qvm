@@ -10,3 +10,5 @@ field_t         fields[]
 spawn_t         spawns[]
 
 Missile spawn requires g_globalvars.newmis set.
+
+dont use map command with redirectcmd & executecmd

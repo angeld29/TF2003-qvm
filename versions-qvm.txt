@@ -2,7 +2,7 @@ QuakeWorld TeamFortress 2003 (QVM/DDL/SO Versions)
 by [sd] angel for MTFL
 
 ////////////////////////////////////////////////////
-Внесенные изменения (на 2x.12.2004 r1) 
+Внесенные изменения (на 2x.12.2004 r1) crc:32330
 API6 
 added:
 	G_executecmd,
@@ -13,6 +13,7 @@ added:
 vote changemap timeout увеличен до  60 сек
 нельзя активировать голосование чаще чем раз в 3 мин
 
+
 admin
 "auth", 0 пароль из "apw", "adminpwn"
 "kick", 1 по userid 
@@ -22,7 +23,13 @@ admin
 "banlist" 3 аналогично rcon listip
 "unban" 3  аналогично rcon removeip
 
+admin level брется из localinfo "adminlevel", default 1
 
+
+cmd vote elect - выборы админа
+localinfo "electpercentage" - процент для голосования(default 50)
+localinfo "electlevel" - получаемый admin level (default 1)
+если 0 то голосование запрещено 
 
 
 ////////////////////////////////////////////////////

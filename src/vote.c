@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: vote.c,v 1.3 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: vote.c,v 1.4 2004-12-23 17:50:17 AngelD Exp $
  */
 
 // vote.q: mapchange voting functions
@@ -27,9 +27,19 @@
 void Vote_ChangeMap_Init();
 void Vote_ChangeMap_Yes();
 void Vote_ChangeMap_No();
+
+void Vote_Elect_Init();
+void Vote_Elect_Yes();
+void Vote_Elect_No();
+float elect_percentage;
+int elect_level;
+gedict_t* elect_player;
+
+
 vote_t votes[]=
 {
 	{"changemap", Vote_ChangeMap_Init, Vote_ChangeMap_Yes, Vote_ChangeMap_No, 60, 3},
+	{"elect", Vote_Elect_Init, Vote_Elect_Yes, Vote_Elect_No, 60, 3},
 	{NULL}
 };
 int		k_vote = 0;
@@ -174,6 +184,146 @@ void Vote_ChangeMap_No()
 		G_bprint(2, "%d‘ more vote needed\n",f1);
 }
 
+void Vote_Elect_Init()
+{
+	int f1;
+	int needed_votes;
+	gedict_t* voteguard;
+
+	elect_percentage = GetSVInfokeyInt(  "electpercentage", NULL, 50 );
+	elect_level  = GetSVInfokeyInt(  "electlevel", NULL, 1 );
+	elect_player = self;
+	if(!elect_percentage || !elect_level)
+	{
+		G_sprint( self, 2, "Admin election disabled\n",self->s.v.netname);
+		return;
+	}
+
+	if ( self->is_admin >= elect_level ) 
+	{
+		G_sprint(self, 2, "You are already an admin\n");
+		return;
+	}
+
+	if( elect_percentage < 5 || elect_percentage > 95)
+		elect_percentage = 50;
+
+	f1 = CountPlayers();
+	
+	if(  elect_percentage * f1 < 100 ) 
+	{
+		G_bprint(2,  "%s ηαιξσ αδνιξ στατυσ!\n", elect_player->s.v.netname);
+		G_sprint(elect_player, 2, "Type γνδ φοτε αδνιξ for admin commands.\n");
+		current_vote = -1;
+		elect_player->is_admin = elect_level;
+		return;	
+	}
+
+	
+	G_bprint(2, "%s has requested admin rights!\n",self->s.v.netname);
+
+	k_vote = 1;
+	self->k_voted = 1;
+	needed_votes = (int)(f1 * elect_percentage / 100)+1 - k_vote;
+
+	if( needed_votes > 1 )
+		G_bprint(2, "%d‘ total votes needed\nType ",needed_votes);
+	else
+		G_bprint(2, "%d‘ total vote needed\nType ", needed_votes);
+
+	G_bprint(3, "γνδ φοτε ωεσ");
+	G_bprint(2, " in console to approve\n");
+
+	voteguard = spawn(); // Check the 1 minute timeout for voting
+	voteguard->s.v.owner = EDICT_TO_PROG(world);
+	voteguard->s.v.classname  = "voteguard";
+	voteguard->s.v.think = (func_t) VoteThink;
+	voteguard->s.v.nextthink = g_globalvars.time + votes[current_vote].timeout;
+}
+
+void Vote_Elect_Yes()
+{
+	int 		f1, needed_votes;
+	gedict_t* 	p = world;
+
+	if(!k_vote) return;
+
+	if(self->k_voted) {
+		G_sprint(self, 2, "--- your vote is still good ---\n");
+		return;
+	}
+
+// register the vote
+	k_vote ++;
+	G_bprint(2, "%s gives his vote\n",self->s.v.netname);
+	f1 = CountPlayers();
+	needed_votes = (int)(f1 * elect_percentage / 100)+1 - k_vote;
+
+	//if(  elect_percentage * f1 < 100 * k_vote ) 
+	if( needed_votes < 1)
+	{
+		k_vote = 0;
+		current_vote = -1;
+        	while((p = trap_find(p, FOFS(s.v.classname), "player"))) 
+        	{
+			if( p->s.v.netname[0] ) p->k_voted = 0;
+		}
+
+		p = trap_find(world, FOFS(s.v.classname), "voteguard");
+		if(p) {
+			p->s.v.classname  = "";
+		 dremove(p);
+		}
+		G_bprint(2,  "%s ηαιξσ αδνιξ στατυσ!\n", elect_player->s.v.netname);
+		G_sprint(elect_player, 2, "Type γνδ φοτε αδνιξ for admin commands.\n");
+		elect_player->is_admin = elect_level;
+		return;	
+	}
+
+// calculate how many more votes are needed
+	self->k_voted = 1;
+
+	if( needed_votes > 1)
+		G_bprint(2, "%d‘ total votes needed\nType ", needed_votes);
+	else
+		G_bprint(2, "%d‘ total vote needed\nType ", needed_votes);
+
+
+}
+
+void Vote_Elect_No()
+{
+	gedict_t* p;
+	int f1, needed_votes;
+
+// withdraw one's vote
+	if(!k_vote || !self->k_voted) return;
+
+	G_bprint(2, "%s withdraws his vote\n",self->s.v.netname);
+	self->k_voted = 0;
+	k_vote--;
+	if(!k_vote) {
+		G_bprint(3, "Voting is closed\n");
+		p = trap_find(world, FOFS(s.v.classname), "voteguard");
+		if(p) 
+		{
+			p->s.v.classname  = "";
+		 	dremove(p);
+		}
+		current_vote = -1;
+		return;
+	}
+
+	f1 = CountPlayers();
+	needed_votes = (int)(f1 * elect_percentage / 100)+1 - k_vote;
+
+	
+	if(needed_votes > 1)
+		G_bprint(2, "%d‘ more votes needed\n",needed_votes);
+	else
+		G_bprint(2, "%d‘ more vote needed\n",needed_votes);
+}
+
 void Vote_Cmd()
 {
         char    cmd_command[50];
@@ -218,7 +368,7 @@ void Vote_Cmd()
 		G_sprint( self, 2, "Vote %s in progress\n",votes[current_vote].command);
 	        return;
 	}
-	if( g_globalvars.time < self.last_vote_time )
+	if( g_globalvars.time < self->last_vote_time )
 	{
 		G_sprint( self, 2, "You cannot vote at this time.\n");
 		return;
@@ -228,7 +378,7 @@ void Vote_Cmd()
 		if( !strcmp(cmd_command,ucmd->command) )
 		{
 		        current_vote = i;
-		        self.last_vote_time = g_globalvars.time + votes[current_vote].pause * 60;
+		        self->last_vote_time = g_globalvars.time + votes[current_vote].pause * 60;
 			ucmd->VoteInit();
 			return;
 		}
