@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.29 2004-12-23 17:50:17 AngelD Exp $
+ *  $Id: client.c,v 1.30 2005-02-14 14:59:45 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -264,58 +264,59 @@ void DecodeLevelParms()
 			tf_data.clan_scores_dumped = 0;
 			tf_data.game_locked = 0;
 
-			fvar = GetSVInfokeyFloat( "pm", "prematch", 0 );
-			if( fvar < 0 )
-				fvar = 0;
-			tf_data.cb_prematch_time = g_globalvars.time + fvar * 60;
-			if( fvar )
-			{
-				tf_data.cb_prematch_time += 5;
-				ent = spawn();
-				ent->s.v.think = ( func_t ) PreMatch_Think;
-				ent->s.v.nextthink = g_globalvars.time + 5;
-
-				tf_data.cb_ceasefire_time = GetSVInfokeyFloat( "cft", "ceasefire_time", 0 );
-
-				if ( tf_data.cb_ceasefire_time > 0 )
-				{
-					tf_data.cb_ceasefire_time = g_globalvars.time + tf_data.cb_ceasefire_time * 60;
-
-					if( tf_data.cb_prematch_time <= tf_data.cb_ceasefire_time + 7  )
-					{
-						tf_data.cb_ceasefire_time = tf_data.cb_prematch_time;
-						tf_data.cb_prematch_time += 7;
-					}
-					
-                   			tf_data.cease_fire = 1;
-                   			G_bprint( 2, "CEASE FIRE\n" );
-                   			te = trap_find( world, FOFS( s.v.classname ), "player" );
-                   			while ( te )
-                   			{
-                   				CenterPrint( te, "CEASE FIRE\n" );
-                   				te->tfstate = te->tfstate | TFSTATE_CANT_MOVE;
-                   				TeamFortress_SetSpeed( te );
-                   				te = trap_find( te, FOFS( s.v.classname ), "player" );
-                   			}
-                   			te = spawn();
-                   			te->s.v.classname = "ceasefire";
-                   			te->s.v.think = ( func_t ) CeaseFire_think;
-                   			te->s.v.nextthink = g_globalvars.time + 5;
-                   			te->s.v.weapon = 1;
-				}else
-					tf_data.cb_ceasefire_time = 0;
-			}
-			if ( timelimit && ( ( timelimit ) < tf_data.cb_prematch_time ) )
-			{
-				timelimit = tf_data.cb_prematch_time + 1;
-				sprintf( st, "%d", (int)( timelimit / 60 ) );
-				trap_cvar_set( "timelimit", st );
-			}
 			GetSVInfokeyString( "lg", "locked_game", st, sizeof( st ), "off" );
 			if ( !strcmp( st, "on" ) )
 				tf_data.game_locked = 1;
 		} else
 			tf_data.clanbattle = 0;
+
+       		fvar = GetSVInfokeyFloat( "pm", "prematch", 0 );
+       		if( fvar < 0 )
+       			fvar = 0;
+       		tf_data.cb_prematch_time = g_globalvars.time + fvar * 60;
+       		if( fvar )
+       		{
+       			tf_data.cb_prematch_time += 5;
+       			ent = spawn();
+       			ent->s.v.think = ( func_t ) PreMatch_Think;
+       			ent->s.v.nextthink = g_globalvars.time + 5;
+
+       			tf_data.cb_ceasefire_time = GetSVInfokeyFloat( "cft", "ceasefire_time", 0 );
+
+       			if ( tf_data.cb_ceasefire_time > 0 )
+       			{
+       				tf_data.cb_ceasefire_time = g_globalvars.time + tf_data.cb_ceasefire_time * 60;
+
+       				if( tf_data.cb_prematch_time <= tf_data.cb_ceasefire_time + 7  )
+       				{
+       					tf_data.cb_ceasefire_time = tf_data.cb_prematch_time;
+       					tf_data.cb_prematch_time += 7;
+       				}
+       				
+                  			tf_data.cease_fire = 1;
+                  			G_bprint( 2, "CEASE FIRE\n" );
+                  			te = trap_find( world, FOFS( s.v.classname ), "player" );
+                  			while ( te )
+                  			{
+                  				CenterPrint( te, "CEASE FIRE\n" );
+                  				te->tfstate = te->tfstate | TFSTATE_CANT_MOVE;
+                  				TeamFortress_SetSpeed( te );
+                  				te = trap_find( te, FOFS( s.v.classname ), "player" );
+                  			}
+                  			te = spawn();
+                  			te->s.v.classname = "ceasefire";
+                  			te->s.v.think = ( func_t ) CeaseFire_think;
+                  			te->s.v.nextthink = g_globalvars.time + 5;
+                  			te->s.v.weapon = 1;
+       			}else
+       				tf_data.cb_ceasefire_time = 0;
+       		}
+       		if ( timelimit && ( ( timelimit ) < tf_data.cb_prematch_time ) )
+       		{
+       			timelimit = tf_data.cb_prematch_time + 1;
+       			sprintf( st, "%d", (int)( timelimit / 60 ) );
+       			trap_cvar_set( "timelimit", st );
+       		}
 
 		GetSVInfokeyString( "a", "autoteam", st, sizeof( st ), "" );
 		if ( !strcmp( st, "on" ) )

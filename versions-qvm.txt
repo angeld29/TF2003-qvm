@@ -5,6 +5,7 @@ by [sd] angel for MTFL
 Внесенные изменения (на 14.02.2005 r1) crc:
 double flash fixed
 Skin reset\n fixed
+prematch не зависит от clan mode
 
 ////////////////////////////////////////////////////
 Внесенные изменения (на 08.02.2005 r1) crc:
