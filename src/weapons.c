@@ -360,7 +360,7 @@ void W_FireMedikit(  )
 			if ( ( trace_ent->team_no == self->team_no && self->team_no ) || coop )
 			{
 				healam = WEAP_MEDIKIT_HEAL;
-				for ( te=world ;te = find( te, FOFS( s.v.classname ), "timer" );)
+				for ( te=world ; (te = find( te, FOFS( s.v.classname ), "timer" ));)
 				{
 					if ( te->s.v.owner != g_globalvars.trace_ent )
 						continue;
@@ -379,7 +379,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->tfstate & TFSTATE_HALLUCINATING )
 				{
-				        for ( te=world ;te = find( te, FOFS( s.v.classname ), "timer" );)
+				        for ( te=world ; (te = find( te, FOFS( s.v.classname ), "timer" ));)
 					{
 						if ( te->s.v.owner != g_globalvars.trace_ent )
 							continue;
@@ -406,7 +406,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->tfstate & TFSTATE_TRANQUILISED )
 				{
-				        for ( te=world ;te = find( te, FOFS( s.v.classname ), "timer" );)
+				        for ( te=world ; (te = find( te, FOFS( s.v.classname ), "timer" ));)
 					{
 						if ( te->s.v.owner != g_globalvars.trace_ent )
 							continue;
@@ -429,7 +429,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->FlashTime > 0 )
 				{
-				        for ( te=world ;te = find( te, FOFS( s.v.netname ), "flashtimer" );)
+				        for ( te=world ; (te = find( te, FOFS( s.v.netname ), "flashtimer" ));)
 					{
 						if ( te->s.v.owner != g_globalvars.trace_ent )
 							continue;

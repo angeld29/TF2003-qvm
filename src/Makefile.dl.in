@@ -16,14 +16,14 @@
 #   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-#   $Id: Makefile.dl.in,v 1.1 2004-10-01 03:57:32 AngelD Exp $
+#   $Id: Makefile.dl.in,v 1.2 2004-10-03 06:21:51 AngelD Exp $
 
 CC=@CC@
 RM=@RM@
 MKDEP=@MKDEP@
 INSTALLDIR=$(PREFIX)/sbin
 
-MODULE=qwprogs.so
+MODULE=../bin/qwprogs.so
 
 CFLAGS=-g -Wall -O2 -fPIC
 LDFLAGS=-shared -Wl,-soname,$(MODULE)

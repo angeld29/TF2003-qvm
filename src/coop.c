@@ -68,8 +68,8 @@ int DoorShouldOpen(  )
 {
 	gedict_t *ptr;
 	int     plyrcount;
-	gedict_t *plyr1;
-	gedict_t *plyr2;
+	gedict_t *plyr1 = NULL;
+	gedict_t *plyr2 = NULL;
 
 	if ( coop != 2 )
 		return 1;

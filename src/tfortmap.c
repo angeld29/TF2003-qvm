@@ -2306,7 +2306,7 @@ void tfgoalitem_checkgoalreturn( gedict_t * Item )
 
 void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 {
-	int     flag_time;
+	int     flag_time = 0;
 
 	if ( Item->goal_state == 1 )
 	{

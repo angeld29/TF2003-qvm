@@ -16,7 +16,7 @@ void TeamFortress_DetonatePipebombs(  )
 {
 	gedict_t *e;
 
-	for ( e = world; e = find( e, FOFS( s.v.classname ), "pipebomb" ); )
+	for ( e = world; (e = find( e, FOFS( s.v.classname ), "pipebomb" )); )
 	{
 		if ( e->s.v.owner == EDICT_TO_PROG( self ) )
 			e->s.v.nextthink = g_globalvars.time;
@@ -108,7 +108,7 @@ void Detpack_SetClip(  )
 	gedict_t *te;
 //	gedict_t *pl;
 
-	for ( te = world; te = find( te, FOFS( s.v.classname ), "detpack" ); )
+	for ( te = world; (te = find( te, FOFS( s.v.classname ), "detpack" )); )
 	{
 	        switch(tg_data.detpack_clip)
 	        {
@@ -144,7 +144,7 @@ void TeamFortress_SetDetpack( float timer )
 	if ( self->ammo_detpack <= 0 && !tg_data.tg_enabled )
 		return;
 
-	for ( at_spot = world; at_spot = findradius( at_spot, self->s.v.origin, 65 ); )
+	for ( at_spot = world; (at_spot = findradius( at_spot, self->s.v.origin, 65 )); )
 	{
 		if ( streq( at_spot->s.v.classname, "player" ) && self != at_spot )
 		{
@@ -174,7 +174,7 @@ void TeamFortress_SetDetpack( float timer )
 	}
 	if ( tf_data.detpack_block )
 	{
-		for ( at_spot = world; at_spot = findradius( at_spot, self->s.v.origin, 100 ); )
+		for ( at_spot = world; (at_spot = findradius( at_spot, self->s.v.origin, 100 )); )
 		{
 			if ( tf_data.birthday == 1 && streq( at_spot->mdl, "progs/detpack2.mdl" ) )
 			{
@@ -195,7 +195,7 @@ void TeamFortress_SetDetpack( float timer )
 	}
         if( !tg_data.tg_enabled )
         {
-        	for ( te = world; te = find( te, FOFS( s.v.classname ), "detpack" ); )
+        	for ( te = world; (te = find( te, FOFS( s.v.classname ), "detpack" )); )
         	{
         		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
         		{
@@ -236,9 +236,9 @@ void TeamFortress_DetpackStop(  )
 {
 	gedict_t *detpack_timer;
 
-	for ( detpack_timer = world; detpack_timer = find( detpack_timer, FOFS( s.v.netname ), "detpack_timer" ); )
+	for ( detpack_timer = world; (detpack_timer = find( detpack_timer, FOFS( s.v.netname ), "detpack_timer" )); )
 	{
-		if ( detpack_timer->s.v.owner = EDICT_TO_PROG( self ) )
+		if ( detpack_timer->s.v.owner == EDICT_TO_PROG( self ) )
 			break;
 	}
 	if ( !detpack_timer )
@@ -337,7 +337,7 @@ void TeamFortress_DetpackExplode(  )
 	if ( pos != -2 && pos != -6 && self->real_owner->has_disconnected != 1 )
 	{
 		tf_data.deathmsg = 12;
-		for ( head = world; head = findradius( head, self->s.v.origin, WEAP_DETPACK_SIZE ); )
+		for ( head = world; (head = findradius( head, self->s.v.origin, WEAP_DETPACK_SIZE )); )
 		{
 			if ( streq( head->s.v.classname, "info_tfgoal" ) )
 			{

@@ -47,7 +47,7 @@ void PreMatch_Think(  )
 		G_bprint( 2, "GAME IS NOW LOCKED\n" );
 	teamscores[0] = teamscores[1] = teamscores[2] = teamscores[3] = teamscores[4] = 0;
 	teamfrags[0] = teamfrags[1] = teamfrags[2] = teamfrags[3] = teamfrags[4] = 0;
-	for ( te = world; te = find( te, FOFS( s.v.classname ), "player" ); )
+	for ( te = world; (te = find( te, FOFS( s.v.classname ), "player" )); )
 	{
 		oldself = self;
 		self = te;
@@ -67,7 +67,7 @@ void PreMatch_Think(  )
 		TeamFortress_RemoveTimers(  );
 		self->s.v.frags = 0;
 		self->real_frags = 0;
-		for ( gren = world; gren = find( gren, FOFS( s.v.classname ), "grenade" ); )
+		for ( gren = world; (gren = find( gren, FOFS( s.v.classname ), "grenade" )); )
 		{
 			if ( gren->s.v.owner == EDICT_TO_PROG( self ) )
 				gren->s.v.nextthink = g_globalvars.time + 0.1;
@@ -89,7 +89,7 @@ void TeamFortress_ShowIDs(  )
 	}
 	got_one = 0;
 	G_sprint( self, 2, "Existing Team Member IDs:\n" );
-	for ( te = world; te = find( te, FOFS( s.v.classname ), "player" ); )
+	for ( te = world; (te = find( te, FOFS( s.v.classname ), "player" )); )
 	{
 		if ( te->team_no == self->team_no )
 		{
@@ -101,7 +101,7 @@ void TeamFortress_ShowIDs(  )
 		G_sprint( self, 2, "NONE\n" );
 	got_one = 0;
 	G_sprint( self, 2, "Disconnected Team Member IDs:\n" );
-	for ( te = world; te = find( te, FOFS( s.v.classname ), "ghost" ); )
+	for ( te = world; (te = find( te, FOFS( s.v.classname ), "ghost" )); )
 	{
 		if ( te->team_no == self->team_no )
 		{
@@ -123,7 +123,7 @@ void DumpClanScores(  )
 
 	for ( i = 1; i <= 4; i++ )
 	{
-		if ( t_pl[i] = TeamFortress_TeamGetNoPlayers( i ) )
+		if ( (t_pl[i] = TeamFortress_TeamGetNoPlayers( i ) ))
 			no_teams++;
 		t_unacc[i] = 0;
 	}
@@ -131,7 +131,7 @@ void DumpClanScores(  )
 	if ( no_teams < 2 )
 		return;
 	teamfrags_q = tf_data.toggleflags & ( TFLAG_TEAMFRAGS | TFLAG_FULLTEAMSCORE );
-	for ( te = world; te = find( te, FOFS( s.v.classname ), "player" ); )
+	for ( te = world; (te = find( te, FOFS( s.v.classname ), "player" )); )
 	{
 		if ( te->team_no < 0 || te->team_no > 4 )
 			continue;
@@ -195,7 +195,7 @@ void DumpClanScores(  )
 					continue;
 				printed = teamscores[i] / t_pl[i];
 				ti = teamscores[i] % t_pl[i];
-				for ( te = world; te = find( te, FOFS( s.v.classname ), "player" ); )
+				for ( te = world; (te = find( te, FOFS( s.v.classname ), "player" )); )
 				{
 					if ( te->team_no == i )
 						te->s.v.frags = printed;
@@ -214,7 +214,7 @@ void DumpClanScores(  )
 					continue;
 				printed = t_unacc[i] / t_pl[i];
 				ti = t_unacc[i] % t_pl[i];
-				for ( te = world; te = find( te, FOFS( s.v.classname ), "player" ); )
+				for ( te = world; (te = find( te, FOFS( s.v.classname ), "player" )); )
 				{
 					if ( te->team_no == i )
 					{
@@ -239,7 +239,7 @@ void DumpClanScores(  )
 			  TeamFortress_TeamGetNoPlayers( i ), teamfrags[i], t_unacc[i], teamscores[i] );
 	}
 
-	for ( te = world; te = find( te, FOFS( s.v.classname ), "player" ); )
+	for ( te = world; (te = find( te, FOFS( s.v.classname ), "player" )); )
 	{
 		if ( GetInfokeyString( te, "take_sshot", NULL, st2, sizeof( st2 ), "" ) )
 		{

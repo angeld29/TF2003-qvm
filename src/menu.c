@@ -1173,7 +1173,7 @@ void BirthdayTimer(  )
   		self->s.v.nextthink = g_globalvars.time + 1.5;
   		self->s.v.weapon +=  1;
         }
-        for( te = world; te= find(te, FOFS(s.v.classname) ,"player");)
+        for( te = world; (te= find(te, FOFS(s.v.classname) ,"player"));)
         {
           G_centerprint(te, self->team_str_moved, snipers_num);
           if(self->s.v.weapon == 1)
@@ -1237,7 +1237,7 @@ void 	Menu_BirthDay_Input( int inp )
                   tf_data.birthday = 1;
                   localcmd("localinfo birthday on\n");
                   G_bprint(2, "IT'S PARTY TIME\n");
-                  for(te = world; te = find( te, FOFS(s.v.classname), "player");)
+                  for(te = world; (te = find( te, FOFS(s.v.classname), "player"));)
                   	CenterPrint(te, "\n\nHAPPY BIRTHDAY TEAMFORTRESS!\n");
                   te = spawn();
                   te->s.v.weapon = 10;
@@ -1514,7 +1514,9 @@ void 	TG_Cheats_Menu(menunum_t menu)
 	}
 	switch( tg_data.gren_time )
 	{
+	   
 		case 0:
+		default:	
 			s_gren_time = "4)‰Grenade effect time: full  \n";
 			break;
 		case 5:

@@ -1087,7 +1087,7 @@ int CheckTelefragSpot( vec3_t v )
 	spot_maxs[1] = self->s.v.maxs[1] + v[1] + 5;	
 	spot_maxs[2] = self->s.v.maxs[2] + v[2] + 5;	
 
-	for (   te = world ; te = find( te , FOFS(s.v.classname), "player");)
+	for (   te = world ; (te = find( te , FOFS(s.v.classname), "player"));)
 	{
 		if( te->team_no != self->team_no )
 			continue;
@@ -1158,7 +1158,7 @@ gedict_t *FindRandomTeamSpawnPoint( int team_num )
 	int     numspots = 0, numallspots = 0;
 	int     rndspot;
 
-	for ( spot = world; spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] ); )
+	for ( spot = world; (spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] )); )
 	{
 		if ( !Activated( spot, self ) )
 			continue;
@@ -1171,7 +1171,7 @@ gedict_t *FindRandomTeamSpawnPoint( int team_num )
 	if ( numspots )
 	{
 		rndspot = g_random() * numspots;
-		for ( spot = world; spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] ); )
+		for ( spot = world; (spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] )); )
 		{
 
 			if ( !Activated( spot, self ) )
@@ -1185,7 +1185,7 @@ gedict_t *FindRandomTeamSpawnPoint( int team_num )
 	} else			// not found no telefrag spot
 	{
 		rndspot = g_random() * numallspots;
-		for ( spot = world; spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] ); )
+		for ( spot = world; (spot = find( spot, FOFS( team_str_home ), team_spawn_str[team_num] )); )
 		{
 
 			if ( !Activated( spot, self ) )

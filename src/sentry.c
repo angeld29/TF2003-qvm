@@ -293,7 +293,7 @@ int Sentry_FindTarget_Angel(  )
 				return 0;
 		}
 	}
-	for ( client = world; client = find( client, FOFS( s.v.classname ), "player" ); )
+	for ( client = world; (client = find( client, FOFS( s.v.classname ), "player" )); )
 	{
 		if ( CheckTarget( client ) )
 		{
@@ -912,12 +912,12 @@ void Eng_StaticSG_Activate(  )
 	gedict_t *pl;
 	float   failed;
 
-	for ( ent = world; ent = find( ent, FOFS( s.v.classname ), "building_sentrygun" ); )
+	for ( ent = world; (ent = find( ent, FOFS( s.v.classname ), "building_sentrygun" )); )
 	{
 		failed = 0;
 		if ( ent->has_sentry && !ent->s.v.takedamage )
 		{
-			for ( pl = world; pl = findradius( pl, ent->s.v.origin, 64 ); )
+			for ( pl = world; (pl = findradius( pl, ent->s.v.origin, 64 )); )
 			{
 				if ( streq( pl->s.v.classname, "player" ) )
 				{

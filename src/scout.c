@@ -171,7 +171,7 @@ void FlashGrenadeExplode(  )
 	trap_WriteCoord( 4, self->s.v.origin[1] );
 	trap_WriteCoord( 4, self->s.v.origin[2] );
 	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
-	for ( te = world; te = findradius( te, self->s.v.origin, 300 ); )
+	for ( te = world; (te = findradius( te, self->s.v.origin, 300 )); )
 	{
 		if ( strneq( te->s.v.classname, "player" ) )
 			continue;
@@ -413,7 +413,7 @@ void ScannerSwitch(  )
 		self->ScannerOn = 1;
 	} else
 	{
-		for ( te = world; te = find( te, FOFS( s.v.netname ), "scanner" ); )
+		for ( te = world; (te = find( te, FOFS( s.v.netname ), "scanner" )); )
 		{
 			if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 			{
@@ -436,7 +436,7 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 	gedict_t *te;
 	vec3_t  org, dist;
 
-	for ( head = world; head = findradius( head, inflictor->s.v.origin, bounce + 40 ); )
+	for ( head = world; (head = findradius( head, inflictor->s.v.origin, bounce + 40 )); )
 	{
 		if ( head == ignore )
 			continue;
@@ -473,7 +473,7 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 				continue;
 			
 			G_sprint( head, 2, "You are conced\n");
-			for ( te = world; te = find( te, FOFS( s.v.classname ), "timer" ); )
+			for ( te = world; (te = find( te, FOFS( s.v.classname ), "timer" )); )
 			{
 				if ( te->s.v.owner != EDICT_TO_PROG( head ) )
 					continue;
@@ -668,7 +668,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 	any_detected2 = 0;
 	scanrange = scanrange * 25;
 	minlen = scanrange + 100;
-	for ( list = world; list = findradius( list, self->s.v.origin, scanrange + 40 ); )
+	for ( list = world; (list = findradius( list, self->s.v.origin, scanrange + 40 )); )
 	{
 		enemy_detected = 0;
 		friend_detected = 0;
@@ -814,7 +814,7 @@ void	TG_Eff_Conc(gedict_t *head)
        		return;
 
 	G_sprint( head, 2, "You are conced\n");
-      	for ( te = world; te = find( te, FOFS( s.v.classname ), "timer" ); )
+      	for ( te = world; (te = find( te, FOFS( s.v.classname ), "timer" )); )
       	{
       		if ( te->s.v.owner != EDICT_TO_PROG( head ) )
       			continue;
@@ -878,7 +878,7 @@ void	TG_Eff_Remove(gedict_t *pl)
        	if ( pl->s.v.health <= 0 )
        		return;
 
-     	for ( te=world ;te = find( te, FOFS( s.v.classname ), "timer" );)
+     	for ( te=world ; (te = find( te, FOFS( s.v.classname ), "timer" ));)
      	{
      		if ( te->s.v.owner != EDICT_TO_PROG( pl ))
      			continue;
@@ -892,7 +892,7 @@ void	TG_Eff_Remove(gedict_t *pl)
      	}
      	if ( pl->tfstate & TFSTATE_HALLUCINATING )
      	{
-     	        for ( te=world ;te = find( te, FOFS( s.v.classname ), "timer" );)
+     	        for ( te=world ; (te = find( te, FOFS( s.v.classname ), "timer" ));)
      		{
      			if ( te->s.v.owner != EDICT_TO_PROG( pl ))
      				continue;
@@ -913,7 +913,7 @@ void	TG_Eff_Remove(gedict_t *pl)
      	}
      	if ( pl->tfstate & TFSTATE_TRANQUILISED )
      	{
-     		for ( te=world ;te = find( te, FOFS( s.v.classname ), "timer" );)
+     		for ( te=world ; (te = find( te, FOFS( s.v.classname ), "timer" ));)
      		{
      			if ( te->s.v.owner != EDICT_TO_PROG( pl ))
      				continue;
@@ -930,7 +930,7 @@ void	TG_Eff_Remove(gedict_t *pl)
      	}
      	if ( pl->FlashTime > 0 )
      	{
-     	        for ( te=world ;te = find( te, FOFS( s.v.netname ), "flashtimer" );)
+     	        for ( te=world ; (te = find( te, FOFS( s.v.netname ), "flashtimer" ));)
      		{
      			if ( te->s.v.owner != EDICT_TO_PROG( pl ))
      				continue;

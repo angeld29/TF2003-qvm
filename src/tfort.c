@@ -550,8 +550,8 @@ void TeamFortress_ChangeClass(  )
 			spot->s.v.think = ( func_t ) SUB_Remove;
 		}
 	}
-	spot = world;
-	while ( spot = find( spot, FOFS( s.v.classname ), "player" ) )
+	
+	for( spot = world;( spot = find( spot, FOFS( s.v.classname ), "player" ) ) ;)
 	{
 		if ( spot->team_no == self->team_no && spot != self )
 		{
@@ -699,8 +699,8 @@ void TeamFortress_Inventory(  )
 		else
 			G_sprint( self, 2, "%d Detpack. ", self->ammo_detpack );
 	}
-	tg = world;
-	while ( tg = find( tg, FOFS( s.v.classname ), "item_tfgoal" ) )
+	
+	for ( tg = world;( tg = find( tg, FOFS( s.v.classname ), "item_tfgoal" ) ) ; )
 	{
 		if ( tg->s.v.owner == EDICT_TO_PROG( self ) )
 		{
@@ -725,8 +725,7 @@ void TeamFortress_Inventory(  )
 		}
 	}
 	G_sprint( self, 2, "\n" );
-	te = world;
-	while ( te = find( te, FOFS( s.v.classname ), "detpack" ) )
+	for ( te = world;( te = find( te, FOFS( s.v.classname ), "detpack" ) ) ; )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
@@ -821,6 +820,9 @@ void TeamFortress_ShowTF(  )
 	case SG_SFIRE_NEW:
 		G_sprint( self, 2, "Sentry Shells Fire: NEW\n" );
 		break;
+	default:
+		break;
+			
 	}
 	if(tf_data.sg_rfire)
 		G_sprint( self, 2, "Sentry Rockets Fire: NEW\n" );
@@ -1010,10 +1012,8 @@ void    TeamFortress_GrenadePrimed(  );
 
 void TeamFortress_PrimeGrenade(  )
 {
-	int     gtype;
+	int     gtype = -1;
 
-// string gs;
-	//string ptime;
 	gedict_t *tGrenade;
 
 	if ( ( self->tfstate & 1 ) || ( self->tfstate & 1024 ) )
@@ -1140,6 +1140,8 @@ void TeamFortress_PrimeGrenade(  )
 			return;
 		}
 	}
+	if( gtype < 0 )
+		return;
 
 	self->tfstate |= 1;
 	tGrenade = spawn(  );
@@ -1332,12 +1334,12 @@ void TeamFortress_GrenadePrimed(  )
 
 void TeamFortress_ThrowGrenade(  )
 {
-	gedict_t *te = world;
+	gedict_t *te;
 
 	if ( !( self->tfstate & 1 ) )
 		return;
 	self->tfstate |= TFSTATE_GRENTHROWING;
-	while ( te = find( te, FOFS( s.v.classname ), "primer" ) )
+	for ( te = world ; ( te = find( te, FOFS( s.v.classname ), "primer" ) ) ; )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 			if ( te->respawn_time <= g_globalvars.time )
@@ -1750,7 +1752,7 @@ void TeamFortress_PrintClassName( gedict_t * Viewer, int pc, int rpc )
 
 void TeamFortress_RemoveTimers(  )
 {
-	gedict_t *te = world;
+	gedict_t *te;
 
 	self->leg_damage = 0;
 	self->is_undercover = 0;
@@ -1770,7 +1772,7 @@ void TeamFortress_RemoveTimers(  )
 
 	ResetGasSkins(self);
 
-	while ( te = find( te, FOFS( s.v.classname ), "timer" ) )
+	for( te = world; ( te = find( te, FOFS( s.v.classname ), "timer" ) );)
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
@@ -1779,7 +1781,7 @@ void TeamFortress_RemoveTimers(  )
 		}
 	}
 
-	for( te = world;te = find( te, FOFS( s.v.classname ), "item_tfgoal" ); )
+	for( te = world; (te = find( te, FOFS( s.v.classname ), "item_tfgoal" )); )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
@@ -1797,7 +1799,7 @@ void TeamFortress_RemoveTimers(  )
 			}
 		}
 	}
-	for( te = world; te = find( te, FOFS( s.v.classname ), "detpack" );)
+	for( te = world; (te = find( te, FOFS( s.v.classname ), "detpack" ));)
 	{
 		if ( te->weaponmode == 1 && te->s.v.enemy == EDICT_TO_PROG( self ) )
 			te->weaponmode = 0;
@@ -1807,7 +1809,7 @@ void TeamFortress_RemoveTimers(  )
 
 	if ( self->has_disconnected == 1 )
 	{
-		for(te = world;te = find( te, FOFS( s.v.classname ), "grenade" );)
+		for(te = world; (te = find( te, FOFS( s.v.classname ), "grenade" ));)
 		{
 			if ( te->s.v.owner == EDICT_TO_PROG( self ) && streq(te->s.v.model , "progs/caltrop.mdl") )
 			{
@@ -1958,29 +1960,28 @@ void TeamFortress_DropAmmo( int type )
 {
 	float   ammo ;
 
-	if ( type == 1 )
+	switch( type )
 	{
-		ammo = DROP_SHELLS;
-		if ( self->s.v.ammo_shells < ammo )
-		{
-			if ( self->playerclass == 9 )
-			{
-				if ( self->s.v.ammo_cells / AMMO_COST_SHELLS > ammo - self->s.v.ammo_shells )
-				{
-					G_sprint( self, 2, "you make some shells.\n" );
-					self->s.v.ammo_cells =
-					    self->s.v.ammo_cells - ( ammo - self->s.v.ammo_shells ) * AMMO_COST_SHELLS;
-					self->s.v.ammo_shells = ammo;
-				}
-			}
-   			if (self->s.v.ammo_shells < ammo) 
-				return;
-		}
-		self->s.v.ammo_shells = self->s.v.ammo_shells - ammo;
-	} else
-	{
-		if ( type == 2 )
-		{
+		case 1:
+          		ammo = DROP_SHELLS;
+          		if ( self->s.v.ammo_shells < ammo )
+          		{
+          			if ( self->playerclass == 9 )
+          			{
+          				if ( self->s.v.ammo_cells / AMMO_COST_SHELLS > ammo - self->s.v.ammo_shells )
+          				{
+          					G_sprint( self, 2, "you make some shells.\n" );
+          					self->s.v.ammo_cells =
+          					    self->s.v.ammo_cells - ( ammo - self->s.v.ammo_shells ) * AMMO_COST_SHELLS;
+          					self->s.v.ammo_shells = ammo;
+          				}
+          			}
+             			if (self->s.v.ammo_shells < ammo) 
+          				return;
+          		}
+          		self->s.v.ammo_shells = self->s.v.ammo_shells - ammo;
+          		break;
+		case 2:
 			ammo = DROP_NAILS;
 			if ( self->s.v.ammo_nails < ammo )
 			{
@@ -1999,50 +2000,38 @@ void TeamFortress_DropAmmo( int type )
 					return;
 			}
 			self->s.v.ammo_nails = self->s.v.ammo_nails - ammo;
-		} else
-		{
-			if ( type == 3 )
-			{
-				ammo = DROP_ROCKETS;
-				if ( self->s.v.ammo_rockets < ammo )
-				{
-					if ( self->playerclass == 9 )
-					{
-						if ( self->s.v.ammo_cells /
-						     AMMO_COST_ROCKETS > ammo - self->s.v.ammo_rockets )
-						{
-							G_sprint( self, 2, "you make some rockets.\n" );
-							self->s.v.ammo_cells =
-							    self->s.v.ammo_cells -
-							    ( ammo - self->s.v.ammo_rockets ) * AMMO_COST_ROCKETS;
-							self->s.v.ammo_rockets = ammo;
-						}
-					}
-					if ( self->s.v.ammo_rockets < ammo )
-						return;
-				}
-				self->s.v.ammo_rockets = self->s.v.ammo_rockets - ammo;
-			} else
-			{
-				if ( type == 4 )
-				{
-					ammo = DROP_CELLS;
-					if ( self->s.v.ammo_cells < ammo )
-					{
-/*      if (self->playerclass == 9) {
-       if (self->s.v.ammo_cells / AMMO_COST_CELLS > ammo - self->s.v.ammo_cells) {
-        G_sprint(self, 2, "you make some cells.\n");
-        self->s.v.ammo_cells = self->s.v.ammo_cells - (ammo - self->s.v.ammo_cells) * AMMO_COST_CELLS;
-        self->s.v.ammo_cells = ammo;
-       }
-      }else*/
-//      if (self->s.v.ammo_cells < ammo) 
-						return;
-					}
-					self->s.v.ammo_cells = self->s.v.ammo_cells - ammo;
-				}
-			}
-		}
+			break;
+		case 3:
+       			ammo = DROP_ROCKETS;
+       			if ( self->s.v.ammo_rockets < ammo )
+       			{
+       				if ( self->playerclass == 9 )
+       				{
+       					if ( self->s.v.ammo_cells /
+       					     AMMO_COST_ROCKETS > ammo - self->s.v.ammo_rockets )
+       					{
+       						G_sprint( self, 2, "you make some rockets.\n" );
+       						self->s.v.ammo_cells =
+       						    self->s.v.ammo_cells -
+       						    ( ammo - self->s.v.ammo_rockets ) * AMMO_COST_ROCKETS;
+       						self->s.v.ammo_rockets = ammo;
+       					}
+       				}
+       				if ( self->s.v.ammo_rockets < ammo )
+       					return;
+       			}
+       			self->s.v.ammo_rockets = self->s.v.ammo_rockets - ammo;
+			break;
+		case 4:
+      			ammo = DROP_CELLS;
+      			if ( self->s.v.ammo_cells < ammo )
+      			{
+      				return;
+      			}
+      			self->s.v.ammo_cells = self->s.v.ammo_cells - ammo;
+      			break;
+		default:
+			return;
 	}
 	W_SetCurrentAmmo(  );
 	increment_team_ammoboxes( self->team_no );
@@ -2118,7 +2107,7 @@ void    TeamFortress_AmmoboxRemove(  )
 {
 	decrement_team_ammoboxes( self->team_no );
 	SUB_Remove();
-};
+}
 
 void TeamFortress_AmmoboxTouch(  )
 {
@@ -2251,7 +2240,7 @@ void RemoveOldAmmobox( int tno )
 
 	time = g_globalvars.time + 35;
 
-	for(old = world; old = find( old, FOFS( s.v.classname ), "ammobox" );)
+	for(old = world; (old = find( old, FOFS( s.v.classname ), "ammobox" ));)
 	{
 	        if( old->team_no != tno && tno )
 	        	continue;

@@ -877,7 +877,9 @@ void player_assaultcannonup2(  )
 void player_assaultcannon1(  )
 {
 	vec3_t  v;
+#ifndef NEWHWGUY
 	int     st;
+#endif
 
 	self->s.v.frame = 103;
 	self->s.v.think = ( func_t ) player_assaultcannon2;
@@ -1532,7 +1534,7 @@ void PlayerDie(  )
 	self->imp3 = 0;
 	self->imp4 = 0;
 
-	for(te = world;te = find( te, FOFS( s.v.classname ), "primer" );)
+	for(te = world; (te = find( te, FOFS( s.v.classname ), "primer" ));)
 	{
 		if(te->s.v.owner == EDICT_TO_PROG( self ))
 			break;

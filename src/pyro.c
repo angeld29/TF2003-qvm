@@ -131,7 +131,7 @@ void NapalmGrenadeNetThink(  )
 	gedict_t *head;
 
 	self->s.v.nextthink = g_globalvars.time + 1;
-	for ( head = world; head = findradius( head, self->s.v.origin, 180 ); )
+	for ( head = world; (head = findradius( head, self->s.v.origin, 180 )); )
 	{
 		if ( head->s.v.takedamage )
 		{
@@ -173,7 +173,7 @@ void NapalmGrenadeExplode(  )
         		return;
         	}
         	self->s.v.effects = ( int ) self->s.v.effects | 8;
-        	for ( head = world; head = findradius( head, self->s.v.origin, 180 ); )
+        	for ( head = world; (head = findradius( head, self->s.v.origin, 180 )); )
         	{
         		if ( head->s.v.takedamage )
         		{
@@ -725,7 +725,7 @@ void T_IncendiaryTouch(  )
 		tf_data.deathmsg = 15;
 		TF_T_Damage( other, self, owner, damg, 2, 16 );
 	}
-	for ( head = world; head = findradius( head, self->s.v.origin, 180 ); )
+	for ( head = world; (head = findradius( head, self->s.v.origin, 180 )); )
 	{
 		if ( head->s.v.takedamage )
 		{

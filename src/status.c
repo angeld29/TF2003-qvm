@@ -282,7 +282,7 @@ char   *SentryInfoToSBar( gedict_t * pl, char *str )
 {
 	gedict_t *te;
 
-	for ( te = world; te = find( te, FOFS( s.v.classname ), "building_sentrygun" ); )
+	for ( te = world; (te = find( te, FOFS( s.v.classname ), "building_sentrygun" )); )
 	{
 		if ( te->real_owner != pl )
 			continue;
@@ -317,7 +317,7 @@ char   *DispHealthToSbar( gedict_t * pl, char *str )
 {
 	gedict_t *te;
 
-	for ( te = world; te = find( te, FOFS( s.v.classname ), "building_dispenser" ); )
+	for ( te = world; (te = find( te, FOFS( s.v.classname ), "building_dispenser" )); )
 	{
 		if ( te->real_owner != pl )
 			continue;

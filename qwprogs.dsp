@@ -310,7 +310,6 @@ SOURCE=.\src\version.c
 !IF  "$(CFG)" == "qwprogs - Win32 Release"
 
 # ADD CPP /YX
-# SUBTRACT CPP /FA<none>
 
 !ELSEIF  "$(CFG)" == "qwprogs - Win32 Debug"
 
