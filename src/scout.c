@@ -216,10 +216,6 @@ void FlashGrenadeExplode(  )
 				newmis->s.v.owner = EDICT_TO_PROG( te );
 				newmis->s.v.think = ( func_t ) FlashTimerNew;
 				newmis->s.v.nextthink = g_globalvars.time + NEW_FLASH_START_TIME;
-#ifdef TG
-				if ( tg_data.gren_time )
-					newmis->gren_eff_time = g_globalvars.time + tg_data.gren_time;
-#endif
 			}
 			if ( te == owner )
 			{
@@ -244,10 +240,6 @@ void FlashGrenadeExplode(  )
 				newmis->s.v.owner = EDICT_TO_PROG( te );
 				newmis->s.v.think = ( func_t ) FlashTimer;
 				newmis->s.v.nextthink = g_globalvars.time + 1;
-#ifdef TG
-				if ( tg_data.gren_time )
-						newmis->gren_eff_time = g_globalvars.time + tg_data.gren_time;
-#endif
 			}
 			if ( te == owner )
 			{
@@ -259,6 +251,10 @@ void FlashGrenadeExplode(  )
 			stuffcmd( te, "v_cshift %.0f %.0f %.0f %.0f\n", te->FlashTime * 10, te->FlashTime * 10,
 				  te->FlashTime * 10, te->FlashTime * 10 );
 		}
+#ifdef TG
+       		if ( tg_data.gren_time )
+       			newmis->gren_eff_time = g_globalvars.time + tg_data.gren_time;
+#endif
 	}
 	dremove( self );
 }
@@ -782,7 +778,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 }
 
 #ifdef TG
-void	TG_Eff_Flash(gedict_t *te)
+void	TG_Eff_Flash(gedict_t *te, gedict_t *attaker)
 {
        	if ( strneq( te->s.v.classname, "player" ) )
        		return;
@@ -798,14 +794,23 @@ void	TG_Eff_Flash(gedict_t *te)
        			newmis = spawn(  );
        			newmis->s.v.classname = "timer";
        			newmis->s.v.netname = "flashtimer";
-       			newmis->team_no = te->team_no;
+       			newmis->team_no = attaker->team_no;
        			newmis->s.v.owner = EDICT_TO_PROG( te );
        			newmis->s.v.think = ( func_t ) FlashTimerNew;
        			newmis->s.v.nextthink = g_globalvars.time + NEW_FLASH_START_TIME;
        		}
+      		if ( te == attaker )
+      		{
+      			te->FlashTime = 16;
+      			stuffcmd( te, "v_cshift 160 160 160 160\n" );
+      			disableupdates( te, -1 );	/* server-side flash */
+      		} else
+      		{
       			te->FlashTime = 24;
       			stuffcmd( te, "v_cshift 255 255 255 255\n" );
       			disableupdates( te, NEW_FLASH_START_TIME );	/* server-side flash */
+      		}
+
        	}else
        	{
        		if ( !te->FlashTime )
@@ -813,12 +818,18 @@ void	TG_Eff_Flash(gedict_t *te)
        			newmis = spawn(  );
        			newmis->s.v.classname = "timer";
        			newmis->s.v.netname = "flashtimer";
-       			newmis->team_no = te->team_no;
+       			newmis->team_no = attaker->team_no;
        			newmis->s.v.owner = EDICT_TO_PROG( te );
        			newmis->s.v.think = ( func_t ) FlashTimer;
        			newmis->s.v.nextthink = g_globalvars.time + 1;
        		}
-       	        te->FlashTime = 24;
+       		if ( te == attaker )
+       		{
+       			te->FlashTime = 16;
+       		} else
+       		{
+       			te->FlashTime = 24;
+       		}
        		stuffcmd( te, "v_cshift %.0f %.0f %.0f %.0f\n", te->FlashTime * 10, te->FlashTime * 10,
        			  te->FlashTime * 10, te->FlashTime * 10 );
        	}
