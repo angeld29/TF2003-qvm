@@ -17,6 +17,6 @@ void dremove( gedict_t * te )
 
 void display_location(  )
 {
-	G_sprint( self, 2, "Location : '%d %d %d'\n", self->s.v.origin[0], self->s.v.origin[1], self->s.v.origin[2] );
-	G_sprint( self, 2, "Angles   : '%d %d %d'\n", self->s.v.angles[0], self->s.v.angles[1], self->s.v.angles[2] );
+	G_sprint( self, 2, "Location : '%.0f %.0f %.0f'\n", self->s.v.origin[0], self->s.v.origin[1], self->s.v.origin[2] );
+	G_sprint( self, 2, "Angles   : '%.0f %.0f %.0f'\n", self->s.v.angles[0], self->s.v.angles[1], self->s.v.angles[2] );
 }

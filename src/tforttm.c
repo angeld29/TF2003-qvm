@@ -761,7 +761,7 @@ void TeamFortress_StatusQuery(  )
 		  TeamFortress_TeamGetNoPlayers( 2 ),
 		  TeamFortress_TeamGetNoPlayers( 3 ), TeamFortress_TeamGetNoPlayers( 4 ) );
 
-	G_sprint( self, 2, "    equalisation: %d %d %d %d\n",
+	G_sprint( self, 2, "    equalisation: %.0f %.0f %.0f %.0f\n",
 		  teamadvantage[1], teamadvantage[2], teamadvantage[3], teamadvantage[4] );
 
 	G_sprint( self, 2, "Teamplay is %d\n", teamplay );

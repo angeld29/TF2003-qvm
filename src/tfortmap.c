@@ -2626,12 +2626,13 @@ void DropGoalItems(  )
 {
 	gedict_t *te;
 
-	newmis = spawn(  );
+	newmis = spawn();
+	g_globalvars.newmis = EDICT_TO_PROG( newmis );
 	makevectors( self->s.v.v_angle );
 	VectorNormalize( g_globalvars.v_forward );
 	VectorScale( g_globalvars.v_forward, 64, g_globalvars.v_forward );
 
-	VectorAdd( g_globalvars.v_forward, self->s.v.origin, self->s.v.origin );
+	VectorAdd( g_globalvars.v_forward, self->s.v.origin, newmis->s.v.origin );
 	te = find( world, FOFS( s.v.classname ), "item_tfgoal" );
 	while ( te )
 	{
