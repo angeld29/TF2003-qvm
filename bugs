@@ -9,3 +9,6 @@ PC-   1b404 SentryInfoToSBar + 85
      4da6 PlayerPostThink + 291
         0 vmMain + 170
         0 vmMain + 0
+
+sg on well
+statick sg malfunction

@@ -119,7 +119,7 @@ int visible( gedict_t * targ )
 	VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, spot2 );
 
 	traceline( PASSVEC3( spot1 ), PASSVEC3( spot2 ), 1, self );
-    if( GetSVInfokeyInt( "watervis", NULL, 0) == 0)
+    	if( GetSVInfokeyInt( "watervis", NULL, 0) == 0)
 	{
 	 if ( g_globalvars.trace_inopen && g_globalvars.trace_inwater )
 		return 0;

@@ -1799,7 +1799,7 @@ void PlayerPreThink()
 
 	if ( !self->playerclass )
 	{
-		if ( self->s.v.button2 && self->current_menu == MENU_TEAM && !self->team_no )
+		if ( self->s.v.button2 && ( self->current_menu == MENU_TEAM ) && !self->team_no )
 		{
 			if ( TeamFortress_TeamPutPlayerInTeam() )
 			{

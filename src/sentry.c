@@ -442,7 +442,7 @@ void SG_Static(  )
 void Sentry_Die(  )
 {
 	G_sprint( self->real_owner, 2, "Your sentry gun was destroyed.\n" );
-	if ( self->has_sentry && !tg_data.tg_enabled )
+	if ( self->has_sentry && tg_data.tg_enabled )
 	{
 		self->s.v.health = 0;
 		setmodel( self, "" );
@@ -473,8 +473,45 @@ void Sentry_Die(  )
 	}
 }
 #endif
-
 void FireSentryBullets( int shotcount, gedict_t * targ, float spread_x, float spread_y, float spread_z )
+{
+	vec3_t  direction;
+	vec3_t  src;
+	vec3_t  dst;
+	vec3_t  dir, end, tmp, norm_dir;
+
+	makevectors( self->s.v.v_angle );
+
+	VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
+	VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
+	VectorSubtract( dst, src, dir );
+
+	normalize(dir,norm_dir);
+	
+	if( vlen(dir) > 100 )
+	{
+		 VectorScale(norm_dir, 60, tmp);
+		 VectorAdd(src,tmp,src);
+	}
+
+	ClearMultiDamage(  );
+	traceline( PASSVEC3( src ), PASSVEC3( dst ), 0, self );
+
+	if(g_globalvars.trace_fraction == 1)
+		return;
+
+	VectorScale( norm_dir, 4, puff_org );
+	VectorSubtract( g_globalvars.trace_endpos, puff_org, puff_org );
+
+
+	for (  ; shotcount > 0  ; shotcount-- )
+	{
+		TraceAttack( 4, norm_dir );
+	}
+	ApplyMultiDamage(  );
+	Multi_Finish(  );
+}
+void FireSentryBulletsOld( int shotcount, gedict_t * targ, float spread_x, float spread_y, float spread_z )
 {
 	vec3_t  direction;
 	vec3_t  src;
@@ -482,10 +519,16 @@ void FireSentryBullets( int shotcount, gedict_t * targ, float spread_x, float sp
 	vec3_t  dir, end, tmp;
 
 	makevectors( self->s.v.v_angle );
+
 	VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
 	VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
 	VectorSubtract( dst, src, dir );
-
+	if( vlen(dir) > 100 )
+	{
+		 normalize(dir ,tmp);
+		 VectorScale(tmp, 60, tmp);
+		 VectorAdd(src,tmp,src);
+	}
 	ClearMultiDamage(  );
 	VectorScale( dir, 2048, end );
 	VectorAdd( end, src, end );
@@ -505,6 +548,7 @@ void FireSentryBullets( int shotcount, gedict_t * targ, float spread_x, float sp
 		VectorAdd( end, src, end );
 		traceline( PASSVEC3( src ), PASSVEC3( end ), 0, self );
 
+
 		if ( g_globalvars.trace_fraction != 1 )
 		{
 			TraceAttack( 4, direction );
@@ -521,7 +565,7 @@ void    FireSentryLighting( gedict_t * targ )
 {
 	vec3_t  src;
 	vec3_t  dst;
-	vec3_t  dir, end,direction;
+	vec3_t  dir, end,direction, tmp;
 	gedict_t*trace_ent;
 	float   rs;
 
@@ -531,8 +575,16 @@ void    FireSentryLighting( gedict_t * targ )
 		makevectors( self->s.v.v_angle );
 		VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
 		VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
+          	if( vlen(dir) > 100 )
+          	{
+          		 normalize(dir ,tmp);
+          		 VectorScale(tmp, 60, tmp);
+          		 VectorAdd(src,tmp,src);
+          	}
 		VectorSubtract( dst, src, dir );
 		VectorNormalize( direction );
+		VectorScale( dir, 2048, end );
+		VectorAdd( end, src, end );
 	} else
 	{
 		if ( tf_data.sentry_type == SENTRY_MTFL || tf_data.sentry_type == SENTRY_MTFL_NEWFIND )
@@ -544,12 +596,14 @@ void    FireSentryLighting( gedict_t * targ )
 		VectorAdd( self->s.v.origin, src, src );
 		src[2] = self->s.v.absmin[2] + self->s.v.size[2] * 0.7;
 		VectorSubtract( targ->s.v.origin, self->s.v.origin, dir );
+		VectorScale( dir, 2048, end );
+		VectorAdd( end, src, end );
+
 	}
 	g_globalvars.trace_ent = 0;
 
-	VectorScale( dir, 2048, end );
-	VectorAdd( end, src, end );
 	traceline( PASSVEC3( src ), PASSVEC3( end ), 0, self );
+	
 
 	trap_WriteByte( 4, 23 );
 	trap_WriteByte( 4, 5 );
@@ -629,23 +683,31 @@ int Sentry_Fire(  )
 		newmis->s.v.owner = EDICT_TO_PROG( self );
 		newmis->s.v.movetype = MOVETYPE_FLYMISSILE;
 		newmis->s.v.solid = SOLID_BBOX;
-		VectorSubtract( enemy->s.v.origin, self->s.v.origin, newmis->s.v.velocity );
-		VectorNormalize( newmis->s.v.velocity );
-		VectorScale( newmis->s.v.velocity, 800, newmis->s.v.velocity );
-		vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
+
+
 		newmis->s.v.weapon = 34;
 		newmis->s.v.touch = ( func_t ) T_MissileTouch;
 		newmis->s.v.nextthink = g_globalvars.time + 5;
 		newmis->s.v.think = ( func_t ) SUB_Remove;
+		
 		setmodel( newmis, "progs/missile.mdl" );
 		setsize( newmis, 0, 0, 0, 0, 0, 0 );
+
+		VectorSubtract( enemy->s.v.origin, self->s.v.origin, newmis->s.v.velocity );
+		VectorNormalize( newmis->s.v.velocity );
+		VectorScale( newmis->s.v.velocity, 800, newmis->s.v.velocity );
+		
+		vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
+
 		makevectors( self->s.v.angles);
 		VectorScale( g_globalvars.v_forward, 8, vtemp );
 		VectorAdd( vtemp, self->s.v.origin, vtemp );
 		vtemp[2] += 16;
 		setorigin( newmis, PASSVEC3( vtemp ) );
+
 		self->super_damage_finished = g_globalvars.time + 3;
 		self->s.v.ammo_rockets = self->s.v.ammo_rockets - 1;
+		
 		if ( self->s.v.ammo_rockets == 10 )
 			G_sprint( self->real_owner, 2, "Sentry Gun is low on rockets.\n" );
 	}

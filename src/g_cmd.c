@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.2 2004-09-16 13:06:08 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.3 2004-09-19 21:18:27 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -28,6 +28,7 @@
 extern void trap_CmdArgv( int arg, char *valbuff, int sizebuff );
 
 void    ClientKill(  );
+void Test();
 qboolean ClientCommand(  )
 {
 	char    cmd_command[1024];
@@ -40,22 +41,11 @@ qboolean ClientCommand(  )
 		ClientKill(  );
 		return true;
 	}
-/*	if ( !strcmp( cmd_command, "builddisp" ) )
+	if ( !strcmp( cmd_command, "test" ) )
 	{
-		if ( self->is_building )
-			TeamFortress_EngineerBuild(  );
-		else
-			TeamFortress_Build( 1 );
-		return true;
+	     //Test();
+	     return true;
 	}
-	if ( !strcmp( cmd_command, "buildsentry" ) )
-	{
-		if ( self->is_building )
-			TeamFortress_EngineerBuild(  );
-		else
-			TeamFortress_Build( 2 );
-		return true;
-	}*/
 	//G_Printf("ClientCommand %s\n",cmd_command);
 	return false;
 }
@@ -87,3 +77,42 @@ qboolean ClientUserInfoChanged()
 	return 0;
 
 }
+
+void Test()
+{
+	char    value[1024];
+	int type,dist;
+	vec3_t  src;
+	vec3_t  dst;
+	vec3_t  dir;
+	gedict_t *targ;
+
+	trap_CmdArgv( 1, value, sizeof( value ) );
+	type = atoi(value);
+	trap_CmdArgv( 2, value, sizeof( value ) );
+	dist = atoi(value);
+
+	VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
+	makevectors( self->s.v.v_angle );
+	VectorScale(g_globalvars.v_forward, dist, dir);
+	VectorAdd(src,dir,dst);
+	traceline( PASSVEC3( src ), PASSVEC3( dst ), type, self );
+       	trap_WriteByte( MSG_BROADCAST, SVC_TEMPENTITY );
+       	trap_WriteByte( MSG_BROADCAST, TE_TAREXPLOSION );
+       	trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[0] );
+       	trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[1] );
+       	trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[2] );
+       	trap_multicast( PASSVEC3( g_globalvars.trace_endpos ), MULTICAST_PHS );
+       	G_sprint(self, 2, "fraction %.3f\n",g_globalvars.trace_fraction);
+
+	if(g_globalvars.trace_ent)
+	{
+	        targ = PROG_TO_EDICT(g_globalvars.trace_ent);
+		G_sprint(self, 2, "ent %s\n",targ->s.v.classname);
+//		VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
+//		traceline( PASSVEC3( src ), PASSVEC3( dst ), type, self );
+         	
+	}
+	
+		
+};

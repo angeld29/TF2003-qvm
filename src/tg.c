@@ -66,7 +66,7 @@ void TG_LoadSettings()
        	else
        		tg_data.unlimit_ammo = 0;
 
-       	GetSVInfokeyString( "unl_ammo", NULL, st, sizeof( st ), "off" );
+       	GetSVInfokeyString( "unl_gren", NULL, st, sizeof( st ), "off" );
        	if ( !strcmp( st, "on" ) )
        		tg_data.unlimit_grens = 1;
        	else

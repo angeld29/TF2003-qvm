@@ -1532,9 +1532,12 @@ void PlayerDie(  )
 	self->imp3 = 0;
 	self->imp4 = 0;
 
-	te = find( world, FOFS( s.v.classname ), "primer" );
-	while ( te && te->s.v.owner != EDICT_TO_PROG( self ) )
-		te = find( te, FOFS( s.v.classname ), "primer" );
+	for(te = world;te = find( te, FOFS( s.v.classname ), "primer" );)
+	{
+		if(te->s.v.owner == EDICT_TO_PROG( self ))
+			break;
+	
+	}
 	if ( te )
 //  te->s.v.nextthink = g_globalvars.time;
 	{

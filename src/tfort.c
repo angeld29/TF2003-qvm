@@ -778,8 +778,9 @@ void TeamFortress_ShowTF(  )
 	if ( tf_data.clanbattle == 1 )
 	{
 		fl = GetSVInfokeyFloat( "pm", "prematch", 0 ) * 60;
-		G_sprint( self, 2, "Clan battle: ÏÎ\nPrematch: %d seconds\n", fl );
-		G_sprint( self, 2, "Cease fire: %d seconds\n", ( int ) tf_data.cb_ceasefire_time );
+		G_sprint( self, 2, "Clan battle: ÏÎ\nPrematch: %d seconds\n", (int)fl );
+		fl =  GetSVInfokeyFloat( "cft", "ceasefire_time", 0 ) * 60;
+		G_sprint( self, 2, "Cease fire: %d seconds\n", (int)fl );
 	} else
 		G_sprint( self, 2, "Clan battle: ÏÆÆ\n" );
 	G_sprint( self, 2, "Cheat pause: %d\n", ( int ) tf_data.cheat_pause );

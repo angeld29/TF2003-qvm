@@ -1995,7 +1995,7 @@ void W_SetCurrentAmmo(  )
 		self->s.v.weapon = 2;
 		break;
 	case WEAP_NAILGUN:
-		self->s.v.currentammo = self->s.v.ammo_shells;
+		self->s.v.currentammo = self->s.v.ammo_nails;
 		if ( !( self->tfstate & TFSTATE_RELOADING ) )
 		{
 			self->s.v.weaponmodel = "progs/v_nail.mdl";
