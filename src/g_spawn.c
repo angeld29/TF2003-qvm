@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_spawn.c,v 1.4 2004-12-09 14:34:22 AngelD Exp $
+ *  $Id: g_spawn.c,v 1.5 2005-02-14 13:52:51 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -118,6 +118,7 @@ field_t         fields[] = {
 	{"angle", 	FOFS( s.v.angles ),	F_ANGLEHACK},
 	{"light", 	0,			F_IGNORE},
 	{"wad", 	0, 			F_IGNORE},
+	{"_color", 	0, 			F_IGNORE},
 //////Team Fortress
 	{"netname",		FOFS( s.v.netname ),		F_LSTRING},
 	{"team_no", 		FOFS( team_no ),		F_INT},
@@ -753,7 +754,8 @@ void G_ParseField( const char *key, const char *value, gedict_t * ent )
 			return;
 		}
 	}
-	G_Printf( "unknown field: %s\n", key );
+	G_dprint( "unknown field: %s\n", key );
+	//G_Printf( "unknown field: %s\n", key );
 }
 
 /*

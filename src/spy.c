@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: spy.c,v 1.9 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: spy.c,v 1.10 2005-02-14 13:52:51 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1097,18 +1097,18 @@ void TeamFortress_SpyUndercoverThink(  )
 			owner->immune_to_check = g_globalvars.time + tf_data.cheat_pause;	//10;
 			if ( self->s.v.skin )
 			{
-				G_sprint( owner, 2, "Skin set to " );
-				TeamFortress_PrintClassName( owner, self->s.v.skin, 0 );
 				owner->undercover_skin = self->s.v.skin;
 				TeamFortress_SetSkin( owner );
+				G_sprint( owner, 2, "Skin set to " );
+				TeamFortress_PrintClassName( owner, self->s.v.skin, 0 );
 			}
 			if ( self->s.v.team )
 			{
-				G_sprint( owner, 2, "Colors set to Team %.0f\n", self->s.v.team );
 				owner->undercover_team = self->s.v.team;
 				stuffcmd( owner, "color %d %d\n", TeamFortress_TeamGetTopColor( self->s.v.team ),
 					  TeamFortress_TeamGetColor( self->s.v.team ) - 1 );
 				TeamFortress_SetSkin( owner );
+				G_sprint( owner, 2, "Colors set to Team %.0f\n", self->s.v.team );
 			}
 			TeamFortress_SpyCalcName( owner );
 			if ( !owner->StatusBarSize )
@@ -1132,7 +1132,7 @@ void TeamFortress_SpyChangeSkin( int class )
 			G_sprint( self, 2, "Skin reset.\n" );
 			return;
 		}
-		G_sprint( self, 2, "Skin reset." );
+		G_sprint( self, 2, "Skin reset.\n" );
 		self->undercover_skin = 0;
 		TeamFortress_SetSkin( self );
 		if ( !self->undercover_team )

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: menu.c,v 1.16 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: menu.c,v 1.17 2005-02-14 13:52:51 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -1011,7 +1011,7 @@ void Menu_Spy( menunum_t menu )
 		
 		
 	if (((int)self->s.v.effects & (8 | 4)) || self->is_unabletospy == 1) {
-		spy_menu_undecover = "";
+		s_undercover = "";
 	}
 
         CenterPrint( self, "Action:                           \n"
@@ -1075,7 +1075,7 @@ void Menu_Spy_Input( int inp )
 		self->s.v.impulse = 0;
 		break;
 	case 6:
-		if ( self->undercover_team || self->undercover_skin )
+		//if ( self->undercover_team || self->undercover_skin )
 		{
 			ResetMenu(  );
 			self->s.v.impulse = 0;
@@ -1464,11 +1464,11 @@ void 	TG_Detpack_Menu(menunum_t menu)
 	
         switch(tg_data.detpack_clip)
         {
-        	case TG_DETPACK_CLIP_ALL:
+        	case TG_DETPACK_SOLID_ALL:
         		s_clip = "1)‰detpack clip is ALL        \n";
         		break;
 
-        	case TG_DETPACK_SOLID_ALL:
+        	case TG_DETPACK_CLIP_ALL:
         		s_clip = "1)‡detpack clip is OFF        \n";
         		break;
 

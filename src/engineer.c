@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: engineer.c,v 1.18 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: engineer.c,v 1.19 2005-02-14 13:52:51 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -323,7 +323,7 @@ void TeamFortress_EngineerBuild(  )
 //	}
     }
 }
-int CheckAreaNew( gedict_t * obj, gedict_t * builder )
+/*int CheckAreaNew( gedict_t * obj, gedict_t * builder )
 {
     gedict_t *te;
     vec3_t end;
@@ -331,6 +331,7 @@ int CheckAreaNew( gedict_t * obj, gedict_t * builder )
     TraceCapsule( PASSVEC3( obj->s.v.origin ), PASSVEC3( obj->s.v.origin ), 0, obj, -16, -16, 0, 16, 16, 48 );
     if ( g_globalvars.trace_startsolid == 1 )
     {
+    G_bprint(2,"before allsolid == 1\n");
 	VectorCopy( obj->s.v.origin, end );
 	end[2] -= 48;
 	TraceCapsule( PASSVEC3( obj->s.v.origin ), PASSVEC3( end ), 0, obj, -16, -16, 0, 16, 16, 4 );
@@ -343,7 +344,35 @@ int CheckAreaNew( gedict_t * obj, gedict_t * builder )
 
     te = findradius( world, obj->s.v.origin, 64 );
     if ( te )
-	return 0;
+		return 0;
+    return 1;
+}*/
+int CheckAreaNew( gedict_t * obj, gedict_t * builder )
+{
+    gedict_t *te;
+    vec3_t end;
+
+    TraceCapsule( PASSVEC3( obj->s.v.origin ), PASSVEC3( obj->s.v.origin ), 0, obj, PASSVEC3( obj->s.v.mins), PASSVEC3( obj->s.v.maxs) );
+    if ( g_globalvars.trace_startsolid == 1 )
+    {
+    //G_bprint(2,"before allsolid == 1\n");
+	VectorCopy( obj->s.v.origin, end );
+	end[2] -= 48;
+	TraceCapsule( PASSVEC3( obj->s.v.origin ), PASSVEC3( end ), 0, obj, PASSVEC3( obj->s.v.mins), obj->s.v.maxs[0], obj->s.v.maxs[1], 4);
+	VectorCopy( g_globalvars.trace_endpos, end );
+	end[2]++;
+	TraceCapsule( PASSVEC3( end ), PASSVEC3( end ), 0, obj, PASSVEC3( obj->s.v.mins), PASSVEC3( obj->s.v.maxs) );
+	if ( g_globalvars.trace_startsolid == 1 )
+	    return 0;
+    }
+
+    te = findradius( world, obj->s.v.origin, 64 );
+    if ( te )
+	{
+		
+		return 0;
+	}
+    
     return 1;
 }
 
@@ -398,7 +427,7 @@ int CheckArea( gedict_t * obj, gedict_t * builder )
 	return 0;
     te = findradius( world, obj->s.v.origin, 64 );
     if ( te )
-	return 0;
+		return 0;
     return 1;
 }
 
@@ -425,8 +454,8 @@ void TeamFortress_Build( int objtobuild )
 	    G_sprint( self, 2, "You can only have one dispenser.\nTry dismantling your old one.\n" );
 	    return;
 	}
-	SetVector( tmp1, -16, -16, 0 );
-	SetVector( tmp2, 16, 16, 48 );
+	SetVector( tmp1, -8, -8, 0 );
+	SetVector( tmp2, 8, 8, 24 );
 	newmis->mdl = "progs/disp.mdl";
 	newmis->s.v.netname = "dispenser";
 	btime = g_globalvars.time + BUILD_TIME_DISPENSER;
@@ -455,6 +484,8 @@ void TeamFortress_Build( int objtobuild )
 	}
 
     }
+	VectorCopy(tmp1,newmis->s.v.mins);
+	VectorCopy(tmp2,newmis->s.v.maxs);
 
     if ( !CheckArea( newmis, self ) )
     {
@@ -610,6 +641,10 @@ void TeamFortress_FinishedBuilding(  )
 	setsize( oldself, -8, -8, 0, 8, 8, 24 );
 	oldself->s.v.origin[2] += 8;
 	setorigin( oldself, PASSVEC3( oldself->s.v.origin ) );
+    /*TraceCapsule( PASSVEC3( oldself->s.v.origin ), PASSVEC3( oldself->s.v.origin ), 0, oldself, PASSVEC3( oldself->s.v.mins), PASSVEC3( oldself->s.v.maxs));
+	if ( g_globalvars.trace_startsolid == 1 )
+	    G_bprint(2,"all solid = 1\n");*/
+    
     } else
     {
 	if ( oldself->s.v.weapon == BUILD_SENTRYGUN )
