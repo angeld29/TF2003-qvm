@@ -183,8 +183,7 @@ void Sentry_Rotate(  )
 
 	self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & 8 );
 	CheckSentry( self );
-	if ( tf_data.sentry_type == SENTRY_NEW || tf_data.sentry_type == SENTRY_MTFL_NEWFIND
-	     || tf_data.sentry_type == SENTRY_OLD_NEWFIND )
+	if ( tf_data.sg_newfind)
 	{
 		if ( Sentry_FindTarget_Angel(  ) )
 			return;
@@ -448,7 +447,7 @@ void Sentry_Die(  )
 		trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
 	} else
 	{
-		self->real_owner->has_sentry = self->real_owner->has_sentry - 1;
+		self->real_owner->has_sentry -= 1;
 		self->s.v.think = ( func_t ) Sentry_Explode;
 		self->s.v.nextthink = g_globalvars.time + 0.1;
 	}
@@ -456,10 +455,10 @@ void Sentry_Die(  )
 
 void FireSentryBullets( int shotcount, gedict_t * targ, float spread_x, float spread_y, float spread_z )
 {
-	vec3_t  direction;
+	//vec3_t  end,direction;
 	vec3_t  src;
 	vec3_t  dst;
-	vec3_t  dir, end, tmp, norm_dir;
+	vec3_t  dir,  tmp, norm_dir;
 
 	makevectors( self->s.v.v_angle );
 
@@ -492,7 +491,12 @@ void FireSentryBullets( int shotcount, gedict_t * targ, float spread_x, float sp
 	ApplyMultiDamage(  );
 	Multi_Finish(  );
 }
-void FireSentryBulletsOld( int shotcount, gedict_t * targ, float spread_x, float spread_y, float spread_z )
+/*
+====================================
+FireSentryBulletsMTFL2
+====================================
+*/
+void FireSentryBulletsMTFL2( int shotcount, gedict_t * targ, float spread_x, float spread_y, float spread_z )
 {
 	vec3_t  direction;
 	vec3_t  src;
@@ -504,12 +508,7 @@ void FireSentryBulletsOld( int shotcount, gedict_t * targ, float spread_x, float
 	VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
 	VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
 	VectorSubtract( dst, src, dir );
-	if( vlen(dir) > 100 )
-	{
-		 normalize(dir ,tmp);
-		 VectorScale(tmp, 60, tmp);
-		 VectorAdd(src,tmp,src);
-	}
+
 	ClearMultiDamage(  );
 	VectorScale( dir, 2048, end );
 	VectorAdd( end, src, end );
@@ -545,40 +544,52 @@ void    FireSentryLighting( gedict_t * targ )
 {
 	vec3_t  src;
 	vec3_t  dst;
-	vec3_t  dir, end,direction, tmp;
+	vec3_t  dir, end,direction, tmp,norm_dir;
 	gedict_t*trace_ent;
-	float   rs;
 
-	if ( tf_data.sentry_type == SENTRY_FIX || tf_data.sentry_type == SENTRY_NEW )
+	switch( tf_data.sg_sfire )
 	{
-		VectorCopy( self->s.v.angles, self->s.v.v_angle );
-		makevectors( self->s.v.v_angle );
-		VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
-		VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
-          	if( vlen(dir) > 100 )
-          	{
-          		 normalize(dir ,tmp);
-          		 VectorScale(tmp, 60, tmp);
-          		 VectorAdd(src,tmp,src);
-          	}
-		VectorSubtract( dst, src, dir );
-		VectorNormalize( direction );
-		VectorScale( dir, 2048, end );
-		VectorAdd( end, src, end );
-	} else
-	{
-		if ( tf_data.sentry_type == SENTRY_MTFL || tf_data.sentry_type == SENTRY_MTFL_NEWFIND )
-		{
+		case SG_SFIRE_NEW:
 			VectorCopy( self->s.v.angles, self->s.v.v_angle );
-		}
-		makevectors( self->s.v.v_angle );
-		VectorScale( g_globalvars.v_forward, 10, src );
-		VectorAdd( self->s.v.origin, src, src );
-		src[2] = self->s.v.absmin[2] + self->s.v.size[2] * 0.7;
-		VectorSubtract( targ->s.v.origin, self->s.v.origin, dir );
-		VectorScale( dir, 2048, end );
-		VectorAdd( end, src, end );
+			makevectors( self->s.v.v_angle );
 
+                	VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
+                	VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
+                	VectorSubtract( dst, src, dir );
+
+                	normalize(dir,norm_dir);
+                	if( vlen(dir) > 100 )
+                	{
+                		 VectorScale(norm_dir, 60, tmp);
+                		 VectorAdd(src,tmp,src);
+                	}
+                	VectorCopy(dst,end);
+			break;
+		case SG_SFIRE_MTFL2:
+        		VectorCopy( self->s.v.angles, self->s.v.v_angle );
+        		makevectors( self->s.v.v_angle );
+        		VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
+        		VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
+
+        		VectorSubtract( dst, src, dir );
+        		VectorNormalize( direction );
+        		VectorScale( dir, 2048, end );
+        		VectorAdd( end, src, end );
+        		break;
+
+		case SG_SFIRE_MTFL1:
+			VectorCopy( self->s.v.angles, self->s.v.v_angle );
+		case SG_SFIRE_281:
+        		makevectors( self->s.v.v_angle );
+        		VectorScale( g_globalvars.v_forward, 10, src );
+        		VectorAdd( self->s.v.origin, src, src );
+        		src[2] = self->s.v.absmin[2] + self->s.v.size[2] * 0.7;
+        		VectorSubtract( targ->s.v.origin, self->s.v.origin, dir );
+        		VectorScale( dir, 2048, end );
+        		VectorAdd( end, src, end );
+        		break;
+		default:
+			return;
 	}
 	g_globalvars.trace_ent = 0;
 
@@ -600,34 +611,31 @@ void    FireSentryLighting( gedict_t * targ )
 		trace_ent = PROG_TO_EDICT(g_globalvars.trace_ent);
 		if ( streq( trace_ent->s.v.classname, "player" ) )
 		{
-			rs = (int)( g_random(  ) * 15) + 1 ;
-			trace_ent->s.v.noise = "";
-			if ( rs == 1 )
-				trace_ent->s.v.noise = "player/pain1.wav";
-			else
+            switch((int)( g_random(  ) * 30) )  
 			{
-				if ( rs == 2 )
-					trace_ent->s.v.noise = "player/pain2.wav";
-				else
-				{
-					if ( rs == 3 )
-						trace_ent->s.v.noise = "player/pain3.wav";
-					else
-					{
-						if ( rs == 4 )
-							trace_ent->s.v.noise = "player/pain4.wav";
-						else
-						{
-							if ( rs == 5 )
-								trace_ent->s.v.noise = "player/pain5.wav";
-							else
-								trace_ent->s.v.noise = "player/pain6.wav";
-						}
-					}
-				}
+				case 0:
+					sound( trace_ent, 2, "player/pain1.wav" , 1, 1 );
+					break;
+				case 1:
+					sound( trace_ent, 2, "player/pain1.wav" , 1, 1 );
+					break;
+				case 2:
+					sound( trace_ent, 2, "player/pain2.wav" , 1, 1 );
+					break;
+				case 3:
+					sound( trace_ent, 2, "player/pain3.wav" , 1, 1 );
+					break;
+				case 4:
+					sound( trace_ent, 2, "player/pain4.wav" , 1, 1 );
+					break;
+				case 5:
+					sound( trace_ent, 2, "player/pain5.wav" , 1, 1 );
+					break;
+				case 6:
+					sound( trace_ent, 2, "player/pain6.wav" , 1, 1 );
+					break;
+				default:break;
 			}
-			if ( rs <= 6 )
-				sound( trace_ent, 2, trace_ent->s.v.noise, 1, 1 );
 		}
 	}
 }
@@ -704,19 +712,28 @@ int Sentry_Fire(  )
 		FireSentryLighting( PROG_TO_EDICT(self->s.v.enemy) );
 	} else
 	{
-		if ( tf_data.sentry_type == SENTRY_MTFL || tf_data.sentry_type == SENTRY_MTFL_NEWFIND )
-		{		//mtfl sentry
-			VectorCopy( self->s.v.angles, self->s.v.v_angle );
-			FireBullets( 4, dir, 0.1, 0.1, 0 );
-		} else
-		{
-			if ( tf_data.sentry_type == SENTRY_FIX || tf_data.sentry_type == SENTRY_NEW )
-			{
+	        switch(tf_data.sg_sfire)
+	        {
+	        	case SG_SFIRE_281:
+	        		FireBullets( 4, dir, 0.1, 0.1, 0 );
+	        		break;
+	        	case SG_SFIRE_MTFL1:
+				VectorCopy( self->s.v.angles, self->s.v.v_angle );
+				FireBullets( 4, dir, 0.1, 0.1, 0 );
+	        		break;
+	        	case SG_SFIRE_MTFL2:
+				VectorCopy( self->s.v.angles, self->s.v.v_angle );
+				FireSentryBulletsMTFL2( 4, enemy, 0.1, 0.1, 0 );
+				break;
+	        	case SG_SFIRE_NEW:
 				VectorCopy( self->s.v.angles, self->s.v.v_angle );
 				FireSentryBullets( 4, enemy, 0.1, 0.1, 0 );
-			} else
-				FireBullets( 4, dir, 0.1, 0.1, 0 );
-		}
+				break;
+	        		
+	        	default:
+	        		G_Error("Unknown SG TYPE\n");
+	        
+	        }
 	}
 //////
 	if ( !self->s.v.ammo_shells && g_random(  ) < 0.1 )

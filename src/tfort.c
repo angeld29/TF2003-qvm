@@ -801,25 +801,24 @@ void TeamFortress_ShowTF(  )
 	}else
 		G_sprint( self, 2, "Topcolor checking disabled\n" );
 
-	switch ( tf_data.sentry_type )
+	if( tf_data.sg_newfind )
+		G_sprint( self, 2, "Sentry New Find Target: %d ppl\n", tf_data.sgppl );
+	else
+		G_sprint( self, 2, "Sentry New Find Target: ÏÆÆ\n" );
+	
+	switch ( tf_data.sg_sfire )
 	{
-	case SENTRY_MTFL:
-		G_sprint( self, 2, "Sentry: 2.8.1 fixed(mtfl)\n" );
+	case SG_SFIRE_281:
+		G_sprint( self, 2, "Sentry Shells Fire: 2.8.1\n" );
 		break;
-	case SENTRY_OLD:
-		G_sprint( self, 2, "Sentry: 2.8.1\n" );
+	case SG_SFIRE_MTFL1:
+		G_sprint( self, 2, "Sentry Shells Fire: 2.8.1 fixed(mtfl)\n" );
 		break;
-	case SENTRY_FIX:
-		G_sprint( self, 2, "Sentry: 2.8.1 fixed new\n" );
+	case SG_SFIRE_MTFL2:
+		G_sprint( self, 2, "Sentry Shells Fire: MTFL2\n" );
 		break;
-	case SENTRY_NEW:
-		G_sprint( self, 2, "Sentry: NEW %d ppl\n", tf_data.sgppl );
-		break;
-	case SENTRY_MTFL_NEWFIND:
-		G_sprint( self, 2, "Sentry: MTFL new find %d ppl\n", tf_data.sgppl );
-		break;
-	case SENTRY_OLD_NEWFIND:
-		G_sprint( self, 2, "Sentry: 2.8.1 new find %d ppl\n", tf_data.sgppl );
+	case SG_SFIRE_NEW:
+		G_sprint( self, 2, "Sentry Shells Fire: NEW\n" );
 		break;
 	}
 

@@ -95,21 +95,56 @@ void TG_LoadSettings()
        			tg_data.detpack_clip = TG_DETPACK_CLIP_OWNER;
        	Detpack_SetClip();
 
-       	tf_data.sentry_type = SENTRY_NEW;
+      	tf_data.sg_newfind = true;
+      	tf_data.sg_sfire   = SG_SFIRE_NEW;
 
-       	GetSVInfokeyString( "sg", NULL, st, sizeof( st ), "new" );
-       	if ( !strcmp( st, "old" ) )
-       		tf_data.sentry_type = SENTRY_OLD;
-       	else if ( !strcmp( st, "fix" ) )
-       		tf_data.sentry_type = SENTRY_FIX;
-       	else if ( !strcmp( st, "oldmtfl" ) )
-       		tf_data.sentry_type = SENTRY_MTFL;
-       	else if ( !strcmp( st, "mtflf" ) )
-       		tf_data.sentry_type = SENTRY_MTFL_NEWFIND;
-       	else if ( !strcmp( st, "oldf" ) )
-       		tf_data.sentry_type = SENTRY_OLD_NEWFIND;
-       	else
-       		tf_data.sentry_type = SENTRY_NEW;
+      	GetSVInfokeyString( "sg", NULL, st, sizeof( st ), "new" );
+      	if ( !strcmp( st, "old" ) )
+      	{
+      		tf_data.sg_newfind = false;
+      		tf_data.sg_sfire   = SG_SFIRE_281;
+      	}
+      	if ( !strcmp( st, "fix" ) )
+      	{
+      		tf_data.sg_newfind = false;
+      		tf_data.sg_sfire   = SG_SFIRE_MTFL2;
+      	}
+
+      	if ( !strcmp( st, "oldmtfl" ) )
+      	{
+      		tf_data.sg_newfind = false;
+      		tf_data.sg_sfire   = SG_SFIRE_MTFL1;
+      	}
+      	if ( !strcmp( st, "mtflf" ) )
+      	{
+      		tf_data.sg_newfind = true;
+      		tf_data.sg_sfire   = SG_SFIRE_MTFL1;
+      	}
+
+      	if ( !strcmp( st, "oldf" ) )
+      	{
+      		tf_data.sg_newfind = true;
+      		tf_data.sg_sfire   = SG_SFIRE_281;
+      	}
+
+      	GetSVInfokeyString( "sg_newfind", NULL, st, sizeof( st ), "on" );
+      	if ( !strcmp( st, "off" ) )
+      		tf_data.sg_newfind = false;
+      	else
+      		tf_data.sg_newfind = true;
+
+
+      	GetSVInfokeyString( "sg_sfire", NULL, st, sizeof( st ), "new" );
+
+      	if( !strcmp(st, "old"))
+      		tf_data.sg_sfire = SG_SFIRE_281;
+
+      	if( !strcmp(st, "mtfl1"))
+      		tf_data.sg_sfire = SG_SFIRE_MTFL1;
+
+      	if( !strcmp(st, "mtfl2"))
+      		tf_data.sg_sfire = SG_SFIRE_MTFL2;
+      		
 
        	tf_data.sgppl = GetSVInfokeyInt( "sgppl", NULL, 12 );
        	if ( tf_data.sgppl < 0 )

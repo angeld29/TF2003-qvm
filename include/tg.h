@@ -78,7 +78,7 @@ typedef struct{
 extern tf_tg_server_data_t tg_data;
 
 void	TG_Eff_Conc(gedict_t *head);
-void	TG_Eff_Flash(gedict_t *te, gedict_t *attaker);
+void	TG_Eff_Flash(gedict_t *te);
 void	TG_Eff_Remove(gedict_t *pl);
 void 	TG_LoadSettings();
 

@@ -1289,7 +1289,7 @@ void 	TG_Main_Menu_Input( int inp )
   self->menu_count = 23;
 
 }
-char* sentry_type_names[]=
+/*char* sentry_type_names[]=
 {
  "Sentry: 2.8.1",
  "Sentry: 2.8.1 fixed(mtfl)",
@@ -1298,51 +1298,52 @@ char* sentry_type_names[]=
  "Sentry: MTFL new find,SGPPL = ",
  "Sentry: 2.8.1 new find,SGPPL = ",
  "Unknown Sentry type"
-};
+}; */
+
+char* sentry_sfire_names[]=
+{
+"4) Sentry Shells Fire: NEW    \n",
+"4) Sentry Shells Fire: 2.8.1  \n",
+"4) Sentry Shells Fire: MTFL1  \n",
+"4) Sentry Shells Fire: MTFL2  \n"
+}; 
 
 char* sentry_find_names[]=
 {
-  "5)†ignore teammates           \n",
-  "5)ˆignore owner               \n",
-  "5)‰ignore OFF                 \n",
-  "5)‡ignore all targets         \n",
+  "6)†ignore teammates           \n",
+  "6)ˆignore owner               \n",
+  "6)‰ignore OFF                 \n",
+  "6)‡ignore all targets         \n",
 };
 
 char* sentry_firetype_names[]=
 {
- "6) Fire bullets & rockets     \n",
- "6) Fire bullets               \n",
- "6) Fire lightning (no damage) \n"
+ "7) Fire bullets & rockets     \n",
+ "7) Fire bullets               \n",
+ "7) Fire lightning (no damage) \n"
 };
 void 	TG_SGOptions_Menu(menunum_t menu)
 {
-  char *s_sgtype, s_sgppl[10], *s_sg_fire,*s_sg_find,*s_sgfiretype,*s_sbar,*s_change_sgppl;
-  switch( tf_data.sentry_type )
+  char *s_sg_newfind,*s_sg_sfire, s_sgppl[80], *s_sg_fire,*s_sg_find,*s_sgfiretype,*s_sbar;
+  
+  if( tf_data.sg_newfind )
   {
-  	case SENTRY_OLD:
-  	case SENTRY_MTFL:
-  	case SENTRY_FIX:
-  	                sprintf(s_sgppl,"\n");
-  			s_change_sgppl = "                              \n"
-  					 "                              \n";
-			break;
-  	case SENTRY_NEW:
-  	case SENTRY_MTFL_NEWFIND:
-  	case SENTRY_OLD_NEWFIND:
-  			s_change_sgppl = "2) Increase SGPPL             \n"
-  					 "3) Decrease SGPPL             \n";
-  			sprintf(s_sgppl,"%d\n", tf_data.sgppl);
-  			break;
-  	default: 
-  		tf_data.sentry_type = MAX_SENTRY_TYPES;
-  		sprintf(s_sgppl,"\n");
-  		break;
+  		s_sg_newfind =  "1)‰Sentry New Find Target ON  \n";
+        sprintf(s_sgppl,"2)-    %3d ppl emulation   3)+\n",tf_data.sgppl);
+  }else
+  {
+  	s_sg_newfind = "1)‡Sentry New Find Target OFF \n";
+  	sprintf(s_sgppl,"\n");
   }
-  s_sgtype = sentry_type_names[tf_data.sentry_type];
+
+  if(tf_data.sg_sfire >= SG_SFIRE_NUM)
+  	tf_data.sg_sfire = 0;
+  s_sg_sfire = sentry_sfire_names[tf_data.sg_sfire];
+  	
   if ( !tg_data.sg_disable_fire)
-  	s_sg_fire = "4)‰fire ON                    \n";
+  	s_sg_fire = "5)‰fire ON                    \n";
   else
-  	s_sg_fire = "4)‡fire OFF                   \n";
+  	s_sg_fire = "5)‡fire OFF                   \n";
   if(tg_data.sg_allow_find >= TG_SG_FIND_IGNORE_NUM)
   	tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
   
@@ -1352,16 +1353,15 @@ void 	TG_SGOptions_Menu(menunum_t menu)
   	tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;
   s_sgfiretype = sentry_firetype_names[tg_data.sg_fire_type];
   if( tg_data.tg_sbar )
-  	s_sbar = "7)‰Eng Sbar for All           \n";
+  	s_sbar = "8)‰Eng Sbar for All           \n";
   else
-  	s_sbar = "7)‡Limited Eng Sbar           \n";
+  	s_sbar = "8)‡Limited Eng Sbar           \n";
 
   CenterPrint(self,"Sentry Gun Options:\n"
-  		   "%s%s"
-  		   "1) Change SG type             \n"
-  		   "%s%s%s%s%s"
-  		   "8) Nothing                    \n",
-  		   s_sgtype, s_sgppl, s_change_sgppl,
+  		   "%s%s%s"
+  		   "%s%s%s%s"
+  		   "9) Nothing                    \n",
+  		   s_sg_newfind, s_sgppl, s_sg_sfire,
   		   s_sg_fire, s_sg_find, s_sgfiretype, s_sbar );
 }
 void 	TG_SGOptions_Menu_Input( int inp )
@@ -1369,39 +1369,38 @@ void 	TG_SGOptions_Menu_Input( int inp )
 	switch(inp)
 	{
 		case 1:
-			if( ++(tf_data.sentry_type) >= MAX_SENTRY_TYPES	)
-				tf_data.sentry_type = 0;
+		        tf_data.sg_newfind = (tf_data.sg_newfind)?0:1;
 		       break;
-		case 2:
-			if(tf_data.sentry_type == SENTRY_NEW || 
-				tf_data.sentry_type == SENTRY_MTFL_NEWFIND || 
-				tf_data.sentry_type == SENTRY_OLD_NEWFIND)
+		case 3:
+			if( tf_data.sg_newfind )
 				tf_data.sgppl++;
 			break;	
-		case 3:
-			if(tf_data.sentry_type == SENTRY_NEW || 
-				tf_data.sentry_type == SENTRY_MTFL_NEWFIND || 
-				tf_data.sentry_type == SENTRY_OLD_NEWFIND)
-				{
+		case 2:
+			if( tf_data.sg_newfind )
+			{
 				 if(tf_data.sgppl)
 				 	tf_data.sgppl--;
-				}
+			}
 			break;	
 		case 4:
+			if( ++(tf_data.sg_sfire) >= SG_SFIRE_NUM)
+				tf_data.sg_sfire = 0;
+		       break;
+		case 5:
 			tg_data.sg_disable_fire = (tg_data.sg_disable_fire)?0:1;
 			break;
-		case 5:
+		case 6:
 			if( ++(tg_data.sg_allow_find) >= TG_SG_FIND_IGNORE_NUM)
 				tg_data.sg_allow_find = 0;
 		       break;
-		case 6:
+		case 7:
 			if( ++(tg_data.sg_fire_type) >= TG_SG_FIRE_NUM)
 				tg_data.sg_fire_type = 0;
 		       break;
-		case 7:
+		case 8:
 			tg_data.tg_sbar = (tg_data.tg_sbar)?0:1;
 			break;
-		case 8:
+		case 9:
 			ResetMenu(  );
 			self->s.v.impulse = 0;
 			break;

@@ -299,6 +299,15 @@ extern char           *team_menu_string;
 
 extern int FLAME_MAXWORLDNUM, MAX_WORLD_PIPEBOMBS, MAX_WORLD_AMMOBOXES, GR_TYPE_MIRV_NO, GR_TYPE_NAPALM_NO;
 
+typedef enum
+{
+	SG_SFIRE_NEW,
+	SG_SFIRE_281,
+	SG_SFIRE_MTFL1,
+	SG_SFIRE_MTFL2,
+	SG_SFIRE_NUM
+}sg_sfire_t;
+
 typedef struct {
 	int             toggleflags;
 	float           respawn_delay_time;
@@ -330,7 +339,9 @@ typedef struct {
 	int		cheat_pause;
 	int		disable_grens;
 	int		topcolor_check;
-	sentry_types_t	sentry_type;
+//	sentry_types_t	sentry_type;
+	qboolean	sg_newfind;
+	sg_sfire_t	sg_sfire;
 	int		sgppl;
 	int		snip_range_fix,snip_fps,snip_ammo;
 	float		snip_time;

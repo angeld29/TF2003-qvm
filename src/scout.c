@@ -205,6 +205,8 @@ void FlashGrenadeExplode(  )
 				newmis->s.v.owner = EDICT_TO_PROG( te );
 				newmis->s.v.think = ( func_t ) FlashTimerNew;
 				newmis->s.v.nextthink = g_globalvars.time + NEW_FLASH_START_TIME;
+                		if ( tg_data.gren_time )
+                			newmis->gren_eff_time = g_globalvars.time + tg_data.gren_time;
 			}
 			if ( te == owner )
 			{
@@ -229,6 +231,8 @@ void FlashGrenadeExplode(  )
 				newmis->s.v.owner = EDICT_TO_PROG( te );
 				newmis->s.v.think = ( func_t ) FlashTimer;
 				newmis->s.v.nextthink = g_globalvars.time + 1;
+                		if ( tg_data.gren_time )
+                			newmis->gren_eff_time = g_globalvars.time + tg_data.gren_time;
 			}
 			if ( te == owner )
 			{
@@ -240,8 +244,6 @@ void FlashGrenadeExplode(  )
 			stuffcmd( te, "v_cshift %.0f %.0f %.0f %.0f\n", te->FlashTime * 10, te->FlashTime * 10,
 				  te->FlashTime * 10, te->FlashTime * 10 );
 		}
-       		if ( tg_data.gren_time )
-       			newmis->gren_eff_time = g_globalvars.time + tg_data.gren_time;
 	}
 	dremove( self );
 }
@@ -464,7 +466,7 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 
 			if ( head == PROG_TO_EDICT( inflictor->s.v.owner ) && tg_data.gren_effect == TG_GREN_EFFECT_OFF_FORSELF )
 				continue;
-
+			
 			G_sprint( head, 2, "You are conced\n");
 			for ( te = world; te = find( te, FOFS( s.v.classname ), "timer" ); )
 			{
@@ -488,8 +490,6 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 					te->s.v.health = 800;
 					te->s.v.nextthink = g_globalvars.time + 0.25;
 				}
-				if ( tg_data.gren_time )
-					te->gren_eff_time = g_globalvars.time + tg_data.gren_time;
 			} else
 			{
 				if ( tf_data.old_grens == 1 )
@@ -514,9 +514,9 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 					te->s.v.owner = EDICT_TO_PROG( head );
 					te->s.v.health = 800;
 				}
-				if ( tg_data.gren_time )
-					te->gren_eff_time = g_globalvars.time + tg_data.gren_time;
 			}
+			if ( tg_data.gren_time )
+				te->gren_eff_time = g_globalvars.time + tg_data.gren_time;
 		}
 	}
 }
@@ -756,7 +756,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 	return;
 }
 
-void	TG_Eff_Flash(gedict_t *te, gedict_t *attaker)
+void	TG_Eff_Flash(gedict_t *te)
 {
        	if ( strneq( te->s.v.classname, "player" ) )
        		return;
@@ -772,22 +772,14 @@ void	TG_Eff_Flash(gedict_t *te, gedict_t *attaker)
        			newmis = spawn(  );
        			newmis->s.v.classname = "timer";
        			newmis->s.v.netname = "flashtimer";
-       			newmis->team_no = attaker->team_no;
+       			newmis->team_no = te->team_no;
        			newmis->s.v.owner = EDICT_TO_PROG( te );
        			newmis->s.v.think = ( func_t ) FlashTimerNew;
        			newmis->s.v.nextthink = g_globalvars.time + NEW_FLASH_START_TIME;
        		}
-      		if ( te == attaker )
-      		{
-      			te->FlashTime = 16;
-      			stuffcmd( te, "v_cshift 160 160 160 160\n" );
-      			disableupdates( te, -1 );	/* server-side flash */
-      		} else
-      		{
-      			te->FlashTime = 24;
-      			stuffcmd( te, "v_cshift 255 255 255 255\n" );
-      			disableupdates( te, NEW_FLASH_START_TIME );	/* server-side flash */
-      		}
+   			te->FlashTime = 24;
+   			stuffcmd( te, "v_cshift 255 255 255 255\n" );
+   			disableupdates( te, NEW_FLASH_START_TIME );	/* server-side flash */
 
        	}else
        	{
@@ -796,19 +788,13 @@ void	TG_Eff_Flash(gedict_t *te, gedict_t *attaker)
        			newmis = spawn(  );
        			newmis->s.v.classname = "timer";
        			newmis->s.v.netname = "flashtimer";
-       			newmis->team_no = attaker->team_no;
+       			newmis->team_no = te->team_no;
        			newmis->s.v.owner = EDICT_TO_PROG( te );
        			newmis->s.v.think = ( func_t ) FlashTimer;
        			newmis->s.v.nextthink = g_globalvars.time + 1;
        		}
-       		if ( te == attaker )
-       		{
-       			te->FlashTime = 16;
-       		} else
-       		{
-       			te->FlashTime = 24;
-       		}
-       		stuffcmd( te, "v_cshift %.0f %.0f %.0f %.0f\n", te->FlashTime * 10, te->FlashTime * 10,
+   			te->FlashTime = 24;
+      		stuffcmd( te, "v_cshift %.0f %.0f %.0f %.0f\n", te->FlashTime * 10, te->FlashTime * 10,
        			  te->FlashTime * 10, te->FlashTime * 10 );
        	}
 

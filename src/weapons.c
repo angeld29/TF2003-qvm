@@ -3283,7 +3283,7 @@ void ImpulseCommands(  )
          		self->s.v.impulse = 0;
          		break;
          	case TG_FLASH_IMPULSE:
-         		TG_Eff_Flash( self, world );
+         		TG_Eff_Flash( self );
          		self->s.v.impulse = 0;
          		break;
          	case TG_EFF_REMOVE_IMPULSE:
