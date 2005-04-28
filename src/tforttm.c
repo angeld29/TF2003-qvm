@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tforttm.c,v 1.11 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: tforttm.c,v 1.12 2005-04-28 15:42:55 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -234,8 +234,6 @@ void TeamFortress_CheckTeamCheats(  )
 			{
 				if ( TeamFortress_TeamGetTopColor( self->undercover_team ) != tc )
 				{
-					stuffcmd( self, "color " );
-
 					stuffcmd( self, "color %d %d\n",
 						  TeamFortress_TeamGetTopColor( self->undercover_team ),
 						  TeamFortress_TeamGetColor( self->undercover_team ) - 1 );

@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.10 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.11 2005-04-28 15:42:55 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -101,24 +101,100 @@ qboolean ClientUserInfoChanged()
 	char    key[1024];
 	char    value[1024];
 	char	*sk;
+	int    color;
 
 	self = PROG_TO_EDICT( g_globalvars.self );
 	
-	trap_CmdArgv( 1, key, sizeof( key ) );
+	if( !self->team_no )
+	        return 0;
 
-	if(strcmp(key,"team"))
-		return 0;
+	trap_CmdArgv( 1, key, sizeof( key ) );
 	trap_CmdArgv( 2, value, sizeof( value ) );
 
-	if(!self->team_no)
-		return 0;
-	sk = GetTeamName( self->team_no );
-	if( strneq( value, sk ) )
+	if(!strcmp(key,"team"))
 	{
-		SetTeamName( self );
-	        G_sprint( self, 2, "you cannot change your team setinfo\n");
-	        return 1;
+		
+           	
+
+           	sk = GetTeamName( self->team_no );
+           	if( strneq( value, sk ) )
+           	{
+           		SetTeamName( self );
+           	        G_sprint( self, 2, "you cannot change your team setinfo\n");
+           	        return 1;
+           	}
+           	return 0;
 	}
+	if( !self->playerclass )
+	        return 0;
+
+	if(!strcmp(key,"skin"))
+	{
+	        if ( !self->playerclass )
+	                return 0;
+	        sk = TeamFortress_GetSkin( self );
+		if ( strneq( value, sk ) )
+		{
+		        G_sprint( self, 2, "you cannot change your skin setinfo\n");
+		        TeamFortress_SetSkin( self );
+		        return 1;
+		}
+		return 0;
+	}
+	if((!strcmp(key,"topcolor"))  && tf_data.topcolor_check )
+	{
+	        color = atoi(value);
+	        if ( self->playerclass == PC_SPY && self->undercover_team )
+	        {
+	                if( TeamFortress_TeamGetTopColor( self->undercover_team ) != color )
+	                {
+	                        G_sprint( self, 2, "you cannot change your topcolor setinfo\n");
+/*       				stuffcmd( self, "color %d %d\n",
+       					  TeamFortress_TeamGetTopColor( self->undercover_team ),
+       					  TeamFortress_TeamGetColor( self->undercover_team ) - 1 );*/
+	                        return 1;
+	                }
+	        }else
+	        {
+	                if( TeamFortress_TeamGetTopColor( self->team_no ) != color )
+	                {
+	                        G_sprint( self, 2, "you cannot change your topcolor setinfo\n");
+/*       				stuffcmd( self, "color %d %d\n",
+       					  TeamFortress_TeamGetTopColor( self->undercover_team ),
+       					  TeamFortress_TeamGetColor( self->undercover_team ) - 1 );*/
+	                        return 1;
+	                }
+	        }
+	        return 0;
+	}
+
+	if((!strcmp(key,"bottomcolor")))
+	{
+	        color = atoi(value);
+	        if ( self->playerclass == PC_SPY && self->undercover_team )
+	        {
+	                if( TeamFortress_TeamGetColor( self->undercover_team ) - 1 != color )
+	                {
+	                        G_sprint( self, 2, "you cannot change your bottomcolor setinfo\n");
+/*       				stuffcmd( self, "color %d %d\n",
+       					  TeamFortress_TeamGetTopColor( self->team_no ),
+       					  TeamFortress_TeamGetColor( self->team_no ) - 1 );*/
+	                        return 1;
+	                }
+	        }else
+	        {
+	                if( TeamFortress_TeamGetColor( self->team_no ) - 1 != color )
+	                {
+	                        G_sprint( self, 2, "you cannot change your bottomcolor setinfo\n");
+/*       				stuffcmd( self, "color %d %d\n",
+       					  TeamFortress_TeamGetTopColor( self->team_no ),
+       					  TeamFortress_TeamGetColor( self->team_no ) - 1 );*/
+	                        return 1;
+	                }
+	        }
+	        return 0;
+	}
+
 	return 0;
 
 }

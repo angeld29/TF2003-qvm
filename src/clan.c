@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: clan.c,v 1.7 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: clan.c,v 1.8 2005-04-28 15:42:55 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -30,38 +30,38 @@ void PreMatch_Think(  )
 	gedict_t *oldself;
 	gedict_t *gren;
 
-	time_left = tf_data.cb_prematch_time - g_globalvars.time;
+	time_left = ceil(tf_data.cb_prematch_time - g_globalvars.time+0.5);
 	if ( time_left > 60 )
 	{
 		G_bprint( 2, "%d minutes left till Match begins.\n", time_left / 60 );
 		if ( time_left < 120 )
 			self->s.v.nextthink = g_globalvars.time + time_left - 60;
 		else
-			self->s.v.nextthink = g_globalvars.time + 60;
+			self->s.v.nextthink = g_globalvars.time + 60.0;
 		return;
 	}
 	if ( time_left >= 59 )
 	{
 		G_bprint( 2, "1 minute left till Match begins.\n" );
-		self->s.v.nextthink = g_globalvars.time + 30;
+		self->s.v.nextthink = g_globalvars.time + 30.0;
 		return;
 	}
 	if ( time_left >= 29 )
 	{
 		G_bprint( 2, "30 seconds left till Match begins.\n" );
-		self->s.v.nextthink = g_globalvars.time + 20;
+		self->s.v.nextthink = g_globalvars.time + 20.0;
 		return;
 	}
 	if ( time_left > 1 )
 	{
 		G_bprint( 2, "%d seconds.\n", time_left );
-		self->s.v.nextthink = g_globalvars.time + 1;
+		self->s.v.nextthink = g_globalvars.time + 1.0;
 		return;
 	}
 	if ( time_left > 0 )
 	{
 		G_bprint( 2, "1 second.\n" );
-		self->s.v.nextthink = g_globalvars.time + 1;
+		self->s.v.nextthink = g_globalvars.time + 1.0;
 		return;
 	}
 	G_bprint( 2, "MATCH BEGINS NOW\n" );
