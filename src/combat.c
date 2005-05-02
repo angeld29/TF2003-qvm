@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: combat.c,v 1.6 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: combat.c,v 1.7 2005-05-02 12:17:41 AngelD Exp $
  */
 #include "g_local.h"
 void    ClientObituary( gedict_t * e1, gedict_t * e2 );
@@ -540,7 +540,7 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 			olddmsg = tf_data.deathmsg;
 			if ( T_AttackType & TF_TD_EXPLOSION )
 			{
-				tf_data.deathmsg = 37;
+				tf_data.deathmsg = DMSG_TEAMKILL;
 				if ( teamplay & 16384 )
 					TF_T_Damage( attacker, world, world, take, 1, 0 );
 				else
