@@ -49,3 +49,9 @@ version
 vote
 weapons
 world
+bot\ai
+bot\ai-misc
+bot\fighting
+bot\move
+bot\qw
+

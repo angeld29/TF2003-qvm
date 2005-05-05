@@ -16,7 +16,7 @@
 #   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-#   $Id: Makefile.vm.in,v 1.5 2004-12-23 03:16:14 AngelD Exp $
+#   $Id: Makefile.vm.in,v 1.6 2005-05-05 15:09:03 AngelD Exp $
 
 LCC=@LCC@
 Q3ASM=@Q3ASM@
@@ -33,7 +33,7 @@ SOURCES= g_main.c actions.c admin.c admin_cmd.c bg_lib.c buttons.c clan.c client
          g_tf_utils.c g_utils.c hook.c items.c mathlib.c menu.c misc.c plats.c player.c\
          pyro.c q_shared.c scout.c sentry.c server.c sniper.c  spectate.c spy.c status.c subs.c\
          tfort.c  tforthlp.c tfortmap.c tforttm.c tg.c triggers.c tsoldier.c version.c\
-         vote.c weapons.c world.c
+         vote.c weapons.c world.c bot\ai.c bot\ai-misc.c bot\fighting.c bot\move.c bot\qw.c
 
 OBJECTS=$(SOURCES:.c=.s)
 

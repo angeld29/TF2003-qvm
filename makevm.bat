@@ -23,7 +23,7 @@ set INCLUDE=
 
 
 mkdir VM
-
+mkdir VM\bot
 cd VM
 
 
@@ -222,6 +222,28 @@ cd VM
 @if errorlevel 1 goto quit
 
 %CC% %CFLAGS% %INCFLAGS% %SRC%\vote.c
+
+@if errorlevel 1 goto quit
+
+%CC% %CFLAGS% %INCFLAGS% %SRC%\bot\ai.c -o bot\ai.asm
+
+@if errorlevel 1 goto quit
+
+
+%CC% %CFLAGS% %INCFLAGS% %SRC%\bot\ai-misc.c -o bot\ai-misc.asm
+
+@if errorlevel 1 goto quit
+
+
+%CC% %CFLAGS% %INCFLAGS% %SRC%\bot\fighting.c -o bot\fighting.asm
+
+@if errorlevel 1 goto quit
+
+%CC% %CFLAGS% %INCFLAGS% %SRC%\bot\move.c -o bot\move.asm
+
+@if errorlevel 1 goto quit
+
+%CC% %CFLAGS% %INCFLAGS% %SRC%\bot\qw.c -o bot\qw.asm
 
 @if errorlevel 1 goto quit
 
