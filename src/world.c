@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: world.c,v 1.4 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: world.c,v 1.5 2005-05-05 14:51:43 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -344,4 +344,6 @@ void StartFrame( int time )
 	deathmatch = trap_cvar( "deathmatch" );
 
 	framecount = framecount + 1;
+
+	BotFrame();
 }

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: actions.c,v 1.14 2005-02-14 13:52:51 AngelD Exp $
+ *  $Id: actions.c,v 1.15 2005-05-05 14:51:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -480,10 +480,6 @@ void TeamFortress_ID_Player( gedict_t * trace_ent )
 {
 	char   *cls;
 
-#ifdef TEST
-        G_bprint(2,"TeamFortress_ID_player 1 Remove ME\n");
-#endif
-	
 	if ( self->team_no && TeamFortress_isTeamsAllied(self->team_no , trace_ent->team_no) )
 	{
 		cls = TeamFortress_GetClassName( trace_ent->playerclass );
@@ -496,10 +492,6 @@ void TeamFortress_ID_Player( gedict_t * trace_ent )
 		case PC_ENGINEER:
 			G_centerprint( self, "\n\n\n\n%s\nFriendly %s\n%.0f armor\n", trace_ent->s.v.netname, cls,
 				       trace_ent->s.v.armorvalue );
-#ifdef TEST
-                        G_bprint(2,"Remove ME %s\n\n\n\n%s\nFriendly %s\n%.0f armor\n", self->s.v.netname,trace_ent->s.v.netname, cls,
-				       trace_ent->s.v.armorvalue );
-#endif
 			break;
 		default:
 			G_centerprint( self, "\n\n\n\n%s\nFriendly %s\n", trace_ent->s.v.netname, cls );
@@ -562,10 +554,6 @@ void TeamFortress_ID_Player( gedict_t * trace_ent )
 void TeamFortress_ID_Sentry( gedict_t * te )
 {
 
-#ifdef TEST
-       	G_bprint(2,"TeamFortress_ID_sentry 1 Remove ME\n");
-#endif
-
 	if ( self == te->real_owner )
 	{
 		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )
@@ -617,26 +605,14 @@ void TeamFortress_ID(  )
 {
 	vec3_t  src, end;
 	gedict_t *te, *trace_ent;
-#ifdef TEST
-	G_bprint(2,"TeamFortress_ID 1 Remove ME\n");
-#endif
 	if ( tf_data.new_flash && ( self->FlashTime >= ( 24 - NEW_FLASH_START_TIME ) ) )
 		return;
-#ifdef TEST
-	G_bprint(2,"TeamFortress_ID 2 Remove ME\n");
-#endif
 
 	if((self->tfstate & TFSTATE_HALLUCINATING) && (tf_data.new_gas & GAS_MASK_DISABLE_ID) )
 		return;
-#ifdef TEST
-	G_bprint(2,"TeamFortress_ID 3 Remove ME\n");
-#endif
 
 	if( self->current_menu > MENU_DEFAULT)
 		return;
-#ifdef TEST
-	G_bprint(2,"TeamFortress_ID 4 Remove ME\n");
-#endif
 
 	makevectors( self->s.v.v_angle );
 	VectorScale( g_globalvars.v_forward, 10, src );
@@ -660,9 +636,6 @@ void TeamFortress_ID(  )
 	 if ( g_globalvars.trace_inopen && g_globalvars.trace_inwater )
 	 	return;
 	}
-#ifdef TEST
-	G_bprint(2,"TeamFortress_ID 5 Remove ME\n");
-#endif
 	if ( streq( trace_ent->s.v.classname, "player" ) && trace_ent->s.v.health > 0 )
 	{
 		if ( trace_ent->is_feigning && self->team_no && !TeamFortress_isTeamsAllied(self->team_no, trace_ent->team_no) )

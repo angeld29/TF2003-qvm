@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.21 2005-04-03 10:52:05 AngelD Exp $
+ *  $Id: weapons.c,v 1.22 2005-05-05 14:51:43 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -938,7 +938,7 @@ void W_FireSniperRifle(  )
 	vec3_t  dir, src;
 	float   dam_mult;
 	float   zdif;
-	float   use_this;
+	//float   use_this;
 	vec3_t  f;
 	vec3_t  g;
 	vec3_t  h, tmp;
@@ -1224,6 +1224,7 @@ void W_FireRocket(  )
 
 	vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
 
+	newmis->s.v.classname = "rocket";
 	newmis->s.v.touch = ( func_t ) T_MissileTouch;
 	newmis->voided = 0;
 // set newmis duration

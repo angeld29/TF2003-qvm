@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: spy.c,v 1.10 2005-02-14 13:52:51 AngelD Exp $
+ *  $Id: spy.c,v 1.11 2005-05-05 14:51:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1105,8 +1105,9 @@ void TeamFortress_SpyUndercoverThink(  )
 			if ( self->s.v.team )
 			{
 				owner->undercover_team = self->s.v.team;
-				stuffcmd( owner, "color %d %d\n", TeamFortress_TeamGetTopColor( self->s.v.team ),
+				TeamFortress_SetColor( owner, TeamFortress_TeamGetTopColor( self->s.v.team ),
 					  TeamFortress_TeamGetColor( self->s.v.team ) - 1 );
+
 				TeamFortress_SetSkin( owner );
 				G_sprint( owner, 2, "Colors set to Team %.0f\n", self->s.v.team );
 			}
@@ -1165,7 +1166,7 @@ void TeamFortress_SpyChangeColor( int teamno )
 		G_sprint( self, 2, "Colors reset.\n" );
 		self->immune_to_check = g_globalvars.time + tf_data.cheat_pause;	//10;
 		self->undercover_team = 0;
-		stuffcmd( self, "color %d %d\n", TeamFortress_TeamGetTopColor( self->team_no ),
+		TeamFortress_SetColor( self, TeamFortress_TeamGetTopColor( self->team_no ),
 			  TeamFortress_TeamGetColor( self->team_no ) - 1 );
 
 		if ( !self->undercover_skin )
@@ -1596,7 +1597,7 @@ void Spy_RemoveDisguise( gedict_t * spy )
 			{
 				spy->immune_to_check = g_globalvars.time + tf_data.cheat_pause;	//10;
 				spy->undercover_team = 0;
-				stuffcmd( spy, "color %d %d\n", TeamFortress_TeamGetTopColor( spy->team_no ),
+				TeamFortress_SetColor( spy, TeamFortress_TeamGetTopColor( spy->team_no ),
 					  TeamFortress_TeamGetColor( spy->team_no ) - 1 );
 
 			}

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.31 2005-04-28 15:42:55 AngelD Exp $
+ *  $Id: client.c,v 1.32 2005-05-05 14:51:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -548,6 +548,11 @@ void DecodeLevelParms()
 		GetSVInfokeyString( "tg", "training_ground", st, sizeof( st ), "off" );
 		if ( !strcmp( st, "on" ) )
 			tg_data.tg_enabled = 1;
+
+		GetSVInfokeyString( "enable_bot",NULL, st, sizeof( st ), "off" );
+		if ( !strcmp( st, "on" ) )
+			tf_data.enable_bot = 1;
+
 //////////////
 		tf_data.respawn_delay_time = GetSVInfokeyFloat( "rd", "respawn_delay", 0 );
 		
@@ -566,7 +571,7 @@ void DecodeLevelParms()
 			ent->s.v.nextthink = g_globalvars.time + autoteam_time;
 			ent->s.v.think = ( func_t ) autoteam_think;
 		}
-
+		
 		GetSVInfokeyString( "mtfl", NULL, st, sizeof( st ), "off" );
 		if ( !strcmp( st, "on" ) )
 		{
@@ -601,6 +606,7 @@ void DecodeLevelParms()
 			tf_data.lan_mode = 0;
 			tf_data.pyrotype = 0;
 			tg_data.tg_enabled = 0;
+			tf_data.enable_bot = 0;
 		} else
 			tf_data.mtfl = 0;
 
@@ -1012,7 +1018,7 @@ void respawn()
 		// make a copy of the dead body for appearances sake
 		CopyToBodyQue( self );
 		// set default spawn parms
-		SetNewParms();
+		SetNewParms();//!!!FIXME for setspawnparam???
 		// respawn              
 		PutClientInServer();
 	} else
@@ -2165,6 +2171,7 @@ void PlayerPostThink()
 	float   fdmg;
 	float   dtime;
 
+
 	dtime = g_globalvars.time - self->lasttime;
 
  	VectorSubtract(self->s.v.velocity,self->lastvel,self->accel);
@@ -2229,6 +2236,7 @@ void PlayerPostThink()
 		TeamFortress_CheckTeamCheats();
 		self->cheat_check = g_globalvars.time + 3;
 	}
+
 }
 
 ////////////////

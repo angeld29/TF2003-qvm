@@ -54,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"Release/tf2003bot.dll"
 
 !ELSEIF  "$(CFG)" == "qwprogs - Win32 Debug"
 
@@ -107,7 +107,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /out:"D:\games\qwtf\fortress\qwprogs.dll" /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /out:"D:\games\qwtf\fortress\qwprogs.dll" /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /out:"D:\games\qwtf\fortress\tf2003bot.dll" /pdbtype:sept
 
 !ENDIF 
 
@@ -119,6 +119,30 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+# Begin Group "Bot"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=".\src\bot\ai-misc.c"
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\bot\ai.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\bot\fighting.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\bot\move.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\bot\qw.c
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\src\actions.c

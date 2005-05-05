@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.h,v 1.7 2004-12-23 03:16:14 AngelD Exp $
+ *  $Id: tfort.h,v 1.8 2005-05-05 14:51:43 AngelD Exp $
  */
 
 typedef struct {
@@ -57,6 +57,7 @@ void    TeamFortress_SetEquipment(  );
 void    TeamFortress_SetHealth(  );
 void    TeamFortress_SetSpeed( gedict_t * );
 void    TeamFortress_SetSkin( gedict_t * );
+void    TeamFortress_SetColor( gedict_t * p, int top, int bottom );
 void    TeamFortress_ExecClassScript( gedict_t * );
 void    TeamFortress_ExecMapScript( gedict_t * p );
 int     TeamFortress_TeamPutPlayerInTeam(  );

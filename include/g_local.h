@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_local.h,v 1.14 2004-12-23 03:16:14 AngelD Exp $
+ *  $Id: g_local.h,v 1.15 2005-05-05 14:51:43 AngelD Exp $
  */
 //
 // g_local.h -- local definitions for game module
@@ -35,6 +35,7 @@
 #include "player.h"
 #include "tfort.h"
 #include "spy.h"
+#include "bot.h"
 
 #include "menu.h"
 #include "vote.h"

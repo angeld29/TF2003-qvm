@@ -86,3 +86,8 @@ equ     trap_executecmd		 -75
 equ     trap_conprint		 -76
 equ     trap_readcmd		 -77
 equ     trap_redirectcmd         -78
+
+equ	trap_AddBot		 -79
+equ	trap_RemoveBot		 -80
+equ	trap_SetBotUserInfo	 -81
+equ	trap_SetBotCMD		 -82

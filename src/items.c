@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: items.c,v 1.8 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: items.c,v 1.9 2005-05-05 14:51:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1767,6 +1767,7 @@ void DropBackpack(  )
 	VectorCopy( self->s.v.origin, newmis->s.v.origin );
 	newmis->s.v.origin[2] -= 24;
 
+	newmis->s.v.classname = "item_backpack";
 	newmis->s.v.ammo_shells = self->s.v.ammo_shells;
 	newmis->s.v.ammo_nails = self->s.v.ammo_nails;
 	newmis->s.v.ammo_rockets = self->s.v.ammo_rockets;

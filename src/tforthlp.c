@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tforthlp.c,v 1.8 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: tforthlp.c,v 1.9 2005-05-05 14:51:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -39,12 +39,18 @@ void TeamFortress_MOTD(  )
 
 		if ( teamplay && !self->team_no )
 		{
-			stuffcmd( self, "color 0\n" );
+		        TeamFortress_SetColor( self, 0,0);
 		}
 		if ( !self->got_aliases )
 			G_sprint( self, 2, "\n\n\n" );
 		G_sprint( self, 2, "Type help for more info.\n" );
 		G_sprint( self, 2, "Ñõáëå×ïòìä ÔåáíÆïòôòåóó ”’’•\n" );
+
+		if( tf_data.enable_bot )
+		{
+		      G_sprint( self, 2, "Bots Enabled\n" );
+		}
+
 //		G_sprint(self, 2, "Official ÍÔÆÌ version\n");
 
 		G_sprint( self, 2, "by sd‘ angel for ÍÔÆÌ\n" );

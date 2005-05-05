@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: pyro.c,v 1.9 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: pyro.c,v 1.10 2005-05-05 14:51:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -793,6 +793,7 @@ void W_FireIncendiaryCannon(  )
 	sound( self, 1, "weapons/sgun1.wav", 1, 1 );
 	KickPlayer( -3, self );
 	newmis = spawn(  );
+
 	g_globalvars.newmis = EDICT_TO_PROG( newmis );
 	newmis->s.v.owner = EDICT_TO_PROG( self );
 	newmis->s.v.movetype = MOVETYPE_FLYMISSILE;
@@ -801,6 +802,7 @@ void W_FireIncendiaryCannon(  )
 	aim( newmis->s.v.velocity );
 	VectorScale( newmis->s.v.velocity, 600, newmis->s.v.velocity );
 	vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
+	newmis->s.v.classname = "rocket";
 	newmis->s.v.touch = ( func_t ) T_IncendiaryTouch;
 	newmis->s.v.nextthink = g_globalvars.time + 5;
 	newmis->s.v.think = ( func_t ) SUB_Remove;

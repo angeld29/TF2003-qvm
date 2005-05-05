@@ -2,6 +2,30 @@ QuakeWorld TeamFortress 2003 (QVM/DDL/SO Versions)
 by [sd] angel for MTFL
 
 ////////////////////////////////////////////////////
+¬несенные изменени€ (на 05.05.2005 r1) crc: 
+API 7
+добавлены функции
+int 	trap_AddBot( const char* name, int bottomcolor, int topcolor, const char* skin);
+int 	trap_RemoveBot( int edn );
+int 	trap_SetBotUserInfo( int edn, const char* varname, const char* value );
+int 	trap_SetBotCMD( int edn,int msec, float angles_x, float angles_y, float angles_z, int forwardmove, int sidemove, int upmove,  int buttons, int impulse);
+
+бот полностью аналогичен игроку, только команды управлени€ задаютс€ модом с помощью trap_SetBotCMD
+движение бота обсчитыватс€ после всех entites, при этом вызываютс€ :
+GAME_CLIENT_PRETHINK
+GAME_EDICT_THINK
+GAME_CLIENT_POSTTHINK
+
+перенесен pablobot1on1
+включаетс€ localinfo enable_bot on
+команды:
+ /cmd addbot teamno classno
+ /cmd removebot
+
+ ак и оригинальный бот, он пока заточен лишь под игру солдом на карте 1on1r. ¬ принципе, он играет там всеми классами, но некоторыми весьма бестолково :).
+
+
+////////////////////////////////////////////////////
 ¬несенные изменени€ (на 28.04.2005 r1) crc: 
 timelimit теперь всегда больше прематча
 добавлена защита от читеров на setinfo skin,  topcolor, botomcolor

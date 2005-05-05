@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.28 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: tfort.c,v 1.29 2005-05-05 14:51:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -958,6 +958,9 @@ void TeamFortress_ShowTF(  )
 		G_sprint( self, 2, "ÍÔÆÌ Settings ÏÎ\n" );
 
 	G_sprint( self, 2, "TF2003 (build %d) by sd‘ angel for ÍÔÆÌ\n" ,build_number());
+	if( tf_data.enable_bot )
+	        G_sprint( self, 2, "Bot enabled\n" );
+	        
 
         if( tg_data.tg_enabled )
         	G_sprint( self, 2, "Training Ground enabled\n" );
@@ -1439,10 +1442,35 @@ void TeamFortress_SetSkin( gedict_t * p )
 		p->s.v.skin = p->undercover_skin;
 	else
 		p->s.v.skin = p->playerclass;
-	if ( p->s.v.skin )
-		stuffcmd( p, "skin %s\n", TeamFortress_GetSkin( p ) );
-	else
-		stuffcmd( p, "skin base\n" );
+	if( p->isBot )
+	{
+	        if ( p->s.v.skin )
+	                trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"skin",TeamFortress_GetSkin( p ));
+	        else
+	                trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"skin","base");
+
+	}else
+	{
+        	if ( p->s.v.skin )
+        		stuffcmd( p, "skin %s\n", TeamFortress_GetSkin( p ) );
+        	else
+        		stuffcmd( p, "skin base\n" );
+	}
+}
+
+void TeamFortress_SetColor( gedict_t * p, int top, int bottom )
+{
+        char tmp[0x20];
+        if( p->isBot )
+        {
+                sprintf(tmp,"%d",top);
+                trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"topcolor",tmp);
+                sprintf(tmp,"%d",bottom);
+                trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"bottomcolor",tmp);
+        }else
+        {
+                stuffcmd( p, "color %d %d\n",top,bottom);
+        }
 }
 
 
@@ -1472,8 +1500,7 @@ void TeamFortress_SetEquipment(  )
 	{
 		self->immune_to_check = g_globalvars.time + tf_data.cheat_pause;	//10;
 		self->undercover_team = 0;
-		stuffcmd( self, "color %d %d\n",
-			  TeamFortress_TeamGetTopColor( self->team_no ),
+		TeamFortress_SetColor( self, TeamFortress_TeamGetTopColor( self->team_no ),
 			  TeamFortress_TeamGetColor( self->team_no ) - 1 );
 	}
 	self->is_building = 0;

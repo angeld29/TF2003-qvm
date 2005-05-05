@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.11 2004-10-30 12:37:51 AngelD Exp $
+ *  $Id: g_main.c,v 1.12 2005-05-05 14:51:43 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -30,6 +30,7 @@ globalvars_t    g_globalvars;
 field_t         expfields[] = {
 	{"maxspeed", FOFS( maxspeed ), F_FLOAT}	,
 	{"gravity", FOFS( gravity ), F_FLOAT},
+	{"isBot", FOFS( isBot ), F_INT},
 	{NULL}
 };
 
@@ -214,6 +215,7 @@ void Com_Printf( const char *msg, ... )
 }
 
 //===================================================================
+
 void G_InitGame( int levelTime, int randomSeed )
 {
 	int             i;

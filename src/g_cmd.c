@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.11 2005-04-28 15:42:55 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.12 2005-05-05 14:51:43 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -31,30 +31,34 @@
 
 
 typedef struct {
-	char		*command;
-	void		(*Action) ();
-	int		allowed;
-}cmd_t;
+	char   *command;
+	void    ( *Action ) (  );
+	int     allowed;
+} cmd_t;
 
-void    ClientKill();
-void	Test();
-void	TG_Cmd();
-void	Vote_Cmd();
-void 	TeamFortress_Cmd_Discard(  );
-void 	Engineer_RotateSG(  );
-void 	TeamFortress_Cmd_Detpack();
-void 	Admin_Cmd();
+void    ClientKill(  );
+void    Test(  );
+void    AddBot(  );
+void    RemoveBot(  );
+void    TG_Cmd(  );
+void    Vote_Cmd(  );
+void    TeamFortress_Cmd_Discard(  );
+void    Engineer_RotateSG(  );
+void    TeamFortress_Cmd_Detpack(  );
+void    Admin_Cmd(  );
 
-cmd_t cmds[] ={
-	{"kill",ClientKill},
-	{"test",Test},
-	{"tg",TG_Cmd},
-	{"vote",Vote_Cmd,CMD_NOT_PREMATCH},
-	{"admin",Admin_Cmd},
+cmd_t   cmds[] = {
+	{"kill", ClientKill},
+	{"test", Test},
+	{"addbot", AddBot},
+	{"removebot", RemoveBot},
+	{"tg", TG_Cmd},
+	{"vote", Vote_Cmd, CMD_NOT_PREMATCH},
+	{"admin", Admin_Cmd},
 	{"discard", TeamFortress_Cmd_Discard, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
-	{"sg_rotate",Engineer_RotateSG, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
-	{"detpack",TeamFortress_Cmd_Detpack, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
-	{NULL,NULL,0}
+	{"sg_rotate", Engineer_RotateSG, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
+	{"detpack", TeamFortress_Cmd_Detpack, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
+	{NULL, NULL, 0}
 };
 extern void trap_CmdArgv( int arg, char *valbuff, int sizebuff );
 
@@ -62,146 +66,197 @@ extern void trap_CmdArgv( int arg, char *valbuff, int sizebuff );
 qboolean ClientCommand(  )
 {
 	char    cmd_command[1024];
-	cmd_t	*ucmd;
+	cmd_t  *ucmd;
 
 	self = PROG_TO_EDICT( g_globalvars.self );
 	trap_CmdArgv( 0, cmd_command, sizeof( cmd_command ) );
-	for ( ucmd = cmds ; ucmd->command  ; ucmd++ )
+	for ( ucmd = cmds; ucmd->command; ucmd++ )
 	{
-		if(strcmp(cmd_command,ucmd->command))
+		if ( strcmp( cmd_command, ucmd->command ) )
 			continue;
-		if( (ucmd->allowed & CMD_NOT_PREMATCH) && (tf_data.cb_prematch_time > g_globalvars.time))
+		if ( ( ucmd->allowed & CMD_NOT_PREMATCH )
+		     && ( tf_data.cb_prematch_time > g_globalvars.time ) )
 		{
-			G_sprint( self, 2, "cmd '%s' not allowed in prematch\n",cmd_command);
+			G_sprint( self, 2, "cmd '%s' not allowed in prematch\n", cmd_command );
 			return true;
 		}
 
-		if( (ucmd->allowed & CMD_NOT_DEAD) && ( self->s.v.deadflag))
+		if ( ( ucmd->allowed & CMD_NOT_DEAD ) && ( self->s.v.deadflag ) )
 			return true;
 
-		if( (ucmd->allowed & CMD_NOT_ATTACK) && ( g_globalvars.time < self->attack_finished ))
+		if ( ( ucmd->allowed & CMD_NOT_ATTACK ) && ( g_globalvars.time < self->attack_finished ) )
 			return true;
 
-		if( (ucmd->allowed & CMD_NOT_TEAM) && ( !self->team_no))
+		if ( ( ucmd->allowed & CMD_NOT_TEAM ) && ( !self->team_no ) )
 			return true;
 
-		if( (ucmd->allowed & CMD_NOT_CLASS) && ( !self->playerclass))
+		if ( ( ucmd->allowed & CMD_NOT_CLASS ) && ( !self->playerclass ) )
 			return true;
 
 
-	        ucmd->Action();
-	        return true;
+		ucmd->Action(  );
+		return true;
 	}
 	return false;
 }
 
 
-qboolean ClientUserInfoChanged()
+qboolean ClientUserInfoChanged(  )
 {
 	char    key[1024];
 	char    value[1024];
-	char	*sk;
-	int    color;
+	char   *sk;
+	int     color;
 
 	self = PROG_TO_EDICT( g_globalvars.self );
-	
-	if( !self->team_no )
-	        return 0;
+
+	if ( !self->team_no )
+		return 0;
 
 	trap_CmdArgv( 1, key, sizeof( key ) );
 	trap_CmdArgv( 2, value, sizeof( value ) );
 
-	if(!strcmp(key,"team"))
+	if ( !strcmp( key, "team" ) )
 	{
-		
-           	
 
-           	sk = GetTeamName( self->team_no );
-           	if( strneq( value, sk ) )
-           	{
-           		SetTeamName( self );
-           	        G_sprint( self, 2, "you cannot change your team setinfo\n");
-           	        return 1;
-           	}
-           	return 0;
-	}
-	if( !self->playerclass )
-	        return 0;
 
-	if(!strcmp(key,"skin"))
-	{
-	        if ( !self->playerclass )
-	                return 0;
-	        sk = TeamFortress_GetSkin( self );
+
+		sk = GetTeamName( self->team_no );
 		if ( strneq( value, sk ) )
 		{
-		        G_sprint( self, 2, "you cannot change your skin setinfo\n");
-		        TeamFortress_SetSkin( self );
-		        return 1;
+			SetTeamName( self );
+			G_sprint( self, 2, "you cannot change your team setinfo\n" );
+			return 1;
 		}
 		return 0;
 	}
-	if((!strcmp(key,"topcolor"))  && tf_data.topcolor_check )
+	if ( !self->playerclass )
+		return 0;
+
+	if ( !strcmp( key, "skin" ) )
 	{
-	        color = atoi(value);
-	        if ( self->playerclass == PC_SPY && self->undercover_team )
-	        {
-	                if( TeamFortress_TeamGetTopColor( self->undercover_team ) != color )
-	                {
-	                        G_sprint( self, 2, "you cannot change your topcolor setinfo\n");
+		if ( !self->playerclass )
+			return 0;
+		sk = TeamFortress_GetSkin( self );
+		if ( strneq( value, sk ) )
+		{
+			G_sprint( self, 2, "you cannot change your skin setinfo\n" );
+			TeamFortress_SetSkin( self );
+			return 1;
+		}
+		return 0;
+	}
+	if ( ( !strcmp( key, "topcolor" ) ) && tf_data.topcolor_check )
+	{
+		color = atoi( value );
+		if ( self->playerclass == PC_SPY && self->undercover_team )
+		{
+			if ( TeamFortress_TeamGetTopColor( self->undercover_team ) != color )
+			{
+				G_sprint( self, 2, "you cannot change your topcolor setinfo\n" );
 /*       				stuffcmd( self, "color %d %d\n",
        					  TeamFortress_TeamGetTopColor( self->undercover_team ),
        					  TeamFortress_TeamGetColor( self->undercover_team ) - 1 );*/
-	                        return 1;
-	                }
-	        }else
-	        {
-	                if( TeamFortress_TeamGetTopColor( self->team_no ) != color )
-	                {
-	                        G_sprint( self, 2, "you cannot change your topcolor setinfo\n");
+				return 1;
+			}
+		} else
+		{
+			if ( TeamFortress_TeamGetTopColor( self->team_no ) != color )
+			{
+				G_sprint( self, 2, "you cannot change your topcolor setinfo\n" );
 /*       				stuffcmd( self, "color %d %d\n",
        					  TeamFortress_TeamGetTopColor( self->undercover_team ),
        					  TeamFortress_TeamGetColor( self->undercover_team ) - 1 );*/
-	                        return 1;
-	                }
-	        }
-	        return 0;
+				return 1;
+			}
+		}
+		return 0;
 	}
 
-	if((!strcmp(key,"bottomcolor")))
+	if ( ( !strcmp( key, "bottomcolor" ) ) )
 	{
-	        color = atoi(value);
-	        if ( self->playerclass == PC_SPY && self->undercover_team )
-	        {
-	                if( TeamFortress_TeamGetColor( self->undercover_team ) - 1 != color )
-	                {
-	                        G_sprint( self, 2, "you cannot change your bottomcolor setinfo\n");
+		color = atoi( value );
+		if ( self->playerclass == PC_SPY && self->undercover_team )
+		{
+			if ( TeamFortress_TeamGetColor( self->undercover_team ) - 1 != color )
+			{
+				G_sprint( self, 2, "you cannot change your bottomcolor setinfo\n" );
 /*       				stuffcmd( self, "color %d %d\n",
        					  TeamFortress_TeamGetTopColor( self->team_no ),
        					  TeamFortress_TeamGetColor( self->team_no ) - 1 );*/
-	                        return 1;
-	                }
-	        }else
-	        {
-	                if( TeamFortress_TeamGetColor( self->team_no ) - 1 != color )
-	                {
-	                        G_sprint( self, 2, "you cannot change your bottomcolor setinfo\n");
+				return 1;
+			}
+		} else
+		{
+			if ( TeamFortress_TeamGetColor( self->team_no ) - 1 != color )
+			{
+				G_sprint( self, 2, "you cannot change your bottomcolor setinfo\n" );
 /*       				stuffcmd( self, "color %d %d\n",
        					  TeamFortress_TeamGetTopColor( self->team_no ),
        					  TeamFortress_TeamGetColor( self->team_no ) - 1 );*/
-	                        return 1;
-	                }
-	        }
-	        return 0;
+				return 1;
+			}
+		}
+		return 0;
 	}
 
 	return 0;
 
 }
 
-
-void Test()
+void Test(  )
 {
 
 }
 
+//extern vec3_t VEC_ORIGIN, VEC_HULL_MIN, VEC_HULL_MAX, VEC_HULL2_MIN, VEC_HULL2_MAX;
+
+//void    DecodeLevelParms(  );
+
+void AddBot(  )
+{
+	char    value[1024];
+	int     team, class, argc;
+
+	if ( !tf_data.enable_bot )
+	{
+		G_sprint( self, 2, "Bots disabled\n" );
+		return;
+	}
+	argc = trap_CmdArgc(  );
+	if ( argc != 3 )
+	{
+		G_sprint( self, 2, "usage: cmd addbot <team> <class>\n" );
+		return;
+	}
+	trap_CmdArgv( 1, value, sizeof( value ) );
+	team = atoi( value );
+	trap_CmdArgv( 2, value, sizeof( value ) );
+	class = atoi( value );
+
+	botConnect( team, class );
+}
+
+
+void RemoveBot(  )
+{
+	gedict_t *te;
+
+	if ( !tf_data.enable_bot )
+	{
+		G_sprint( self, 2, "Bots disabled\n" );
+		return;
+	}
+
+	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "player" ) ); )
+	{
+		if ( te->has_disconnected )
+			continue;
+		if ( te->isBot )
+			break;
+	}
+
+	if ( !te )
+		return;
+	botDisconnect( te );
+}

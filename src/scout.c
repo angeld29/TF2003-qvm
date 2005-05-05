@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: scout.c,v 1.17 2005-02-14 13:52:51 AngelD Exp $
+ *  $Id: scout.c,v 1.18 2005-05-05 14:51:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -424,7 +424,8 @@ void ConcussionGrenadeTimer(  )
 			    crandom(  ) * g_globalvars.v_right[2] * self->s.v.health;
 			if ( !( pos == -2 && VectorCompareF( owner->s.v.velocity, 0, 0, 0 ) ) )
 			{
-				VectorAdd( owner->s.v.velocity, stumble, owner->s.v.velocity ) owner->s.v.fixangle = 1;
+				VectorAdd( owner->s.v.velocity, stumble, owner->s.v.velocity );
+				owner->s.v.fixangle = 1;
 			}
 		}
 	}

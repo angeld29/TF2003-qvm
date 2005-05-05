@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tforttm.c,v 1.12 2005-04-28 15:42:55 AngelD Exp $
+ *  $Id: tforttm.c,v 1.13 2005-05-05 14:51:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -96,7 +96,14 @@ char   *GetTeamName( int tno )
 
 void SetTeamName( gedict_t * p )
 {
-	stuffcmd( p, "team %s\n", GetTeamName( p->team_no ) );
+        if ( p->isBot )
+        {
+                if( p->team_no >0 && p->team_no <=4)
+                        trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"team",team_names[p->team_no-1 ]);
+                else
+                        trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"team","");
+        }else
+	       stuffcmd( p, "team %s\n", GetTeamName( p->team_no ) );
 }
 
 
@@ -139,8 +146,8 @@ int TeamFortress_TeamSet( int tno )
 		self->immune_to_check = g_globalvars.time + 10;
 		if ( ( tf_data.toggleflags & 128 ) || ( tf_data.toggleflags & 2048 ) )
 			self->s.v.frags = TeamFortress_TeamGetScore( tno );
-		stuffcmd( self, "color %d %d\n",
-			  TeamFortress_TeamGetTopColor( tno ), TeamFortress_TeamGetColor( tno ) - 1 );
+		TeamFortress_SetColor( self, TeamFortress_TeamGetTopColor( tno ), 
+		                      TeamFortress_TeamGetColor( tno ) - 1 );
 
 
 		self->team_no = tno;
@@ -157,7 +164,7 @@ int TeamFortress_TeamSet( int tno )
 		return 1;
 	}
 	G_bprint( 2, "%s has joined Team No %d.\n", self->s.v.netname, tno );
-	stuffcmd( self, "color %d %d\n", TeamFortress_TeamGetTopColor( tno ), TeamFortress_TeamGetColor( tno ) - 1 );
+	TeamFortress_SetColor( self, TeamFortress_TeamGetTopColor( tno ), TeamFortress_TeamGetColor( tno ) - 1 );
 
 	self->team_no = tno;
 	self->immune_to_check = g_globalvars.time + 10;
@@ -203,7 +210,7 @@ void TeamFortress_CheckTeamCheats(  )
 		{
 			if ( TeamFortress_TeamGetColor( self->undercover_team ) - 1 != tc )
 			{
-				stuffcmd( self, "color %d %d\n",
+			        TeamFortress_SetColor( self,
 					  TeamFortress_TeamGetTopColor( self->undercover_team ),
 					  TeamFortress_TeamGetColor( self->undercover_team ) - 1 );
 
@@ -217,7 +224,7 @@ void TeamFortress_CheckTeamCheats(  )
 		{
 			if ( tc != TeamFortress_TeamGetColor( self->team_no ) - 1 )
 			{
-				stuffcmd( self, "color %d %d\n",
+				TeamFortress_SetColor( self,
 					  TeamFortress_TeamGetTopColor( self->team_no ),
 					  TeamFortress_TeamGetColor( self->team_no ) - 1 );
 				G_bprint( 1, "%s has been kicked for changing color.\n", self->s.v.netname );
@@ -234,7 +241,7 @@ void TeamFortress_CheckTeamCheats(  )
 			{
 				if ( TeamFortress_TeamGetTopColor( self->undercover_team ) != tc )
 				{
-					stuffcmd( self, "color %d %d\n",
+				        TeamFortress_SetColor( self, 
 						  TeamFortress_TeamGetTopColor( self->undercover_team ),
 						  TeamFortress_TeamGetColor( self->undercover_team ) - 1 );
 
@@ -248,7 +255,7 @@ void TeamFortress_CheckTeamCheats(  )
 			{
 				if ( tc != TeamFortress_TeamGetTopColor( self->team_no ) )
 				{
-					stuffcmd( self, "color %d %d\n",
+					TeamFortress_SetColor( self, 
 						  TeamFortress_TeamGetTopColor( self->undercover_team ),
 						  TeamFortress_TeamGetColor( self->undercover_team ) - 1 );
 

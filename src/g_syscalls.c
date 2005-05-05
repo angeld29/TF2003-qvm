@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.c,v 1.7 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: g_syscalls.c,v 1.8 2005-05-05 14:51:43 AngelD Exp $
  */
 
 //#include "g_local.h"
@@ -387,5 +387,29 @@ int 	trap_FS_GetFileList(  const char *path, const char *extension, char *listbu
 int trap_Map_Extension( const char* ext_name, int mapto)
 {
 	return syscall( G_Map_Extension, (int)ext_name, mapto );
+}
+
+
+int 	trap_AddBot( const char* name, int bottomcolor, int topcolor, const char* skin)
+{
+        return syscall( G_Add_Bot, (int)name, bottomcolor, topcolor, (int)skin );
+}
+
+int 	trap_RemoveBot( int edn )
+{
+        return syscall( G_Remove_Bot, edn );
+}
+
+int 	trap_SetBotUserInfo( int edn, const char* varname, const char* value )
+{
+        return syscall( G_SetBotUserInfo, edn, (int)varname, (int)value );
+}
+
+int 	trap_SetBotCMD( int edn,int msec, float angles_x, float angles_y, float angles_z, 
+                                int forwardmove, int sidemove, int upmove, 
+                                int buttons, int impulse)
+{
+        return syscall( G_SetBotCMD, edn, msec, PASSFLOAT( angles_x), PASSFLOAT( angles_y), PASSFLOAT( angles_z), 
+                                forwardmove, sidemove, upmove, buttons, impulse );
 }
 
