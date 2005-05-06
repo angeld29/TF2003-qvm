@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: vote.c,v 1.4 2004-12-23 17:50:17 AngelD Exp $
+ *  $Id: vote.c,v 1.5 2005-05-06 14:01:37 AngelD Exp $
  */
 
 // vote.q: mapchange voting functions
@@ -344,10 +344,6 @@ void Vote_Cmd()
 		{
 			G_sprint( self, 2, "%s\n",ucmd->command);
 		}
-/*	        G_sprint(self, 2, "Usage:\n"
-	        		  "start vote: γνδ φοτε γθαξηεναπ\n"
-	        		  "vote yes  : γνδ φοτε ωεσ\n"
-	        		  "vote no   : γνδ φοτε ξο\n");*/
 		return;
 	}
 

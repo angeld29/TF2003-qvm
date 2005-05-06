@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: bot.h,v 1.2 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: bot.h,v 1.3 2005-05-06 14:01:36 AngelD Exp $
  */
 
 #define KEY_MOVEUP       1
@@ -51,7 +51,7 @@
 */
 
 void BotFrame();
-void botConnect(int whichteam, int whichClass);
+void botConnect(int whichteam, int whichClass, char* name);
 void botDisconnect(gedict_t* te);
 void Bot_AI();
 

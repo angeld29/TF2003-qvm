@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.12 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.13 2005-05-06 14:01:37 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -38,7 +38,7 @@ typedef struct {
 
 void    ClientKill(  );
 void    Test(  );
-void    AddBot(  );
+void    Bot();
 void    RemoveBot(  );
 void    TG_Cmd(  );
 void    Vote_Cmd(  );
@@ -50,8 +50,7 @@ void    Admin_Cmd(  );
 cmd_t   cmds[] = {
 	{"kill", ClientKill},
 	{"test", Test},
-	{"addbot", AddBot},
-	{"removebot", RemoveBot},
+	{"bot", Bot},
 	{"tg", TG_Cmd},
 	{"vote", Vote_Cmd, CMD_NOT_PREMATCH},
 	{"admin", Admin_Cmd},
@@ -209,54 +208,3 @@ void Test(  )
 
 }
 
-//extern vec3_t VEC_ORIGIN, VEC_HULL_MIN, VEC_HULL_MAX, VEC_HULL2_MIN, VEC_HULL2_MAX;
-
-//void    DecodeLevelParms(  );
-
-void AddBot(  )
-{
-	char    value[1024];
-	int     team, class, argc;
-
-	if ( !tf_data.enable_bot )
-	{
-		G_sprint( self, 2, "Bots disabled\n" );
-		return;
-	}
-	argc = trap_CmdArgc(  );
-	if ( argc != 3 )
-	{
-		G_sprint( self, 2, "usage: cmd addbot <team> <class>\n" );
-		return;
-	}
-	trap_CmdArgv( 1, value, sizeof( value ) );
-	team = atoi( value );
-	trap_CmdArgv( 2, value, sizeof( value ) );
-	class = atoi( value );
-
-	botConnect( team, class );
-}
-
-
-void RemoveBot(  )
-{
-	gedict_t *te;
-
-	if ( !tf_data.enable_bot )
-	{
-		G_sprint( self, 2, "Bots disabled\n" );
-		return;
-	}
-
-	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "player" ) ); )
-	{
-		if ( te->has_disconnected )
-			continue;
-		if ( te->isBot )
-			break;
-	}
-
-	if ( !te )
-		return;
-	botDisconnect( te );
-}

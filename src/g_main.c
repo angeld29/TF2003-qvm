@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.12 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: g_main.c,v 1.13 2005-05-06 14:01:37 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -241,6 +241,7 @@ void G_InitGame( int levelTime, int randomSeed )
 //TF Intialization
 	memset( &tf_data, 0, sizeof(tf_data));
 	memset( &tg_data, 0, sizeof(tg_data));
+	
 //test
 /*        num = trap_FS_GetFileList( "SKINS" , ".pcx" , dirlist, sizeof(dirlist));
         dirptr=dirlist;

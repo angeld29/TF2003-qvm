@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: progs.h,v 1.16 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: progs.h,v 1.17 2005-05-06 14:01:36 AngelD Exp $
  */
 #include "progdefs.h"
 
@@ -353,6 +353,13 @@ typedef enum
 	SG_SFIRE_NUM
 }sg_sfire_t;
 
+typedef enum
+{
+	ARENA_MODE_NONE = 0,
+	ARENA_MODE_FFA,
+	ARENA_MODE_DUEL
+}arena_modes_t;
+
 
 typedef struct {
 	int             toggleflags;
@@ -398,5 +405,9 @@ typedef struct {
 	int		gren2box,random_tf_spawn,disable_powerups,flag_timer,detpack_block;
 	int		mtfl;
 	int 		lan_mode;
+//bot
 	int             enable_bot;
+	int             botResupplyBetweenKills;
+	arena_modes_t   arena_mode;
+
 } tf_server_data_t;

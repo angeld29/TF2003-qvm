@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.32 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: client.c,v 1.33 2005-05-06 14:01:36 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -553,6 +553,14 @@ void DecodeLevelParms()
 		if ( !strcmp( st, "on" ) )
 			tf_data.enable_bot = 1;
 
+		GetSVInfokeyString( "arena",NULL, st, sizeof( st ), "off" );
+
+		tf_data.arena_mode = ARENA_MODE_NONE;
+		if ( !strcmp( st, "ffa" ) )
+			tf_data.arena_mode = ARENA_MODE_FFA;
+//		if ( !strcmp( st, "duel" ) )
+//			tf_data.arena_mode = ARENA_MODE_DUEL;
+                tf_data.botResupplyBetweenKills = (tf_data.arena_mode)?0:1;
 //////////////
 		tf_data.respawn_delay_time = GetSVInfokeyFloat( "rd", "respawn_delay", 0 );
 		
@@ -607,6 +615,7 @@ void DecodeLevelParms()
 			tf_data.pyrotype = 0;
 			tg_data.tg_enabled = 0;
 			tf_data.enable_bot = 0;
+			tf_data.arena_mode = ARENA_MODE_NONE;
 		} else
 			tf_data.mtfl = 0;
 
@@ -1413,6 +1422,7 @@ void PutClientInServer()
 	TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & 8 );
 	TeamFortress_SetEquipment();
 	TeamFortress_SetHealth();
+	TeamFortress_PrepareForArenaRespawn();
 	TeamFortress_SetSpeed( self );
 	TeamFortress_SetSkin( self );
 	stuffcmd( self, "v_idlescale 0\nfov 90\n" );

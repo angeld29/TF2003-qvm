@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.h,v 1.8 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: tfort.h,v 1.9 2005-05-06 14:01:36 AngelD Exp $
  */
 
 typedef struct {
@@ -228,3 +228,5 @@ int     TeamFortress_GetMaxAmmo( gedict_t * Retriever, int AmmoType );
 int     TeamFortress_CanGetWeapon( gedict_t * Retriever, int WeaponType );
 
 qboolean TeamFortress_isTeamsAllied(int teamno1, int teamno2);
+
+void TeamFortress_PrepareForArenaRespawn(  );

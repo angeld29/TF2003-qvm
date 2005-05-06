@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.h,v 1.8 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: g_syscalls.h,v 1.9 2005-05-06 14:01:36 AngelD Exp $
  */
 
 int     trap_GetApiVersion(  );
@@ -99,6 +99,12 @@ int 	trap_FS_GetFileList(  const char *path, const char *extension, char *listbu
 
 int 	trap_Map_Extension( const char* ext_name, int mapto);
 
+/*  return:
+    0 	success maping
+   -1	not found
+   -2	cannot map
+*/
+
 int 	trap_AddBot( const char* name, int bottomcolor, int topcolor, const char* skin);
 int 	trap_RemoveBot( int edn );
 int 	trap_SetBotUserInfo( int edn, const char* varname, const char* value );
@@ -106,11 +112,3 @@ int 	trap_SetBotCMD( int edn,int msec, float angles_x, float angles_y, float ang
                                 int forwardmove, int sidemove, int upmove, 
                                 int buttons, int impulse);
 
-//	G_SetBotUserInfo,
-//	G_SetBotCMD
-
-/*  return:
-    0 	success maping
-   -1	not found
-   -2	cannot map
-*/

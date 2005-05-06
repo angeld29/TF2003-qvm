@@ -247,6 +247,10 @@ cd VM
 
 @if errorlevel 1 goto quit
 
+%CC% %CFLAGS% %INCFLAGS% %SRC%\bot\ui.c -o bot\ui.asm
+
+@if errorlevel 1 goto quit
+
 copy %SRC%\g_syscalls.asm .
 
 @if errorlevel 1 goto quit

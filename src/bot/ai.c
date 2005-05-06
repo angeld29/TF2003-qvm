@@ -18,13 +18,12 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: ai.c,v 1.2 2005-05-05 14:51:44 AngelD Exp $
+ *  $Id: ai.c,v 1.3 2005-05-06 14:01:37 AngelD Exp $
  */
 #include "g_local.h"
 
 
 #define BOT_COUNT 1
-#define fResupplyBetweenKills  1
 void Bot_AI(  )
 {
 	float   fTemp;
@@ -39,7 +38,7 @@ void Bot_AI(  )
 		if ( self->fBotMessageTime == 0 )
 		{
 			self->fBotMessageTime =
-			    g_globalvars.time + fResupplyBetweenKills * 1.5 + g_random(  ) * BOT_COUNT * 0.3;
+			    g_globalvars.time + tf_data.botResupplyBetweenKills * 1.5 + g_random(  ) * BOT_COUNT * 0.3;
 			return;
 		}
 		if ( self->fBotMessageTime < g_globalvars.time )
@@ -96,13 +95,13 @@ void Bot_AI(  )
 	if ( self->action & BOT_DEFEND )
 	{
 		PickBestWeapon(  );
-		if ( CheckForResupply(  ) == true && fResupplyBetweenKills )
+		if ( CheckForResupply(  ) == true && tf_data.botResupplyBetweenKills )
 			GoForResupply(  );
 	}
 	if ( self->action & BOT_IDLE )
 	{
 		ReloadWeapons(  );
-		if ( CheckForResupply(  ) == true && fResupplyBetweenKills )
+		if ( CheckForResupply(  ) == true && tf_data.botResupplyBetweenKills )
 			GoForResupply(  );
 		else
 		{

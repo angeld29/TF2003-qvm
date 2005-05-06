@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.29 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: tfort.c,v 1.30 2005-05-06 14:01:37 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -538,6 +538,7 @@ void TeamFortress_ChangeClass(  )
 	TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & 8 );
 	TeamFortress_SetEquipment(  );
 	TeamFortress_SetHealth(  );
+	TeamFortress_PrepareForArenaRespawn();
 	TeamFortress_SetSpeed( self );
 	TeamFortress_SetSkin( self );
 	TeamFortress_ExecClassScript( self );
@@ -954,6 +955,19 @@ void TeamFortress_ShowTF(  )
 	} else
 		G_sprint( self, 2, "All Grenades Enabled\n" );
 		
+	switch( tf_data.arena_mode )
+	{
+	       case ARENA_MODE_NONE:
+	                       G_sprint( self, 2, "Arena Mode: Off\n" );
+	                       break;
+	       case ARENA_MODE_FFA:
+                               G_sprint( self, 2, "Arena Mode: FFA\n" );
+	                       break;
+	       case ARENA_MODE_DUEL:
+	                       G_sprint( self, 2, "Arena Mode: Duel\n" );
+	                       break;
+	}
+
 	if ( tf_data.mtfl )
 		G_sprint( self, 2, "ÍÔÆÌ Settings ÏÎ\n" );
 
@@ -2807,4 +2821,27 @@ void KickCheater( gedict_t * p )
 	p->tfstate = p->tfstate | TFSTATE_CANT_MOVE;
 	TeamFortress_SetSpeed( p );
 	TeamFortress_RemoveTimers(  );
+}
+
+
+void TeamFortress_PrepareForArenaRespawn(  )
+{
+        if( !tf_data.arena_mode )
+                return;
+
+	self->s.v.ammo_rockets = self->maxammo_rockets;
+	self->s.v.ammo_nails  = self->maxammo_nails  ;
+	self->s.v.ammo_shells = self->maxammo_shells ;
+	self->s.v.ammo_cells  = self->maxammo_cells  ;
+	self->ammo_detpack    = self->maxammo_detpack;
+	self->ammo_medikit    = self->maxammo_medikit;
+
+	//self->armorclass |= class_set[pc].armorclass;
+	self->s.v.armortype = self->armor_allowed;
+	self->s.v.armorvalue =self->maxarmor;
+
+	self->no_grenades_1 = 4;
+	self->no_grenades_2 = 4;
+	bound_other_ammo( self );
+	W_SetCurrentAmmo(  );
 }

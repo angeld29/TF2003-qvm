@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: qw.c,v 1.2 2005-05-05 14:51:44 AngelD Exp $
+ *  $Id: qw.c,v 1.3 2005-05-06 14:01:37 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -86,24 +86,22 @@ void BotFrame( void )
 		        botDisconnect( self );
 		        continue;
 		}
-		{
-        		self->s.v.button0 = 0;
-        		self->s.v.button2 = 0;
-        		self->s.v.impulse = 0;
-        		Bot_AI(  );
-		}
+       		self->s.v.button0 = 0;
+       		self->s.v.button2 = 0;
+       		self->s.v.impulse = 0;
+       		Bot_AI(  );
 		Bot_CL_KeyMove(  );
 	}
 	self = oself;
 
 }
 
-void botConnect( int whichteam, int whichClass )
+void botConnect( int whichteam, int whichClass, char* name )
 {
 	gedict_t *oself;
 	int     ednum;
 
-	gedict_t *ent = &g_edicts[ednum = trap_AddBot( PickAName(  ), 0, 0, "base" )];
+	gedict_t *ent = &g_edicts[ednum = trap_AddBot( name, 0, 0, "base" )];
 
 	if ( ent == world )
 	{

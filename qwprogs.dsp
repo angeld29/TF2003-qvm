@@ -142,6 +142,10 @@ SOURCE=.\src\bot\move.c
 
 SOURCE=.\src\bot\qw.c
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\bot\ui.c
+# End Source File
 # End Group
 # Begin Source File
 
