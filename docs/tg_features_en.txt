@@ -1,0 +1,142 @@
+Team Fortress Training Ground features.
+
+All classes are capable of building, upgrading, rearming and dismantles of
+sentry guns and are able to set detpacks.
+Sentry build and upgrade does not require neither cells nor extra time.
+Number of buildings and detpacks is unlimited.
+"Static SG" -- does not disappear after destruction, instead begins to flicker.
+Could be rebuild with "sg_rebuild" command.
+
+"tg.cfg" script automatically executed upon server connect.
+Save/Restore Player Position
+Engineer's Sbar: either 2/3/5/6/7 or all classes
+
+Made an extra menu -- displayed by either "mod_menu" or "impulse 220"
+commands.
+
+Menu Options:
+1) Sentry settings
+2) Detpack settings
+3) Cheats
+4) Load defaults from localinfo (see below).
+5) Save/restore position
+
+SG Options:
+Sentry type and "sgppl" setting displayed.
+1) Change sentry type
+2) Increase SGPPL //for "New Find Target" mode only
+3) Decrease SGPPL //for "New Find Target" mode only
+4) Allow/deny SG fire.
+5) Choose sentry gun targets
+  * ignore OFF - shoot at all players
+  * ignore teammates - do not shoot at teammates
+  * ignore owner - do not shoot at player who built SG
+  * ignore ALL - do not shoot at all
+6) Fire mode: shells and rockets, shells only, lightning only (no damage mode)
+7) Switch Engineer Sbar (EngSbar either for all or 2/3/5/6/7 only)
+
+Detpack options:
+1) Turn on/off detpack solidity.
+* OFF - players could walk through detpack
+* ON - detpack blocks all except player who arm it
+* ALL - detpack blocks all players
+In order for pLayer who arm detpack not stuck in it, this option is either ON
+or OFF after detpack is set. That is, this option should be set each time
+detpack is armed.
+2) Allow/deny detpack disarming.
+3) Allow/deny detpack kicking.
+4) Switch minimal distance between two armed detpacks
+
+Cheat options:
+1) Unlimited ammo
+!!! only for SG shooting and rearming !!!
+2) Unlimited grenades
+3) Turn on/off flash and concussion effects.
+Works only after grenade explosion.
+* OFF - effect disabled.
+* OFF for self - effect disabled for player who thrown grenade
+* ON - normal conc and flash effects.
+4) Conc/flash effects duration. ( 5 sec, 10 sec or as usual )
+5) God mode, immortality
+6) Turn on/off reload necessity for weapons
+
+Saved position:
+1) Save position
+2) Show saved position (by means of text and explosion at that place)
+3) Teleport at saved position
+4) Delete saved position
+
+Aliases:
+mod_menu    display menu
+sg_rebuild  rebuild "static" sentry
+sg_reload   heal/reload sentry
+sg_upgrade  full upgade/rearm sentry
+disp_load   add some ammo to dispenser (disp explosion damage displayed)
+disp_unload reduce ammo in dispenser (disp explosion damage displayed)
+eff_conc    concussion oneself
+eff_flash   flash oneself 
+eff_remove  remove all effects from oneself (blindness, concussion, gas, tranq, infection)
+
+===================================
+LoadDefaults from localinfo
+
+sg_fire 	off/
+sg_find 	all/self/no/
+sg_fire_type	nodmg/bullets/
+gren_eff	off/self/
+gren_time	10/5/
+god		on/
+unl_ammo	on/
+unl_grens	on/
+dp_da		off/
+dp_drop		on/
+disable_reload	on/
+dp_clip		off/all/
+localinfo tg_sbar on/
+
+
+sg_fire off	allow SG fire
+ 	""	deny SG fire
+
+sg_find all	SG shoots at all
+ 	self	does not shoot at owner
+ 	no	does not seek for targets
+ 	""	does not shoot at teammates (normal behavior)
+
+sg_type  	as in TF2003
+sg_ppl
+
+sg_fire_type	nodmg	    shoot with lightning
+                bullets	    shoot with shells only
+                ""	    as usual
+
+tg_sbar   on	Eng sbar for all
+	 ""	for 2/3/5/6/7 only
+
+
+disable_reload	on 	Weapon clip always full
+                ""	as usual
+
+dp_clip off	detpacks do not block
+ 	all	detpacks block everyone
+ 	""	detpacks block everyone except owner
+
+dp_da off	deny detpack disarming
+      ""	allow detpack disarming
+dp_drop on	allow detpack kicking
+        off	deny kicking
+
+unl_ammo on	unlimited ammo
+
+unl_grens on	unlimited grenades
+
+gren_eff off	disable flash/conc effects
+ 	 self	disable flash/conc for oneself
+ 	 ""	flash/conc as usual
+
+gren_time 5	grenade effects past 5 seconds
+ 	  10	grenade effects past 10 seconds
+ 	  ""	as usual
+
+god       on	god mode 
+

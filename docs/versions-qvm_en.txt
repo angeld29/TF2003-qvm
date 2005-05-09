@@ -1,0 +1,360 @@
+QuakeWorld TeamFortress 2003 (QVM/DLL/SO Versions)
+by [sd] angel for MTFL
+
+TF2003-QVM is a first QW-mod ever written in pure C.  During porting from
+QuakeC some code was significantly optimized and even rewritten from scratch.
+That is why there could be errors not found in original TF2003.  All of them
+will be fixed upon discovery.  We are working hard on it :).  After the most
+debugging will be complete, there will be new functios added (there is a long
+TODO list aready).
+
+////////////////////////////////////////////////////
+Changes on May 6, 2005:
+
+Common:
+[+] Added new mode Arena - FFA.
+    Turned on server: "localinfo arena ffa".
+    Respawn with full ammo/armor.
+    "tf_goals" do not work (resupply respawns, flags etc).
+[+] Changed and expanded bot control commands:
+    "cmd bot",
+    "cmd bot add teamno classno [name]",
+    "cmd bot remove",
+    "cmd bot resupply" (always "off" in Arena mode).
+
+////////////////////////////////////////////////////
+Changes on May 5, 2005:
+
+Common:
+[+] API 7. Added functions:
+    int trap_AddBot (const char* name, int bottomcolor, int topcolor, const char* skin);
+    int trap_RemoveBot (int edn);
+    int trap_SetBotUserInfo (int edn, const char* varname, const char* value);
+    int trap_SetBotCMD (int edn, int msec, float angles_x, float angles_y, float angles_z, 
+    int forwardmove, int sidemove, int upmove, int buttons, int impulse);
+    Bot is just like a player, but controlled by mod with trap_SetBotCMD function.
+    Bot movement calculated after all other entities, at that time called:
+    GAME_CLIENT_PRETHINK
+    GAME_EDICT_THINK
+    GAME_CLIENT_POSTTHINK
+[+] Ported PabloTheBot1on1. Works on 1on1r map only. Plays as a soldier best of
+    all other classes. Could play other classes, to, but some of them incoherently.
+    Turned on server: "localinfo enable_bot on".
+    Controlled with commands: "cmd addbot teamno classno" and "cmd removebot".
+
+////////////////////////////////////////////////////
+Changes on April 28, 2005:
+
+Common:
+[+] From now on, "timelimit" is always greater than prematch.
+[+] Added anti-cheat protection on setinfo "skin", "topcolor", "botomcolor".
+
+////////////////////////////////////////////////////
+Changess on April 3, 2005 (crc: 44737):
+
+Sniper:
+[+] Fixed sniper rifle bug.
+    (snip_range_fix just switches rifle range from 3072 to 8092)
+
+Engineer:
+[+] "build" menu could be called in air (however, building is possible on
+    solid surface only, as before).
+
+////////////////////////////////////////////////////
+Changes on March 21, 2005: 
+
+Scout:
+[+] Corrected "uncovered an enemy spy" message displaying.
+
+////////////////////////////////////////////////////
+Changes on February 18, 2005: 
+
+Engineer:
+[+] Fixed build place check error.
+
+////////////////////////////////////////////////////
+Changes on February 14, 2005 (crc: 47352): 
+
+Scout:
+[+] Fixed flash effect on double blindness.
+
+Spy:
+[+] Fixed "Skin reset" message.
+
+Common:
+[+] Prematch works without "clan mode" now.
+
+////////////////////////////////////////////////////
+Changes on February 8, 2005: 
+
+Common:
+[+] Removed "unknown field _color" message upon loading maps with color lighting.
+
+////////////////////////////////////////////////////
+Changes on February 3, 2005:
+
+Engineer:
+[+] Fixed dispenser falling through floor.
+
+Demoman:
+[+] Fixed detpack menu at Training Ground.
+
+////////////////////////////////////////////////////
+Changes on December 25, 2004 (crc:53211):
+
+Spy:
+[+] Fixed menu error.
+
+////////////////////////////////////////////////////
+Changes on December 23, 2004 (crc:32330):
+
+Common:
+[+] API 6. Added functions:
+    G_executecmd,
+    G_conprint,
+    G_readcmd,
+    G_redirectcmd
+[+] Value of "vote changemap timeout" increased up to 60 seconds.
+[+] Voting could not be activated more often than once a 3 minutes.
+[+] Server could be controlled without "rcon". Available commands:
+    "cmd admin auth" server password from localinfo "apw", "adminpwn" (admin level 0),
+    "cmd admin kick" on "userid" (admin level 1),
+    "cmd admin map" same as "rcon map" (admin level 2),
+    "cmd admin status" same as "rcon status" (admin level 3),
+    "cmd admin ban" on "userid" (admin level 3),
+    "cmd admin banlist" same as "rcon listip" (admin level 3),
+    "cmd admin unban" same as "rcon removeip" (admin level 3),
+    admin level is taken from localinfo "adminlevel", default 1.
+[+] Added new command "cmd vote elect" - admin election, set through server's localinfo:
+    "localinfo electpercentage" - vote percentage (default 50).
+    "localinfo electlevel" - assigned admin level (default 1).
+    If "electlevel" is 0, election is denied.
+
+////////////////////////////////////////////////////
+Changes on December 20, 2004:
+
+Engineer:
+[+] Sentry could be rotated at any degree:
+    Controlled with "cmd sg_rotate <angle>", only if "use_sg" menu activated.
+
+Demoman:
+[+] Detpack could be armed with "cmd" command with any time preset.
+    Armed on "cmd detpack 5-255" 
+    Cancel arming on "cmd detpack stop"
+
+Common:
+[+] Fixed error with "setinfo s 4" - class help on.
+    If either "setinfo ch" or "clashelp" are present, use its value.
+    If either "setinfo s" present or bit "4" is reset - classhelp is off, otherwise on.
+[+] Implement custom discard by means of "cmd":
+    For example: "cmd discard s 10 n 20 r -10 c 0".
+    Positive values mean how much to discard, negative ones - how much to keep.
+    If some type of ammo is omitted, discard value is default for that class.
+    "cmd discard" - default discard for each class.
+[+] Implemented allied commands (team allies).
+    Set up within entity "info_tfdetect", "team_no" field:
+    1  - team 1 & 2
+    2  - team 1 & 3
+    4  - team 1 & 4
+    8  - team 2 & 3
+    16 - team 2 & 4
+    32 - team 3 & 4
+    Works for:
+    saveme
+    id
+    detpack touch
+    disp touch
+    spy <=> scout touch
+    sg_find
+    FireSpanner
+    FireMedikit (addfrag for cure only not for allied conc/infection etc)
+    FireBioWeapon
+
+////////////////////////////////////////////////////
+Changes on December 11, 2004:
+
+Common:
+[+] Fixed RandomRespawn error (respawn at DM spawn point).
+
+////////////////////////////////////////////////////
+Changes on December 10, 2004:
+
+Common:
+[+] Fixed DumpClanScores port error.
+
+////////////////////////////////////////////////////
+Changes on December 9, 2004 (build 563 crc: 64837):
+
+Common:
+[+] Entity field "delay_time" could be fractional, again.
+[+] API 5 - QVM perfomance on TFvsTF map optimized.
+
+////////////////////////////////////////////////////
+Changes on December 4, 2004 (crc: 59565):
+
+Common:
+[+] Fixed port error related to immortal civilian.
+[+] Fixed port error related to players per team limit.
+[+] Fixed spy "id" error.
+
+////////////////////////////////////////////////////
+Changes on December 2, 2004:
+
+Sniper:
+[+] Restored autorifle range.
+
+Common:
+[+] Fixed "dropammo" pick up in case of full ammo.
+[+] Corrected sbar displaying at high res.
+[+] Fixed respawn telefrags.
+[+] Fixed "carried by (null)" message.
+
+////////////////////////////////////////////////////
+Changes on November 22, 2004:
+
+[+] Fixed port error related to t_heal, caused players to not be able to respawn
+    after death.
+[+] Empty messages within "goal" do not displayed anymore.
+
+////////////////////////////////////////////////////
+Changes on November 16, 2004:
+
+Common:
+[+] Fixed prematch error, caused some players to stay alive on prematch end.
+
+////////////////////////////////////////////////////
+Changes on November 13, 2004:
+
+Common:
+[+] Added "cmd vote" function, for map change without rcon.
+[+] Added "cmd test" function, for some bugs cause discovery.
+
+////////////////////////////////////////////////////
+Changes on November 10, 2004:
+
+Pyro:
+[+] Flame jet does not fade on wall, instead it spreaded upon it.
+    Should be turned on server: "localinfo pyrotype 1".
+
+Common:
+[+] Fixed "class_menu" port error.
+
+////////////////////////////////////////////////////
+Changes on November 6, 2004:
+
+Demoman:
+[+] Fixed detpack countdown port error.
+
+Common:
+[+] Fixed class limits port error.
+
+////////////////////////////////////////////////////
+Changes on October 25, 2004:
+
+Common:
+[+] Removed bug related to set_sucide_frame.
+
+////////////////////////////////////////////////////
+Changes on October 3, 2004 (build 496):
+
+Demoman:
+[+] Fixed port error with TeamFortress_DetpackStop.
+
+////////////////////////////////////////////////////
+Changes on September 30, 2004:
+
+Engineer:
+[+] Fixed sentry destruction upon build in air.
+[+] Fixed sentry target seek with "watervis 1" enabled.
+
+Common:
+[+] CeaseFireTime (cft) works only if prematch is enabled and it is cut on prematch duration.
+
+Training Ground:
+[+] Sentry upgrade works even if there is not enough cells.
+
+////////////////////////////////////////////////////
+Changes on September 29, 2004:
+
+Scout:
+[+] Fixed port error with autoscan couldn't be turned off.
+
+Medic:
+[+] Fixed currentammo displaying during health regeneration.
+
+////////////////////////////////////////////////////
+Changes on September 27, 2004:
+
+Common:
+[+] Fixed respawn telefrag.
+[+] Fixed players stuck in each other at respawns.
+
+Training Ground:
+[+] Fixed static sentry self-destruction.
+
+////////////////////////////////////////////////////
+Changes on September 22, 2004:
+
+Engineer:
+[+] New sentry rocket firing:
+    Rockets could be fired through basement.
+    There is target prediction.
+    If player is on ground or near ground sentry shoots at point below player.
+    Turned on server: localinfo "sg_rfire" new/old.
+
+Common:
+[+] "id" function depends on server watervis setting.
+[+] Autoid delay reduced to 0.5 sec (two times more often).
+
+[+] Suicided players leave corpses after death, too.
+[+] Fixed ammobox bug. From now on, ammobox limit would not reduce.
+    In case of limit hit, oldest ammobox is removed.
+
+////////////////////////////////////////////////////
+Changes on September 20, 2004:
+
+Engineer:
+[+] New options system for sentry gun tuning:
+    localinfo "sg_newfind" on/off
+    localinfo "sg_sfire" new/old/mtfl1/mtfl2
+    localinfo "sg" remains for compatibility, not recommended although.
+[+] Removed shells spread with "sg_sfire new" (didn't work anyway).
+[+] fixed particles displaying upon shells hit with "sg_sfire new".
+[+] Sentry shoots with shells through basement with "sg_sfire new".
+
+Common:
+[+] Fixed multiple conc-effect bug.
+[+] TG and QW-LAN mods do not require separate modules anymore, they are included into main.
+    Turned on server with "localinfo tg on" and "localinfo lan on", respectively.
+    If "localinfo mtfl" is on, they are turned off automatically.
+
+Training Ground:
+[+] New commands:
+    /cmd tg sgppl 
+    /cmd tg sg_fire
+    /cmd tg sg_find
+    /cmd tg sg_fire_type
+
+////////////////////////////////////////////////////
+Changes on September 16, 2004:
+
+Soldier:
+[+] Alternate message "%s checks if his weapon is loaded\n" displayed more
+    often upon suicide with RL (same as basic "%s becomes bored with life\n").
+
+Engineer:
+[+] Extended "id" on sentry on dispenser.
+[+] Disp and sentry health do not disappear upon "building" message.
+
+Common:
+[+] Sbar optimized, from now on it displays precise numbers.
+
+////////////////////////////////////////////////////
+
+TF2003 version (20.08.2004 r1) fully ported from QuakeC to plain C.
+/see version.txt and readme.txt/
+
+////////////////////////////////////////////////////
+
+http://clan.sd.ru
+http://mtfl.sd.ru
