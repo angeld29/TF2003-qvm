@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: bot.h,v 1.3 2005-05-06 14:01:36 AngelD Exp $
+ *  $Id: bot.h,v 1.4 2005-05-09 00:33:02 AngelD Exp $
  */
 
 #define KEY_MOVEUP       1
@@ -32,12 +32,20 @@
 #define KEY_LOOKLEFT   256
 #define KEY_LOOKRIGHT  512
 
+#define BOT_STRAFE_NONE 0
+#define BOT_STRAFE_LEFT 1
+#define BOT_STRAFE_RIGHT 2
+#define BOT_STRAFE_CHANGE_DIRECTION 3
+
 #define BOT_IDLE                1
 #define BOT_FIGHTING            2
 #define BOT_MOVING              4
 #define BOT_DEFEND              8
 #define BOT_RESUPPLYING         16
 #define BOT_AVOIDING_HAZARD     32
+
+#define BOT_TIMEWAIT_AFTER_TELEPORT 0.5
+
 /*
 #define BOT_AI_LEAD             2
 #define BOT_AI_FOLLOW           3

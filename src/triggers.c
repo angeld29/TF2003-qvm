@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: triggers.c,v 1.6 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: triggers.c,v 1.7 2005-05-09 00:33:02 AngelD Exp $
  */
 #include "g_local.h"
 gedict_t *stemp, *otemp, *s, *old;
@@ -544,7 +544,7 @@ void teleport_use(  )
 }
 
 /*QUAKED trigger_teleport (.5 .5 .5) ? PLAYER_ONLY SILENT
-Any object touching this will be transported to the corresponding info_teleport_destination gedict_t*. You must set the "target" field, and create an object with a "targetname" field that matches.
+Any object touching this will be transported to the corresponding info_teleport_destination entity. You must set the "target" field, and create an object with a "targetname" field that matches.
 
 If the trigger_teleport has a targetname, it will only teleport entities when it has been fired.
 */

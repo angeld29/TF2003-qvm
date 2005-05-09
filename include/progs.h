@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: progs.h,v 1.17 2005-05-06 14:01:36 AngelD Exp $
+ *  $Id: progs.h,v 1.18 2005-05-09 00:33:02 AngelD Exp $
  */
 #include "progdefs.h"
 
@@ -309,14 +309,18 @@ typedef struct gedict_s {
 	int            keys, nextimpulse;
 	int            action,oldAction;
 	int            bot_team,bot_skin;
+	int            bot_strafe_state;
 	int            bot_lastmenu,bot_lastmenucount;
 	float          fBotMessageTime;
 	vec3_t         botDirection,lastSighted;
-	vec3_t         waypoint1, waypoint2, waypoint3,	waypoint4, waypoint5;
 	struct gedict_s*      target1,*target2,*target3;
-	int            distanceToWaypoint;
 	float          checkMovementTime;
 	float          obs_time;
+//movment
+        float          botNoMoveTime;
+	vec3_t         waypoint1, waypoint2, waypoint3,	waypoint4, waypoint5;
+	int            distanceToWaypoint;
+
 ///
 
 } gedict_t;

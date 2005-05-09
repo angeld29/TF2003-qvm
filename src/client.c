@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.33 2005-05-06 14:01:36 AngelD Exp $
+ *  $Id: client.c,v 1.34 2005-05-09 00:33:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1352,6 +1352,18 @@ void PutClientInServer()
 	vec3_t  v;
 	char    s[10];
 
+	if( self->isBot )
+	{
+      		ClearAllWaypoints(  );
+      		ClearAllTargets(  );
+      		self->obs_time = 0;
+      		self->action = BOT_IDLE;
+      		self->s.v.button0 = 0;
+      		self->s.v.button1 = 0;
+      		self->s.v.button2 = 0;
+      		self->keys = 0;
+      		self->fBotMessageTime = 0;
+	}
 	self->s.v.touch = ( func_t ) player_touch;
 	self->s.v.classname = "player";
 	self->s.v.health = 100;

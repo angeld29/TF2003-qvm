@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: qw.c,v 1.3 2005-05-06 14:01:37 AngelD Exp $
+ *  $Id: qw.c,v 1.4 2005-05-09 00:33:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -61,7 +61,13 @@ void Bot_CL_KeyMove(  )
 	self->s.v.v_angle[2] = 0;
 	self->s.v.v_angle[1] = anglemod( self->s.v.v_angle[1] );
 //	VectorCopy(self->s.v.v_angle,self->s.v.angles); 
-
+/*        if( self->s.v.fixangle )
+        {
+                G_bprint(2,"fixangle\n");
+                VectorCopy(self->s.v.angles,self->s.v.v_angle);
+                self->s.v.v_angle[0] *= -3;
+                self->s.v.fixangle = 0;
+        }*/
 	trap_SetBotCMD( NUM_FOR_EDICT( self ), g_globalvars.frametime * 1000,
 //                      self->s.v.angles[0], self->s.v.angles[1], self->s.v.angles[2],
 			self->s.v.v_angle[0], self->s.v.v_angle[1], self->s.v.v_angle[2],
@@ -89,6 +95,13 @@ void BotFrame( void )
        		self->s.v.button0 = 0;
        		self->s.v.button2 = 0;
        		self->s.v.impulse = 0;
+       		self->keys = 0;
+       		if( self->team_no && self->team_no != 1)
+       		{
+       		        G_bprint(3,"%s: i'm dont know how to play for team 2\n",self->s.v.netname);
+       		        botDisconnect(self);
+       		        continue;
+       		}
        		Bot_AI(  );
 		Bot_CL_KeyMove(  );
 	}
@@ -111,13 +124,13 @@ void botConnect( int whichteam, int whichClass, char* name )
 
 	oself = self;
 	self = ent;
-	self->has_disconnected = 0;
+//	self->has_disconnected = 0;
 	self->bot_skin = whichClass;
 	self->bot_team = whichteam;
-	PutClientInServer(  );
-	TeamFortress_TeamSet( whichteam );
-	self->s.v.impulse = whichClass + TF_CHANGEPC;
-	TeamFortress_ChangeClass(  );
+//	PutClientInServer(  );
+//	TeamFortress_TeamSet( whichteam );
+//	self->s.v.impulse = whichClass + TF_CHANGEPC;
+//	TeamFortress_ChangeClass(  );
 	
 	ClearAllWaypoints(  );
 	ClearAllTargets(  );
@@ -141,7 +154,7 @@ void botDisconnect( gedict_t * te )
 	}
 	oself = self;
 	self = te;
-	ClientDisconnect(  );
+//	ClientDisconnect(  );
 	trap_RemoveBot( NUM_FOR_EDICT( te ) );
 	self = oself;
 }

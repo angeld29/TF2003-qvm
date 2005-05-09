@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: ui.c,v 1.1 2005-05-06 14:01:37 AngelD Exp $
+ *  $Id: ui.c,v 1.2 2005-05-09 00:33:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -30,13 +30,38 @@ typedef struct {
 void AddBot(  );
 void RemoveBot(  );
 void ResupplySetBot();
+void BotReport();
 bot_cmd_t bot_cmds[]=
 {
 	{"add", AddBot},
 	{"remove", RemoveBot},
 	{"resupply", ResupplySetBot},
+	{"report", BotReport},
 	{NULL}
 };
+
+void BotReport(  )
+{
+	gedict_t *te;
+
+
+	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "player" ) ); )
+	{
+		if ( te->has_disconnected )
+			continue;
+		if ( te->isBot )
+			break;
+	}
+
+	if ( !te )
+		return;
+
+        G_bprint(2,"Bot: %s, state %d, menu %d\n origin %4.0f %4.0f %4.0f\nwp     %4.0f %4.0f %4.0f\n",
+                te->s.v.netname,te->action,te->current_menu,
+                PASSVEC3(te->s.v.origin),
+                PASSVEC3(te->waypoint1)
+        );
+}
 
 void AddBot(  )
 {
@@ -128,7 +153,7 @@ void Bot()
 	if ( !tf_data.enable_bot )
 	{
 		G_sprint( self, 2, "Bots disabled\n" );
-		return;
+//FIXME!!!!		return;
 	}
 
 	argc = trap_CmdArgc();

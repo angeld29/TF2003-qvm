@@ -18,9 +18,22 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: move.c,v 1.2 2005-05-05 14:51:44 AngelD Exp $
+ *  $Id: move.c,v 1.3 2005-05-09 00:33:02 AngelD Exp $
  */
 #include "g_local.h"
+
+#define MAX_YAW_PER_SEK 180
+#define MAX_STRAFE_ANGLE 30 //MAX abs(dir-vel)
+#define MAX_STRAFE_ANGLE_AT_START 60
+#define SPEED_COEFFICIENT 1.4
+#define CHANGE_WP_DISTANCE 50
+
+float max_yaw_pf;
+vec3_t dir2move, curr_vel, cur_angle;
+float vel_yaw, dir_yaw, view_yaw; 
+float velocity,sv_accelerate;
+
+
 
 qboolean AtLocation( vec3_t vDestination )
 {
@@ -29,23 +42,6 @@ qboolean AtLocation( vec3_t vDestination )
 	VectorSubtract( vDestination, self->s.v.origin, spot1 );
 
 	return vlen( spot1 ) < 45;
-}
-
-void StrafeLeft()
-{
-	if ( self->obs_time < g_globalvars.time )
-		self->keys |= KEY_MOVELEFT;
-}
-
-void StrafeRight()
-{
-	if ( self->obs_time < g_globalvars.time )
-		self->keys |= KEY_MOVERIGHT;
-}
-
-void BotTouch()
-{
-	return;
 }
 
 void ClearAllWaypoints()
@@ -57,11 +53,6 @@ void ClearAllWaypoints()
 	SetVector( self->waypoint5, 0, 0, 0 );
 	self->distanceToWaypoint = 5000;
 	self->checkMovementTime = g_globalvars.time + 0.7;
-}
-
-void frik_obstructed( vec3_t whichway )
-{
-
 }
 
 float angcomp( float y1, float y2 )
@@ -82,98 +73,109 @@ float angcomp( float y1, float y2 )
 	return answer;
 }
 
-int GetKeysByDir( vec3_t sdir )
+
+
+float   subangle( float y1, float y2 )
 {
-	vec3_t  keydir;
-	vec3_t  lookhere;
-	int     outkeys;
-	float   tang;
+        float o;
+        
+        o = anglemod(y1) -anglemod(y2);
 
-	outkeys = 0;
-	vectoangles( sdir, keydir );
+/*	if( o > 180)
+	        o -=360;
+	if( o < -180)
+	        o +=360;*/
+	return anglemod( o );
 
-	if ( !( self->action & ( BOT_FIGHTING | BOT_AVOIDING_HAZARD ) ) )
-	{
-		VectorCopy( keydir, lookhere );
-		lookhere[0] = 0;
-		VectorCopy( lookhere, self->s.v.v_angle );
-	}
-	if ( sdir[0] || sdir[1] )
-	{
-		tang = angcomp( keydir[1], self->s.v.v_angle[1] );
-		if ( fabs( tang ) <= 80 )
-			outkeys |= KEY_MOVEFORWARD;
-		tang = angcomp( keydir[1], self->s.v.v_angle[1] - 90 );
-		if ( fabs( tang ) <= 80 )
-			outkeys |= KEY_MOVERIGHT;
-		tang = angcomp( keydir[1], self->s.v.v_angle[1] + 90 );
-		if ( fabs( tang ) <= 80 )
-			outkeys |= KEY_MOVELEFT;
-		tang = angcomp( keydir[1], self->s.v.v_angle[1] - 180 );
-		if ( fabs( tang ) <= 80 )
-			outkeys |= KEY_MOVEBACK;
-	}
-	if ( sdir[2] > 0.7 )
-		outkeys |= KEY_MOVEUP;
-	else
-	{
-		if ( sdir[2] < 0.7 )
-			outkeys |= KEY_MOVEDOWN;
-	}
-	return outkeys;
 }
 
-int GetKeysByLoc( vec3_t vLocation )
+void InitCalcMovement()
 {
-	vec3_t  vDirection;
+        vec3_t vtmp;
 
-	VectorSubtract( vLocation, self->s.v.origin, vDirection );
+        max_yaw_pf = MAX_YAW_PER_SEK * g_globalvars.frametime;
 
-	return GetKeysByDir( vDirection );
+	VectorCopy( self->s.v.velocity, curr_vel );
+	vectoangles( curr_vel, vtmp );
+	vel_yaw = vtmp[1];
+	curr_vel[2] = 0;
+	velocity = vlen( curr_vel );
+
+	VectorSubtract( self->waypoint1, self->s.v.origin, dir2move );
+
+	dir2move[2] = 0;
+	vectoangles( dir2move, vtmp );
+
+	dir_yaw = vtmp[1];
+
+/*	{
+	        vec3_t end;
+	        normalize( dir2move, vtmp );
+	        VectorScale(vtmp, 120, vtmp);
+	        VectorAdd(self->s.v.origin,vtmp,end);
+	        TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( end ), 0, self 
+	        , PASSVEC3( self->s.v.mins), PASSVEC3( self->s.v.maxs));
+	        if( g_globalvars.trace_ent)
+                dir_yaw += (g_random()<0.5)?90:-90;
+	}*/
+
+	VectorCopy( self->s.v.v_angle, cur_angle);
+
+	cur_angle[2] = 0;
+
+	view_yaw = cur_angle[1];
+
+	sv_accelerate = trap_cvar("sv_accelerate");
 }
+int counter = 0;
 
-void GotoLocation( vec3_t vDestination )
+void ChangeBotVAngle(float pitch, float yaw, float roll)
 {
-	self->keys = GetKeysByLoc( vDestination );
+
+        float ftmp = angcomp( yaw, view_yaw);
+
+        self->s.v.v_angle[0] = pitch;
+        self->s.v.v_angle[2] = roll;
+        self->s.v.v_angle[1] = yaw;
+        return;
+
+        if( abs(ftmp) < max_yaw_pf )
+        {
+                self->s.v.v_angle[1] = yaw;
+                return;
+        }else
+        {
+                if( ftmp < 0 )
+                        self->s.v.v_angle[1] -= max_yaw_pf;
+                else
+                        self->s.v.v_angle[1] += max_yaw_pf;
+        }
 }
-
-void MoveToLocation( vec3_t vDestination )
-{
-	ClearAllWaypoints();
-	if ( self->action != BOT_MOVING )
-	{
-		self->oldAction = self->action;
-		self->action = BOT_MOVING;
-	}
-	VectorCopy( vDestination, self->waypoint1 );
-}
-
-
 void DoMovement()
 {
-	float   botDistanceToWaypoint;
-	vec3_t   vtmp;
+        float maxaccel, ideal_angle , ftmp;
+        float max_strafe_angle ,range;
 
 	if ( VectorCompareF( self->waypoint1, 0, 0, 0 ) )
 	{
-		if ( self->oldAction != BOT_MOVING )
-			self->action = self->oldAction;
-		else
-			self->action = BOT_IDLE;
-
-		self->oldAction = BOT_IDLE;
-		if ( self->action == BOT_DEFEND )
-			VectorCopy( self->botDirection, self->s.v.v_angle );
-		self->obs_time = 0;
 		self->keys = 0;
 		return;
 	}
-	VectorSubtract( self->waypoint1, self->s.v.origin, vtmp );
-	if ( vlen( vtmp ) < 50 )
+
+	VectorSubtract( self->waypoint1, self->s.v.origin, dir2move );
+
+	range = vlen(self->s.v.velocity) * g_globalvars.frametime ;
+	if( range < CHANGE_WP_DISTANCE )
+	        range  = CHANGE_WP_DISTANCE;
+
+	if ( vlen( dir2move ) < range )
 	{
 		if ( VectorCompareF( self->waypoint2, 0, 0, 0 ) )
+		{
 			SetVector( self->waypoint1, 0, 0, 0 );
-		else
+			self->keys = 0;
+			return;
+		} else
 		{
 			VectorCopy( self->waypoint2, self->waypoint1 );
 			VectorCopy( self->waypoint3, self->waypoint2 );
@@ -181,25 +183,112 @@ void DoMovement()
 			VectorCopy( self->waypoint5, self->waypoint4 );
 			SetVector( self->waypoint5, 0, 0, 0 );
 		}
-		self->distanceToWaypoint = 5000;
-		self->checkMovementTime = g_globalvars.time + 0.7;
 	}
-	if ( self->checkMovementTime < g_globalvars.time )
+
+	if( self->s.v.fixangle )
+	        self->botNoMoveTime = g_globalvars.time + BOT_TIMEWAIT_AFTER_TELEPORT;
+
+	if( g_globalvars.time < self->botNoMoveTime )
 	{
-		VectorSubtract( self->waypoint1, self->s.v.origin, vtmp );
-		botDistanceToWaypoint = vlen( vtmp );
-		if ( self->distanceToWaypoint < botDistanceToWaypoint )
-		{
-			ClearAllWaypoints();
-			self->keys = 0;
-			self->action = BOT_IDLE;
-			return;
-		} else
-		{
-			self->checkMovementTime = g_globalvars.time + 0.7;
-			self->distanceToWaypoint = botDistanceToWaypoint;
-		}
+	        return;
 	}
-	if ( !VectorCompareF( self->waypoint1, 0, 0, 0 ) )
-		self->keys = GetKeysByLoc( self->waypoint1 );
+	        
+	InitCalcMovement();
+
+        if ( ( int ) ( self->s.v.flags ) & FL_ONGROUND )
+	{
+	        if( velocity < self->maxfbspeed)
+	        {
+         	        self->keys |= KEY_MOVEFORWARD;
+         	        self->keys |= KEY_MOVELEFT;
+         	        self->s.v.button2 = 0;
+	        }else
+	        {
+               	        self->s.v.button2 = 1;
+	                if( self->bot_strafe_state == BOT_STRAFE_LEFT)
+	                {
+	                        self->keys |= KEY_MOVELEFT;
+
+                         //      self->bot_strafe_state = BOT_STRAFE_RIGHT;
+	                }else
+	                {
+	                        self->keys |= KEY_MOVERIGHT;
+       	                 //      self->bot_strafe_state = BOT_STRAFE_LEFT;
+	                }
+	        }
+                return;
+	}
+	//Air Move
+	self->s.v.button2 = 0;
+	ftmp =  subangle( dir_yaw,vel_yaw );
+
+//	maxaccel = sv_accelerate * self->maxfbspeed * g_globalvars.frametime;
+//	ideal_angle = acos ( (self->maxfbspeed - maxaccel) /velocity ) * 180.0 / M_PI;
+
+/*	if( counter++ > 10  )
+	{
+	        //G_bprint(2,"%3.0f %3.0f %3.0f %3.0f %3.0f %3.0f\n",
+	        //dir_yaw,vel_yaw,ftmp, velocity,ideal_angle,self->s.v.v_angle[1]);
+	        counter =0;
+	
+	}*/
+
+
+	//max_strafe_angle = ( velocity < self->maxfbspeed *SPEED_COEFFICIENT)? MAX_STRAFE_ANGLE_AT_START:MAX_STRAFE_ANGLE;
+
+	max_strafe_angle = 80 - 40 * (velocity /(float) self->maxfbspeed - 1.0);
+
+	if( max_strafe_angle < 30 ) max_strafe_angle = 30;
+
+	if( (ftmp  > max_strafe_angle) && (ftmp < 360 - max_strafe_angle) )
+	{//change vel direction
+	        if( ftmp > 180)
+	        {
+	                self->bot_strafe_state = BOT_STRAFE_RIGHT;
+	                self->keys |= KEY_MOVERIGHT;
+	        }else
+	        {
+	                self->keys |= KEY_MOVELEFT;
+	                self->bot_strafe_state = BOT_STRAFE_LEFT;
+	        }
+	        ChangeBotVAngle(0,vel_yaw,0);
+	        return;
+	}
+
+	//ftmp =  g_globalvars.frametime * 0.001;
+
+/*        ftmp = vel_yaw - self->s.v.v_angle[1];
+        if( abs(ftmp) > max_yaw_pf )
+        {
+                if( ftmp > 0)
+                        self->s.v.v_angle[1] += max_yaw_pf;
+                else
+                        self->s.v.v_angle[1] -= max_yaw_pf;
+        }else*/
+
+        ftmp = asin( 1/ 2 *velocity)* 180.0 / M_PI;
+        //ftmp = 0;
+        if(self->bot_strafe_state == BOT_STRAFE_RIGHT)
+        {
+                ChangeBotVAngle(0, vel_yaw+ftmp, 0);
+        }else
+        {
+                ChangeBotVAngle(0, vel_yaw-ftmp, 0);
+        }
+        
+
+        if( self->bot_strafe_state == BOT_STRAFE_LEFT)
+        {
+/*                self->s.v.v_angle[0] = 0;
+                self->s.v.v_angle[1] = vel_yaw + ftmp;
+                self->s.v.v_angle[2] = 0;*/
+
+                self->keys |= KEY_MOVELEFT;
+        }else
+        {
+/*                self->s.v.v_angle[0] = 0;
+                self->s.v.v_angle[1] = vel_yaw - ftmp;
+                self->s.v.v_angle[2] = 0;*/
+                self->keys |= KEY_MOVERIGHT;
+        }
 }
