@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: qw.c,v 1.4 2005-05-09 00:33:02 AngelD Exp $
+ *  $Id: qw.c,v 1.5 2005-05-11 11:29:20 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -60,17 +60,9 @@ void Bot_CL_KeyMove(  )
 
 	self->s.v.v_angle[2] = 0;
 	self->s.v.v_angle[1] = anglemod( self->s.v.v_angle[1] );
-//	VectorCopy(self->s.v.v_angle,self->s.v.angles); 
-/*        if( self->s.v.fixangle )
-        {
-                G_bprint(2,"fixangle\n");
-                VectorCopy(self->s.v.angles,self->s.v.v_angle);
-                self->s.v.v_angle[0] *= -3;
-                self->s.v.fixangle = 0;
-        }*/
+
 	trap_SetBotCMD( NUM_FOR_EDICT( self ), g_globalvars.frametime * 1000,
-//                      self->s.v.angles[0], self->s.v.angles[1], self->s.v.angles[2],
-			self->s.v.v_angle[0], self->s.v.v_angle[1], self->s.v.v_angle[2],
+			PASSVEC3(self->s.v.v_angle),
 			forwardmove, sidemove, upmove, buttons, self->s.v.impulse );
 }
 void BotFrame( void )
@@ -124,13 +116,8 @@ void botConnect( int whichteam, int whichClass, char* name )
 
 	oself = self;
 	self = ent;
-//	self->has_disconnected = 0;
 	self->bot_skin = whichClass;
 	self->bot_team = whichteam;
-//	PutClientInServer(  );
-//	TeamFortress_TeamSet( whichteam );
-//	self->s.v.impulse = whichClass + TF_CHANGEPC;
-//	TeamFortress_ChangeClass(  );
 	
 	ClearAllWaypoints(  );
 	ClearAllTargets(  );
@@ -154,7 +141,6 @@ void botDisconnect( gedict_t * te )
 	}
 	oself = self;
 	self = te;
-//	ClientDisconnect(  );
 	trap_RemoveBot( NUM_FOR_EDICT( te ) );
 	self = oself;
 }

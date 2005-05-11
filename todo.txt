@@ -1,10 +1,5 @@
 camera
-+localinfo mtfl on
 suicide body
-+watervis действует на id
-+telefrag check on respawn
-+fix explode grenade after disconnect
-
 fix TeamFortress_TeamGetColor чтобы возвращал реальный цвет а не цвет+1
 
 scanner на sentry, флаги
@@ -15,7 +10,6 @@ flare dmg
 
 Arena Mode
 bot sold like sentry
-+team allies (border/hunted)
 
 vote for classlimit(отдельных игроков)
 
@@ -44,7 +38,8 @@ vote for classlimit(отдельных игроков)
 ??Еще хочется сообщение о выбросе гранаты. типа "you throwed grenade type 1/2"
 
 свист снайперской пули
-+меню build в воздухе
 подбор только нужного числа патронов
 
 statistika
+
+fix void DropBackpack(  )

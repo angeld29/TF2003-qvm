@@ -1332,4 +1332,15 @@ int sprintf( char *str, const char *fmt, ... )
 	va_end (argptr);
 	return ret;
 }
+
+float asin(float x)
+{
+/*        if( x == 1 )
+                return M_PI/2;
+                
+        if( x == -1 )
+                return -M_PI/2;*/
+
+        return atan2(x, -x*x+1);
+}
 #endif

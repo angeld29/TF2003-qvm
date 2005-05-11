@@ -140,7 +140,7 @@ Medic:
       // In early TF versions, "special" was switching between bioweapon and medikit.
       Since these two functions were merged into one, there was no much sence in using
       this alias. From now on, it switches between axe and primary weapon.
-[new] Now medic is able to cure flash grenade effect.
+[new] Now medic is able to cure "server-side" flash grenade effect.
       // Medic is supposed to heal :)
 
 Heavyguy:
@@ -159,9 +159,8 @@ Heavyguy:
       // In earlier versions, "special" just switched weapon to cannon.
 [add] Changed displaying of cannon bullet hits, actual shot spread is shown.
       // It looks much more spectacular :)
-[new] Cannon damage is increased 2 times (as in TF 2.9). When shooting starts, damage is
-      same as in TF 2.8. When some time passed, bullet spread is increased 3 times during
-      3 seconds.
+[new] Cannon damage is increased 2 times (as in TF 2.9). One half of the damage amount
+      is same as in TF2.8, second half has its spread increased 3 times during 3 seconds.
       // In TF 2.8, cannon was effective at middle range, thanks to small bullet spread.
       However at close range it didn't have enough strength (if ammo expense would be
       taken into account, actual damage should be 3 times as it actually was).
@@ -339,8 +338,8 @@ Common:
       instead of first shot there was a reload.
 [fix] Removed command score sbar displaying bug.
       // Earlier, in some cases, score of one team could be displayed twice within sbar.
-[fix] Removed command score bug, not showing score more than 100.
-      // So far, score 100 (10 flags) didn't showed up on sbar.
+[fix] Removed command score bug, not showing score of 100.
+      // So far, score 100 (10 flags) didn't displayed on sbar.
 [fix] Removed bug with current ammmo displaying.
       // In some cases, ammo amount in menu was reduced by 2 instead of 1.
 [fix] Corpses do not interact with buttons, doors and platforms anymore.

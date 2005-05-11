@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: triggers.c,v 1.7 2005-05-09 00:33:02 AngelD Exp $
+ *  $Id: triggers.c,v 1.8 2005-05-11 11:29:20 AngelD Exp $
  */
 #include "g_local.h"
 gedict_t *stemp, *otemp, *s, *old;
@@ -456,7 +456,7 @@ void teleport_touch(  )
 	if ( other->s.v.health <= 0 || other->s.v.solid != SOLID_SLIDEBOX )
 		return;
 
-// activator = other;
+//        activator = other;
 	SUB_UseTargets(  );
 
 	//put a tfog where the player was
