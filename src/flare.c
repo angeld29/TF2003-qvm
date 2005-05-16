@@ -18,8 +18,12 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: flare.c,v 1.5 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: flare.c,v 1.6 2005-05-16 06:31:38 AngelD Exp $
  */
+/*==================================
+This file handles all the functions
+to deal with the flare 'grenade'.
+==================================*/
 #include "g_local.h"
 int     num_team_flares[5] = { 0, 0, 0, 0, 0 };
 
@@ -88,6 +92,13 @@ void FlareGrenadeThink(  )
 }
 
 
+/*============================
+void() FlareGrenadeExplode
+
+It is not really a grenade, nor does it
+'explode'. But it fits in well with the
+rest of the grenade code.
+=============================*/
 void FlareGrenadeExplode(  )
 {
 

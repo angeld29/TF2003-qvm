@@ -18,8 +18,9 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: bot.h,v 1.4 2005-05-09 00:33:02 AngelD Exp $
+ *  $Id: bot.h,v 1.5 2005-05-16 06:31:38 AngelD Exp $
  */
+#include "bot_waypoint.h"
 
 #define KEY_MOVEUP       1
 #define KEY_MOVEDOWN     2
@@ -95,3 +96,5 @@ qboolean CheckForResupply();
 void GoForResupply();
 int BotImpulse();
 int BotImpulseMenu();
+
+extern float bot_frametime;

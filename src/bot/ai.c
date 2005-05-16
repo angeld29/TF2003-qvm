@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: ai.c,v 1.5 2005-05-11 11:29:20 AngelD Exp $
+ *  $Id: ai.c,v 1.6 2005-05-16 06:31:39 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -53,8 +53,6 @@ qboolean ThrowGrenade(  )
 void SelectWP();
 void Bot_AI(  )
 {
-	vec3_t  vtemp2;
-
 	if ( self->s.v.health <= 0 )
 	{
 		if ( self->fBotMessageTime == 0 )
@@ -201,7 +199,12 @@ void SelectWP()
 	{
 	        return;
 	}
-
+	if( self->s.v.origin[0] > 200 )
+	{
+	        SetVector( self->waypoint1, 1800, 0, 24 );
+	        return;
+	}
+	        
 	nexty = g_random() * 700 *2 + (- 700); 
 
 	SetVector( self->waypoint1, 200, nexty, 24 );
@@ -230,56 +233,5 @@ void SelectWPOld()
       	}
         return;
 
-/*        if( self->s.v.origin[1] < 150 )
-        {
-                nexty = self->s.v.origin[1] + g_random() * 200;
-        }else
-        {
-                if( self->s.v.origin[1] < 650)
-                        nexty = self->s.v.origin[1] - g_random() * 200;
-                else
-                        nexty = self->s.v.origin[1] - g_random() * 200+100;
-        }*/
-      	if ( self->team_no == 1 )
-      	{
-      	        switch((int) (1500 - self->s.v.origin[0] ) / 1000 )
-      	        {
-      	         case 0:
-      	                SetVector( self->waypoint1, 1600, nexty, 24 );
-      	                break;
-      	         case 1:
-      	                SetVector( self->waypoint1, 400, nexty, 24 );
-      	                break;
-      	                
-      	         case 2:
-      	                SetVector( self->waypoint1, -400, nexty, 24 );
-      	                break;
-
-      	         default:
-      	                SetVector( self->waypoint1, -1200, nexty, 24 );
-      	                break;
-      	        
-      	        }
-      	} else
-      	{
-      	        switch( (int) (self->s.v.origin[0] + 1500) / 1000 )
-      	        {
-      	         case 0:
-      	                SetVector( self->waypoint1, -1600, nexty, 24 );
-      	                break;
-      	         case 1:
-      	                SetVector( self->waypoint1, -400, nexty, 24 );
-      	                break;
-      	                
-      	         case 2:
-      	                SetVector( self->waypoint1, 400, nexty, 24 );
-      	                break;
-
-      	         default:
-      	                SetVector( self->waypoint1, 1200, nexty, 24 );
-      	                break;
-      	        
-      	        }
-      	}
 }
 

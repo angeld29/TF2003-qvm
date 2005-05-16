@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: sentry.c,v 1.23 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: sentry.c,v 1.24 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -37,6 +37,8 @@ void ai_face(  )
 	changeyaw( self );
 }
 
+//===========================
+// Level 1 Sentry Gun Frames
 void lvl1_sentry_stand(  )
 {
 	self->s.v.frame = 0;
@@ -90,6 +92,8 @@ void lvl1_sentry_atk3(  )
 }
 
 
+//===========================
+// Level 2 Sentry Gun Frames
 void lvl2_sentry_stand(  )
 {
 	self->s.v.frame = 3;
@@ -144,6 +148,8 @@ void lvl2_sentry_atk3(  )
 }
 
 
+//===========================
+// Level 3 Sentry Gun Frames
 void lvl3_sentry_stand(  )
 {
 	self->s.v.frame = 6;
@@ -196,13 +202,12 @@ void lvl3_sentry_atk3(  )
 	Sentry_Fire(  );
 }
 
+//=============
 void Sentry_Rotate(  )
 {
 	float   ay;
 
-//      gedict_t *gunhead;
-
-	self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & 8 );
+	self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & EF_DIMLIGHT );
 	CheckSentry( self );
 	if ( tf_data.sg_newfind)
 	{
@@ -393,11 +398,12 @@ void Sentry_HuntTarget(  )
 	VectorSubtract( PROG_TO_EDICT( self->s.v.enemy )->s.v.origin, self->s.v.origin, vtemp );
 	self->s.v.ideal_yaw = vectoyaw( vtemp );
 	self->s.v.nextthink = g_globalvars.time + 0.1;
-	SUB_AttackFinished( 1 );
+	SUB_AttackFinished( 1 ); // wait a while before first attack
 }
 
 void Sentry_Pain( struct gedict_s *attacker, float take )
 {
+        // Update the owner's status bar
 	self->real_owner->StatusRefreshTime = g_globalvars.time + 0.2;
 }
 
@@ -408,7 +414,7 @@ void Sentry_Explode(  )
 	ThrowGib( "progs/tgib3.mdl", -70 );
 	if ( self->real_owner->has_disconnected != 1 )
 	{
-		tf_data.deathmsg = 38;
+		tf_data.deathmsg = DMSG_SG_EXPLODION;
 		T_RadiusDamage( self, self->real_owner, 75 + self->s.v.ammo_rockets * 8, self );
 	}
 	if ( streq( self->s.v.classname, "building_sentrygun_base" ) )
@@ -458,7 +464,7 @@ void Sentry_Die(  )
 		ThrowGib( "progs/tgib1.mdl", -70 );
 		ThrowGib( "progs/tgib2.mdl", -70 );
 		ThrowGib( "progs/tgib3.mdl", -70 );
-		tf_data.deathmsg = 38;
+		tf_data.deathmsg = DMSG_SG_EXPLODION;
 		T_RadiusDamage( self, self->real_owner, 75 + self->s.v.ammo_rockets * 8, self );
 		trap_WriteByte( 4, SVC_TEMPENTITY );
 		trap_WriteByte( 4, TE_EXPLOSION );
@@ -856,6 +862,8 @@ int Sentry_Fire(  )
 		return 0;
 	if ( enemy->is_feigning == 1 )
 		return 0;
+	
+	// Level 3 Turrets fire rockets every 3 seconds
 	if ( self->s.v.weapon == 3 && self->s.v.ammo_rockets > 0 
 		&& self->super_damage_finished < g_globalvars.time
 	     	&& ( tg_data.sg_fire_type == TG_SG_FIRE_NORMAL )  )
@@ -880,7 +888,7 @@ int Sentry_Fire(  )
 		FireSentryLighting( PROG_TO_EDICT(self->s.v.enemy) );
 		return 1;
 	}
-	tf_data.deathmsg = 27;
+	tf_data.deathmsg = DMSG_SENTRYGUN_BULLET;
 
 	self->s.v.ammo_shells -= 1;
 	if ( self->s.v.ammo_shells < 0 )
@@ -911,7 +919,8 @@ int Sentry_Fire(  )
         		G_Error("Unknown SG TYPE %d\n",tf_data.sg_sfire);
         
         }
-//////
+
+        // Warn owner that it's low on ammo
 	if ( !self->s.v.ammo_shells && g_random(  ) < 0.1 )
 		G_sprint( self->real_owner, 2, "Sentry Gun is out of shells.\n" );
 	else

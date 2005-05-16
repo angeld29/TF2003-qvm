@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: qw.c,v 1.5 2005-05-11 11:29:20 AngelD Exp $
+ *  $Id: qw.c,v 1.6 2005-05-16 06:31:39 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -58,10 +58,10 @@ void Bot_CL_KeyMove(  )
                 return;
         }*/
 
-	self->s.v.v_angle[2] = 0;
+	//self->s.v.v_angle[2] = 0;
 	self->s.v.v_angle[1] = anglemod( self->s.v.v_angle[1] );
 
-	trap_SetBotCMD( NUM_FOR_EDICT( self ), g_globalvars.frametime * 1000,
+	trap_SetBotCMD( NUM_FOR_EDICT( self ), bot_frametime * 1000,
 			PASSVEC3(self->s.v.v_angle),
 			forwardmove, sidemove, upmove, buttons, self->s.v.impulse );
 }

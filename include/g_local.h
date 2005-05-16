@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_local.h,v 1.15 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: g_local.h,v 1.16 2005-05-16 06:31:38 AngelD Exp $
  */
 //
 // g_local.h -- local definitions for game module
@@ -61,7 +61,6 @@ int             NUM_FOR_EDICT( gedict_t * e );
 
 extern tf_server_data_t tf_data;
 
-extern char     mapname[];
 extern gedict_t g_edicts[];
 extern globalvars_t g_globalvars;
 extern gedict_t *world;

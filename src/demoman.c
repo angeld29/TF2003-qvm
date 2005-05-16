@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: demoman.c,v 1.13 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: demoman.c,v 1.14 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -34,10 +34,12 @@ void    TeamFortress_DetpackDisarm(  );
 void    TeamFortress_DetpackCountDown(  );
 int     num_team_pipebombs[5];
 
+//=========================================================================
+// Detonate all thrown pipebombs
 void TeamFortress_DetonatePipebombs(  )
 {
 	gedict_t *e;
-
+	// Find all this players pipebombs
 	for ( e = world; (e = trap_find( e, FOFS( s.v.classname ), "pipebomb" )); )
 	{
 		if ( e->s.v.owner == EDICT_TO_PROG( self ) )
@@ -45,42 +47,51 @@ void TeamFortress_DetonatePipebombs(  )
 	}
 }
 
+//=========================================================================
+// Pipebomb touch function
 void PipebombTouch(  )
 {
-	sound( self, 1, "weapons/bounce.wav", 1, 1 );
+	sound( self, CHAN_WEAPON, "weapons/bounce.wav", 1, ATTN_NORM );  // bounce sound
 	if ( VectorCompareF( self->s.v.velocity, 0, 0, 0 ) )
 		SetVector( self->s.v.avelocity, 0, 0, 0 );
 }
 
+//=========================================================================
+// Touch Function for Mirv Grenade
+// Mirv Grenade heavily influenced by the Firewall Grenade by Steve Bond (wedge@nuc.net)
 void MirvGrenadeTouch(  )
 {
-	sound( self, 1, "weapons/bounce.wav", 1, 1 );
+        // If the Mirv Grenade hits a player, it just bounces off
+	sound( self, CHAN_WEAPON, "weapons/bounce.wav", 1, ATTN_NORM );
 	if ( VectorCompareF( self->s.v.velocity, 0, 0, 0 ) )
 		SetVector( self->s.v.avelocity, 0, 0, 0 );
 }
 
+//=========================================================================
+// Mirv Grenade explode function, for when the PRIMETIME runs out
 void MirvGrenadeExplode(  )
 {
 	float   i;
 
-	tf_data.deathmsg = 10;
+	tf_data.deathmsg = DMSG_GREN_MIRV;
 	T_RadiusDamage( self, PROG_TO_EDICT( self->s.v.owner ), 100, world );
-	trap_WriteByte( 4, SVC_TEMPENTITY );
-	trap_WriteByte( 4, TE_EXPLOSION );
-	trap_WriteCoord( 4, self->s.v.origin[0] );
-	trap_WriteCoord( 4, self->s.v.origin[1] );
-	trap_WriteCoord( 4, self->s.v.origin[2] );
+	trap_WriteByte( MSG_BROADCAST, SVC_TEMPENTITY );
+	trap_WriteByte( MSG_BROADCAST, TE_EXPLOSION );
+	trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[0] );
+	trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[1] );
+	trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[2] );
 	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
 	self->s.v.solid = SOLID_NOT;
-	i = 0;
-	while ( i < GR_TYPE_MIRV_NO )
+	// Launch mirvs
+	for ( i = 0; i < GR_TYPE_MIRV_NO; i++)
 	{
 		MirvGrenadeLaunch( self->s.v.origin, PROG_TO_EDICT( self->s.v.owner ) );
-		i = i + 1;
 	}
 	BecomeExplosion(  );
 }
 
+//=========================================================================
+// Launch a Mirv
 void GrenadeTouch(  );
 void GrenadeExplode(  );
 
@@ -124,11 +135,13 @@ void MirvGrenadeLaunch( vec3_t org, gedict_t * shooter )
 	setorigin( newmis, PASSVEC3( org ) );
 }
 
+//=========================================================================
+// Handles the Setting of Detpacks
 
+// Training Ground Stuff
 void Detpack_SetClip(  )
 {
 	gedict_t *te;
-//	gedict_t *pl;
 
 	for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "detpack" )); )
 	{
@@ -177,6 +190,7 @@ void TeamFortress_SetDetpack( float timer )
 	gedict_t *te;
 	gedict_t *at_spot;
 
+	// prevent detpack impulse from triggering anything else
 	self->s.v.impulse = 0;
 	self->last_impulse = 0;
 
@@ -231,9 +245,10 @@ void TeamFortress_SetDetpack( float timer )
 			}
 		}
 	}
+	// Cant set detpack if you're in the air
 	if ( !( ( int ) self->s.v.flags & FL_ONGROUND ) )
 	{
-		G_sprint( self, 2, "You can't set detpacks in the air!\n" );
+		G_sprint( self, PRINT_HIGH, "You can't set detpacks in the air!\n" );
 		return;
 	}
         if( !tg_data.tg_enabled )
@@ -242,7 +257,7 @@ void TeamFortress_SetDetpack( float timer )
         	{
         		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
         		{
-        			G_sprint( self, 2, "You can only have 1 detpack active at a time.\n" );
+        			G_sprint( self, PRINT_HIGH, "You can only have 1 detpack active at a time.\n" );
         			return;
         		}
         	}
@@ -255,10 +270,12 @@ void TeamFortress_SetDetpack( float timer )
 	self->is_detpacking = 1;
 	self->ammo_detpack = self->ammo_detpack - 1;
 	self->tfstate = self->tfstate | TFSTATE_CANT_MOVE;
+	// Save the current weapon and remove it
 	self->s.v.weapon = self->current_weapon;
 	self->current_weapon = 0;
 	self->s.v.weaponmodel = "";
 	self->s.v.weaponframe = 0;
+
 	TeamFortress_SetSpeed( self );
 	self->pausetime = g_globalvars.time + WEAP_DETPACK_SETTIME;
 	G_sprint( self, 2, "Setting detpack for %.0f seconds...\n", timer );
@@ -275,6 +292,8 @@ void TeamFortress_SetDetpack( float timer )
 	newmis->s.v.health = timer;
 }
 
+//=========================================================================
+// Stops the setting of the detpack
 void TeamFortress_DetpackStop(  )
 {
 	gedict_t *detpack_timer;
@@ -297,12 +316,12 @@ void TeamFortress_DetpackStop(  )
 	self->pausetime = g_globalvars.time;
 }
 
+//=========================================================================
+// The detpack is set, let the player go and start timer
 void TeamFortress_DetpackSet(  )
 {
 	gedict_t *countd;
 	gedict_t *oldself, *owner;
-
-//      int     skinno;
 
 	owner = PROG_TO_EDICT( self->s.v.owner );
 	self->is_detpacking = 0;
@@ -331,20 +350,25 @@ void TeamFortress_DetpackSet(  )
 	newmis->s.v.angles[1] = owner->s.v.angles[1];
 	SetVector( newmis->s.v.velocity, 0, 0, 0 );
 	SetVector( newmis->s.v.avelocity, 0, 0, 0 );
-	newmis->weaponmode = 0;
+
+	newmis->weaponmode = 0;        // Detpack weaponmode = 1 when disarming
 	newmis->s.v.touch = ( func_t ) TeamFortress_DetpackTouch;
+
 	if ( tf_data.birthday == 1 )
 		setmodel( newmis, "progs/detpack2.mdl" );
 	else
 		setmodel( newmis, "progs/detpack.mdl" );
 	setsize( newmis, -16, -16, 0, 16, 16, 8 );
 	setorigin( newmis, PASSVEC3( owner->s.v.origin ) );
+	
+	// Create the CountDown entity
 	countd = spawn(  );
 	newmis->linked_list = countd;
 	countd->s.v.think = ( func_t ) TeamFortress_DetpackCountDown;
 	countd->s.v.health = self->s.v.health - 1;
 	countd->s.v.owner = self->s.v.owner;
-	countd->s.v.classname = "countdown_timer";
+	countd->s.v.classname = "countdown_timer";// Don't call it timer, because we
+                                                  // don't want it removed if player dies
 	countd->s.v.enemy = EDICT_TO_PROG( newmis );
 	newmis->oldenemy = countd;
 	if ( self->s.v.health <= 255 )
@@ -360,6 +384,8 @@ void TeamFortress_DetpackSet(  )
 	dremove( self );
 }
 
+//=========================================================================
+// The detpack goes BOOM!
 void TeamFortress_DetpackExplode(  )
 {
 	float   pos;
@@ -375,11 +401,12 @@ void TeamFortress_DetpackExplode(  )
 	if ( tf_data.birthday == 1 )
 		G_bprint( 1, "%s spreads good cheer!\n", self->real_owner->s.v.netname );
 
+	// Check the pointcontents to prevent detpack outside the world
 	pos = trap_pointcontents( PASSVEC3( self->s.v.origin ) );
 
-	if ( pos != -2 && pos != -6 && self->real_owner->has_disconnected != 1 )
+	if ( pos != CONTENT_SOLID && pos != CONTENT_SKY && self->real_owner->has_disconnected != 1 )
 	{
-		tf_data.deathmsg = 12;
+		tf_data.deathmsg = DMSG_DETPACK;
 		for ( head = world; (head = findradius( head, self->s.v.origin, WEAP_DETPACK_SIZE )); )
 		{
 			if ( streq( head->s.v.classname, "info_tfgoal" ) )
@@ -432,24 +459,23 @@ void TeamFortress_DetpackExplode(  )
 		trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
 	} else
 		G_sprint( self->real_owner, 2, "Your detpack fizzled out.\n" );
-	if ( self->weaponmode == 1 )
+	// This code handles a disarming scout with protection
+	if ( self->weaponmode == 1 )// Detpack was being disarmed
 	{
 		TeamFortress_SetSpeed( PROG_TO_EDICT( self->s.v.enemy ) );
-		dremove( self->oldenemy );
-		dremove( self->observer_list );
+		dremove( self->oldenemy );            // CountDown
+		dremove( self->observer_list );       // Disarm timer
 	}
 	BecomeExplosion(  );
 }
 
+//=========================================================================
+// The detpack touch function. Scouts can disarm it.
 void TeamFortress_DetpackTouch(  )
 {
 	gedict_t *disarm, *owner;
 	vec3_t  source;
 	vec3_t  dest;
-
-//      vec3_t  org;
-//      vec3_t  def;
-
 
 	if ( tg_data.detpack_drop )
 		CheckBelowBuilding( self );
@@ -482,17 +508,23 @@ void TeamFortress_DetpackTouch(  )
 	other->tfstate = other->tfstate | TFSTATE_CANT_MOVE;
 	G_sprint( other, 2, "Disarming detpack...\n" );
 	TeamFortress_SetSpeed( other );
+	
+	// Spawn disarming entity
 	disarm = spawn(  );
-	disarm->s.v.owner = EDICT_TO_PROG( other );
-	disarm->s.v.enemy = EDICT_TO_PROG( self );
+	disarm->s.v.owner = EDICT_TO_PROG( other );// the scout
+	disarm->s.v.enemy = EDICT_TO_PROG( self ); // the detpack
 	disarm->s.v.classname = "timer";
 	disarm->s.v.nextthink = g_globalvars.time + WEAP_DETPACK_DISARMTIME;
 	disarm->s.v.think = ( func_t ) TeamFortress_DetpackDisarm;
-	self->weaponmode = 1;
-	self->s.v.enemy = EDICT_TO_PROG( other );
+	self->weaponmode = 1;                          // indicates disarming
+	self->s.v.enemy = EDICT_TO_PROG( other );      // points to scout
 	self->observer_list = disarm;
 }
 
+//=========================================================================
+// The detpack disarm function. Scout has finished disarming it
+// .enemy is the detpack
+// .owner is the scout
 void TeamFortress_DetpackDisarm(  )
 {
 	gedict_t *owner = PROG_TO_EDICT( self->s.v.owner );
@@ -512,12 +544,17 @@ void TeamFortress_DetpackDisarm(  )
 	}
 	owner->tfstate = owner->tfstate - ( owner->tfstate & TFSTATE_CANT_MOVE );
 	TF_AddFrags( owner, 1 );
+	// Reset speeds of scout
 	TeamFortress_SetSpeed( owner );
-	dremove( enemy->oldenemy );
-	dremove( enemy );
-	dremove( self );
+
+	dremove( enemy->oldenemy ); // remove count down                
+	dremove( enemy );           // remove detpack                   
+	dremove( self );            // remove this timer
 }
 
+//=========================================================================
+// The Detpack CountDown function. Displays the seconds left before the
+// detpack detonates to the owner of the detpack, if <10
 void TeamFortress_DetpackCountDown(  )
 {
 	gedict_t *owner = PROG_TO_EDICT( self->s.v.owner );
@@ -536,6 +573,7 @@ void TeamFortress_DetpackCountDown(  )
 			sound( enemy, 2, "doors/baseuse.wav", 1, 1 );
 			self->has_disconnected = 1;
 		}
+		// Flash the red light
 		if ( self->s.v.health < 5 && !enemy->s.v.skin )
 			enemy->s.v.skin = 1;
 		else

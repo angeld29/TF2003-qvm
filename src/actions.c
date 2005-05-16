@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: actions.c,v 1.15 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: actions.c,v 1.16 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -149,7 +149,7 @@ void TeamFortress_Cmd_Discard(  )
 	if ( newmis->s.v.ammo_cells )
 		self->s.v.ammo_cells = self->s.v.ammo_cells - newmis->s.v.ammo_cells;
 	W_SetCurrentAmmo();
-	sound( self, 3, "weapons/lock4.wav", 1, 1 );
+	sound( self, CHAN_ITEM, "weapons/lock4.wav", 1, 1 );
 	increment_team_ammoboxes( self->team_no );
 
 	newmis->s.v.enemy = EDICT_TO_PROG( self );
@@ -246,7 +246,7 @@ void TeamFortress_Discard(  )
 	if ( newmis->s.v.ammo_cells )
 		self->s.v.ammo_cells = self->s.v.ammo_cells - newmis->s.v.ammo_cells;
 	W_SetCurrentAmmo();
-	sound( self, 3, "weapons/lock4.wav", 1, 1 );
+	sound( self, CHAN_ITEM, "weapons/lock4.wav", 1, 1 );
 	increment_team_ammoboxes( self->team_no );
 
 	newmis->s.v.enemy = EDICT_TO_PROG( self );
@@ -285,9 +285,9 @@ void TeamFortress_SaveMe(  )
 	if ( self->last_saveme_sound < g_globalvars.time )
 	{
 		if ( g_random(  ) < 0.8 )
-			sound( self, 1, "speech/saveme1.wav", 1, 1 );
+			sound( self, CHAN_WEAPON, "speech/saveme1.wav", 1, 1 );
 		else
-			sound( self, 1, "speech/saveme2.wav", 1, 1 );
+			sound( self, CHAN_WEAPON, "speech/saveme2.wav", 1, 1 );
 		self->last_saveme_sound = g_globalvars.time + 4;
 	}
 	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ) , "player" )); )

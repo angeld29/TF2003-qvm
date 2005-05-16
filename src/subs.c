@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: subs.c,v 1.6 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: subs.c,v 1.7 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -52,7 +52,7 @@ void InitTrigger(  )
 // trigger angles are used for one-way touches.  An angle of 0 is assumed
 // to mean no restrictions, so use a yaw of 360 instead.
 	if ( !VectorCompareF( self->s.v.angles, 0, 0, 0 ) )
-		SetMovedir( self );
+		SetMovedir( );
 	self->s.v.solid = SOLID_TRIGGER;
 	setmodel( self, self->s.v.model );	// set size and link into world
 	self->s.v.movetype = MOVETYPE_NONE;

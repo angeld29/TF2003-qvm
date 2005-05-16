@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: ui.c,v 1.2 2005-05-09 00:33:02 AngelD Exp $
+ *  $Id: ui.c,v 1.3 2005-05-16 06:31:39 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -31,12 +31,14 @@ void AddBot(  );
 void RemoveBot(  );
 void ResupplySetBot();
 void BotReport();
+void BotSet();
 bot_cmd_t bot_cmds[]=
 {
 	{"add", AddBot},
 	{"remove", RemoveBot},
 	{"resupply", ResupplySetBot},
 	{"report", BotReport},
+	{"set", BotSet},
 	{NULL}
 };
 
@@ -50,17 +52,15 @@ void BotReport(  )
 		if ( te->has_disconnected )
 			continue;
 		if ( te->isBot )
-			break;
+		{
+                   G_bprint(2,"Bot: %s, state %d, menu %d\n velocity %3.0f  ,origin %4.0f %4.0f %4.0f\nwp     %4.0f %4.0f %4.0f\n",
+                           te->s.v.netname,te->action,te->current_menu,
+                           vlen(te->s.v.velocity),
+                           PASSVEC3(te->s.v.origin),
+                           PASSVEC3(te->waypoint1)
+                   );
+		}
 	}
-
-	if ( !te )
-		return;
-
-        G_bprint(2,"Bot: %s, state %d, menu %d\n origin %4.0f %4.0f %4.0f\nwp     %4.0f %4.0f %4.0f\n",
-                te->s.v.netname,te->action,te->current_menu,
-                PASSVEC3(te->s.v.origin),
-                PASSVEC3(te->waypoint1)
-        );
 }
 
 void AddBot(  )
@@ -73,7 +73,7 @@ void AddBot(  )
 
 	if ( argc < 4 )
 	{
-		G_sprint( self, 2, "usage: cmd addbot <team> <class> [<name>]\n" );
+		G_sprint( self, 2, "usage: cmd bot add <team> <class> [<name>]\n" );
 		return;
 	}
 
@@ -153,7 +153,8 @@ void Bot()
 	if ( !tf_data.enable_bot )
 	{
 		G_sprint( self, 2, "Bots disabled\n" );
-//FIXME!!!!		return;
+//FIXME!!!!
+                return;
 	}
 
 	argc = trap_CmdArgc();
@@ -177,4 +178,37 @@ void Bot()
 			return;
 		}
 	}
+}
+
+extern float max_yaw_per_sek;
+void BotSet()
+{
+        char    cmd_command[50];
+        int argc;
+
+        argc = trap_CmdArgc();
+
+        if( argc < 3 )
+        {
+                return;
+        }
+        trap_CmdArgv( 2, cmd_command, sizeof( cmd_command ) );
+
+        if( !strncmp(cmd_command,"max_yaw_speed",sizeof(cmd_command)))
+        {
+                if( argc == 3 )
+                        G_sprint(self,2,"max_yaw_speed = %3.0f\n",max_yaw_per_sek);
+                else
+                {
+                        trap_CmdArgv( 3, cmd_command, sizeof( cmd_command ) );
+                        max_yaw_per_sek = atof(cmd_command);
+                        if( max_yaw_per_sek < 10 )
+                                max_yaw_per_sek = 10;
+
+                        G_sprint(self,2,"max_yaw_speed set to %3.0f\n",max_yaw_per_sek);
+                }
+        
+        }
+        
+
 }

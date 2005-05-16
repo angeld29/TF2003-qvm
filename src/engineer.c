@@ -18,21 +18,33 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: engineer.c,v 1.21 2005-04-03 10:52:05 AngelD Exp $
+ *  $Id: engineer.c,v 1.22 2005-05-16 06:31:38 AngelD Exp $
  */
+/*========================================================
+Weapons and functions for the ENGINEER class and associated weaponry                          
+=======================================================*/
+
 #include "g_local.h"
 #include "sentry.h"
 
+// Weapon Functions
 void LaserBolt_Touch(  );
-void TeamFortress_FinishedBuilding(  );
-void T_Dispenser(  );
-void Dispenser_Die(  );
+
+// EMP Grenade Functions
 void EMPExplode(  );
 void EMPGrenadeTouch(  );
 void EMPGrenadeExplode(  );
+
+// Building Functions
 void CheckDistance(  );
+void TeamFortress_FinishedBuilding(  );
+void T_Dispenser(  );
+void Dispenser_Die(  );
+
 void teamsprint( int tno, gedict_t * ignore, char *st );
 
+//=========================================================================
+// Laserbolt think function
 void LaserBolt_Think(  )
 {
     self->s.v.solid = SOLID_TRIGGER;
@@ -44,15 +56,20 @@ void LaserBolt_Think(  )
     self->s.v.think = ( func_t ) SUB_Remove;
 }
 
+//=========================================================================
+// Laserbolt touch function. Just moves through the player and comes out
+// the other side.
 void LaserBolt_Touch(  )
 {
     vec3_t org;
 
     if ( other == PROG_TO_EDICT( self->s.v.owner ) )
 	return;
+    // don't explode on same person twice	
     if ( other == PROG_TO_EDICT( self->s.v.enemy ) && self->s.v.enemy )
 	return;
-    if ( trap_pointcontents( PASSVEC3( self->s.v.origin ) ) == -6 )
+
+    if ( trap_pointcontents( PASSVEC3( self->s.v.origin ) ) == CONTENT_SKY )
     {
 	dremove( self );
 	return;
@@ -64,7 +81,7 @@ void LaserBolt_Touch(  )
     {
 	SpawnBlood( org, 15 );
 	tf_data.deathmsg = DMSG_LASERBOLT;
-	TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.enemy ), 25, 2, 8 );
+	TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.enemy ), 25, 2, TF_TD_ELECTRICITY );
 	VectorCopy( self->s.v.oldorigin, self->s.v.velocity );
 	self->s.v.owner = EDICT_TO_PROG( other );
 	setmodel( self, "" );
@@ -84,6 +101,8 @@ void LaserBolt_Touch(  )
     dremove( self );
 }
 
+//=========================================================================
+// Fire a laserbolt
 void W_FireLaser(  )
 {
     vec3_t vec;
@@ -96,11 +115,13 @@ void W_FireLaser(  )
     VectorAdd( self->s.v.origin, org, org );
     aim( vec );
     VectorNormalize( vec );
+
     newmis = spawn(  );
     newmis->s.v.owner = EDICT_TO_PROG( self );
-    newmis->s.v.enemy = EDICT_TO_PROG( self );
+    newmis->s.v.enemy = EDICT_TO_PROG( self ); // The real owner
     newmis->s.v.movetype = MOVETYPE_FLYMISSILE;
     newmis->s.v.solid = SOLID_TRIGGER;
+
     setmodel( newmis, "progs/e_spike1.mdl" );
     setsize( newmis, 0, 0, 0, 0, 0, 0 );
     setorigin( newmis, org[0], org[1], org[2] + 16 );
@@ -112,9 +133,13 @@ void W_FireLaser(  )
     newmis->s.v.touch = ( func_t ) LaserBolt_Touch;
 }
 
+
 void weapon_touch(  );
 void ammo_touch(  );
 void BackpackTouch(  );
+
+//=========================================================================
+// Ammo/Weapon exploded by the EMP grenade
 void EMPExplode(  )
 {
     float expsize;
@@ -152,7 +177,7 @@ void EMPExplode(  )
 	    }
 	}
     }
-    tf_data.deathmsg = 31;
+    tf_data.deathmsg = DMSG_GREN_EMP_AMMO;
     T_RadiusDamage( self, PROG_TO_EDICT( self->s.v.enemy ), expsize, world );
     trap_WriteByte( 4, SVC_TEMPENTITY );
     trap_WriteByte( 4, TE_EXPLOSION );
@@ -160,27 +185,34 @@ void EMPExplode(  )
     trap_WriteCoord( 4, self->s.v.origin[1] );
     trap_WriteCoord( 4, self->s.v.origin[2] );
     trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+
+    // Respawn
     Respawn_Item( self, PROG_TO_EDICT( self->s.v.enemy ) );
 }
 
+//=========================================================================
+// Touch Function for EMP Grenade
 void EMPGrenadeTouch(  )
 {
+    // If the EMP Grenade hits a player, it just bounces off
     sound( self, 1, "weapons/bounce.wav", 1, 1 );
     if ( VectorCompareF( self->s.v.velocity, 0, 0, 0 ) )
 	SetVector( self->s.v.avelocity, 0, 0, 0 );
 }
 
+//=========================================================================
+// EMP Grenade explode function, for when the PRIMETIME runs out
 void EMPGrenadeExplode(  )
 {
     float expsize;
     gedict_t *te;
     gedict_t *oldself;
 
-    trap_WriteByte( 4, SVC_TEMPENTITY );
-    trap_WriteByte( 4, TE_TAREXPLOSION );
-    trap_WriteCoord( 4, self->s.v.origin[0] );
-    trap_WriteCoord( 4, self->s.v.origin[1] );
-    trap_WriteCoord( 4, self->s.v.origin[2] );
+    trap_WriteByte( MSG_BROADCAST, SVC_TEMPENTITY );
+    trap_WriteByte( MSG_BROADCAST, TE_TAREXPLOSION );
+    trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[0] );
+    trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[1] );
+    trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[2] );
     trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
     for ( te = world; (te = findradius( te, self->s.v.origin, 240 )); )
     {
@@ -225,7 +257,7 @@ void EMPGrenadeExplode(  )
 	    if ( expsize > 0 )
 	    {
 		te->s.v.solid = SOLID_NOT;
-		tf_data.deathmsg = 30;
+		tf_data.deathmsg = DMSG_GREN_EMP;
 		T_RadiusDamage( te, PROG_TO_EDICT( self->s.v.owner ), expsize, te );
 		te->s.v.think = ( func_t ) TeamFortress_AmmoboxRemove;//SUB_Remove;
 		te->s.v.nextthink = g_globalvars.time + 0.1;
@@ -249,7 +281,7 @@ void EMPGrenadeExplode(  )
 		    expsize = expsize + te->s.v.ammo_cells * 0.75;
 		if ( expsize > 0 )
 		{
-		    tf_data.deathmsg = 30;
+		    tf_data.deathmsg = DMSG_GREN_EMP;
 		    T_RadiusDamage( te, PROG_TO_EDICT( self->s.v.owner ), expsize, te );
 		    if ( te->s.v.touch != ( func_t ) BackpackTouch )
 		    {
@@ -281,6 +313,8 @@ void EMPGrenadeExplode(  )
     dremove( self );
 }
 
+//=========================================================================
+// Function handling the Engineer's build impulse
 void TeamFortress_EngineerBuild(  )
 {
     gedict_t *te;
@@ -290,6 +324,7 @@ void TeamFortress_EngineerBuild(  )
 	CenterPrint( self, "You can't build in the air!\n\n" );
 	return;
     }*/
+    // Pop up the menu
     if ( !self->is_building )
     {
         if(!tg_data.tg_enabled)
@@ -309,6 +344,7 @@ void TeamFortress_EngineerBuild(  )
 	    G_sprint( self, 2, "You stop building.\n" );
 	    self->tfstate = self->tfstate - ( self->tfstate & TFSTATE_CANT_MOVE );
 	    TeamFortress_SetSpeed( self );
+	    // Remove the timer
 	    for ( te = world; (te = trap_find( te, FOFS( s.v.netname ), "build_timer" )); )
 	    {
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
@@ -323,30 +359,7 @@ void TeamFortress_EngineerBuild(  )
 //	}
     }
 }
-/*int CheckAreaNew( gedict_t * obj, gedict_t * builder )
-{
-    gedict_t *te;
-    vec3_t end;
 
-    TraceCapsule( PASSVEC3( obj->s.v.origin ), PASSVEC3( obj->s.v.origin ), 0, obj, -16, -16, 0, 16, 16, 48 );
-    if ( g_globalvars.trace_startsolid == 1 )
-    {
-    G_bprint(2,"before allsolid == 1\n");
-	VectorCopy( obj->s.v.origin, end );
-	end[2] -= 48;
-	TraceCapsule( PASSVEC3( obj->s.v.origin ), PASSVEC3( end ), 0, obj, -16, -16, 0, 16, 16, 4 );
-	VectorCopy( g_globalvars.trace_endpos, end );
-	end[2]++;
-	TraceCapsule( PASSVEC3( end ), PASSVEC3( end ), 0, obj, -16, -16, 0, 16, 16, 48 );
-	if ( g_globalvars.trace_startsolid == 1 )
-	    return 0;
-    }
-
-    te = findradius( world, obj->s.v.origin, 64 );
-    if ( te )
-		return 0;
-    return 1;
-}*/
 int CheckAreaNew( gedict_t * obj, gedict_t * builder )
 {
     gedict_t *te;
@@ -355,7 +368,6 @@ int CheckAreaNew( gedict_t * obj, gedict_t * builder )
     TraceCapsule( PASSVEC3( obj->s.v.origin ), PASSVEC3( obj->s.v.origin ), 0, obj, PASSVEC3( obj->s.v.mins), PASSVEC3( obj->s.v.maxs) );
     if ( g_globalvars.trace_startsolid == 1 )
     {
-    //G_bprint(2,"before allsolid == 1\n");
 	VectorCopy( obj->s.v.origin, end );
 	end[2] -= 48;
 	TraceCapsule( PASSVEC3( obj->s.v.origin ), PASSVEC3( end ), 0, obj, PASSVEC3( obj->s.v.mins), obj->s.v.maxs[0], obj->s.v.maxs[1], 4);
@@ -368,68 +380,10 @@ int CheckAreaNew( gedict_t * obj, gedict_t * builder )
 
     te = findradius( world, obj->s.v.origin, 64 );
     if ( te )
-	{
-		
-		return 0;
-	}
+	return 0;
     
     return 1;
 }
-
-/*int CheckArea( gedict_t * obj, gedict_t * builder )
-{
-    vec3_t src;
-    vec3_t end;
-    int pos;
-    gedict_t *te;
-
-    pos = CheckAreaNew( obj, builder );
-    if ( pos == 0 )
-	return 0;
-
-
-    pos = trap_pointcontents( PASSVEC3( obj->s.v.origin ) );
-    if ( pos == -2 || pos == -6 )
-	return 0;
-    src[0] = obj->s.v.origin[0] + obj->s.v.maxs[0] + 24;
-    src[1] = obj->s.v.origin[1] + obj->s.v.maxs[1] + 24;
-    src[2] = obj->s.v.origin[2] + obj->s.v.maxs[2] + 16;
-    pos = trap_pointcontents( PASSVEC3( src ) );
-    if ( pos == -2 || pos == -6 )
-	return 0;
-    end[0] = obj->s.v.origin[0] + obj->s.v.mins[0] - 16;
-    end[1] = obj->s.v.origin[1] + obj->s.v.mins[1] - 16;
-    end[2] = obj->s.v.origin[2] + obj->s.v.mins[2] - 16;
-    traceline( PASSVEC3( src ), PASSVEC3( end ), 1, obj );
-    if ( g_globalvars.trace_fraction != 1 )
-	return 0;
-    pos = trap_pointcontents( PASSVEC3( end ) );
-    if ( pos == -2 || pos == -6 )
-	return 0;
-    src[0] = obj->s.v.origin[0] + obj->s.v.mins[0] - 16;
-    src[1] = obj->s.v.origin[1] + obj->s.v.maxs[1] + 16;
-    src[2] = obj->s.v.origin[2] + obj->s.v.maxs[2] + 16;
-    pos = trap_pointcontents( PASSVEC3( src ) );
-    if ( pos == -2 || pos == -6 )
-	return 0;
-    end[0] = obj->s.v.origin[0] + obj->s.v.maxs[0] + 16;
-    end[1] = obj->s.v.origin[1] + obj->s.v.mins[1] - 16;
-    end[2] = obj->s.v.origin[2] + obj->s.v.mins[2] - 16;
-    traceline( PASSVEC3( src ), PASSVEC3( end ), 1, obj );
-
-    if ( g_globalvars.trace_fraction != 1 )
-	return 0;
-    pos = trap_pointcontents( PASSVEC3( end ) );
-    if ( pos == -2 || pos == -6 )
-	return 0;
-    traceline( PASSVEC3( builder->s.v.origin ), PASSVEC3( obj->s.v.origin ), 1, builder );
-    if ( g_globalvars.trace_fraction != 1 )
-	return 0;
-    te = findradius( world, obj->s.v.origin, 64 );
-    if ( te )
-		return 0;
-    return 1;
-}*/
 
 int CheckArea( gedict_t * obj, gedict_t * builder )
 {
@@ -442,15 +396,14 @@ int CheckArea( gedict_t * obj, gedict_t * builder )
     if ( pos == 0 )
 	return 0;
 
-
     pos = trap_pointcontents( PASSVEC3( obj->s.v.origin ) );
-    if ( pos == -2 || pos == -6 )
+    if ( pos == CONTENT_SOLID || pos == CONTENT_SKY )
 	return 0;
     src[0] = obj->s.v.origin[0]  + 24;
     src[1] = obj->s.v.origin[1]  + 24;
     src[2] = obj->s.v.origin[2]  + 16;
     pos = trap_pointcontents( PASSVEC3( src ) );
-    if ( pos == -2 || pos == -6 )
+    if ( pos == CONTENT_SOLID || pos == CONTENT_SKY )
 	return 0;
     end[0] = obj->s.v.origin[0]  - 16;
     end[1] = obj->s.v.origin[1]  - 16;
@@ -459,13 +412,13 @@ int CheckArea( gedict_t * obj, gedict_t * builder )
     if ( g_globalvars.trace_fraction != 1 )
 	return 0;
     pos = trap_pointcontents( PASSVEC3( end ) );
-    if ( pos == -2 || pos == -6 )
+    if ( pos == CONTENT_SOLID || pos == CONTENT_SKY )
 	return 0;
     src[0] = obj->s.v.origin[0] - 16;
     src[1] = obj->s.v.origin[1] + 16;
     src[2] = obj->s.v.origin[2] + 16;
     pos = trap_pointcontents( PASSVEC3( src ) );
-    if ( pos == -2 || pos == -6 )
+    if ( pos == CONTENT_SOLID || pos == CONTENT_SKY )
 	return 0;
     end[0] = obj->s.v.origin[0] + 16;
     end[1] = obj->s.v.origin[1] - 16;
@@ -475,7 +428,7 @@ int CheckArea( gedict_t * obj, gedict_t * builder )
     if ( g_globalvars.trace_fraction != 1 )
 	return 0;
     pos = trap_pointcontents( PASSVEC3( end ) );
-    if ( pos == -2 || pos == -6 )
+    if ( pos == CONTENT_SOLID || pos == CONTENT_SKY )
 	return 0;
     traceline( PASSVEC3( builder->s.v.origin ), PASSVEC3( obj->s.v.origin ), 1, builder );
     if ( g_globalvars.trace_fraction != 1 )
@@ -485,6 +438,7 @@ int CheckArea( gedict_t * obj, gedict_t * builder )
 		return 0;
     return 1;
 }
+
 void TeamFortress_Build( int objtobuild )
 {
     float btime;
@@ -495,11 +449,14 @@ void TeamFortress_Build( int objtobuild )
 
     newmis = spawn(  );
     g_globalvars.newmis = EDICT_TO_PROG( newmis );
+
+    // get an origin
     makevectors( self->s.v.v_angle );
     g_globalvars.v_forward[2] = 0;
     VectorNormalize( g_globalvars.v_forward );
     VectorScale( g_globalvars.v_forward, 64, g_globalvars.v_forward );
     VectorAdd( self->s.v.origin, g_globalvars.v_forward, newmis->s.v.origin );
+
     if ( objtobuild == BUILD_DISPENSER )
     {
         if( self->has_dispenser && !tg_data.tg_enabled)
@@ -539,13 +496,15 @@ void TeamFortress_Build( int objtobuild )
     }
     VectorCopy(tmp1,newmis->s.v.mins);
     VectorCopy(tmp2,newmis->s.v.maxs);
-
+    // before we start building it, check it out
+    // check for validity of point
     if ( !CheckArea( newmis, self ) )
     {
 	G_sprint( self, 2, "Not enough room to build here\n" );
 	dremove( newmis );
 	return;
     }
+
     if ( !( ( int ) self->s.v.flags & FL_ONGROUND ) )
     {
 	CenterPrint( self, "You can't build in the air!\n\n" );
@@ -553,10 +512,12 @@ void TeamFortress_Build( int objtobuild )
     }
     self->is_building = 1;
     self->tfstate = self->tfstate | TFSTATE_CANT_MOVE;
+    // Save the current weapon and remove it
     self->s.v.weapon = self->current_weapon;
     self->current_weapon = 0;
     self->s.v.weaponmodel = "";
     self->s.v.weaponframe = 0;
+
     TeamFortress_SetSpeed( self );
     newmis->s.v.owner = EDICT_TO_PROG( self );
     newmis->s.v.classname = "timer";
@@ -596,8 +557,9 @@ void CheckBelowBuilding( gedict_t * bld )
 void DispenserThink(  )
 {
     CheckBelowBuilding( self );
-    if ( self->hook_out > 3 )
+    if ( self->hook_out > 3 ) 
     {
+        // dispenser refilling itself 5%
 	self->s.v.ammo_shells = self->s.v.ammo_shells + ( int ) ( 400 / 20 );
 	self->s.v.ammo_cells = self->s.v.ammo_cells + ( int ) ( 400 / 20 );
 	self->s.v.ammo_nails = self->s.v.ammo_nails + ( int ) ( 600 / 20 );
@@ -660,6 +622,7 @@ void TeamFortress_FinishedBuilding(  )
         if( !tg_data.tg_enabled )
 		self->s.v.ammo_cells = self->s.v.ammo_cells - 100;
 
+	// Create the dispenser
 	oldself->s.v.classname = "building_dispenser";
 	oldself->s.v.netname = "dispenser";
 	oldself->s.v.blocked = ( func_t ) T_Dispenser;
@@ -672,32 +635,35 @@ void TeamFortress_FinishedBuilding(  )
 	oldself->th_die = Dispenser_Die;
 	oldself->mdl = "progs/disp.mdl";
 	oldself->team_no = self->team_no;
-	oldself->real_owner = self;
-	oldself->s.v.colormap = self->s.v.colormap;
+
+	oldself->real_owner = self;                    // The Engineer owns this item
+	oldself->s.v.colormap = self->s.v.colormap;    // Set the Color
 	oldself->s.v.takedamage = 2;
 	oldself->s.v.owner = EDICT_TO_PROG( world );
 	oldself->s.v.movetype = MOVETYPE_TOSS;
 	SetVector( oldself->s.v.velocity, 0, 0, 8 );
 	oldself->s.v.flags = ( int ) oldself->s.v.flags - ( ( int ) oldself->s.v.flags & FL_ONGROUND );
+
+	// Put some ammo in the Dispenser
 	oldself->s.v.ammo_shells = ceil( self->s.v.ammo_shells * 0.25 );
 	oldself->s.v.ammo_nails = ceil( self->s.v.ammo_nails * 0.25 );
 	oldself->s.v.ammo_rockets = ceil( self->s.v.ammo_rockets * 0.25 );
 	oldself->s.v.ammo_cells = ceil( self->s.v.ammo_cells * 0.25 );
 	oldself->s.v.armorvalue = ceil( self->s.v.armorvalue * 0.25 );
+
+	// Remove ours
 	self->s.v.ammo_shells = ceil( self->s.v.ammo_shells * 0.75 );
 	self->s.v.ammo_nails = ceil( self->s.v.ammo_nails * 0.75 );
 	self->s.v.ammo_rockets = ceil( self->s.v.ammo_rockets * 0.75 );
 	self->s.v.ammo_cells = ceil( self->s.v.ammo_cells * 0.75 );
 	self->s.v.armorvalue = ceil( self->s.v.armorvalue * 0.75 );
+
 	oldself->s.v.solid = SOLID_BBOX;
 	setmodel( oldself, oldself->mdl );
 	setsize( oldself, -8, -8, 0, 8, 8, 24 );
 	oldself->s.v.origin[2] += 8;
 	setorigin( oldself, PASSVEC3( oldself->s.v.origin ) );
-    /*TraceCapsule( PASSVEC3( oldself->s.v.origin ), PASSVEC3( oldself->s.v.origin ), 0, oldself, PASSVEC3( oldself->s.v.mins), PASSVEC3( oldself->s.v.maxs));
-	if ( g_globalvars.trace_startsolid == 1 )
-	    G_bprint(2,"all solid = 1\n");*/
-    
+
     } else
     {
 	if ( oldself->s.v.weapon == BUILD_SENTRYGUN )
@@ -707,6 +673,7 @@ void TeamFortress_FinishedBuilding(  )
 	    G_sprint( self, 2, "You finish building the sentry gun.\n" );
 	    teamsprint( self->team_no, self, self->s.v.netname );
 	    teamsprint( self->team_no, self, " has built a Sentry Gun.\n" );
+
 	    oldself->s.v.classname = "building_sentrygun_base";
 	    oldself->s.v.netname = "sentry gun";
 	    oldself->s.v.takedamage = 0;
@@ -737,17 +704,18 @@ void TeamFortress_FinishedBuilding(  )
 	    newmis->trigger_field = oldself;
 	    oldself->oldenemy = newmis;
 	    newmis->s.v.movetype = MOVETYPE_STEP;
-	    oldself->s.v.colormap = self->s.v.colormap;
-	    newmis->s.v.colormap = self->s.v.colormap;
-	    newmis->s.v.takedamage = 2;
+	    oldself->s.v.colormap = self->s.v.colormap;               // Set the Base Color
+	    newmis->s.v.colormap = self->s.v.colormap;                // Set the Color
+	    newmis->s.v.takedamage = DAMAGE_AIM;
 	    SetVector( newmis->s.v.velocity, 0, 0, -8 );
 	    newmis->s.v.flags = ( int ) newmis->s.v.flags - ( ( int ) newmis->s.v.flags & FL_ONGROUND );
 	    oldself->s.v.flags = ( int ) oldself->s.v.flags - ( ( int ) oldself->s.v.flags & FL_ONGROUND );
 	    newmis->team_no = self->team_no;
 	    newmis->s.v.think = ( func_t ) lvl1_sentry_stand;
 	    newmis->s.v.nextthink = g_globalvars.time + 0.5;
+	    // Rotate Details
 	    newmis->s.v.yaw_speed = 10;
-	    newmis->heat = 0;
+	    newmis->heat = 0;          // Turn Right
 	    newmis->s.v.angles[0] = 0;
 	    newmis->s.v.angles[1] = ( int ) ( oldself->s.v.angles[1] );
 	    newmis->s.v.angles[2] = 0;
@@ -760,6 +728,7 @@ void TeamFortress_FinishedBuilding(  )
 		newmis->waitmin = newmis->waitmax;
 		newmis->waitmax = anglemod( newmis->s.v.angles[1] - 50 );
 	    }
+	    // Give the Gun some ammo
 	    newmis->s.v.ammo_shells = 25;
 	    newmis->maxammo_shells = 100;
 	    newmis->maxammo_rockets = 20;
@@ -769,19 +738,29 @@ void TeamFortress_FinishedBuilding(  )
     self = oldself;
 }
 
+//=========================================================================
+// Dispenser Touch function. Allows players to get stuff from the Dispenser.
 void T_Dispenser(  )
 {
     gedict_t *dist_checker;
 
     if ( strneq( other->s.v.classname, "player" ) )
 	return;
+
     if ( other->team_no && !TeamFortress_isTeamsAllied (other->team_no , self->team_no) )
 	CenterPrint( self->real_owner, "Enemies are using your dispenser!\n" );
+
+    // Ignore any engineer working on this dispenser	
     if ( ( !other->building || other->building == world ) && other->building_wait < g_globalvars.time )
     {
+        // Pop up the menu
 	other->current_menu = MENU_DISPENSER;
 	other->menu_count = MENU_REFRESH_RATE;
+
 	other->building = self;
+
+        // Start a Distance checker, which removes the menu if the player
+	// gets too far away from the Dispenser.
 	dist_checker = spawn(  );
 	dist_checker->s.v.classname = "timer";
 	dist_checker->s.v.owner = EDICT_TO_PROG( other );
@@ -797,7 +776,7 @@ void Dispenser_Explode(  )
 
     if ( self->real_owner->has_disconnected != 1 )
     {
-	tf_data.deathmsg = 39;
+	tf_data.deathmsg = DMSG_DISP_EXPLODION;
 	sdmg = 25 + self->s.v.ammo_rockets * 1.5 + self->s.v.ammo_cells;
 	if ( sdmg > 250 )
 	    sdmg = 250;
@@ -825,6 +804,8 @@ void Dispenser_Die(  )
     self->s.v.nextthink = g_globalvars.time + 0.1;
 }
 
+//=========================================================================
+// Engineer has used a Spanner on the Dispenser
 void Engineer_UseDispenser( gedict_t * disp )
 {
     gedict_t *dist_checker;
@@ -833,9 +814,13 @@ void Engineer_UseDispenser( gedict_t * disp )
 	      "Dispenser has %.0f health\n%.0f shells, %.0f nails,%.0f rockets\n%.0f cells, and %.0f armor\n",
 	      disp->s.v.health, disp->s.v.ammo_shells, disp->s.v.ammo_nails, disp->s.v.ammo_rockets,
 	      disp->s.v.ammo_cells, disp->s.v.armorvalue );
+    // Pop up the menu
     self->current_menu = MENU_ENGINEER_FIX_DISPENSER;
     self->menu_count = MENU_REFRESH_RATE;
     self->building = disp;
+
+    // Start a Distance checker, which removes the menu if the player
+    // gets too far away from the Dispenser.
     dist_checker = spawn(  );
     dist_checker->s.v.classname = "timer";
     dist_checker->s.v.owner = EDICT_TO_PROG( self );
@@ -844,6 +829,8 @@ void Engineer_UseDispenser( gedict_t * disp )
     dist_checker->s.v.nextthink = g_globalvars.time + 0.3;
 }
 
+//=========================================================================
+// Engineer has used a Spanner on the SentryGun
 void Engineer_UseSentryGun( gedict_t * gun )
 {
     gedict_t *dist_checker;
@@ -904,6 +891,9 @@ void CheckSentry( gedict_t * gunhead )
     }
 }
 
+//=========================================================================
+// Think function for the timer which checks the distance between the 
+// Engineer and the building he's using
 void CheckDistance(  )
 {
     vec3_t dist;
@@ -911,11 +901,14 @@ void CheckDistance(  )
 
     owner = PROG_TO_EDICT( self->s.v.owner );
     enemy = PROG_TO_EDICT( self->s.v.enemy );
+    // Check to see if the Engineer's spanner'ed a different building 
+    // without leaving the area of this one.
     if ( owner->building != enemy )
     {
 	dremove( self );
 	return;
     }
+
     VectorSubtract( enemy->s.v.origin, owner->s.v.origin, dist );
     if ( vlen( dist ) > 64 )
     {
@@ -940,7 +933,7 @@ void DestroyBuilding( gedict_t * eng, char *bld )
 	if ( te->real_owner == eng )
 	{
 	    pos = trap_pointcontents( PASSVEC3( te->s.v.origin ) );
-	    if ( pos == -2 || pos == -6 )
+	    if ( pos == CONTENT_SOLID || pos == CONTENT_SKY )
 	    {
 		oldself = self;
 		self = eng;
@@ -978,8 +971,8 @@ void Engineer_RemoveBuildings( gedict_t * eng )
     }
 #endif
 }
-
-
+//=======================================
+// TG Stuff
 void Eng_SGUp(  )
 {
     gedict_t *sg;

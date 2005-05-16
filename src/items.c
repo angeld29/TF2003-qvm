@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: items.c,v 1.9 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: items.c,v 1.10 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -279,7 +279,7 @@ void SP_item_health(  )
 	}
 
 	setsize( self, 0, 0, 0, 32, 32, 56 );
-	StartItem( self );
+	StartItem( );
 }
 
 void health_touch(  )
@@ -536,7 +536,7 @@ void SP_item_armor1(  )
 	setmodel( self, "progs/armor.mdl" );
 	self->s.v.skin = 0;
 	setsize( self, -16, -16, 0, 16, 16, 56 );
-	StartItem( self );
+	StartItem( );
 }
 
 
@@ -555,7 +555,7 @@ void SP_item_armor2(  )
 	setmodel( self, "progs/armor.mdl" );
 	self->s.v.skin = 1;
 	setsize( self, -16, -16, 0, 16, 16, 56 );
-	StartItem( self );
+	StartItem( );
 }
 
 /*QUAKED item_armorInv (0 .5 .8) (-16 -16 0) (16 16 32)
@@ -573,7 +573,7 @@ void SP_item_armorInv(  )
 	setmodel( self, "progs/armor.mdl" );
 	self->s.v.skin = 2;
 	setsize( self, -16, -16, 0, 16, 16, 56 );
-	StartItem( self );
+	StartItem( );
 }
 
 /*

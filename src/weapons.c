@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.22 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: weapons.c,v 1.23 2005-05-16 06:31:39 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -29,46 +29,50 @@ void    button_fire(  );
 
 void W_Precache(  )
 {
-	trap_precache_sound( "weapons/r_exp3.wav" );
-	trap_precache_sound( "weapons/rocket1i.wav" );
-	trap_precache_sound( "weapons/sgun1.wav" );
-	trap_precache_sound( "weapons/guncock.wav" );
-	trap_precache_sound( "weapons/ric1.wav" );
-	trap_precache_sound( "weapons/ric2.wav" );
-	trap_precache_sound( "weapons/ric3.wav" );
-	trap_precache_sound( "weapons/spike2.wav" );
-	trap_precache_sound( "weapons/tink1.wav" );
-	trap_precache_sound( "weapons/grenade.wav" );
-	trap_precache_sound( "weapons/bounce.wav" );
-	trap_precache_sound( "weapons/shotgn2.wav" );
-	trap_precache_sound( "wizard/wattack.wav" );
-	trap_precache_sound( "items/r_item1.wav" );
-	trap_precache_sound( "items/r_item2.wav" );
-	trap_precache_model( "progs/flame2.mdl" );
-	trap_precache_sound( "ambience/fire1.wav" );
-	trap_precache_sound( "blob/land1.wav" );
-	trap_precache_model( "progs/v_spike.mdl" );
-	trap_precache_sound( "hknight/hit.wav" );
-	trap_precache_sound( "weapons/detpack.wav" );
-	trap_precache_sound( "weapons/turrset.wav" );
-	trap_precache_sound( "weapons/turrspot.wav" );
-	trap_precache_sound( "weapons/turridle.wav" );
-	trap_precache_sound( "weapons/sniper.wav" );
-	trap_precache_sound( "weapons/flmfire2.wav" );
-	trap_precache_sound( "weapons/flmgrexp.wav" );
-	trap_precache_sound( "misc/vapeur2.wav" );
-	trap_precache_sound( "weapons/asscan1.wav" );
-	trap_precache_sound( "weapons/asscan2.wav" );
-	trap_precache_sound( "weapons/asscan3.wav" );
-	trap_precache_sound( "weapons/asscan4.wav" );
-	trap_precache_sound( "weapons/railgun.wav" );
-	trap_precache_sound( "weapons/dartgun.wav" );
-	trap_precache_model( "progs/v_flame.mdl" );
+	trap_precache_sound( "weapons/r_exp3.wav" );           // new rocket explosion               
+	trap_precache_sound( "weapons/rocket1i.wav" );         // spike gun                          
+	trap_precache_sound( "weapons/sgun1.wav" );                                                  
+	trap_precache_sound( "weapons/guncock.wav" );          // player shotgun                     
+	trap_precache_sound( "weapons/ric1.wav" );             // ricochet (used in c code)          
+	trap_precache_sound( "weapons/ric2.wav" );             // ricochet (used in c code)          
+	trap_precache_sound( "weapons/ric3.wav" );             // ricochet (used in c code)          
+	trap_precache_sound( "weapons/spike2.wav" );           // super spikes                       
+	trap_precache_sound( "weapons/tink1.wav" );            // spikes tink (used in c code)       
+	trap_precache_sound( "weapons/grenade.wav" );          // grenade launcher                   
+	trap_precache_sound( "weapons/bounce.wav" );           // grenade bounce                     
+	trap_precache_sound( "weapons/shotgn2.wav" );          // super shotgun                      
+	trap_precache_sound( "wizard/wattack.wav" );           // sniper rifle                       
+	trap_precache_sound( "items/r_item1.wav" );            // Medikit                            
+	trap_precache_sound( "items/r_item2.wav" );            // Medikit                            
+	trap_precache_model( "progs/flame2.mdl" );             // Flamethrower                       
+	trap_precache_sound( "ambience/fire1.wav" );                                                 
+	trap_precache_sound( "blob/land1.wav" );               // Hook                               
+	trap_precache_model( "progs/v_spike.mdl" );            // Hook                               
+	trap_precache_sound( "hknight/hit.wav" );              	// Hook                       
+	                                                                                             
+	trap_precache_sound( "weapons/detpack.wav" );           
+	trap_precache_sound( "weapons/turrset.wav" );            // Sentry Gun Setup                 
+	trap_precache_sound( "weapons/turrspot.wav" );           // Sentry Gun Spot                  
+	trap_precache_sound( "weapons/turridle.wav" );           // Sentry Gun Idle                  
+	trap_precache_sound( "weapons/sniper.wav" );             // sniper rifle                       
+	trap_precache_sound( "weapons/flmfire2.wav" );           //flamethrower                         
+	trap_precache_sound( "weapons/flmgrexp.wav" );           //flamethrower                       
+	trap_precache_sound( "misc/vapeur2.wav" );               // flamethrower                     
+	trap_precache_sound( "weapons/asscan1.wav" );            // Assault Cannon Powerup           
+	trap_precache_sound( "weapons/asscan2.wav" );            // Assault Cannon Churning          
+	trap_precache_sound( "weapons/asscan3.wav" );            // Assault Cannon Powerdown         
+	trap_precache_sound( "weapons/asscan4.wav" );            
+	trap_precache_sound( "weapons/railgun.wav" );            // Railgun                          
+	trap_precache_sound( "weapons/dartgun.wav" );            // Spy's dart gun                   
+
+	trap_precache_model( "progs/v_flame.mdl" );              
 	trap_precache_model( "progs/v_tgun.mdl" );
 
 }
 
 
+//======================================================================
+// Calculate the attack_finished time
 void Attack_Finished( float att_delay )
 {
 	if ( self->tfstate & TFSTATE_TRANQUILISED )
@@ -521,7 +525,7 @@ void W_FireBioweapon(  )
 			{
 				trace_ent->axhitme = 1;
 				SpawnBlood( org, 20 );
-				tf_data.deathmsg = 14;
+				tf_data.deathmsg = DMSG_BIOWEAPON_ATT;
 				T_Damage( trace_ent, self, self, 10 );
 				if ( trace_ent->playerclass == PC_MEDIC )
 					return;
@@ -872,7 +876,7 @@ void W_FireShotgun(  )
 	if ( !tg_data.unlimit_ammo )
 		self->s.v.currentammo = --( self->s.v.ammo_shells );
 	aim( dir );
-	tf_data.deathmsg = 1;
+	tf_data.deathmsg = DMSG_SHOTGUN;
 	FireBullets( 6, dir, 0.04, 0.04, 0 );
 }
 
@@ -895,7 +899,7 @@ void W_FireSuperShotgun(  )
 	if ( !tg_data.unlimit_ammo )
 		self->s.v.currentammo = self->s.v.ammo_shells = self->s.v.ammo_shells - 2;
 	aim( dir );
-	tf_data.deathmsg = 2;
+	tf_data.deathmsg = DMSG_SSHOTGUN;
 	FireBullets( 14, dir, 0.14, 0.08, 0 );
 }
 
@@ -1030,17 +1034,19 @@ void W_FireSniperRifle(  )
 					tf_data.deathmsg = DMSG_SNIPERRIFLE;
 			}
 		}
-	}
-	ClearMultiDamage(  );
-	if ( g_globalvars.trace_fraction != 1 )
+	}else
 	{
-		TraceAttack( self->heat * dam_mult, dir );
 		trap_WriteByte( MSG_BROADCAST, SVC_TEMPENTITY );
 		trap_WriteByte( MSG_BROADCAST, TE_SPIKE );
 		trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[0] );
 		trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[1] );
 		trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[2] );
 		trap_multicast( PASSVEC3( g_globalvars.trace_endpos ), MULTICAST_PHS );
+	}
+	ClearMultiDamage(  );
+	if ( g_globalvars.trace_fraction != 1 )
+	{
+		TraceAttack( self->heat * dam_mult, dir );
 	}
 	ApplyMultiDamage(  );
 }
@@ -1455,7 +1461,7 @@ void GrenadeExplode(  )
 		decrement_team_pipebombs( self->team_no );
 
 		if ( !( ( int ) self->s.v.flags & FL_ONGROUND ) )
-			self->s.v.weapon = 40;	// TRAP
+			self->s.v.weapon = DMSG_PIPEBOMB;	// TRAP
 	}
 	if ( PROG_TO_EDICT( self->s.v.owner )->has_disconnected != 1 )
 	{
@@ -1750,7 +1756,7 @@ void superspike_touch(  )
 	{
 		spawn_touchblood( 18 );
 		tf_data.deathmsg = self->s.v.weapon;
-		if ( tf_data.deathmsg == 9 )
+		if ( tf_data.deathmsg == DMSG_GREN_NAIL )
 			ndmg = 40;
 		else
 			ndmg = 26;

@@ -18,9 +18,14 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: spy.c,v 1.11 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: spy.c,v 1.12 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
+/*
+========================================================
+Functions for the SPY class and associated weaponry                          
+========================================================
+*/
 
 void    TeamFortress_SpyCalcName( gedict_t * spy );
 void    TeamFortress_SpyUndercoverThink(  );
@@ -28,6 +33,7 @@ void    GasGrenadeMakeGas(  );
 void    T_TranqDartTouch(  );
 void    spawn_touchblood( float damage );
 
+// Spy Feign Death Frames
 void spy_diea1(  )
 {
 	self->s.v.frame = 50;
@@ -837,6 +843,8 @@ void spy_upaxe9(  )
 	player_stand1(  );
 }
 
+//=========================================================================
+// Function handling the Spy's feign death ability
 void TeamFortress_SpyFeignDeath( int issilent )
 {
 	int     i, j;
@@ -846,6 +854,7 @@ void TeamFortress_SpyFeignDeath( int issilent )
 	self->StatusRefreshTime = g_globalvars.time + 0.1;
 	if ( self->is_feigning )
 	{
+	        // Check to make sure there isn't anyone on top of us
 		at_spot = findradius( world, self->s.v.origin, 64 );
 		i = 1;
 		j = 0;
@@ -883,6 +892,7 @@ void TeamFortress_SpyFeignDeath( int issilent )
 		W_SetCurrentAmmo(  );
 		self->tfstate = self->tfstate - ( self->tfstate & TFSTATE_CANT_MOVE );
 		TeamFortress_SetSpeed( self );
+		// Check .weapon, because .current_weapon has been reset
 		if ( self->s.v.weapon <= 16 )
 		{
 			spy_upaxe1(  );
@@ -990,6 +1000,9 @@ void TeamFortress_SpyFeignDeath( int issilent )
 	}
 }
 
+//=========================================================================
+// If its a net game, the SPY goes invisible.
+// If its a LAN game, the class/skin changing menu pops up.
 void TeamFortress_SpyGoUndercover(  )
 {
 	gedict_t *te;
@@ -997,8 +1010,8 @@ void TeamFortress_SpyGoUndercover(  )
 
 	if ( tf_data.invis_only == 1 )
 	{
-
-		if ( ( int ) self->s.v.effects & ( 8 | 4 ) )
+	        // If the spy is already invisible, become visible
+		if ( ( int ) self->s.v.effects & ( EF_DIMLIGHT | EF_BRIGHTLIGHT ) )
 		{
 			G_sprint( self, 1, "You cannot disguise while glowing.\n" );
 			return;
@@ -1011,7 +1024,7 @@ void TeamFortress_SpyGoUndercover(  )
 		if ( self->is_undercover == 1 )
 		{
 			self->is_undercover = 0;
-			self->s.v.modelindex = modelindex_player;
+			self->s.v.modelindex = modelindex_player; // return to normal
 			self->s.v.items = ( int ) self->s.v.items - ( ( int ) self->s.v.items & IT_INVISIBILITY );
 		} else
 		{
@@ -1048,21 +1061,27 @@ void TeamFortress_SpyGoUndercover(  )
 	}
 }
 
+//=========================================================================
+// Try and find the player's name who's skin and team closest fit the 
+// current disguise of the spy
 void TeamFortress_SpyCalcName( gedict_t * spy )
 {
 	gedict_t *te;
 
 	spy->undercover_name = NULL;
+	// Find a player on the team the spy is disguised as to pretend to be
 	if ( spy->undercover_team )
 	{
 		for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
 		{
+		        // First, try to find a player with same color and skins
 			if ( te->team_no == spy->undercover_team && te->s.v.skin == spy->undercover_skin )
 			{
 				spy->undercover_name = te->s.v.netname;
 				break;
 			}
 		}
+		// If we couldn't, just find one of that team
 		if ( !spy->undercover_name )
 		{
 
@@ -1078,6 +1097,8 @@ void TeamFortress_SpyCalcName( gedict_t * spy )
 	}
 }
 
+//=========================================================================
+// Make the spy who owns this timer undercover, and then remove itself
 void TeamFortress_SpyUndercoverThink(  )
 {
 	gedict_t *owner = PROG_TO_EDICT( self->s.v.owner );
@@ -1121,10 +1142,13 @@ void TeamFortress_SpyUndercoverThink(  )
 	dremove( self );
 }
 
+//=========================================================================
+// Change the Spy's skin to the class they chose
 void TeamFortress_SpyChangeSkin( int class )
 {
 	gedict_t *te;
 
+	// If they're returning their skin to their Spy, just reset it
 	if ( class == PC_SPY )
 	{
 
@@ -1142,6 +1166,8 @@ void TeamFortress_SpyChangeSkin( int class )
 	}
 	G_sprint( self, 2, "Going undercover...\n" );
 	self->is_undercover = 2;
+	
+	// Start a timer, which changes the spy's skin to the chosen one
 	te = spawn(  );
 	te->s.v.classname = "timer";
 	te->s.v.owner = EDICT_TO_PROG( self );
@@ -1151,10 +1177,13 @@ void TeamFortress_SpyChangeSkin( int class )
 	TeamFortress_SetSkin( self );
 }
 
+//=========================================================================
+// Change the Spy's color to that of the Team they chose
 void TeamFortress_SpyChangeColor( int teamno )
 {
 	gedict_t *te;
 
+	// If they're returning their color to their own team, just reset it
 	if ( teamno == self->team_no )
 	{
 
@@ -1175,7 +1204,10 @@ void TeamFortress_SpyChangeColor( int teamno )
 		return;
 	}
 	G_sprint( self, 2, "Going undercover...\n" );
+
 	self->is_undercover = 2;
+
+	// Start a timer, which changes the spy's skin to the chosen one
 	te = spawn(  );
 	te->s.v.classname = "timer";
 	te->s.v.owner = EDICT_TO_PROG( self );
@@ -1184,6 +1216,8 @@ void TeamFortress_SpyChangeColor( int teamno )
 	te->s.v.team = teamno;
 }
 
+//=========================================================================
+// Gas Grenade touch function.
 void GasGrenadeTouch(  )
 {
 	sound( self, 1, "weapons/bounce.wav", 1, 1 );
@@ -1191,13 +1225,16 @@ void GasGrenadeTouch(  )
 		SetVector( self->s.v.avelocity, 0, 0, 0 );
 }
 
+//=========================================================================
+// Gas grenade explosion. Throws up the particle cloud.
 void GasGrenadeExplode(  )
 {
 	gedict_t *te;
 	float   pos;
 
+	// Check the pointcontents to prevent detpack outside the world
 	pos = trap_pointcontents( PASSVEC3( self->s.v.origin ) );
-	if ( pos == -1 )
+	if ( pos == CONTENT_EMPTY )
 	{
 		te = spawn(  );
 		te->s.v.think = ( func_t ) GasGrenadeMakeGas;
@@ -1209,6 +1246,7 @@ void GasGrenadeExplode(  )
 		te->s.v.weapon = 0;
 	} else
 	{
+	        // Make some bubbles :)
 		for ( pos = 0; pos < 10; pos++ )
 		{
 			newmis = spawn(  );
@@ -1229,6 +1267,8 @@ void GasGrenadeExplode(  )
 	dremove( self );
 }
 
+//=========================================================================
+// Gas Grenade Gas function
 void GasGrenadeMakeGas(  )
 {
 	gedict_t *te;
@@ -1487,6 +1527,8 @@ void HallucinationTimer(  )
 	}
 }
 
+//=========================================================================
+// Firing Function for the Tranquiliser Gun
 void W_FireTranq(  )
 {
 
@@ -1499,7 +1541,7 @@ void W_FireTranq(  )
 	newmis->s.v.solid = SOLID_BBOX;
 	makevectors( self->s.v.v_angle );
 	VectorCopy( g_globalvars.v_forward, newmis->s.v.velocity );
-	VectorScale( g_globalvars.v_forward, 1500, newmis->s.v.velocity );
+	VectorScale( g_globalvars.v_forward, 1500, newmis->s.v.velocity ); // Faster than a normal nail
 	vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
 	newmis->s.v.touch = ( func_t ) T_TranqDartTouch;
 	newmis->s.v.think = ( func_t ) SUB_Remove;
@@ -1512,6 +1554,8 @@ void W_FireTranq(  )
 		   self->s.v.origin[2] + g_globalvars.v_forward[2] * 8 + 16 );
 }
 
+//=========================================================================
+// Touch Function for the Tranquiliser Darts
 void T_TranqDartTouch(  )
 {
 	gedict_t *timer;
@@ -1576,6 +1620,9 @@ void T_TranqDartTouch(  )
 	dremove( self );
 }
 
+//=========================================================================
+// Think function for Tranquilisation.
+// Just remove the player's tranquilisation.
 void TranquiliserTimer(  )
 {
 	gedict_t *owner = PROG_TO_EDICT( self->s.v.owner );
@@ -1586,6 +1633,7 @@ void TranquiliserTimer(  )
 	dremove( self );
 }
 
+// Reset spy skin and color or remove invisibility
 void Spy_RemoveDisguise( gedict_t * spy )
 {
 

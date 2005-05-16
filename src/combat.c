@@ -18,13 +18,20 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: combat.c,v 1.7 2005-05-02 12:17:41 AngelD Exp $
+ *  $Id: combat.c,v 1.8 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
 void    ClientObituary( gedict_t * e1, gedict_t * e2 );
 
 //============================================================================
 
+/*================
+monster_death_use (from monsters.qc)
+
+When a monster dies, it fires all of its targets with the current
+enemy as activator.
+================
+*/
 void monster_death_use(  )
 {
 
@@ -106,18 +113,20 @@ void Killed( gedict_t * targ, gedict_t * attacker )
 	oself = self;
 	self = targ;
 
+	// don't let sbar look bad if a player
 	if ( self->s.v.health < -99 )
-		self->s.v.health = -99;	// don't let sbar look bad if a player
+		self->s.v.health = -99;	
 
+	// doors, triggers, etc
 	if ( self->s.v.movetype == MOVETYPE_PUSH || self->s.v.movetype == MOVETYPE_NONE )
-	{			// doors, triggers, etc
+	{			
 		self->th_die(  );
 		self = oself;
 		return;
 	}
 	self->s.v.enemy = EDICT_TO_PROG( attacker );
 
-// bump the monster counter
+        // bump the monster counter
 	if ( ( ( int ) ( self->s.v.flags ) ) & FL_MONSTER )
 	{
 		g_globalvars.killed_monsters++;
@@ -295,6 +304,31 @@ void T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker, float
 	self = oldself;
 }
 
+/*==============================
+ TF_T_Damage
+ same thing as T_Damage (see above), just with some more details
+
+ T_Flags:
+	#TF_TD_IGNOREARMOUR: bypasses the armour of the target
+	#TF_TD_NOTTEAM: doesn't damage a team member
+	#TF_TD_NOTSELF: doesn't damage self
+
+ The following is used to determine whether this attack is affected 
+ the type of armor the defender is wearing.
+ T_AttackType:		
+	#TF_TD_OTHER			:	type ignored
+	#TF_TD_SHOT			: 	bullet damage
+	#TF_TD_NAIL			:	nailgun damage
+	#TF_TD_EXPLOSION		:	explosion damage
+	#TF_TD_ELECTRICITY	:	electricity damage
+	#TF_TD_FIRE			:	fire damage
+
+	#TF_TD_NOSOUND		:	Special Value. Health is adjusted without
+						    any sound, painframe, etc
+							Health is _set_ to damage, not altered.
+
+==============================*/
+
 void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 		  float damage, int T_flags, int T_AttackType )
 {
@@ -323,8 +357,10 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 	if ( streq( attacker->s.v.classname, "player" ) )
 	{
 		damage = damage * 0.9;
+		// check for quad damage powerup on the attacker
 		if ( attacker->super_damage_finished > g_globalvars.time )
 			damage = damage * 4;
+
 		if ( strneq( targ->s.v.classname, "player" )
 		     && strneq( targ->s.v.classname, "bot" )
 		     && strneq( targ->s.v.classname, "building_sentrygun" )
@@ -334,6 +370,7 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 		{
 			if ( !Activated( targ, attacker ) )
 			{
+			        // If an else goal should be activated, activate it
 				if ( targ->else_goal )
 				{
 					te = Findgoal( targ->else_goal );
@@ -344,9 +381,13 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 			}
 		}
 	}
+	// used by buttons and triggers to set activator for target firing
 	damage_attacker = attacker;
+
 	if ( teamplay & ( TEAMPLAY_LESSSCOREHELP | TEAMPLAY_LESSPLAYERSHELP ) )
 		damage = TeamEqualiseDamage( targ, attacker, damage );
+
+	// Do armorclass stuff
 	if ( targ->armorclass && T_AttackType )
 	{
 		if ( ( targ->armorclass & AT_SAVESHOT ) && ( T_AttackType & TF_TD_SHOT ) )
@@ -360,6 +401,7 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 		if ( ( targ->armorclass & AT_SAVEFIRE ) && ( T_AttackType & TF_TD_FIRE ) )
 			damage = floor( damage * 0.5 );
 	}
+	// save damage based on the target's armor level
 	if ( T_flags & TF_TD_IGNOREARMOUR )
 	{
 		take = damage;
@@ -397,12 +439,16 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 		{
 			save = targ->s.v.armorvalue;
 			targ->s.v.armortype = 0;	// lost all armor
+			targ->armorclass = 0;	       // lost special armor
 			targ->s.v.items -= ( ( int ) targ->s.v.items & ( IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3 ) );
 		}
 
 		targ->s.v.armorvalue = targ->s.v.armorvalue - save;
 		take = ceil( damage - save );
 	}
+	// add to the damage total for clients, which will be sent as a single
+	// message at the end of the frame
+	// FIXME: remove after combining shotgun blasts?
 	if ( ( int ) targ->s.v.flags & FL_CLIENT )
 	{
 		targ->s.v.dmg_take += take;
@@ -411,11 +457,13 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 	}
 	damage_inflictor = inflictor;
 
+	// figure momentum add
 	if ( inflictor != world && targ->s.v.movetype == MOVETYPE_WALK && !( targ->tfstate & TFSTATE_CANT_MOVE ) )
 	{
+	        // Nail Gren doesn't knock ppl
 		if ( tf_data.deathmsg != DMSG_GREN_NAIL )
 		{
-//   targ.immune_to_check = g_globalvars.time + damage / 20;
+                        //   targ.immune_to_check = g_globalvars.time + damage / 20;
 			dir[0] = targ->s.v.origin[0] - ( inflictor->s.v.absmin[0] + inflictor->s.v.absmax[0] ) * 0.5;
 			dir[1] = targ->s.v.origin[1] - ( inflictor->s.v.absmin[1] + inflictor->s.v.absmax[1] ) * 0.5;
 			dir[2] = targ->s.v.origin[2] - ( inflictor->s.v.absmin[2] + inflictor->s.v.absmax[2] ) * 0.5;
@@ -440,6 +488,8 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 			} else
 				moment = damage;
 			
+			// Set kickback for smaller weapons
+			// Read: only if it's not yourself doing the damage
 			if ( moment < 60 && streq( attacker->s.v.classname, "player" )
 			     && streq( targ->s.v.classname, "player" )
 			     && strneq( attacker->s.v.netname, targ->s.v.netname ) )
@@ -449,11 +499,14 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 				targ->s.v.velocity[2] += dir[2] * moment * 11;
 
 			} else
+			// Otherwise, these rules apply to rockets and grenades                        
+			// for blast velocity
 			{
 				targ->s.v.velocity[0] += dir[0] * moment * 8;
 				targ->s.v.velocity[1] += dir[1] * moment * 8;
 				targ->s.v.velocity[2] += dir[2] * moment * 8;
 			}
+			// Rocket Jump modifiers
 			if ( ( rj > 1 )
 			     && ( ( streq( attacker->s.v.classname, "player" ) )
 				  && streq( targ->s.v.classname, "player" ) )
@@ -466,9 +519,10 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 			}
 		}
 	}
+// check for godmode or invincibility
 	if ( streq( targ->s.v.classname, "player" ) && tg_data.godmode )
 		return;
-// check for godmode or invincibility
+
 	if ( ( int ) targ->s.v.flags & FL_GODMODE )
 		return;
 
@@ -481,6 +535,7 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 		}
 		return;
 	}
+	// team play damage avoidance
 	if ( streq( attacker->s.v.classname, "player" )
 	     && ( streq( targ->s.v.classname, "player" )
 		  || streq( targ->s.v.classname, "building_sentrygun" )
@@ -517,10 +572,10 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 		if ( targ == attacker )
 			return;
 	}
+	// do the damage, min 1
 	if ( take < 1 )
 		take = 1;
-	take = rint( take );
-	//take = floor( take );
+	take = rint( take );	//take = floor( take );
 
 	if ( !no_damage )
 	{
@@ -550,7 +605,7 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 				}
 			} else
 			{
-				tf_data.deathmsg = 37;
+				tf_data.deathmsg = DMSG_TEAMKILL;
 				if ( teamplay & 4096 )
 					TF_T_Damage( attacker, world, world, take, 1, 0 );
 				else
@@ -566,7 +621,7 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 		return;
 	if ( targ->s.v.armorvalue < 1 )
 	{
-		targ->armorclass = 0;
+		targ->armorclass = 0; // lost special armor
 		targ->s.v.armorvalue = 0;
 	}
 	if ( targ->s.v.health <= 0 )
@@ -577,17 +632,24 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 		Killed( targ, attacker );
 		return;
 	}
+	// react to the damage
 	oldself = self;
 	self = targ;
 	if ( self->th_pain )
 	{
 		self->th_pain( attacker, take );
+		// nightmare mode monsters don't go into pain frames often
 		if ( skill >= 3 )
 			self->pain_finished = g_globalvars.time + 5;
 	}
 	self = oldself;
 }
 
+/*
+============
+T_RadiusDamage
+============
+*/
 void T_RadiusDamage( gedict_t * inflictor, gedict_t * attacker, float damage, gedict_t * ignore )
 {
 	float   points;
@@ -621,7 +683,7 @@ void T_RadiusDamage( gedict_t * inflictor, gedict_t * attacker, float damage, ge
 				if ( points > 0 )
 				{
 					if ( CanDamage( head, inflictor ) )
-					{
+					{// shambler takes half damage from all explosions
 						if ( streq( head->s.v.classname, "monster_shambler" ) )
 							T_Damage( head, inflictor, attacker, points * 0.5 );
 						else
@@ -639,7 +701,6 @@ void T_RadiusDamage( gedict_t * inflictor, gedict_t * attacker, float damage, ge
 T_BeamDamage
 ============
 */
-
 void T_BeamDamage( gedict_t * attacker, float damage )
 {
 	vec3_t  tmpv;

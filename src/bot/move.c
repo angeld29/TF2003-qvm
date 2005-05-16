@@ -18,16 +18,26 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: move.c,v 1.4 2005-05-11 11:29:20 AngelD Exp $
+ *  $Id: move.c,v 1.5 2005-05-16 06:31:39 AngelD Exp $
  */
 #include "g_local.h"
 
-#define MAX_YAW_PER_SEK 900 //180
-#define MAX_STRAFE_ANGLE 30 //MAX abs(dir-vel)
-#define MAX_STRAFE_ANGLE_AT_START 60
-#define SPEED_COEFFICIENT 1.4
+#define DEFAULT_MAX_YAW_PER_SEK 250
+//#define SPEED_REPORT
+//#define MAX_YAW_PER_SEK 1800
+//#define MAX_STRAFE_ANGLE 30 //MAX abs(dir-vel)
+//#define STRAFE_ANGLE_DELTA 5.0
+//#define MAX_STRAFE_ANGLE_AT_START 60
+//#define SPEED_COEFFICIENT 1.4
 #define CHANGE_WP_DISTANCE 50
 
+#ifdef  SPEED_REPORT
+float last_report = 0;
+#endif
+float maxspeed = 0;
+
+float max_yaw_per_sek = DEFAULT_MAX_YAW_PER_SEK;
+float bot_frametime;
 float max_yaw_pf;
 vec3_t dir2move, curr_vel, cur_angle;
 float vel_yaw, dir_yaw, view_yaw; 
@@ -55,7 +65,7 @@ void ClearAllWaypoints()
 	self->checkMovementTime = g_globalvars.time + 0.7;
 }
 
-float angcomp( float y1, float y2 )
+/*float angcomp( float y1, float y2 )
 {
 	float   answer;
 
@@ -71,7 +81,7 @@ float angcomp( float y1, float y2 )
 	if ( fabs( answer ) >= 180 )
 		answer = 360 - fabs( answer );
 	return answer;
-}
+}*/
 
 
 
@@ -79,13 +89,16 @@ float   subangle( float y1, float y2 )
 {
         float o;
         
-        o = anglemod(y1) -anglemod(y2);
+        o = anglemod(y1) - anglemod(y2);
 
 /*	if( o > 180)
 	        o -=360;
 	if( o < -180)
 	        o +=360;*/
-	return anglemod( o );
+	o = anglemod( o );
+	if( o > 180 )
+	        o -= 360;
+	return o;
 
 }
 
@@ -93,13 +106,14 @@ void InitCalcMovement()
 {
         vec3_t vtmp;
 
-        max_yaw_pf = MAX_YAW_PER_SEK * g_globalvars.frametime;
+        max_yaw_pf = max_yaw_per_sek * bot_frametime;
 
 	VectorCopy( self->s.v.velocity, curr_vel );
 	vectoangles( curr_vel, vtmp );
 	vel_yaw = vtmp[1];
 	curr_vel[2] = 0;
 	velocity = vlen( self->s.v.velocity );
+	velocity = vlen( curr_vel );
 
 	VectorSubtract( self->waypoint1, self->s.v.origin, dir2move );
 
@@ -129,34 +143,25 @@ void InitCalcMovement()
 }
 int counter = 0;
 
-void ChangeBotVAngle(float pitch, float yaw, float roll)
+void ChangeBotYaw( float wish_yaw, float max_delta_yaw )
 {
-
-        //float ftmp = angcomp( yaw, view_yaw);
-
-        self->s.v.v_angle[0] = pitch;
-        self->s.v.v_angle[2] = roll;
-        self->s.v.v_angle[1] = yaw;
-        return;
-
-/*        if( abs(ftmp) < max_yaw_pf )
-        {
-                self->s.v.v_angle[1] = yaw;
-                return;
-        }else
+        float ftmp= subangle( wish_yaw, view_yaw);
+        if( fabs(ftmp) < max_yaw_pf )
+                self->s.v.v_angle[1] = wish_yaw;
+        else
         {
                 if( ftmp < 0 )
-                        self->s.v.v_angle[1] -= max_yaw_pf;
+                        self->s.v.v_angle[1] -= max_delta_yaw;
                 else
-                        self->s.v.v_angle[1] += max_yaw_pf;
-        }*/
+                        self->s.v.v_angle[1] += max_delta_yaw;
+        }
 }
-float maxspeed = 0;
+
 
 void DoMovement()
 {
-        float maxaccel, ideal_angle , ftmp;
-        float max_strafe_angle ,range;
+        float ftmp;
+        float max_strafe_angle;
 
 	if ( VectorCompareF( self->waypoint1, 0, 0, 0 ) )
 	{
@@ -169,13 +174,16 @@ void DoMovement()
 		self->keys = 0;
 	        return;
 	}
-	VectorSubtract( self->waypoint1, self->s.v.origin, dir2move );
+	//VectorSubtract( self->waypoint1, self->s.v.origin, dir2move );
 
-	range = vlen(self->s.v.velocity) * g_globalvars.frametime ;
+
+	/*range = vlen(self->s.v.velocity) * bot_frametime;
 	if( range < CHANGE_WP_DISTANCE )
-	        range  = CHANGE_WP_DISTANCE;
+	        range  = CHANGE_WP_DISTANCE;*/
 
-	if ( vlen( dir2move ) < range )
+	InitCalcMovement();
+
+	if ( vlen( dir2move ) / velocity < 0.5 )
 	{
 		if ( VectorCompareF( self->waypoint2, 0, 0, 0 ) )
 		{
@@ -200,20 +208,16 @@ void DoMovement()
 	        return;
 	}
 	        
-	InitCalcMovement();
-/*	if( vlen(curr_vel) - maxspeed > 30 )
-	{
-	        maxspeed = vlen(curr_vel);
-	        G_bprint(3,"maxspeed = %3.0f\n",maxspeed);
 	
-	}*/
 
         if ( ( int ) ( self->s.v.flags ) & FL_ONGROUND )
 	{
 	        if( velocity < self->maxfbspeed * 0.95 )
 	        {
-	                if( abs(dir_yaw - vel_yaw) > 15 )
-	                       ChangeBotVAngle(0, dir_yaw, 0);
+	                if( fabs(dir_yaw - vel_yaw) > 5 )
+	                {
+	                       self->s.v.v_angle[1] = dir_yaw;
+	                }
          	        self->keys |= KEY_MOVEFORWARD;
          	        self->s.v.button2 = 0;
 	        }else
@@ -231,50 +235,58 @@ void DoMovement()
 	}
 	//Air Move
 	self->s.v.button2 = 0;
-	ftmp =  subangle( dir_yaw,vel_yaw );
 
+	ftmp = atan2( 30, velocity) * 180 / M_PI; // angle per frame
 
-/*	if( counter++ > 10  )
+	if( ftmp > max_yaw_pf )
+	        ftmp = max_yaw_pf;
+
+	max_strafe_angle = (ftmp / 5 ) / bot_frametime;
+	if(  max_strafe_angle > 60 )
+	        max_strafe_angle = 60;
+
+#ifdef SPEED_REPORT
+	if( vlen(curr_vel) - maxspeed > 30 ) 
 	{
-	        //G_bprint(2,"%3.0f %3.0f %3.0f %3.0f %3.0f %3.0f\n",
-	        //dir_yaw,vel_yaw,ftmp, velocity,ideal_angle,self->s.v.v_angle[1]);
-	        counter =0;
-	
-	}*/
+	       G_bprint(3,"maxspeed = %3.0f %3.0f\n", 
+	       vlen(curr_vel), (vlen(curr_vel) - maxspeed)/ (g_globalvars.time -last_report ));
+	       maxspeed = vlen(curr_vel);
+	       last_report = g_globalvars.time;
+	}
+#endif
 
-	//max_strafe_angle = ( velocity < self->maxfbspeed *SPEED_COEFFICIENT)? MAX_STRAFE_ANGLE_AT_START:MAX_STRAFE_ANGLE;
-	//max_strafe_angle = 80 - 40 * (velocity /(float) self->maxfbspeed - 1.0);
-	//if( max_strafe_angle < 30 ) max_strafe_angle = 30;
+/*	if( (int)velocity < 300 )
+	        max_strafe_angle = 80;
+	else
+	        if( (int)velocity < 400 )
+	                max_strafe_angle = 60;
+	        else
+      	                max_strafe_angle = 30;*/
 
-	max_strafe_angle  = 30;
-
-	if( (ftmp  > max_strafe_angle) && (ftmp < 360 - max_strafe_angle) )
-	{//change vel direction
-	        if( ftmp > 180)
+      	ftmp =  subangle( dir_yaw,vel_yaw );
+	if( abs( ftmp) >  max_strafe_angle )
+	{
+	        if( ftmp < 0 )
 	        {
 	                self->bot_strafe_state = BOT_STRAFE_RIGHT;
 	                self->keys |= KEY_MOVERIGHT;
+	                
 	        }else
 	        {
 	                self->keys |= KEY_MOVELEFT;
 	                self->bot_strafe_state = BOT_STRAFE_LEFT;
 	        }
-	        ChangeBotVAngle(0,vel_yaw,0);
-	        return;
+	        self->s.v.v_angle[1] = vel_yaw;
+                return;
 	}
 
-
-        if( velocity )  ftmp =  asin(30.0/velocity)/2.0 * 180.0 / M_PI;
-        else  ftmp = 0;
         if(self->bot_strafe_state == BOT_STRAFE_RIGHT)
         {
                 self->keys |= KEY_MOVERIGHT;
-                ChangeBotVAngle(0, vel_yaw+ftmp, 0);
+                
         }else
         {
-                ChangeBotVAngle(0, vel_yaw-ftmp, 0);
                 self->keys |= KEY_MOVELEFT;
         }
-        
-
+        ChangeBotYaw(vel_yaw,max_yaw_pf);
 }

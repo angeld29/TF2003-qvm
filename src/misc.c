@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: misc.c,v 1.3 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: misc.c,v 1.4 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -153,7 +153,7 @@ void SP_light_torch_small_walltorch(  )
 	}
 	trap_precache_model( "progs/flame.mdl" );
 	setmodel( self, "progs/flame.mdl" );
-	FireAmbient( self );
+	FireAmbient( );
 	makestatic( self );
 }
 
@@ -171,7 +171,7 @@ void SP_light_flame_large_yellow(  )
 	trap_precache_model( "progs/flame2.mdl" );
 	setmodel( self, "progs/flame2.mdl" );
 	self->s.v.frame = 1;
-	FireAmbient( self );
+	FireAmbient( );
 	makestatic( self );
 }
 
@@ -187,7 +187,7 @@ void SP_light_flame_small_yellow(  )
 	}
 	trap_precache_model( "progs/flame2.mdl" );
 	setmodel( self, "progs/flame2.mdl" );
-	FireAmbient( self );
+	FireAmbient( );
 	makestatic( self );
 }
 
@@ -203,7 +203,7 @@ void SP_light_flame_small_white(  )
 	}
 	trap_precache_model( "progs/flame2.mdl" );
 	setmodel( self, "progs/flame2.mdl" );
-	FireAmbient( self );
+	FireAmbient( );
 	makestatic( self );
 }
 

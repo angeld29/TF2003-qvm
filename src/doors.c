@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: doors.c,v 1.4 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: doors.c,v 1.5 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -100,7 +100,7 @@ void door_hit_top(  )
 
 void door_hit_bottom(  )
 {
-	self->goal_state = 2;
+	self->goal_state = TFGS_INACTIVE;
 	sound( self, CHAN_VOICE, self->s.v.noise1, 1, ATTN_NORM );
 	self->state = STATE_BOTTOM;
 }
@@ -698,7 +698,8 @@ void fd_secret_use( gedict_t * attacker, float take )
 	if ( !VectorCompare( self->s.v.origin, self->s.v.oldorigin ) )
 		return;
 
-	if ( ( int ) ( self->s.v.spawnflags ) & 32 )
+	// TF Disable doors with spawnflags of DOOR_TOGGLE
+	if ( ( int ) ( self->s.v.spawnflags ) & DOOR_TOGGLE )
 		return;
 
 	self->s.v.message = 0;	// no more message
@@ -837,7 +838,8 @@ void secret_touch(  )
 	if ( self->attack_finished > g_globalvars.time )
 		return;
 
-	if ( ( int ) ( self->s.v.spawnflags ) & 32 )
+	// TF Disable doors with spawnflags of DOOR_TOGGLE
+	if ( ( int ) ( self->s.v.spawnflags ) & DOOR_TOGGLE )
 		return;
 
 	self->attack_finished = g_globalvars.time + 2;

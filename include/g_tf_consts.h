@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_tf_consts.h,v 1.9 2004-12-23 03:16:14 AngelD Exp $
+ *  $Id: g_tf_consts.h,v 1.10 2005-05-16 06:31:38 AngelD Exp $
  */
 // TeamFortress State Flags
 #define TFSTATE_GRENPRIMED  1  // Whether the player has a primed grenade
@@ -574,6 +574,10 @@
 #define DMSG_GREN_FLASH   35
 #define DMSG_TRIGGER   36
 #define DMSG_TEAMKILL   37
+#define DMSG_SG_EXPLODION   38
+#define DMSG_DISP_EXPLODION   39
+#define DMSG_PIPEBOMB   40
+#define DMSG_CALTROP   41
 
 // Some of the toggleflags aren't used anymore, but the bits are still
 // there to provide compatability with old maps

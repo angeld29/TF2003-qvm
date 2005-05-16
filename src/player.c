@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: player.c,v 1.10 2005-04-03 10:52:05 AngelD Exp $
+ *  $Id: player.c,v 1.11 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1321,7 +1321,7 @@ void player_pain( gedict_t * attacker, float take  )
 {
 	if ( self->s.v.weaponframe )
 	{
-		if ( tf_data.deathmsg == 37 )
+		if ( tf_data.deathmsg == DMSG_TEAMKILL )
 			PainSound(  );
 		return;
 	}

@@ -18,12 +18,14 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: sniper.c,v 1.3 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: sniper.c,v 1.4 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
 
 void    SniperSight_Update(  );
 
+//=========================================================================
+// Sniper/Auto Rifle selection function
 void TeamFortress_SniperWeapon(  )
 {
 
@@ -44,6 +46,8 @@ void TeamFortress_SniperWeapon(  )
 	W_SetCurrentAmmo(  );
 }
 
+//=========================================================================
+// Do the autozoom of the sniper rifle
 void TF_zoom( int zoom_level )
 {
 
@@ -52,6 +56,8 @@ void TF_zoom( int zoom_level )
 	stuffcmd( self, "fov %d\n", zoom_level );
 }
 
+//=========================================================================
+// Move the sight to the point the rifle's aiming at
 void SniperSight_Update(  )
 {
 	vec3_t  org, end;
@@ -83,6 +89,8 @@ void SniperSight_Update(  )
 	self->s.v.nextthink = g_globalvars.time + 0.1;
 }
 
+//=========================================================================
+// Create the sight
 void SniperSight_Create(  )
 {
 	gedict_t *sight;
@@ -101,6 +109,7 @@ void SniperSight_Create(  )
 	sight->s.v.nextthink = g_globalvars.time + 0.05;
 }
 
+// this toggles the snipers autozoom on/off
 void TeamFortress_AutoZoomToggle(  )
 {
 	if ( self->tfstate & TFSTATE_ZOOMOFF )

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.30 2005-05-06 14:01:37 AngelD Exp $
+ *  $Id: tfort.c,v 1.31 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -285,6 +285,10 @@ char   *GrenadePrimeName[] = { "Grenade",
 
 int     classbits[] = { 0, 1, 2, 4, 8, 16, 32, 64, 256, 512, 128 };
 
+//=========================================================================
+// IMPULSE FUNCTIONS
+//=========================================================================
+// Uses a class dependant special skill
 void UseSpecialSkill(  )
 {
 	vec3_t  src;

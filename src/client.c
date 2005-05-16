@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.34 2005-05-09 00:33:02 AngelD Exp $
+ *  $Id: client.c,v 1.35 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -62,7 +62,7 @@ void SP_info_intermission()
 // so C can get at it
 	VectorCopy( self->mangle, self->s.v.angles );	//self.angles = self.mangle;      
 }
-
+//-----------------------------------------------------------------------------------------------------
 void SetNewParms( void )
 {
 	g_globalvars.parm1 = 0;
@@ -81,7 +81,7 @@ void SetNewParms( void )
 	g_globalvars.parm14 = 0;
 	g_globalvars.parm15 = 0;
 }
-
+//-----------------------------------------------------------------------------------------------------
 void SetChangeParms()
 {
 
@@ -124,19 +124,19 @@ void SetChangeParms()
 	g_globalvars.parm14 = self->StatusBarSize;
 	g_globalvars.parm15 = self->is_admin;
 }
-
+//-----------------------------------------------------------------------------------------------------
 
 void autoteam_think()
 {
 	tf_data.toggleflags |= TFLAG_AUTOTEAM;
 	dremove( self );
 }
-
 void autokick_think()
 {
 	PROG_TO_EDICT( self->s.v.owner )->teamkills = 0;
 	dremove( self );
 }
+//-----------------------------------------------------------------------------------------------------
 extern int     team_top_colors[5];
 void DecodeLevelParms()
 {
@@ -2261,7 +2261,7 @@ void PlayerPostThink()
 
 }
 
-////////////////
+//-----------------------------------------------------------------------------------------------------
 // GlobalParams:
 // time
 // self
@@ -2713,7 +2713,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
 					deathstring = "%s killed his supposed friend %s\n";
 					break;
 				}
-				if ( tf_data.deathmsg == 23 )
+				if ( tf_data.deathmsg == DMSG_MEDIKIT )
 				{
 					G_bprint( 1, "%s didn't survive the operation by %s\n", targ->s.v.netname,
 						  attacker->s.v.netname );
@@ -3115,7 +3115,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
 					deathstring = "%s intercepts his sentry gun's rocket\n";
 				else
 				{
-					if ( tf_data.deathmsg == 27 )
+					if ( tf_data.deathmsg == DMSG_SENTRYGUN_BULLET )
 						deathstring = "%s crossed his sentry gun's line of fire\n";
 				}
 				G_bprint( 1, deathstring, targ->s.v.netname );
@@ -3133,7 +3133,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
 						deathstring = "%s hates %s's sentry gun\n";
 					} else
 					{
-						if ( tf_data.deathmsg == 27 )
+						if ( tf_data.deathmsg == DMSG_SENTRYGUN_BULLET )
 						{
 							deathstring = "%s is mown down by %s's sentry gun\n";
 						}

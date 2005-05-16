@@ -18,13 +18,21 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: world.c,v 1.5 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: world.c,v 1.6 2005-05-16 06:31:39 AngelD Exp $
  */
 
 #include "g_local.h"
 #define MAX_BODYQUE 4
 gedict_t *bodyque[MAX_BODYQUE];
 int     bodyque_head;
+/*
+==============================================================================
+
+BODY QUE
+
+==============================================================================
+*/
+
 void InitBodyQue(  )
 {
 	int     i;
@@ -61,6 +69,18 @@ void CopyToBodyQue( gedict_t * ent )
 		bodyque_head = 0;
 }
 
+//=======================
+/*QUAKED worldspawn (0 0 0) ?
+Only used for the world entity.
+Set message to the level name.
+Set sounds to the cd track to play.
+
+World Types:
+0: medieval
+1: metal
+2: base
+*/
+//=======================
 
 extern gedict_t *lastspawn;
 int     number_of_teams;
@@ -334,7 +354,7 @@ void SP_worldspawn(  )
 }
 
 int     timelimit, fraglimit, teamplay, deathmatch, framecount, coop;
-
+float old_time = 0;
 
 void StartFrame( int time )
 {
@@ -344,6 +364,7 @@ void StartFrame( int time )
 	deathmatch = trap_cvar( "deathmatch" );
 
 	framecount = framecount + 1;
-
+	bot_frametime = g_globalvars.time - old_time;
+	old_time = g_globalvars.time;
 	BotFrame();
 }

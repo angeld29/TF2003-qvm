@@ -1335,12 +1335,6 @@ int sprintf( char *str, const char *fmt, ... )
 
 float asin(float x)
 {
-/*        if( x == 1 )
-                return M_PI/2;
-                
-        if( x == -1 )
-                return -M_PI/2;*/
-
         return atan2(x, -x*x+1);
 }
 #endif

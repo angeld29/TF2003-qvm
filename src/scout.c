@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: scout.c,v 1.18 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: scout.c,v 1.19 2005-05-16 06:31:38 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -43,7 +43,7 @@ void CaltropTouch(  )
 	G_sprint( other, 2, "Ow, Ow, Ow! Caltrops!\n" );
 	other->leg_damage = other->leg_damage + 2;
 	TeamFortress_SetSpeed( other );
-	tf_data.deathmsg = 41;
+	tf_data.deathmsg = DMSG_CALTROP;
 	T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 10 );
 	dremove( self );
 }
@@ -197,7 +197,7 @@ void FlashGrenadeExplode(  )
 		VectorSubtract( self->s.v.origin, te->s.v.origin, tmp );
 		if ( vlen( tmp ) <= 200 )
 		{
-			tf_data.deathmsg = 35;
+			tf_data.deathmsg = DMSG_GREN_FLASH;
 			TF_T_Damage( te, self, owner, 60, 2, 16 | 4 );
 		}
 		if ( te->s.v.health <= 0 )
@@ -478,7 +478,9 @@ void ScannerSwitch(  )
 }
 
 
-
+//=========================================================================
+// Acts just like T_RadiusDamage, but doesn't damage things, just pushes them away
+// from the explosion at a speed relative to the distance from the explosion's origin.
 void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, gedict_t * ignore )
 {
 	float   points;
@@ -497,6 +499,7 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 		VectorAdd( head->s.v.origin, org, org );
 		VectorSubtract( org, inflictor->s.v.origin, dist );
 		points = 0.5 * vlen( dist );
+
 		if ( points < 0 )
 			points = 0;
 		points = bounce - points;
@@ -509,6 +512,7 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 		if ( streq( head->s.v.classname, "building_sentrygun_base" ) )
 			continue;
 
+		// Bounce!!
 		VectorScale( dist, ( points / 20.0 ), head->s.v.velocity );
 		if ( strneq( head->s.v.classname, "player" ) )
 		{
@@ -522,6 +526,10 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 			if ( head == PROG_TO_EDICT( inflictor->s.v.owner )
 			     && tg_data.gren_effect == TG_GREN_EFFECT_OFF_FORSELF )
 				continue;
+
+			// Concuss 'em!!
+			// If they are already concussed, set the concussion back up
+			// Try to find a concusstimer entity for this player
 
 			G_sprint( head, 2, "You are conced\n" );
 			for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "timer" ) ); )
@@ -598,13 +606,16 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 	char    st[10];
 	int     opt;
 
+	// prevent scan impulse from triggering anything else
 	self->s.v.impulse = 0;
 	self->last_impulse = 0;
+
 	if ( strneq( self->s.v.classname, "player" ) )
 		return;
 
 	if ( !( self->tf_items & NIT_SCANNER ) )
 		return;
+	// If Impulse is TF_SCAN_ENEMY, toggle Scanning for Enemies
 	if ( scanrange == TF_SCAN_ENEMY )
 	{
 		if ( self->tf_items_flags & NIT_SCANNER_ENEMY )
@@ -619,7 +630,8 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 		self->StatusRefreshTime = g_globalvars.time + 0.1;
 		return;
 	}
-
+	
+	// If Impulse is TF_SCAN_FRIENDLY, toggle Scanning for Friendlies
 	if ( scanrange == TF_SCAN_FRIENDLY )
 	{
 		if ( self->tf_items_flags & NIT_SCANNER_FRIENDLY )
@@ -698,10 +710,13 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 	}
 	scen = 0;
 	scfr = 0;
-	if ( self->tf_items_flags & 1 )
+	// Set the Scanner flags
+	if ( self->tf_items_flags & NIT_SCANNER_ENEMY )
 		scen = 1;
-	if ( self->tf_items_flags & 2 )
+	if ( self->tf_items_flags & NIT_SCANNER_FRIENDLY )
 		scfr = 1;
+
+	// If no entity type is enabled, don't scan
 	if ( !scen && !scfr )
 	{
 		G_sprint( self, PRINT_HIGH, "All scanner functions are disabled.\n" );
