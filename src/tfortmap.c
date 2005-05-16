@@ -18,11 +18,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfortmap.c,v 1.15 2005-05-06 14:01:37 AngelD Exp $
+ *  $Id: tfortmap.c,v 1.16 2005-05-16 09:35:46 AngelD Exp $
  */
 #include "g_local.h"
 
-int     item_list_bit;
+static int     item_list_bit;
 char   *team_menu_string = NULL;
 int     CTF_Map;
 void UpdateAbbreviations( gedict_t * Goal )
@@ -266,7 +266,7 @@ void SP_info_tfdetect(  )
 	UpdateAbbreviations( self );
 }
 
-extern char *team_spawn_str[5];
+extern const char *team_spawn_str[5];
 void SP_info_player_teamspawn(  )
 {
 
@@ -283,7 +283,7 @@ void SP_info_player_teamspawn(  )
 	}
 	if ( number_of_teams < self->team_no )
 		number_of_teams = self->team_no;
-	self->team_str_home = team_spawn_str[self->team_no];
+	self->team_str_home = (char*)team_spawn_str[self->team_no];
 }
 
 void SP_i_p_t(  )
@@ -1233,7 +1233,7 @@ void DoGoalWork( gedict_t * Goal, gedict_t * AP )
 			if ( te->goal_state == 3 )
 			{
 				te->goal_state = 2;
-				te->team_str_home = team_spawn_str[te->team_no];
+				te->team_str_home = (char*)team_spawn_str[te->team_no];
 			}
 		}
 	}
@@ -1331,7 +1331,7 @@ void DoGroupWork( gedict_t * Goal, gedict_t * AP )
 			if ( tg->group_no == Goal->restore_spawngroup )
 			{
 				tg->goal_state = 2;
-				tg->team_str_home = team_spawn_str[tg->team_no];
+				tg->team_str_home = (char*)team_spawn_str[tg->team_no];
 			}
 			tg = trap_find( tg, FOFS( s.v.classname ), "info_player_teamspawn" );
 		}

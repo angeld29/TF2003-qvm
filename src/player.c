@@ -18,9 +18,72 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: player.c,v 1.11 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: player.c,v 1.12 2005-05-16 09:35:46 AngelD Exp $
  */
 #include "g_local.h"
+
+void player_diea1();
+void player_diea2();
+void player_diea3();
+void player_diea4();
+void player_diea5();
+void player_diea6();
+void player_diea7();
+void player_diea8();
+void player_diea9();
+void player_diea10();
+void player_diea11();
+void player_dieb1();
+void player_dieb2();
+void player_dieb3();
+void player_dieb4();
+void player_dieb5();
+void player_dieb6();
+void player_dieb7();
+void player_dieb8();
+void player_dieb9();
+void player_diec1();
+void player_diec2();
+void player_diec3();
+void player_diec4();
+void player_diec5();
+void player_diec6();
+void player_diec7();
+void player_diec8();
+void player_diec9();
+void player_diec10();
+void player_diec11();
+void player_diec12();
+void player_diec13();
+void player_diec14();
+void player_diec15();
+void player_died1();
+void player_died2();
+void player_died3();
+void player_died4();
+void player_died5();
+void player_died6();
+void player_died7();
+void player_died8();
+void player_died9();
+void player_diee1();
+void player_diee2();
+void player_diee3();
+void player_diee4();
+void player_diee5();
+void player_diee6();
+void player_diee7();
+void player_diee8();
+void player_diee9();
+void player_die_ax1();
+void player_die_ax2();
+void player_die_ax3();
+void player_die_ax4();
+void player_die_ax5();
+void player_die_ax6();
+void player_die_ax7();
+void player_die_ax8();
+void player_die_ax9();
 
 void player_touch(  )
 {
@@ -1340,13 +1403,6 @@ void player_pain( gedict_t * attacker, float take  )
 		player_pain1(  );
 }
 
-
-void    player_diea1(  );
-void    player_dieb1(  );
-void    player_diec1(  );
-void    player_died1(  );
-void    player_diee1(  );
-void    player_die_ax1(  );
 
 void DeathBubblesSpawn(  )
 {

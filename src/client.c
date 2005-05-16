@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.35 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: client.c,v 1.36 2005-05-16 09:35:45 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -27,12 +27,12 @@
 // 
 //===========================================================================
 
-vec3_t  VEC_ORIGIN = { 0, 0, 0 };
-vec3_t  VEC_HULL_MIN = { -16, -16, -24 };
-vec3_t  VEC_HULL_MAX = { 16, 16, 32 };
+const vec3_t  VEC_ORIGIN = { 0, 0, 0 };
+const vec3_t  VEC_HULL_MIN = { -16, -16, -24 };
+const vec3_t  VEC_HULL_MAX = { 16, 16, 32 };
 
-vec3_t  VEC_HULL2_MIN = { -32, -32, -24 };
-vec3_t  VEC_HULL2_MAX = { 32, 32, 64 };
+const vec3_t  VEC_HULL2_MIN = { -32, -32, -24 };
+const vec3_t  VEC_HULL2_MAX = { 32, 32, 64 };
 int     modelindex_eyes, modelindex_player, modelindex_null;
 int     last_id;
 float   rj;
@@ -1100,7 +1100,7 @@ void ClientKill()
 }
 
 gedict_t *lastspawn_team[5] = { NULL, NULL, NULL, NULL, NULL };
-char   *team_spawn_str[5] = { "", "ts1", "ts2", "ts3", "ts4" };
+const char   *team_spawn_str[5] = { "", "ts1", "ts2", "ts3", "ts4" };
 
 int CheckTelefragSpotOld( vec3_t v )
 {

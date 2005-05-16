@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: admin_cmd.c,v 1.1 2004-12-23 03:16:14 AngelD Exp $
+ *  $Id: admin_cmd.c,v 1.2 2005-05-16 09:35:45 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -38,7 +38,7 @@ void Admin_BanList(int argc);
 void Admin_Console(int argc);
 void Admin_Map(int argc);
 
-admin_cmd_t admin_cmds[] = 
+static const admin_cmd_t admin_cmds[] = 
 {
 	{"auth", Admin_Auth,0},
 //	{"listplayers", Admin_ListPlayers, 1},
@@ -92,7 +92,7 @@ void Admin_Cmd()
 {
 	int argc;
 	char    cmd_command[1024];
-	admin_cmd_t* ucmd;
+	const admin_cmd_t* ucmd;
 
 	argc = trap_CmdArgc();
 

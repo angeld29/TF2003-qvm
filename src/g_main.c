@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.13 2005-05-06 14:01:37 AngelD Exp $
+ *  $Id: g_main.c,v 1.14 2005-05-16 09:35:45 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -27,7 +27,7 @@ gedict_t       *world = g_edicts;
 gedict_t       *self, *other;
 
 globalvars_t    g_globalvars;
-field_t         expfields[] = {
+static field_t         expfields[] = {
 	{"maxspeed", FOFS( maxspeed ), F_FLOAT}	,
 	{"gravity", FOFS( gravity ), F_FLOAT},
 	{"isBot", FOFS( isBot ), F_INT},
@@ -38,7 +38,7 @@ static char     mapname[64];
 static char     worldmodel[64] = "worldmodel";
 static char     netnames[MAX_CLIENTS][32];
 
-gameData_t      gamedata =
+static gameData_t      gamedata =
     { ( edict_t * ) g_edicts, sizeof( gedict_t ), &g_globalvars, expfields , GAME_API_VERSION};
 float           starttime;
 void            G_InitGame( int levelTime, int randomSeed );

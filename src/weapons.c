@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.23 2005-05-16 06:31:39 AngelD Exp $
+ *  $Id: weapons.c,v 1.24 2005-05-16 09:35:46 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -679,14 +679,14 @@ Collects multiple small damages into a single damage
 
 ==============================================================================
 */
-gedict_t *multi_ent;
-float   multi_damage;
+static gedict_t *multi_ent;
+static float   multi_damage;
 
 vec3_t  blood_org;
-float   blood_count;
+static float   blood_count;
 
 vec3_t  puff_org;
-float   puff_count;
+static float   puff_count;
 
 void ClearMultiDamage(  )
 {

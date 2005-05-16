@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: vote.h,v 1.1 2004-12-23 03:16:14 AngelD Exp $
+ *  $Id: vote.h,v 1.2 2005-05-16 09:35:43 AngelD Exp $
  */
 
 typedef struct {
@@ -30,5 +30,5 @@ typedef struct {
 	int		pause;
 }vote_t;
 
-extern vote_t votes[];
+extern const vote_t votes[];
 extern int current_vote;

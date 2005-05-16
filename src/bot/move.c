@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: move.c,v 1.5 2005-05-16 06:31:39 AngelD Exp $
+ *  $Id: move.c,v 1.6 2005-05-16 09:35:46 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -32,17 +32,16 @@
 #define CHANGE_WP_DISTANCE 50
 
 #ifdef  SPEED_REPORT
-float last_report = 0;
+static float last_report = 0;
 #endif
-float maxspeed = 0;
+static float maxspeed = 0;
 
 float max_yaw_per_sek = DEFAULT_MAX_YAW_PER_SEK;
 float bot_frametime;
-float max_yaw_pf;
-vec3_t dir2move, curr_vel, cur_angle;
-float vel_yaw, dir_yaw, view_yaw; 
-float velocity,sv_accelerate;
-
+static float max_yaw_pf;
+static vec3_t dir2move, curr_vel, cur_angle;
+static float vel_yaw, dir_yaw, view_yaw; 
+static float velocity,sv_accelerate;
 
 
 qboolean AtLocation( vec3_t vDestination )
@@ -183,7 +182,7 @@ void DoMovement()
 
 	InitCalcMovement();
 
-	if ( vlen( dir2move ) / velocity < 0.5 )
+	if ( velocity && (( vlen( dir2move ) / velocity) < 0.5) )
 	{
 		if ( VectorCompareF( self->waypoint2, 0, 0, 0 ) )
 		{

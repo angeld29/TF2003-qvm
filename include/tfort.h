@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.h,v 1.9 2005-05-06 14:01:36 AngelD Exp $
+ *  $Id: tfort.h,v 1.10 2005-05-16 09:35:43 AngelD Exp $
  */
 
 typedef struct {
@@ -41,7 +41,7 @@ typedef struct {
 } class_settings_t;
 
 extern char class_skin[][20];
-extern class_settings_t class_set[];
+extern const class_settings_t class_set[];
 
 //tfort.c
 char   *TeamFortress_GetClassName( int pc );
@@ -63,7 +63,7 @@ void    TeamFortress_ExecMapScript( gedict_t * p );
 int     TeamFortress_TeamPutPlayerInTeam(  );
 void    KickCheater( gedict_t * p );
 void    TeamFortress_Alias( char *halias, int himpulse1, int himpulse2 );
-char   *TeamFortress_TeamGetColorString( int tno );
+const char   *TeamFortress_TeamGetColorString( int tno );
 char   *TeamFortress_GetSkin( gedict_t * p );
 void    TeamFortress_AmmoboxRemove(  );
 

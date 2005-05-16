@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.31 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: tfort.c,v 1.32 2005-05-16 09:35:46 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -42,7 +42,7 @@ char class_skin[][20]={
  "",
  "base"
 };
-class_settings_t class_set[] = {
+const class_settings_t class_set[] = {
 	{
 	 0,
 	 1, 0, 0,
@@ -255,7 +255,7 @@ class_settings_t class_set[] = {
 
 };
 
-char   *GrenadeNames[] = { "BUG",
+const char   *GrenadeNames[] = { "BUG",
 	"Normal",
 	"Concussion",
 	"Nail",
@@ -269,7 +269,7 @@ char   *GrenadeNames[] = { "BUG",
 	"Flash"
 };
 
-char   *GrenadePrimeName[] = { "Grenade",
+const char   *GrenadePrimeName[] = { "Grenade",
 	"Grenade",
 	"Concussion grenade",
 	"Nail grenade",
@@ -283,7 +283,7 @@ char   *GrenadePrimeName[] = { "Grenade",
 	"Flash grenade"
 };
 
-int     classbits[] = { 0, 1, 2, 4, 8, 16, 32, 64, 256, 512, 128 };
+const int     classbits[] = { 0, 1, 2, 4, 8, 16, 32, 64, 256, 512, 128 };
 
 //=========================================================================
 // IMPULSE FUNCTIONS
@@ -2278,7 +2278,7 @@ void TeamFortress_AssaultWeapon(  )
 	W_SetCurrentAmmo(  );
 }
 
-char   *explode_msgs[] = {
+const char   *explode_msgs[] = {
 	"%s wouldn't let go of his gifts!\n",
 	"No %s swallowing the grenade isn't very effective!\n",
 	"Well %s don't quit your day job!\n",
@@ -2755,7 +2755,7 @@ void TF_AddFrags( gedict_t * pl, int fr )
 	}
 }
 
-char   *ec_strings[] = {
+const char   *ec_strings[] = {
 	"",
 	"exec scout.cfg\n",
 	"exec sniper.cfg\n",

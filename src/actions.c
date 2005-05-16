@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: actions.c,v 1.16 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: actions.c,v 1.17 2005-05-16 09:35:45 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -27,7 +27,7 @@ void	W_Reload_super_shotgun(  );
 void 	W_Reload_grenade_launcher(  );
 void 	W_Reload_rocket_launcher(  );
 
-int     default_class_discard[10][4] = {
+static const int     default_class_discard[10][4] = {
 	{0, 0, 0, 0},
 	{0, 0, 1, 1},
 	{0, 0, 1, 1},

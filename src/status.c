@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: status.c,v 1.9 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: status.c,v 1.10 2005-05-16 09:35:46 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -56,7 +56,7 @@ void StatusPrint( gedict_t * pl, float fTime, const char *fmt, ... )
 	pl->StatusRefreshTime = g_globalvars.time + fTime;
 }
 
-char   *teamnames[5] = {
+const char   *teamnames[5] = {
 	"  Blue:",
 	"  Blue:",
 	"  Red :",
@@ -163,11 +163,10 @@ void RefreshStatusBar( gedict_t * pl )
 	sbar_p = ClipSizeToString( pl, sbar_p );
 	*sbar_p++ = '\n';
 	*sbar_p = 0;
-//      *(char*)0 = 0;
 	trap_CenterPrint( NUM_FOR_EDICT( pl ), sbar_str );
 }
 
-int     SbarReSizes_old[] = { 0, 5, 12, 17, 23, 25, 35, 50, 70 };
+static const int     SbarReSizes_old[] = { 0, 5, 12, 17, 23, 25, 35, 50, 70 };
 char   *AddStatusSize_old( gedict_t * pl, char *strp )
 {
 	int     i;
@@ -185,7 +184,7 @@ char   *AddStatusSize_old( gedict_t * pl, char *strp )
 	*strp = 0;
 	return strp;
 }
-int     SbarReSizes[2][9] = {{ 14 ,19, 26, 32, 37, 39, 49, 64, 84 },
+static const int     SbarReSizes[2][9] = {{ 14 ,19, 26, 32, 37, 39, 49, 64, 84 },
 			     { 11 ,16, 23, 29, 34, 36, 46, 61, 81 }};
 
 char   *AddStatusSize( gedict_t * pl, char *strp )
@@ -203,7 +202,7 @@ char   *AddStatusSize( gedict_t * pl, char *strp )
 	return strp;
 }
 
-char   *sbar_msg[] = {
+const char   *sbar_msg[] = {
 	"Status Bar Res set to 320x200.\n",
 	"Status Bar Res set to 320x240.\n",
 	"Status Bar Res set to 400x300.\n",
@@ -268,14 +267,14 @@ char   *ClipSizeToString( gedict_t * pl, char *str )
 	while ( *( ++str ) );
 	return str;
 }
-char   *spy_teams[] = {
+const char   *spy_teams[] = {
 	"  ",
 	"Blue",
 	"Red",
 	"Yellow",
 	"Green"
 };
-char   *spy_skins[] = {
+const char   *spy_skins[] = {
 	"  ",
 	"Scout",
 	"Sniper",

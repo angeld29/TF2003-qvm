@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.c,v 1.8 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: g_syscalls.c,v 1.9 2005-05-16 09:35:45 AngelD Exp $
  */
 
 //#include "g_local.h"
@@ -128,19 +128,19 @@ void trap_setsize( int edn, float min_x, float min_y, float min_z, float max_x,
 		 PASSFLOAT( min_z), PASSFLOAT( max_x), PASSFLOAT( max_y), PASSFLOAT( max_z ));
 }
 
-void trap_setmodel( int edn, char *model )
+void trap_setmodel( int edn, const char *model )
 {
 	syscall( G_SETMODEL, edn, (int)model );
 }
 
-void trap_ambientsound( float pos_x, float pos_y, float pos_z, char *samp, float vol,
+void trap_ambientsound( float pos_x, float pos_y, float pos_z, const char *samp, float vol,
 			float atten )
 {
 	syscall( G_AMBIENTSOUND, PASSFLOAT( pos_x), PASSFLOAT( pos_y), PASSFLOAT( pos_z),
 		 (int)samp, PASSFLOAT( vol), PASSFLOAT( atten ));
 }
 
-void trap_sound( int edn, int channel, char *samp, int vol, float att )
+void trap_sound( int edn, int channel, const char *samp, int vol, float att )
 {
 	syscall( G_SOUND, edn, channel, (int)samp, vol, PASSFLOAT( att ));
 }
@@ -177,7 +177,7 @@ void trap_readcmd( const char *str, char* buf, int size )
 	syscall( G_readcmd,(int) str, (int)buf, size );
 }
 
-void trap_redirectcmd( gedict_t* ent, char* str )
+void trap_redirectcmd( gedict_t* ent, const char* str )
 {
 	syscall( G_redirectcmd,(int) ent, (int)str);
 }
@@ -217,7 +217,7 @@ int trap_walkmove( int edn, float yaw, float dist )
 			PASSFLOAT( dist ));
 }
 
-void trap_lightstyle( int style, char *val )
+void trap_lightstyle( int style, const char *val )
 {
 	syscall( G_LIGHTSTYLE, style, (int)val );
 }
@@ -242,7 +242,7 @@ int trap_nextent( int n )
 {
 	return syscall( G_Find, n, fofs, (int)str );
 }*/
-gedict_t* trap_find( gedict_t* ent,int fofs, char*str )
+gedict_t* trap_find( gedict_t* ent,int fofs, const char*str )
 {
 	return (gedict_t*)syscall( G_Find, (int)ent, fofs, (int)str );
 }
@@ -275,7 +275,7 @@ void trap_logfrag( int killer, int killee )
 	syscall( G_LOGFRAG,  killer , killee  );
 }
 
-void trap_infokey( int edn, char *key, char *valbuff, int sizebuff )
+void trap_infokey( int edn, const char *key, char *valbuff, int sizebuff )
 {
 	syscall( G_GETINFOKEY, edn, (int)key, (int)valbuff, sizebuff );
 }

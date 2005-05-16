@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.13 2005-05-06 14:01:37 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.14 2005-05-16 09:35:45 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -47,7 +47,7 @@ void    Engineer_RotateSG(  );
 void    TeamFortress_Cmd_Detpack(  );
 void    Admin_Cmd(  );
 
-cmd_t   cmds[] = {
+const static cmd_t   cmds[] = {
 	{"kill", ClientKill},
 	{"test", Test},
 	{"bot", Bot},
@@ -65,7 +65,7 @@ extern void trap_CmdArgv( int arg, char *valbuff, int sizebuff );
 qboolean ClientCommand(  )
 {
 	char    cmd_command[1024];
-	cmd_t  *ucmd;
+	const cmd_t  *ucmd;
 
 	self = PROG_TO_EDICT( g_globalvars.self );
 	trap_CmdArgv( 0, cmd_command, sizeof( cmd_command ) );

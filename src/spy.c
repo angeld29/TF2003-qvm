@@ -18,9 +18,10 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: spy.c,v 1.12 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: spy.c,v 1.13 2005-05-16 09:35:46 AngelD Exp $
  */
 #include "g_local.h"
+
 /*
 ========================================================
 Functions for the SPY class and associated weaponry                          
@@ -1392,7 +1393,7 @@ void GasEffect1( gedict_t * owner )	//Random Temp Entites
 		T_Damage( owner, owner, owner, 0 );
 }
 
-char   *gas_sounds[] = {
+static const char   *gas_sounds[] = {
 	"play weapons/r_exp3.wav\n",
 	"play weapons/rocket1i.wav\n",
 	"play weapons/sgun1.wav\n",
@@ -1430,7 +1431,7 @@ void GasEffect2( gedict_t * owner )	//sounds
 	stuffcmd( owner, gas_sounds[i] );
 }
 
-char   *gas_sounds2[] = {
+static const char   *gas_sounds2[] = {
 	"play weapons/detpack.wav\n",
 	"play weapons/turrset.wav\n",
 	"play weapons/turrspot.wav\n",

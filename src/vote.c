@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: vote.c,v 1.5 2005-05-06 14:01:37 AngelD Exp $
+ *  $Id: vote.c,v 1.6 2005-05-16 09:35:46 AngelD Exp $
  */
 
 // vote.q: mapchange voting functions
@@ -31,18 +31,18 @@ void Vote_ChangeMap_No();
 void Vote_Elect_Init();
 void Vote_Elect_Yes();
 void Vote_Elect_No();
-float elect_percentage;
-int elect_level;
-gedict_t* elect_player;
+static float elect_percentage;
+static int elect_level;
+static gedict_t* elect_player;
 
 
-vote_t votes[]=
+const vote_t votes[]=
 {
 	{"changemap", Vote_ChangeMap_Init, Vote_ChangeMap_Yes, Vote_ChangeMap_No, 60, 3},
 	{"elect", Vote_Elect_Init, Vote_Elect_Yes, Vote_Elect_No, 60, 3},
 	{NULL}
 };
-int		k_vote = 0;
+static int		k_vote = 0;
 int 		current_vote = -1;
 
 
@@ -328,7 +328,7 @@ void Vote_Cmd()
 {
         char    cmd_command[50];
         int argc,i;
-        vote_t*ucmd;
+        const vote_t*ucmd;
 
 	if ( tf_data.cb_prematch_time > g_globalvars.time )
 	{

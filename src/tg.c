@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tg.c,v 1.12 2005-05-16 06:31:39 AngelD Exp $
+ *  $Id: tg.c,v 1.13 2005-05-16 09:35:46 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -298,6 +298,5 @@ void TG_Cmd()
 	     }
 	     return;
 	}
-
 }
 

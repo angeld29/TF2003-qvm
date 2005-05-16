@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_spawn.c,v 1.5 2005-02-14 13:52:51 AngelD Exp $
+ *  $Id: g_spawn.c,v 1.6 2005-05-16 09:35:45 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -28,10 +28,10 @@
 #define	MAX_SPAWN_VARS			64
 #define	MAX_SPAWN_VARS_CHARS	4096
 
-int             numSpawnVars;
-char           *spawnVars[MAX_SPAWN_VARS][2];	// key / value pairs
-int             numSpawnVarChars;
-char            spawnVarChars[MAX_SPAWN_VARS_CHARS];
+static int             numSpawnVars;
+static char           *spawnVars[MAX_SPAWN_VARS][2];	// key / value pairs
+static int             numSpawnVarChars;
+static char            spawnVarChars[MAX_SPAWN_VARS_CHARS];
 
 qboolean G_SpawnString( const char *key, const char *defaultString, char **out )
 {
@@ -89,7 +89,7 @@ qboolean G_SpawnVector( const char *key, const char *defaultString, float *out )
 // fields are needed for spawning from the entity string
 //
 
-field_t         fields[] = {
+static const field_t         fields[] = {
 	{"classname",	FOFS( s.v.classname ),	F_LSTRING},
 	{"origin", 	FOFS( s.v.origin ),	F_VECTOR},
 	{"model", 	FOFS( s.v.model ),	F_LSTRING},
@@ -486,7 +486,7 @@ void SP_info_player_team2();
 void SP_item_flag_team2();
 void SP_item_flag_team1();
 
-spawn_t         spawns[] = {
+static const spawn_t         spawns[] = {
 	// info entities don't do anything at all, but provide positional
 	// information for things controlled by other processes
 	{"info_player_start",		SP_Null_tf_spawn},
@@ -627,7 +627,7 @@ returning qfalse if not found
 */
 qboolean G_CallSpawn( gedict_t * ent )
 {
-	spawn_t        *s;
+	const spawn_t        *s;
 
 //      gitem_t *item;
 
@@ -712,7 +712,7 @@ in a gentity
 */
 void G_ParseField( const char *key, const char *value, gedict_t * ent )
 {
-	field_t        *f;
+	const field_t        *f;
 	byte           *b;
 	float           v;
 	vec3_t          vec;

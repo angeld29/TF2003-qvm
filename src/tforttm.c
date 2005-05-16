@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tforttm.c,v 1.13 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: tforttm.c,v 1.14 2005-05-16 09:35:46 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -56,8 +56,8 @@ int TeamFortress_TeamPutPlayerInTeam(  )
 	return TeamFortress_TeamSet( likely_team );
 }
 
-int     team_colors[5] = { 0, 14, 5, 13, 12 };
-int     team_top_colors[5] = { 0, 13, 4, 12, 11 };
+static const int     team_colors[5] = { 0, 14, 5, 13, 12 };
+int           team_top_colors[5] = { 0, 13, 4, 12, 11 };
 
 int TeamFortress_TeamGetColor( int tno )
 {
@@ -75,7 +75,7 @@ int TeamFortress_TeamGetTopColor( int tno )
 		return 0;
 }
 
-char    team_names[4][10] = { "blue", "red", "yell", "gren" };
+static char    team_names[4][10] = { "blue", "red", "yell", "gren" };
 
 void LoadTeamNames(  )
 {
@@ -330,7 +330,6 @@ int TeamFortress_TeamGetScoreFrags( int tno )
 	if ( tno <= 0 || tno > 4 )
 		return 0;
 
-
 	if ( ( tf_data.toggleflags & 128 ) || ( tf_data.toggleflags & 2048 ) )
 		return teamscores[tno];
 	else
@@ -450,7 +449,7 @@ void TeamFortress_TeamShowScores( int all )
 }
 
 //////////////////////
-char   *colornames[15] = { "DarkBlue",
+const char   *colornames[15] = { "DarkBlue",
 	"White",
 	"Brown",
 	"Blue",
@@ -467,7 +466,7 @@ char   *colornames[15] = { "DarkBlue",
 	"DarkBlue"
 };
 
-char   *TeamFortress_TeamGetColorString( int tno )
+const char   *TeamFortress_TeamGetColorString( int tno )
 {
 	int     col;
 
@@ -786,7 +785,7 @@ qboolean TeamFortress_TeamIsCivilian( int tno )
 }
 
 //////////////
-char   *li_classrestricted[10][2] = {
+const static char   *li_classrestricted[10][2] = {
 	{"cr_sc", "cr_scout"},
 	{"cr_sn", "cr_sniper"},
 	{"cr_so", "cr_soldier"},
@@ -853,7 +852,7 @@ void teamsprint( int tno, gedict_t * ignore, char *st )
 }
 
 int teams_allied = 0;
-int team_allied_bitindex[4][4] = 
+const static int team_allied_bitindex[4][4] = 
 {
 	{  0,  1,  2,  4},
 	{  1,  0,  8, 16},

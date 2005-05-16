@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_local.h,v 1.16 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: g_local.h,v 1.17 2005-05-16 09:35:43 AngelD Exp $
  */
 //
 // g_local.h -- local definitions for game module
@@ -119,7 +119,7 @@ int     	checkbottom( gedict_t * ed );
 void    	makestatic( gedict_t * ed );
 void    	setspawnparam( gedict_t * ed );
 void    	logfrag( gedict_t * killer, gedict_t * killee );
-void    	infokey( gedict_t * ed, char *key, char *valbuff, int sizebuff );
+void    	infokey( gedict_t * ed, const char *key, char *valbuff, int sizebuff );
 void    	WriteEntity( int to, gedict_t * ed );
 void    	disableupdates( gedict_t * ed, float time );
 int		walkmove( gedict_t * ed, float yaw, float dist );
@@ -177,15 +177,15 @@ void            SpectatorDisconnect();
 void            SpectatorThink();
 
 // weapons.c
-extern int      impulse;
+/*extern int      impulse;
 extern gedict_t *multi_ent;
-extern float   multi_damage;
+extern float   multi_damage;*/
 
 extern vec3_t  blood_org;
-extern float   blood_count;
+//extern float   blood_count;
 
 extern vec3_t  puff_org;
-extern float   puff_count;
+//extern float   puff_count;
 
 int  	        W_BestWeapon();
 void            W_Precache();
@@ -253,12 +253,12 @@ extern char * ANGEL_VERSION;
 int build_number (void);
 //g_tf_utils.c
 
-qboolean 	GetSVInfokeyString( char*key, char* key2, char*value, int size, char*defaultval);
-int		GetSVInfokeyInt   ( char*key, char* key2, int defalutval);
-float 		GetSVInfokeyFloat ( char*key, char* key2, float defalutval);
+qboolean 	GetSVInfokeyString( const char*key, const char* key2, char*value, int size, char*defaultval);
+int		GetSVInfokeyInt   ( const char*key, const char* key2, int defalutval);
+float 		GetSVInfokeyFloat ( const char*key, const char* key2, float defalutval);
 
-qboolean 	GetInfokeyString( gedict_t*pl, char*key, char* key2, char*value, int size, char*defaultval);
-int		GetInfokeyInt   ( gedict_t*pl, char*key, char* key2, int defalutval);
+qboolean 	GetInfokeyString( gedict_t*pl, const char*key, const char* key2, char*value, int size, char*defaultval);
+int		GetInfokeyInt   ( gedict_t*pl, const char*key, const char* key2, int defalutval);
 
 void  		KickPlayer( int psize, gedict_t* p);
 void  		muzzleflash();

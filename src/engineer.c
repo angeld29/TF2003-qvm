@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: engineer.c,v 1.22 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: engineer.c,v 1.23 2005-05-16 09:35:45 AngelD Exp $
  */
 /*========================================================
 Weapons and functions for the ENGINEER class and associated weaponry                          
@@ -875,7 +875,7 @@ void 	Engineer_RotateSG(  )
         angle = atoi(value);
 	self->building->waitmin = anglemod( self->building->waitmin + angle );
 	self->building->waitmax = anglemod( self->building->waitmax + angle );
-};
+}
 
 void CheckSentry( gedict_t * gunhead )
 {

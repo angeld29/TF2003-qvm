@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_utils.c,v 1.7 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: g_utils.c,v 1.8 2005-05-16 09:35:45 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -456,7 +456,7 @@ void logfrag( gedict_t * killer, gedict_t * killee )
 	trap_logfrag( NUM_FOR_EDICT( killer ), NUM_FOR_EDICT( killee ) );
 }
 
-void infokey( gedict_t * ed, char *key, char *valbuff, int sizebuff )
+void infokey( gedict_t * ed, const char *key, char *valbuff, int sizebuff )
 {
 	trap_infokey( NUM_FOR_EDICT( ed ), key, valbuff, sizebuff );
 }

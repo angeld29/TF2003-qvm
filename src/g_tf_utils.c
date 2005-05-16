@@ -18,11 +18,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_tf_utils.c,v 1.5 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: g_tf_utils.c,v 1.6 2005-05-16 09:35:45 AngelD Exp $
  */
 #include "g_local.h"
 
-qboolean GetInfokeyString( gedict_t * pl, char *key, char *key2, char *value, int size, char *defaultval )
+qboolean GetInfokeyString( gedict_t * pl, const char *key, const char *key2, char *value, int size, char *defaultval )
 {
 	infokey( pl, key, value, size );
 	if ( value[0] )
@@ -39,7 +39,7 @@ qboolean GetInfokeyString( gedict_t * pl, char *key, char *key2, char *value, in
 	return false;
 }
 
-int GetInfokeyInt( gedict_t * pl, char *key, char *key2, int defaultval )
+int GetInfokeyInt( gedict_t * pl, const char *key, const char *key2, int defaultval )
 {
 	char    buff[32];
 
@@ -57,7 +57,7 @@ int GetInfokeyInt( gedict_t * pl, char *key, char *key2, int defaultval )
 	return defaultval;
 }
 
-qboolean GetSVInfokeyString( char *key, char *key2, char *value, int size, char *defaultval )
+qboolean GetSVInfokeyString( const char *key, const char *key2, char *value, int size, char *defaultval )
 {
 	infokey( world, key, value, size );
 	if ( value[0] )
@@ -74,7 +74,7 @@ qboolean GetSVInfokeyString( char *key, char *key2, char *value, int size, char 
 	return false;
 }
 
-int GetSVInfokeyInt( char *key, char *key2, int defaultval )
+int GetSVInfokeyInt( const char *key, const char *key2, int defaultval )
 {
 	char    buff[32];
 
@@ -92,7 +92,7 @@ int GetSVInfokeyInt( char *key, char *key2, int defaultval )
 	return defaultval;
 }
 
-float GetSVInfokeyFloat( char *key, char *key2, float defaultval )
+float GetSVInfokeyFloat( const char *key, const char *key2, float defaultval )
 {
 	char    buff[32];
 

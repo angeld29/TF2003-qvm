@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: progs.h,v 1.18 2005-05-09 00:33:02 AngelD Exp $
+ *  $Id: progs.h,v 1.19 2005-05-16 09:35:43 AngelD Exp $
  */
 #include "progdefs.h"
 
@@ -343,7 +343,7 @@ extern  int             num_world_flames;
 extern  int             num_team_pipebombs[5];  
 extern  int             num_team_flares[5];     
 extern  int             num_team_ammoboxes[5];  
-extern	int             item_list_bit;
+//extern	int             item_list_bit;
 extern char           *team_menu_string;  
 
 extern int FLAME_MAXWORLDNUM, MAX_WORLD_PIPEBOMBS, MAX_WORLD_AMMOBOXES, GR_TYPE_MIRV_NO, GR_TYPE_NAPALM_NO;

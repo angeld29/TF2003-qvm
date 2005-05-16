@@ -18,13 +18,13 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: world.c,v 1.6 2005-05-16 06:31:39 AngelD Exp $
+ *  $Id: world.c,v 1.7 2005-05-16 09:35:46 AngelD Exp $
  */
 
 #include "g_local.h"
 #define MAX_BODYQUE 4
-gedict_t *bodyque[MAX_BODYQUE];
-int     bodyque_head;
+static gedict_t *bodyque[MAX_BODYQUE];
+static int     bodyque_head;
 /*
 ==============================================================================
 
@@ -354,7 +354,7 @@ void SP_worldspawn(  )
 }
 
 int     timelimit, fraglimit, teamplay, deathmatch, framecount, coop;
-float old_time = 0;
+static  float old_time = 0;
 
 void StartFrame( int time )
 {

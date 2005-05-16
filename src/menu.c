@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: menu.c,v 1.18 2005-04-03 10:52:05 AngelD Exp $
+ *  $Id: menu.c,v 1.19 2005-05-16 09:35:45 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -71,7 +71,7 @@ void 	TG_Cheats_Menu_Input( int inp );
 void 	TG_SavePosition_Menu(menunum_t menu);
 void 	TG_SavePosition_Menu_Input( int inp );
 
-menu_t  menus[] = {
+const static menu_t  menus[] = {
 	{0, 0, 0, NULL, NULL},	//MENU_NULL,                      
 	{0, 0, 0, NULL, NULL},	//MENU_DEFAULT,                 
 	{31, 0, 0, Menu_Team, Menu_Team_Input},	//MENU_TEAM,                    
@@ -196,7 +196,7 @@ void Menu_Input( int impulse )
 }
 
 extern char *team_menu_string;
-char   *team_menu_strings[] = {
+const char   *team_menu_strings[] = {
 	"              ",
 	"“‘ Team One  ",
 	"”‘ Team Two  ",
@@ -263,13 +263,13 @@ void Menu_Team_Input( int inp )
 	self->s.v.impulse = 0;
 }
 
-char   *class_hdr = "=== Choose Your Class ===";
-char   *class_str = "“‘ Scout   \n"
+const char   *class_hdr = "=== Choose Your Class ===";
+const char   *class_str = "“‘ Scout   \n"
     "”‘ Sniper  \n" "•‘ Soldier \n" "–‘ Demoman \n" "—‘ Medic   \n" "˜‘ HWGuy   \n" "™‘ Pyro    \n";
-char   *class_spy = "š‘ Spy     \n";
-char   *class_eng = "›‘ Engineer\n";
-char   *class_rpc = "’‘ RandomPC\n";
-char   *class_bd = "’‘ The Birthday Boy\n";
+const char   *class_spy = "š‘ Spy     \n";
+const char   *class_eng = "›‘ Engineer\n";
+const char   *class_rpc = "’‘ RandomPC\n";
+const char   *class_bd = "’‘ The Birthday Boy\n";
 
 void Menu_Class( menunum_t menu )
 {
@@ -404,7 +404,7 @@ void Menu_Intro( menunum_t menu )
 			     "======================================\n" "http://mtfl.sd.ru\n" );
 }
 
-char   *classhelp1[] = {
+const char   *classhelp1[] = {
 	"",
 	"ÓÃÏÕÔ Details:               \n\n"
 	    "×ÅÁÐÏÎÓ:                     \n"
@@ -453,7 +453,7 @@ char   *classhelp1[] = {
 	    "“‘ Spanner                  \n"
 	    "”‘ RailGun                  \n" "•‘ Super Shotgun            \n\n" "Press š for alias help\n"
 };
-char   *classhelp2[] = {
+const char   *classhelp2[] = {
 	"",
 	"ÇÒÅÎÁÄÅÓ:            \nFlash Grenade       \nConcussion Grenade  \n\nÓÐÅÃÉÁÌ ÃÏÍÍÁÎÄÓ:   \nScanner : scan10,scan30,scan50,autoscan\nScanner mode : scane,scanf    \n\nPress š for alias help\n",
 	"ÇÒÅÎÁÄÅÓ:            \nHand Grenade        \nFlare               \n\nÓÐÅÃÉÁÌ ÃÏÍÍÁÎÄÓ:   \nautozoom : Toggle Rifle Autozooming\n\n\nPress š for alias help\n",
@@ -542,17 +542,17 @@ void Menu_RepeatHelp( menunum_t menu )
 	self->current_menu = MENU_DEFAULT;
 }
 
-char   *menu_eng_header = "Action:                           \n";
-char   *menu_eng_builddisp = "“‘ Build Ammo&Armor Dispenser   \n";
-char   *menu_eng_buildsentry = "”‘ Build Sentry Gun             \n";
-char   *menu_eng_exit = "—‘ Nothing                      \n\n";
-char   *menu_eng_detdisp = "™‘ Remotely Detonate Dispenser  \n";
-char   *menu_eng_detsentry = "š‘ Remotely Detonate Sentry Gun \n";
+const char   *menu_eng_header = "Action:                           \n";
+const char   *menu_eng_builddisp = "“‘ Build Ammo&Armor Dispenser   \n";
+const char   *menu_eng_buildsentry = "”‘ Build Sentry Gun             \n";
+const char   *menu_eng_exit = "—‘ Nothing                      \n\n";
+const char   *menu_eng_detdisp = "™‘ Remotely Detonate Dispenser  \n";
+const char   *menu_eng_detsentry = "š‘ Remotely Detonate Sentry Gun \n";
 
 
 void Menu_Engineer( menunum_t menu )
 {
-	char   *s_bdisp = "", *s_detdisp = "", *s_bsentry = "", *s_detsentry = "";
+	const char   *s_bdisp = "", *s_detdisp = "", *s_bsentry = "", *s_detsentry = "";
 
 	if ( self->has_dispenser )
 	{
@@ -753,12 +753,12 @@ void Menu_EngineerFix_Dispenser_Input( int inp )
 }
 
 
-char   *menu_eng_fixsg_upgrade = "”‘ Upgrade Sentry Gun          \n";
-char   *menu_eng_fixsg_static = "™‘ Make static                 \n";
-char   *menu_eng_fixsg_nostatic = "™‘ Make no static              \n";
+const char   *menu_eng_fixsg_upgrade = "”‘ Upgrade Sentry Gun          \n";
+const char   *menu_eng_fixsg_static = "™‘ Make static                 \n";
+const char   *menu_eng_fixsg_nostatic = "™‘ Make no static              \n";
 void Menu_EngineerFix_SentryGun( menunum_t menu )
 {
-	char   *s_upgrade = "\n", *s_static = "";
+	const char   *s_upgrade = "\n", *s_static = "";
 
 	if ( self->building->s.v.weapon < 3 && (self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.tg_enabled ) )
 		s_upgrade = menu_eng_fixsg_upgrade;
@@ -993,18 +993,18 @@ void Menu_Dispenser_Input( int inp )
 
 }
 
-char *spy_menu_feign             = "•‘ Start Feigning              \n"
-                                   "–‘ Silent Feign                \n";
-char *spy_menu_stop_feign        = "•‘ Stop Feigning               \n";
-char *spy_menu_undecover         = "“‘ Change Skin                 \n"
-			           "”‘ Change Color                \n";
+const char *spy_menu_feign             = "•‘ Start Feigning              \n"
+                                         "–‘ Silent Feign                \n";
+const char *spy_menu_stop_feign        = "•‘ Stop Feigning               \n";
+const char *spy_menu_undecover         = "“‘ Change Skin                 \n"
+	                 	         "”‘ Change Color                \n";
 
-char *spy_menu_reset_skin        = "—‘ Reset Skin                  \n";
-char *spy_menu_reset_color       = "—‘ Reset Color                 \n";
-char *spy_menu_reset_skin_color  = "—‘ Reset Skin and Color        \n";
+const char *spy_menu_reset_skin        = "—‘ Reset Skin                  \n";
+const char *spy_menu_reset_color       = "—‘ Reset Color                 \n";
+const char *spy_menu_reset_skin_color  = "—‘ Reset Skin and Color        \n";
 void Menu_Spy( menunum_t menu )
 {
-	char *s_undercover = spy_menu_undecover,*s_feign=	"",*s_reset ="";
+	const char *s_undercover = spy_menu_undecover,*s_feign=	"",*s_reset ="";
 
 	if(self->is_feigning)
 		s_feign = spy_menu_stop_feign;
@@ -1146,7 +1146,7 @@ void Menu_NULL( menunum_t menu )
 }
 
 
-char *birthday_msgs[]={
+const char *birthday_msgs[]={
 "\n\n\n\nHAPPY BIRTHDAY TEAMFORTRESS!\n",
 "\n\n\n\nCurrent number of Snipers on\nthe Battlements:\n%4d",
 "\n\n\n\nYeeha!\nThe 505,672nd detpack was\njust laid on the bridge!\n",
@@ -1216,7 +1216,7 @@ void BirthdayTimer(  )
   			snipers_num = TeamFortress_GetNoPlayers() / 2;
 			snipers_num = snipers_num * (g_random()+1);
   		}
-  		self->team_str_moved  = birthday_msgs[rnum];
+  		self->team_str_moved  = (char*)birthday_msgs[rnum];
         }else
         {
   		self->s.v.nextthink = g_globalvars.time + 1.5;
@@ -1339,7 +1339,7 @@ void 	TG_Main_Menu_Input( int inp )
 
 }
 /*REMOVE!!!
-char* sentry_type_names[]=
+const char* sentry_type_names[]=
 {
  "Sentry: 2.8.1",
  "Sentry: 2.8.1 fixed(mtfl)",
@@ -1350,7 +1350,7 @@ char* sentry_type_names[]=
  "Unknown Sentry type"
 }; */
 
-char* sentry_sfire_names[]=
+const char* sentry_sfire_names[]=
 {
 "4) Sentry Shells Fire: NEW    \n",
 "4) Sentry Shells Fire: 2.8.1  \n",
@@ -1358,7 +1358,7 @@ char* sentry_sfire_names[]=
 "4) Sentry Shells Fire: MTFL2  \n"
 }; 
 
-char* sentry_find_names[]=
+const char* sentry_find_names[]=
 {
   "6)†ignore teammates           \n",
   "6)ˆignore owner               \n",
@@ -1366,7 +1366,7 @@ char* sentry_find_names[]=
   "6)‡ignore all targets         \n",
 };
 
-char* sentry_firetype_names[]=
+const char* sentry_firetype_names[]=
 {
  "7) Fire bullets & rockets     \n",
  "7) Fire bullets               \n",
@@ -1374,8 +1374,9 @@ char* sentry_firetype_names[]=
 };
 void 	TG_SGOptions_Menu(menunum_t menu)
 {
-  char *s_sg_newfind,*s_sg_sfire, s_sgppl[80], *s_sg_fire,*s_sg_find,*s_sgfiretype,*s_sbar;
-  char *s_sg_rfire;
+  const char *s_sg_newfind,*s_sg_sfire, *s_sg_fire,*s_sg_find,*s_sgfiretype,*s_sbar;
+  char  s_sgppl[80];
+  const char *s_sg_rfire;
   
   if( tf_data.sg_newfind )
   {
