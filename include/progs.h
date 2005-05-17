@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: progs.h,v 1.19 2005-05-16 09:35:43 AngelD Exp $
+ *  $Id: progs.h,v 1.20 2005-05-17 03:56:00 AngelD Exp $
  */
 #include "progdefs.h"
 
@@ -305,6 +305,7 @@ typedef struct gedict_s {
 	float		last_vote_time;
 //	int		k_stuff;
 //BotFields
+        int            old_button0,old_button1,old_button2,old_keys;
 	int            isBot;
 	int            keys, nextimpulse;
 	int            action,oldAction;

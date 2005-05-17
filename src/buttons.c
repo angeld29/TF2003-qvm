@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: buttons.c,v 1.3 2004-12-23 03:16:14 AngelD Exp $
+ *  $Id: buttons.c,v 1.4 2005-05-17 03:56:00 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -92,7 +92,7 @@ void button_touch(  )
 	if ( strneq( other->s.v.classname, "player" ) )
 		return;
 
-	if ( self->goal_activation & 8 )
+	if ( self->goal_activation & TFGA_SPANNER )
 		return;
 	if ( !other->playerclass )
 		return;
@@ -113,7 +113,7 @@ void button_touch(  )
 
 void button_killed(  )
 {
-	if ( self->goal_activation & 8 )
+	if ( self->goal_activation & TFGA_SPANNER )
 		return;
 	self->s.v.enemy = EDICT_TO_PROG( damage_attacker );
 	self->s.v.health = self->s.v.max_health;

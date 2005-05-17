@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: move.c,v 1.6 2005-05-16 09:35:46 AngelD Exp $
+ *  $Id: move.c,v 1.7 2005-05-17 03:56:00 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -162,6 +162,7 @@ void DoMovement()
         float ftmp;
         float max_strafe_angle;
 
+        self->keys = 0;
 	if ( VectorCompareF( self->waypoint1, 0, 0, 0 ) )
 	{
 		self->keys = 0;
@@ -199,6 +200,7 @@ void DoMovement()
 		}
 	}
 
+
 	if( self->s.v.fixangle )
 	        self->botNoMoveTime = g_globalvars.time + BOT_TIMEWAIT_AFTER_TELEPORT;
 
@@ -221,7 +223,11 @@ void DoMovement()
          	        self->s.v.button2 = 0;
 	        }else
 	        {
-               	        self->s.v.button2 = 1;
+	                if( !self->old_button2 )
+                	        self->s.v.button2 = 1;
+	                else
+                	        self->s.v.button2 = 0;
+	                        
 	                if( self->bot_strafe_state == BOT_STRAFE_LEFT)
 	                {
 	                        self->keys |= KEY_MOVELEFT;

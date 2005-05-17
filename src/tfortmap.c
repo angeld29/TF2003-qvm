@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfortmap.c,v 1.16 2005-05-16 09:35:46 AngelD Exp $
+ *  $Id: tfortmap.c,v 1.17 2005-05-17 03:56:00 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -164,7 +164,7 @@ void TF_PlaceItem(  )
 
 	self->s.v.flags = FL_ITEM;
 	SetVector( self->s.v.velocity, 0, 0, 0 );
-	if ( self->goal_activation & 2048 )
+	if ( self->goal_activation & TFGI_DROP_TO_FLOOR )
 	{
 		self->s.v.movetype = MOVETYPE_TOSS;
 		self->s.v.origin[2] = self->s.v.origin[2] + 6;
@@ -210,7 +210,7 @@ void TF_PlaceGoal(  )
 		self->s.v.nextthink = g_globalvars.time + self->search_time;
 		self->s.v.classname = "info_tfgoal";
 	}
-	if ( self->goal_activation & 2048 )
+	if ( self->goal_activation & TFGI_DROP_TO_FLOOR )
 	{
 		self->s.v.movetype = MOVETYPE_TOSS;
 		self->s.v.origin[2] = self->s.v.origin[2] + 6;
@@ -398,7 +398,7 @@ void SP_item_tfgoal(  )
 	self->s.v.touch = ( func_t ) item_tfgoal_touch;
 	if ( !self->goal_state )
 		self->goal_state = TFGS_INACTIVE;
-	if ( self->goal_activation & 8192 )
+	if ( self->goal_activation & TFGI_SOLID )
 		self->s.v.solid = SOLID_BBOX;
 	else
 		self->s.v.solid = SOLID_TRIGGER;
@@ -534,7 +534,7 @@ void InactivateGoal( gedict_t * Goal )
 	{
 		if ( !Goal->search_time )
 		{
-			if ( ( Goal->goal_activation & 8192 ) && streq( Goal->s.v.classname, "item_tfgoal" ) )
+			if ( ( Goal->goal_activation & TFGI_SOLID ) && streq( Goal->s.v.classname, "item_tfgoal" ) )
 				Goal->s.v.solid = SOLID_BBOX;
 			else
 				Goal->s.v.solid = SOLID_TRIGGER;
@@ -551,7 +551,7 @@ void RestoreGoal( gedict_t * Goal )
 	{
 		if ( !Goal->search_time )
 		{
-			if ( ( Goal->goal_activation & 8192 ) && streq( Goal->s.v.classname, "item_tfgoal" ) )
+			if ( ( Goal->goal_activation & TFGI_SOLID ) && streq( Goal->s.v.classname, "item_tfgoal" ) )
 				Goal->s.v.solid = SOLID_BBOX;
 			else
 				Goal->s.v.solid = SOLID_TRIGGER;
@@ -578,7 +578,7 @@ int IsAffectedBy( gedict_t * Goal, gedict_t * Player, gedict_t * AP )
 
 	if ( !Player->playerclass )
 		return 0;
-	if ( Goal->goal_effects & 32 )
+	if ( Goal->goal_effects & TFGE_SAME_ENVIRONMENT )
 	{
 		genv = trap_pointcontents( PASSVEC3( Goal->s.v.origin ) );
 		if ( trap_pointcontents( PASSVEC3( Player->s.v.origin ) ) != genv )
@@ -589,7 +589,7 @@ int IsAffectedBy( gedict_t * Goal, gedict_t * Player, gedict_t * AP )
 		VectorSubtract( Goal->s.v.origin, Player->s.v.origin, tmp );
 		if ( vlen( tmp ) <= Goal->t_length )
 		{
-			if ( Goal->goal_effects & 16 )
+			if ( Goal->goal_effects & TFGE_WALL )
 			{
 				traceline( PASSVEC3( Goal->s.v.origin ), PASSVEC3( Player->s.v.origin ), 1, Goal );
 				if ( g_globalvars.trace_fraction == 1 )
@@ -600,13 +600,13 @@ int IsAffectedBy( gedict_t * Goal, gedict_t * Player, gedict_t * AP )
 	}
 	if ( strneq( Goal->s.v.classname, "info_tfgoal_timer" ) )
 	{
-		if ( ( Goal->goal_effects & 1 ) && Player == AP )
+		if ( ( Goal->goal_effects & TFGE_AP ) && Player == AP )
 			return 1;
-		if ( ( Goal->goal_effects & 2 ) && AP->team_no == Player->team_no )
+		if ( ( Goal->goal_effects & TFGE_AP_TEAM ) && AP->team_no == Player->team_no )
 			return 1;
-		if ( ( Goal->goal_effects & 4 ) && AP->team_no != Player->team_no )
+		if ( ( Goal->goal_effects & TFGE_NOT_AP_TEAM ) && AP->team_no != Player->team_no )
 			return 1;
-		if ( ( Goal->goal_effects & 8 ) && Player != AP )
+		if ( ( Goal->goal_effects & TFGE_NOT_AP ) && Player != AP )
 			return 1;
 	}
 	if ( Goal->maxammo_shells && Player->team_no == Goal->maxammo_shells )
@@ -754,7 +754,7 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 		Player->lives = Player->lives + Goal->lives;
 		if ( Goal->s.v.frags )
 		{
-			if ( Goal->goal_effects == 1 || !( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
+			if ( Goal->goal_effects == TFGE_AP || !( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
 				TF_AddFrags( Player, Goal->s.v.frags );
 		}
 		oldself = self;
@@ -763,7 +763,7 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 		W_SetCurrentAmmo(  );
 		self = oldself;
 	}
-	if ( Player->playerclass == PC_SPY && ( Goal->goal_result & 16 ) )
+	if ( Player->playerclass == PC_SPY && ( Goal->goal_result & TFGR_REMOVE_DISGUISE ) )
 	{
 		self->immune_to_check = g_globalvars.time + tf_data.cheat_pause;	//10;
 		Spy_RemoveDisguise( Player );
@@ -826,7 +826,7 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 		else
 			G_sprint( Player, 2, "Item is missing.\n" );
 	}
-	if ( Goal->goal_result & 32 )
+	if ( Goal->goal_result & TFGR_FORCE_RESPAWN )
 		ForceRespawn( Player );
 }
 
@@ -843,7 +843,7 @@ void RemoveResults( gedict_t * Goal, gedict_t * Player )
 	{
 		if ( !( Player->item_list & Goal->item_list ) )
 			return;
-		if ( Goal->goal_activation & 1024 )
+		if ( Goal->goal_activation & TFGI_DONTREMOVERES )
 			return;
 		Player->item_list = Player->item_list - ( Player->item_list & Goal->item_list );
 	}
@@ -857,7 +857,7 @@ void RemoveResults( gedict_t * Goal, gedict_t * Player )
 	Player->armorclass = Player->armorclass - ( Player->armorclass & Goal->armorclass );
 	if ( Goal->s.v.frags )
 	{
-		if ( Goal->goal_effects == 1 || !( tf_data.toggleflags & 2048 ) )
+		if ( Goal->goal_effects == TFGE_AP || !( tf_data.toggleflags & 2048 ) )
 			TF_AddFrags( Player, Goal->s.v.frags );
 	}
 	Player->s.v.ammo_shells = Player->s.v.ammo_shells - Goal->s.v.ammo_shells;
@@ -1090,7 +1090,7 @@ void SetupRespawn( gedict_t * Goal )
 		Goal->s.v.nextthink = g_globalvars.time + Goal->search_time;
 		return;
 	}
-	if ( Goal->goal_result & 1 )
+	if ( Goal->goal_result & TFGR_SINGLE )
 	{
 		RemoveGoal( Goal );
 		return;
@@ -1128,9 +1128,9 @@ int Activated( gedict_t * Goal, gedict_t * AP )
 		return 0;
 	APMet = APMeetsCriteria( Goal, AP );
 	if ( streq( Goal->s.v.classname, "item_tfgoal" ) )
-		RevAct = Goal->goal_activation & 64;
+		RevAct = Goal->goal_activation & TFGI_REVERSE_AP;
 	else
-		RevAct = Goal->goal_activation & 4;
+		RevAct = Goal->goal_activation & TFGA_REVERSE_AP;
 	Act = 0;
 	if ( APMet )
 	{
@@ -1157,7 +1157,7 @@ void AttemptToActivate( gedict_t * Goal, gedict_t * AP, gedict_t * ActivatingGoa
 		else
 		{
 			if ( ActivatingGoal != world )
-				DoResults( Goal, AP, ActivatingGoal->goal_result & 2 );
+				DoResults( Goal, AP, ActivatingGoal->goal_result & TFGR_ADD_BONUSES );
 			else
 				DoResults( Goal, AP, 0 );
 		}
@@ -1266,7 +1266,7 @@ void DoGroupWork( gedict_t * Goal, gedict_t * AP )
 			{
 				tg = Findgoal( Goal->last_impulse );
 				if ( tg )
-					DoResults( tg, AP, Goal->goal_result & 2 );
+					DoResults( tg, AP, Goal->goal_result & TFGR_ADD_BONUSES );
 			}
 		}
 	}
@@ -1365,7 +1365,7 @@ void DoItemGroupWork( gedict_t * Item, gedict_t * AP )
 		{
 			tg = Findgoal( Item->pain_finished );
 			if ( tg )
-				DoResults( tg, AP, Item->goal_result & 2 );
+				DoResults( tg, AP, Item->goal_result & TFGR_ADD_BONUSES );
 		}
 	}
 	allcarried = 1;
@@ -1400,7 +1400,7 @@ void DoItemGroupWork( gedict_t * Item, gedict_t * AP )
 		{
 			tg = Findgoal( Item->attack_finished );
 			if ( tg )
-				DoResults( tg, AP, Item->goal_result & 2 );
+				DoResults( tg, AP, Item->goal_result & TFGR_ADD_BONUSES );
 		}
 	}
 }
@@ -1730,7 +1730,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 		}
 		if ( IsAffectedBy( Goal, te, AP ) )
 		{
-			if ( Goal->search_time && ( Goal->goal_effects & 64 ) )
+			if ( Goal->search_time && ( Goal->goal_effects & TFGE_TIMER_CHECK_AP ) )
 			{
 				if ( APMeetsCriteria( Goal, te ) )
 				{
@@ -1747,7 +1747,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 	}
 	if ( strneq( Goal->s.v.classname, "item_tfgoal" ) )
 		Goal->goal_state = 1;
-	if ( Goal->goal_result & 4 )
+	if ( Goal->goal_result & TFGR_ENDGAME )
 	{
 		TeamFortress_TeamShowScores( 1 );
 		winners = TeamFortress_TeamGetWinner(  );
@@ -1780,7 +1780,7 @@ void tfgoal_touch(  )
 	if( tf_data.arena_mode )
 	        return;
 
-	if ( !( self->goal_activation & 1 ) )
+	if ( !( self->goal_activation & TFGA_TOUCH ) )
 		return;
 	if ( strneq( other->s.v.classname, "player" ) )
 		return;
@@ -1940,25 +1940,25 @@ void tfgoalitem_GiveToPlayer( gedict_t * Item, gedict_t * AP, gedict_t * Goal )
 	if ( Item->mdl )
 		setmodel( Item, "" );
 	Item->s.v.solid = SOLID_NOT;
-	if ( Item->goal_activation & 1 )
+	if ( Item->goal_activation & TFGI_GLOW )
 		AP->s.v.effects = ( int ) AP->s.v.effects | 8;
-	if ( Item->goal_activation & 2 )
+	if ( Item->goal_activation & TFGI_SLOW )
 		TeamFortress_SetSpeed( AP );
-	if ( Item->goal_activation & 512 )
+	if ( Item->goal_activation & TFGI_ITEMGLOWS )
 		Item->s.v.effects = Item->s.v.effects - ( ( int ) Item->s.v.effects | 8 );
-	if ( ( int ) Item->s.v.items & 131072 )
-		AP->s.v.items = ( int ) AP->s.v.items | 131072;
-	if ( ( int ) Item->s.v.items & 262144 )
-		AP->s.v.items = ( int ) AP->s.v.items | 262144;
+	if ( ( int ) Item->s.v.items & IT_KEY1 )
+		AP->s.v.items = ( int ) AP->s.v.items | IT_KEY1;
+	if ( ( int ) Item->s.v.items & IT_KEY2 )
+		AP->s.v.items = ( int ) AP->s.v.items | IT_KEY2;
 	if ( Goal != Item )
 	{
-		if ( Goal->goal_result & 8 )
+		if ( Goal->goal_result & TFGR_NO_ITEM_RESULTS )
 		{
 			Item->goal_state = 1;
 			return;
 		}
 	}
-	if ( AP->playerclass == PC_SPY && ( Item->goal_result & 16 ) )
+	if ( AP->playerclass == PC_SPY && ( Item->goal_result & TFGR_REMOVE_DISGUISE ) )
 		AP->is_unabletospy = 1;
 	DoResults( Item, AP, 1 );
 	DoItemGroupWork( Item, AP );
@@ -1970,7 +1970,7 @@ void ReturnItem(  )
 	gedict_t *enemy = PROG_TO_EDICT( self->s.v.enemy );
 
 	enemy->goal_state = 2;
-	if ( ( enemy->goal_activation & 8192 ) && streq( enemy->s.v.classname, "item_tfgoal" ) )
+	if ( ( enemy->goal_activation & TFGI_SOLID ) && streq( enemy->s.v.classname, "item_tfgoal" ) )
 		enemy->s.v.solid = SOLID_BBOX;
 	else
 		enemy->s.v.solid = SOLID_TRIGGER;
@@ -2033,15 +2033,15 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( AP ) && te != Item )
 		{
-			if ( te->goal_activation & 1 )
+			if ( te->goal_activation & TFGI_GLOW )
 				lighton = 1;
-			if ( te->goal_activation & 2 )
+			if ( te->goal_activation & TFGI_SLOW )
 				slowon = 1;
-			if ( ( int ) te->s.v.items & 131072 )
+			if ( ( int ) te->s.v.items & IT_KEY1 )
 				key1on = 1;
-			if ( ( int ) te->s.v.items & 262144 )
+			if ( ( int ) te->s.v.items & IT_KEY2 )
 				key2on = 1;
-			if ( te->goal_result & 16 )
+			if ( te->goal_result & TFGR_REMOVE_DISGUISE )
 				spyoff = 1;
 		}
 		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
@@ -2062,14 +2062,14 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 		AP->s.v.effects = AP->s.v.effects - ( ( int ) AP->s.v.effects & 64 );
 		AP->s.v.effects = AP->s.v.effects - ( ( int ) AP->s.v.effects & 128 );
 	}
-	if ( Item->goal_activation & 512 )
+	if ( Item->goal_activation & TFGI_ITEMGLOWS )
 		Item->s.v.effects = ( int ) Item->s.v.effects | 8;
 	if ( !spyoff )
 		AP->is_unabletospy = 0;
 	if ( !key1on )
-		AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & 131072 );
+		AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY1 );
 	if ( !key2on )
-		AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & 262144 );
+		AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY2 );
 	te = trap_find( world, FOFS( s.v.classname ), "player" );
 	while ( te )
 	{
@@ -2101,7 +2101,7 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 			}
 			te = trap_find( te, FOFS( s.v.classname ), "player" );
 		}
-		if ( Item->goal_activation & 8 )
+		if ( Item->goal_activation & TFGI_RETURN_DROP )
 		{
 			DelayReturn = spawn(  );
 			DelayReturn->s.v.enemy = EDICT_TO_PROG( Item );
@@ -2113,9 +2113,9 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 			DelayReturn->s.v.nextthink = g_globalvars.time + 0.5;
 		} else
 		{
-			if ( Item->goal_activation & 4 )
+			if ( Item->goal_activation & TFGI_DROP )
 			{
-				if ( method == 2 && ( ( Item->goal_activation & 4096 ) || tf_data.allow_drop_goal ) )
+				if ( method == 2 && ( ( Item->goal_activation & TFGI_ALLOW_DROP ) || tf_data.allow_drop_goal ) )
 					tfgoalitem_drop( Item, 1, AP );
 				else
 					tfgoalitem_drop( Item, 0, AP );
@@ -2136,7 +2136,7 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 	{
 		if ( method == 1 )
 		{
-			if ( Item->goal_activation & 16 )
+			if ( Item->goal_activation & TFGI_RETURN_GOAL )
 			{
 				DelayReturn = spawn(  );
 				DelayReturn->s.v.enemy = EDICT_TO_PROG( Item );
@@ -2183,7 +2183,7 @@ void tfgoalitem_dropthink(  )
 						self->s.v.velocity[1] = -50 + g_random(  ) * 100;
 						self->goal_state = 2;
 						self->s.v.movetype = MOVETYPE_TOSS;
-						if ( self->goal_activation & 8192 )
+						if ( self->goal_activation & TFGI_SOLID )
 							self->s.v.solid = SOLID_BBOX;
 						else
 							self->s.v.solid = SOLID_TRIGGER;
@@ -2224,7 +2224,7 @@ void tfgoalitem_drop( gedict_t * Item, float PAlive, gedict_t * P )
 	Item->s.v.velocity[1] = -50 + g_random(  ) * 100;
 	Item->goal_state = 2;
 	Item->s.v.movetype = MOVETYPE_TOSS;
-	if ( Item->goal_activation & 8192 )
+	if ( Item->goal_activation & TFGI_SOLID )
 		Item->s.v.solid = SOLID_BBOX;
 	else
 		Item->s.v.solid = SOLID_TRIGGER;
@@ -2264,7 +2264,7 @@ void tfgoalitem_remove(  )
 
 	if ( self->goal_state == 1 )
 		return;
-	if ( self->goal_activation & 32 )
+	if ( self->goal_activation & TFGI_RETURN_REMOVE )
 	{
 		te = spawn(  );
 		te->s.v.enemy = EDICT_TO_PROG( self );
@@ -2363,7 +2363,7 @@ void SP_info_player_team1(  )
 	CTF_Map = 1;
 	self->s.v.classname = "info_player_teamspawn";
 	self->team_no = 2;
-	self->goal_effects = 1;
+	self->goal_effects = TFGE_AP;
 	self->team_str_home = "ts2";
 }
 
@@ -2372,7 +2372,7 @@ void SP_info_player_team2(  )
 	CTF_Map = 1;
 	self->s.v.classname = "info_player_teamspawn";
 	self->team_no = 1;
-	self->goal_effects = 1;
+	self->goal_effects = TFGE_AP;
 	self->team_str_home = "ts1";
 }
 
@@ -2396,8 +2396,8 @@ void SP_item_flag_team2(  )
 	self->s.v.skin = 0;
 	setmodel( self, self->mdl );
 	self->goal_no = 1;
-	self->goal_activation = 1 | 4 | 128 | 32 | 16 | 512;
-	self->goal_effects = 1;
+	self->goal_activation = TFGI_GLOW | TFGI_DROP | TFGI_REMOVE | TFGI_RETURN_REMOVE | TFGI_RETURN_GOAL | TFGI_ITEMGLOWS;
+	self->goal_effects = TFGE_AP;
 	self->pausetime = 128;
 	SetVector( self->goal_min, -16, -16, -24 );
 	SetVector( self->goal_max, 16, 16, 32 );
@@ -2411,15 +2411,15 @@ void SP_item_flag_team2(  )
 	dp = spawn(  );
 	VectorCopy( self->s.v.origin, dp->s.v.origin );
 	dp->s.v.classname = "info_tfgoal";
-	dp->goal_activation = 1;
+	dp->goal_activation = TFGA_TOUCH;
 	dp->team_no = 1;
 	dp->items_allowed = 2;
 	dp->goal_no = 3;
-	dp->goal_effects = 3;
+	dp->goal_effects = TFGE_AP | TFGE_AP_TEAM;
 	dp->broadcast = " цаптуред the enemy flag!\n";
 	dp->s.v.message = "You цаптуред the enemy flag!\n";
 	dp->s.v.noise = "boss2/pop2.wav";
-	dp->goal_result = 2;
+	dp->goal_result = TFGR_ADD_BONUSES;
 	dp->activate_goal_no = 5;
 	dp->axhitme = 2;
 	dp->count = 10;
@@ -2434,7 +2434,7 @@ void SP_item_flag_team2(  )
 	dp = spawn(  );
 	VectorCopy( dp->s.v.origin, dp->s.v.origin );
 	dp->s.v.classname = "info_tfgoal";
-	dp->goal_effects = 1;
+	dp->goal_effects = TFGE_AP;
 	dp->s.v.frags = 5;
 	dp->goal_activation = 0;
 	dp->goal_no = 5;
@@ -2467,8 +2467,8 @@ void SP_item_flag_team1(  )
 	setmodel( self, self->mdl );
 	self->s.v.skin = 1;
 	self->goal_no = 2;
-	self->goal_activation = 1 | 4 | 128 | 32 | 16 | 512;
-	self->goal_effects = 1;
+	self->goal_activation = TFGI_GLOW | TFGI_DROP | TFGI_REMOVE | TFGI_RETURN_REMOVE | TFGI_RETURN_GOAL | TFGI_ITEMGLOWS;
+	self->goal_effects = TFGE_AP;
 	self->pausetime = 128;
 	SetVector( self->goal_min, -16, -16, -24 );
 	SetVector( self->goal_max, 16, 16, 32 );
@@ -2482,15 +2482,15 @@ void SP_item_flag_team1(  )
 	dp = spawn(  );
 	VectorCopy( self->s.v.origin, dp->s.v.origin );
 	dp->s.v.classname = "info_tfgoal";
-	dp->goal_activation = 1;
+	dp->goal_activation = TFGA_TOUCH;
 	dp->team_no = 2;
 	dp->items_allowed = 1;
 	dp->goal_no = 4;
-	dp->goal_effects = 3;
+	dp->goal_effects = TFGE_AP | TFGE_AP_TEAM;
 	dp->broadcast = " цаптуред the enemy flag!\n";
 	dp->s.v.message = "You цаптуред the enemy flag!\n";
 	dp->s.v.noise = "boss2/pop2.wav";
-	dp->goal_result = 2;
+	dp->goal_result = TFGR_ADD_BONUSES;
 	dp->activate_goal_no = 6;
 	dp->axhitme = 1;
 	dp->count = 10;
@@ -2505,7 +2505,7 @@ void SP_item_flag_team1(  )
 	dp = spawn(  );
 	VectorCopy( dp->s.v.origin, dp->s.v.origin );
 	dp->s.v.classname = "info_tfgoal";
-	dp->goal_effects = 1;
+	dp->goal_effects = TFGE_AP;
 	dp->s.v.frags = 5;
 	dp->goal_activation = 0;
 	dp->goal_no = 6;
@@ -2583,13 +2583,13 @@ void ForceRespawn( gedict_t * P )
 			te = Finditem( spot->s.v.items );
 			if ( te != world )
 				tfgoalitem_GiveToPlayer( te, self, self );
-			if ( !( spot->goal_activation & 1 ) )
+			if ( !( spot->goal_activation & TFSP_MULTIPLEITEMS ) )
 				spot->s.v.items = 0;
 		}
 		if ( spot->s.v.message )
 		{
 			CenterPrint( self, spot->s.v.message );
-			if ( !( spot->goal_activation & 2 ) )
+			if ( !( spot->goal_activation & TFSP_MULTIPLEMSGS ) )
 				spot->s.v.message = NULL;
 		}
 		if ( spot->activate_goal_no )
@@ -2598,7 +2598,7 @@ void ForceRespawn( gedict_t * P )
 			if ( te )
 				AttemptToActivate( te, self, spot );
 		}
-		if ( spot->goal_effects == 1 )
+		if ( spot->goal_effects == TFGE_AP )
 		{
 			spot->s.v.classname = "deadpoint";
 			spot->team_str_home = "";
@@ -2635,7 +2635,7 @@ void DropGoalItems(  )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
-			if ( ( te->goal_activation & 4096 ) || tf_data.allow_drop_goal )
+			if ( ( te->goal_activation & TFGI_ALLOW_DROP ) || tf_data.allow_drop_goal )
 				tfgoalitem_RemoveFromPlayer( te, self, 2 );
 		}
 		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );

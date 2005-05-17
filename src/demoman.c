@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: demoman.c,v 1.14 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: demoman.c,v 1.15 2005-05-17 03:56:00 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -411,7 +411,7 @@ void TeamFortress_DetpackExplode(  )
 		{
 			if ( streq( head->s.v.classname, "info_tfgoal" ) )
 			{
-				if ( ( head->goal_activation & 2 ) && !head->search_time )
+				if ( ( head->goal_activation & TFGA_TOUCH_DETPACK ) && !head->search_time )
 				{
 					traceline( PASSVEC3( self->s.v.origin ), PASSVEC3( head->s.v.origin ), 1,
 						   self );

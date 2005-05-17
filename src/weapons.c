@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.24 2005-05-16 09:35:46 AngelD Exp $
+ *  $Id: weapons.c,v 1.25 2005-05-17 03:56:00 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -167,7 +167,7 @@ void W_FireSpanner(  )
 	VectorSubtract( g_globalvars.trace_endpos, org, org );
 	trace_ent = PROG_TO_EDICT( g_globalvars.trace_ent );
 
-	if ( trace_ent->goal_activation & 8 )
+	if ( trace_ent->goal_activation & TFGA_SPANNER )
 	{
 		if ( Activated( trace_ent, self ) )
 		{

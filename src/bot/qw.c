@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: qw.c,v 1.6 2005-05-16 06:31:39 AngelD Exp $
+ *  $Id: qw.c,v 1.7 2005-05-17 03:56:00 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -84,7 +84,11 @@ void BotFrame( void )
 		        botDisconnect( self );
 		        continue;
 		}
-       		self->s.v.button0 = 0;
+		self->old_button0 = self->s.v.button0;
+		self->old_button2 = self->s.v.button2;
+		self->old_keys = self->keys;
+
+               	self->s.v.button0 = 0;
        		self->s.v.button2 = 0;
        		self->s.v.impulse = 0;
        		self->keys = 0;

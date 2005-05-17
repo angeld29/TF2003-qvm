@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: items.c,v 1.10 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: items.c,v 1.11 2005-05-17 03:56:00 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -185,7 +185,7 @@ HEALTH BOX
 =========================================================================
 */
 //
-// T_Heal: add health to an gedict_t*, limiting health to max_health
+// T_Heal: add health to an entity, limiting health to max_health
 // "ignore" will ignore max_health limit
 //
 int T_Heal( gedict_t * e, float healamount, float ignore )

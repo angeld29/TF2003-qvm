@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.36 2005-05-16 09:35:45 AngelD Exp $
+ *  $Id: client.c,v 1.37 2005-05-17 03:56:00 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -2084,7 +2084,7 @@ void CheckPowerups()
 			{
 				if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 				{
-					if ( te->goal_activation & 1 )
+					if ( te->goal_activation & TFGI_GLOW )
 						lighton = 1;
 				}
 				te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
@@ -2136,7 +2136,7 @@ void CheckPowerups()
 			{
 				if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 				{
-					if ( te->goal_activation & 1 )
+					if ( te->goal_activation & TFGI_GLOW )
 						lighton = 1;
 				}
 				te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );

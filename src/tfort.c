@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.32 2005-05-16 09:35:46 AngelD Exp $
+ *  $Id: tfort.c,v 1.33 2005-05-17 03:56:00 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -507,13 +507,13 @@ void TeamFortress_ChangeClass(  )
 			te = Finditem( spot->s.v.items );
 			if ( te != world )
 				tfgoalitem_GiveToPlayer( te, self, self );
-			if ( !( spot->goal_activation & 1 ) )
+			if ( !( spot->goal_activation & TFSP_MULTIPLEITEMS ) )
 				spot->s.v.items = 0;
 		}
 		if ( spot->s.v.message )
 		{
 			CenterPrint( self, spot->s.v.message );
-			if ( !( spot->goal_activation & 2 ) )
+			if ( !( spot->goal_activation & TFSP_MULTIPLEMSGS ) )
 				spot->s.v.message = 0;
 		}
 		if ( spot->activate_goal_no )
@@ -522,7 +522,7 @@ void TeamFortress_ChangeClass(  )
 			if ( te )
 				AttemptToActivate( te, self, spot );
 		}
-		if ( spot->goal_effects == 1 )
+		if ( spot->goal_effects == TFGE_AP )
 		{
 			spot->s.v.classname = "deadpoint";
 			spot->team_str_home = "";

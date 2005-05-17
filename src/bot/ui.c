@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: ui.c,v 1.4 2005-05-16 09:35:46 AngelD Exp $
+ *  $Id: ui.c,v 1.5 2005-05-17 03:56:00 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -32,6 +32,7 @@ void RemoveBot(  );
 void ResupplySetBot();
 void BotReport();
 void BotSet();
+void BotTest();
 bot_cmd_t bot_cmds[]=
 {
 	{"add", AddBot},
@@ -39,6 +40,7 @@ bot_cmd_t bot_cmds[]=
 	{"resupply", ResupplySetBot},
 	{"report", BotReport},
 	{"set", BotSet},
+//	{"test", BotTest},
 	{NULL}
 };
 
@@ -53,8 +55,9 @@ void BotReport(  )
 			continue;
 		if ( te->isBot )
 		{
-                   G_bprint(2,"Bot: %s, state %d, menu %d\n velocity %3.0f  ,origin %4.0f %4.0f %4.0f\nwp     %4.0f %4.0f %4.0f\n",
+                   G_bprint(2,"Bot: %s, state %d, menu %d\nflags %d\n velocity %3.0f  ,origin %4.0f %4.0f %4.0f\nwp     %4.0f %4.0f %4.0f\n",
                            te->s.v.netname,te->action,te->current_menu,
+                           (int)(te->s.v.flags),
                            vlen(te->s.v.velocity),
                            PASSVEC3(te->s.v.origin),
                            PASSVEC3(te->waypoint1)
@@ -213,3 +216,33 @@ void BotSet()
 
 }
 
+void BotTest()
+{
+ 	gedict_t *te;
+        char    cmd_command[50];
+        int argc;
+        float origin,speed;
+
+	argc = trap_CmdArgc();
+        if( argc < 4 )
+        {
+                return;
+        }
+        trap_CmdArgv( 2, cmd_command, sizeof( cmd_command ) );
+        origin = atof(cmd_command);
+
+        trap_CmdArgv( 3, cmd_command, sizeof( cmd_command ) );
+        speed = atof(cmd_command);
+
+	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "player" ) ); )
+	{
+		if ( te->has_disconnected )
+			continue;
+		if ( te->isBot )
+		{
+		   te->s.v.origin[2] = origin;
+		   te->s.v.velocity[2] = speed;
+                   return;
+		}
+	}
+}

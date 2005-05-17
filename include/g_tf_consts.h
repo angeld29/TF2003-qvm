@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_tf_consts.h,v 1.10 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: g_tf_consts.h,v 1.11 2005-05-17 03:56:00 AngelD Exp $
  */
 // TeamFortress State Flags
 #define TFSTATE_GRENPRIMED  1  // Whether the player has a primed grenade
@@ -401,8 +401,8 @@
 /*==================================================*/
 #define NIT_SCANNER    1 
 
-#define NIT_SILVER_DOOR_OPENED  #IT_KEY1 // 131072 
-#define NIT_GOLD_DOOR_OPENED  #IT_KEY2 // 262144
+#define NIT_SILVER_DOOR_OPENED  IT_KEY1 // 131072 
+#define NIT_GOLD_DOOR_OPENED  IT_KEY2 // 262144
 
 /*==================================================*/
 /* New Item Flags                           */
@@ -467,6 +467,7 @@
 #define TFGR_ENDGAME   4  // Goal fires Intermission, displays scores, and ends level
 #define TFGR_NO_ITEM_RESULTS 8 // GoalItems given by this Goal don't do results
 #define TFGR_REMOVE_DISGUISE 16 // Prevent/Remove undercover from any Spy
+#define TFGR_FORCE_RESPAWN 32 // forces anyone affected by the goal to simply respawn. The player doesn't die... just respawns.
 
 // Defines for Goal Group Result types : goal_group
 // None!
@@ -485,6 +486,9 @@
 #define TFGI_KEEP   256 // Players keep this item even when they die
 #define TFGI_ITEMGLOWS  512 // Item glows when on the ground
 #define TFGI_DONTREMOVERES 1024 // Don't remove results when the item is removed
+#define TFGI_DROP_TO_FLOOR  2048 // If this bit is set, the Goal/Item drops to the ground when it first spawns.
+#define TFGI_ALLOW_DROP     4096 // If this bit is set, any player carrying this item can drop it using the "dropitems" command.
+#define TFGI_SOLID          8192 // If this bit is set, the GoalItem is Solid while not being carried by a player. This means it blocks bullets, grenades.
 
 // Defines for TeamSpawnpoints : goal_activation (in teamspawns)
 #define TFSP_MULTIPLEITEMS 1  // Give out the GoalItem multiple times
