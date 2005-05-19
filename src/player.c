@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: player.c,v 1.12 2005-05-16 09:35:46 AngelD Exp $
+ *  $Id: player.c,v 1.13 2005-05-19 23:29:18 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1564,12 +1564,47 @@ void KillPlayer(  )
 	dremove( self );
 }
 
+#define HEADLESS_GIB
 void GibPlayer(  )
 {
+#ifdef HEADLESS_GIB
+	if (tf_data.deathmsg == DMSG_SNIPERHEADSHOT || tf_data.deathmsg == DMSG_BACKSTAB)
+	{
+		if (tf_data.deathmsg == DMSG_SNIPERHEADSHOT)
+			HeadShotThrowHead("progs/h_player.mdl");
+		else
+			ThrowHead("progs/h_player.mdl", -60);
+
+		newmis = spawn();
+		g_globalvars.newmis = EDICT_TO_PROG( newmis );
+		newmis->s.v.solid = SOLID_NOT;
+		setmodel(newmis, "progs/headless.mdl");
+		setsize(newmis, 0,0,0, 0,0,0);
+		setorigin(newmis, PASSVEC3(self->s.v.origin)-47);
+		newmis->s.v.movetype = MOVETYPE_STEP;
+		VectorCopy(self->s.v.angles,newmis->s.v.angles);
+		//VectorCopy(self->s.v.velocity,newmis->s.v.velocity);
+		newmis->s.v.colormap = self->s.v.colormap ;
+		//newmis->s.v.colormap = TeamFortress_TeamGetColor(self->team_no);
+		newmis->s.v.skin = self->s.v.skin;
+		newmis->s.v.think = ( func_t )Headless_Think;
+		newmis->s.v.nextthink = g_globalvars.time + 0.1;
+		if (self->current_weapon <= WEAP_AXE)
+			newmis->s.v.frame = 0;
+		else
+			newmis->s.v.frame = 8; 
+
+	}
+	else
+	{
+#endif
 	ThrowHead( "progs/h_player.mdl", self->s.v.health );
 	ThrowGib( "progs/gib1.mdl", self->s.v.health );
 	ThrowGib( "progs/gib2.mdl", self->s.v.health );
 	ThrowGib( "progs/gib3.mdl", self->s.v.health );
+#ifdef HEADLESS_GIB
+	}
+#endif
 	if ( tf_data.deathmsg == DMSG_TRIGGER )
 	{
 		newmis = spawn(  );

@@ -5,6 +5,8 @@ by [sd] angel for MTFL
 при попадании из снайперки в тело эффект попадания в стену не выводится
 Убрана ошибка (портирования) сохранения armorclass при потере всего армора
 cmd tg god - индивидуальный god mode
+test: headless gib added
+Removed the stuff regarding "imin1", "imin2", etc. (no longer used).
 
 ////////////////////////////////////////////////////
 Внесенные изменения (на 06.05.2005 r1):

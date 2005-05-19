@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.33 2005-05-17 03:56:00 AngelD Exp $
+ *  $Id: tfort.c,v 1.34 2005-05-19 23:29:18 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -429,7 +429,6 @@ void TeamFortress_ChangeClass(  )
 		} else
 		{
 			G_sprint( self, 2, "You must join a team first. \n" );
-			G_sprint( self, 2, "use imin1, imin2, imin3, or imin4\n" );
 			return;
 		}
 	}

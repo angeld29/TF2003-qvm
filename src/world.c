@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: world.c,v 1.7 2005-05-16 09:35:46 AngelD Exp $
+ *  $Id: world.c,v 1.8 2005-05-19 23:29:18 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -220,6 +220,7 @@ void SP_worldspawn(  )
 	trap_precache_model( "progs/player.mdl" );
 	trap_precache_model( "progs/eyes.mdl" );
 	trap_precache_model( "progs/h_player.mdl" );
+	trap_precache_model( "progs/headless.mdl" );
 	trap_precache_model( "progs/gib1.mdl" );
 	trap_precache_model( "progs/gib2.mdl" );
 	trap_precache_model( "progs/gib3.mdl" );
