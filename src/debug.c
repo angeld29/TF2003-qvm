@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: debug.c,v 1.4 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: debug.c,v 1.5 2005-05-23 18:54:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -26,9 +26,9 @@ void dremove( gedict_t * te )
 {
 	if ( !te || te == world )
 	{
-		G_dprint( "***BUG BUG BUG BUG BUG BUG BUG BUG BUG BUG***\n" );
-		G_dprint( "WORLD has nearly been removed. Don't worry\n" );
-		G_dprint( "***BUG BUG BUG BUG BUG BUG BUG BUG BUG BUG***\n" );
+		G_dprintf( "***BUG BUG BUG BUG BUG BUG BUG BUG BUG BUG***\n" );
+		G_dprintf( "WORLD has nearly been removed. Don't worry\n" );
+		G_dprintf( "***BUG BUG BUG BUG BUG BUG BUG BUG BUG BUG***\n" );
 		return;
 	}
 	if ( te->is_removed == 1 )

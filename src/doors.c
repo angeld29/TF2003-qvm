@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: doors.c,v 1.5 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: doors.c,v 1.6 2005-05-23 18:54:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -557,7 +557,7 @@ void SP_func_door(  )
 		self->noise4 = "doors/baseuse.wav";
 	} else
 	{
-		G_Printf( "no worldtype set!\n" );
+		G_dprintf( "no worldtype set!\n" );
 	}
 	if ( self->s.v.sounds == 0 )
 	{

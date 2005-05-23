@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: items.c,v 1.11 2005-05-17 03:56:00 AngelD Exp $
+ *  $Id: items.c,v 1.12 2005-05-23 18:54:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -32,7 +32,7 @@ void SUB_regen(  )
 
 void SP_noclass(  )
 {
-	G_dprint( "noclass spawned at %f %f %f\n", self->s.v.origin[0], self->s.v.origin[1], self->s.v.origin[2] );
+	G_dprintf( "noclass spawned at %f %f %f\n", self->s.v.origin[0], self->s.v.origin[1], self->s.v.origin[2] );
 	ent_remove( self );
 }
 
@@ -157,7 +157,7 @@ void PlaceItem(  )
 
 	if ( !droptofloor( self ) )
 	{
-		G_Printf( "Bonus item fell out of level at  '%f %f %f'\n",
+		G_dprintf( "Bonus item fell out of level at  '%f %f %f'\n",
 			  self->s.v.origin[0], self->s.v.origin[1], self->s.v.origin[2] );
 		ent_remove( self );
 	}

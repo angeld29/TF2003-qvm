@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: engineer.c,v 1.23 2005-05-16 09:35:45 AngelD Exp $
+ *  $Id: engineer.c,v 1.24 2005-05-23 18:54:02 AngelD Exp $
  */
 /*========================================================
 Weapons and functions for the ENGINEER class and associated weaponry                          
@@ -169,7 +169,7 @@ void EMPExplode(  )
 			    expsize = 60;
 			else
 			{
-			    G_dprint( "EMPExplode: Attempting to explode a %s\n", self->s.v.classname );
+			    G_dprintf( "EMPExplode: Attempting to explode a %s\n", self->s.v.classname );
 			    return;
 			}
 		    }
@@ -966,7 +966,7 @@ void Engineer_RemoveBuildings( gedict_t * eng )
 #ifdef HAS_SENTRY_CHECK
     if( eng->has_sentry)
     {
-    	G_dprint("Warning Engineer_RemoveBuildings: eng->has_sentry == %d\n",eng->has_sentry);
+    	G_dprintf("Warning Engineer_RemoveBuildings: eng->has_sentry == %d\n",eng->has_sentry);
     	eng->has_sentry = 0;
     }
 #endif

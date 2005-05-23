@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: pyro.c,v 1.11 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: pyro.c,v 1.12 2005-05-23 18:54:02 AngelD Exp $
  */
 #include "g_local.h"
 #define FLAME_PLYRMAXTIME 45
@@ -103,7 +103,7 @@ int RemoveFlameFromQueue( int id_flame )
 
 	if ( num_world_flames < FLAME_MAXWORLDNUM )
 	{
-		G_dprint( "ERROR in RemoveFlameFromQueue\n" );
+		G_conprintf( "ERROR in RemoveFlameFromQueue\n" );
 		return 0;
 	}
 
@@ -125,7 +125,7 @@ int RemoveFlameFromQueue( int id_flame )
 	}
 	if ( !tmp )
 	{
-		G_dprint( "\n\nRemoveFlameFromQueue():BOOM!\n" );
+		G_conprintf( "\n\nRemoveFlameFromQueue():BOOM!\n" );
 		return 0;
 	}
 	num_world_flames = num_world_flames - 1;

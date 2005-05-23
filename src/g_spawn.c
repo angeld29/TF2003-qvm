@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_spawn.c,v 1.6 2005-05-16 09:35:45 AngelD Exp $
+ *  $Id: g_spawn.c,v 1.7 2005-05-23 18:54:02 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -633,7 +633,7 @@ qboolean G_CallSpawn( gedict_t * ent )
 
 	if ( !ent->s.v.classname )
 	{
-		G_Printf( "G_CallSpawn: NULL classname\n" );
+		G_dprintf( "G_CallSpawn: NULL classname\n" );
 		return false;
 	}
 
@@ -657,7 +657,7 @@ qboolean G_CallSpawn( gedict_t * ent )
 			return true;
 		}
 	}
-	G_Printf( "%s doesn't have a spawn function\n", ent->s.v.classname );
+	G_dprintf( "%s doesn't have a spawn function\n", ent->s.v.classname );
 	return false;
 }
 
@@ -754,8 +754,7 @@ void G_ParseField( const char *key, const char *value, gedict_t * ent )
 			return;
 		}
 	}
-	G_dprint( "unknown field: %s\n", key );
-	//G_Printf( "unknown field: %s\n", key );
+	G_dprintf( "unknown field: %s\n", key );
 }
 
 /*

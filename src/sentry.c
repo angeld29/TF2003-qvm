@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: sentry.c,v 1.24 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: sentry.c,v 1.25 2005-05-23 18:54:02 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -478,7 +478,7 @@ void Sentry_Die(  )
 #ifdef HAS_SENTRY_CHECK
 		if(!tg_data.tg_enabled && self->real_owner->has_sentry)
 		{
-			G_dprint("Error SentryDie owner->has_sentry !=0 %d\n",self->real_owner->has_sentry);
+			G_dprintf("Error SentryDie owner->has_sentry !=0 %d\n",self->real_owner->has_sentry);
 			G_sprint(self->real_owner,2,"Error SentryDie owner->has_sentry !=0 %d\n",self->real_owner->has_sentry);
 			self->real_owner->has_sentry = 0;
 		}

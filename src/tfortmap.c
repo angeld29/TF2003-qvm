@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfortmap.c,v 1.17 2005-05-17 03:56:00 AngelD Exp $
+ *  $Id: tfortmap.c,v 1.18 2005-05-23 18:54:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -171,7 +171,7 @@ void TF_PlaceItem(  )
 		oldz = self->s.v.origin[2];
 		if ( !droptofloor( self ) )
 		{
-			G_dprint( "GoalItem fell out of level at '%f %f %f'\n",
+			G_dprintf( "GoalItem fell out of level at '%f %f %f'\n",
 				  self->s.v.origin[0], self->s.v.origin[1], self->s.v.origin[2] );
 			dremove( self );
 			return;
@@ -217,7 +217,7 @@ void TF_PlaceGoal(  )
 		oldz = self->s.v.origin[2];
 		if ( !droptofloor( self ) )
 		{
-			G_dprint( "Goal fell out of level at '%f %f %f'\n",
+			G_dprintf( "Goal fell out of level at '%f %f %f'\n",
 				  self->s.v.origin[0], self->s.v.origin[1], self->s.v.origin[2] );
 
 			dremove( self );
@@ -354,7 +354,7 @@ void SP_info_tfgoal_timer(  )
 	}
 	if ( self->search_time <= 0 )
 	{
-		G_dprint( "Timer Goal created with no specified time.\n" );
+		G_dprintf( "Timer Goal created with no specified time.\n" );
 		dremove( self );
 	}
 	self->s.v.solid = SOLID_NOT;
@@ -494,7 +494,7 @@ gedict_t *Finditem( int ino )
 			return tg;
 		tg = trap_find( tg, FOFS( s.v.classname ), "item_tfgoal" );
 	}
-	G_dprint( "Could not find an item with a goal_no of %d.\n", ino );
+	G_dprintf( "Could not find an item with a goal_no of %d.\n", ino );
 	return world;
 }
 
@@ -509,7 +509,7 @@ gedict_t *Findgoal( int gno )
 			return tg;
 		tg = trap_find( tg, FOFS( s.v.classname ), "info_tfgoal" );
 	}
-	G_dprint( "Could not find a goal with a goal_no of %d.\n", gno );
+	G_dprintf( "Could not find a goal with a goal_no of %d.\n", gno );
 	return NULL;
 }
 
@@ -524,7 +524,7 @@ gedict_t *Findteamspawn( int gno )
 			return tg;
 		tg = trap_find( tg, FOFS( s.v.classname ), "info_player_teamspawn" );
 	}
-	G_dprint( "Could not find a Teamspawn with a goal_no of %d.\n", gno );
+	G_dprintf( "Could not find a Teamspawn with a goal_no of %d.\n", gno );
 	return NULL;
 }
 
@@ -1248,7 +1248,7 @@ void DoGroupWork( gedict_t * Goal, gedict_t * AP )
 	{
 		if ( !Goal->last_impulse )
 		{
-			G_dprint( "Goal %d has a .all_active specified, but no .last_impulse\n", Goal->goal_no );
+			G_dprintf( "Goal %d has a .all_active specified, but no .last_impulse\n", Goal->goal_no );
 		} else
 		{
 			allset = 1;
@@ -1349,7 +1349,7 @@ void DoItemGroupWork( gedict_t * Item, gedict_t * AP )
 	{
 		if ( !Item->pain_finished )
 		{
-			G_dprint( "GoalItem %d has a .distance specified, but no .pain_finished\n", Item->goal_no );
+			G_dprintf( "GoalItem %d has a .distance specified, but no .pain_finished\n", Item->goal_no );
 		}
 		tg = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
 		while ( tg )
@@ -1373,7 +1373,7 @@ void DoItemGroupWork( gedict_t * Item, gedict_t * AP )
 	{
 		if ( !Item->attack_finished )
 		{
-			G_dprint( "GoalItem %d has a ->speed  specified, but no .attack_finished\n", Item->goal_no );
+			G_dprintf( "GoalItem %d has a ->speed  specified, but no .attack_finished\n", Item->goal_no );
 		}
 		carrier = world;
 		tg = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
@@ -2533,7 +2533,7 @@ void CTF_FlagCheck(  )
 			pos = trap_pointcontents( PASSVEC3( te->s.v.origin ) );
 			if ( pos == -2 || pos == -6 )
 			{
-				G_dprint( "*****BUG*****\nFlag(s) outside world.\nPlease report this.\n" );
+				G_conprintf( "*****BUG*****\nFlag(s) outside world.\nPlease report this.\n" );
 				te->s.v.nextthink = g_globalvars.time + 0.2;
 				te->s.v.think = ( func_t ) tfgoalitem_remove;
 			}
@@ -2545,7 +2545,7 @@ void CTF_FlagCheck(  )
 				pos = trap_pointcontents( PASSVEC3( te->s.v.origin ) );
 				if ( pos == -2 || pos == -6 )
 				{
-					G_dprint( "*****BUG*****\nFlag(s) outside world.\nPlease report this.\n" );
+					G_conprintf( "*****BUG*****\nFlag(s) outside world.\nPlease report this.\n" );
 					te->s.v.nextthink = g_globalvars.time + 0.2;
 					te->s.v.think = ( func_t ) tfgoalitem_remove;
 				}
@@ -2555,7 +2555,7 @@ void CTF_FlagCheck(  )
 		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 	}
 	if ( flagcount != 2 )
-		G_dprint( "*****BUG*****\nFlag(s) missing.\nPlease report this.\n" );
+		G_conprintf( "*****BUG*****\nFlag(s) missing.\nPlease report this.\n" );
 	self->s.v.nextthink = g_globalvars.time + 30;
 }
 

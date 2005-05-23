@@ -7,6 +7,7 @@ by [sd] angel for MTFL
 cmd tg god - индивидуальный god mode
 test: headless gib added
 Removed the stuff regarding "imin1", "imin2", etc. (no longer used).
+пофикшена возможность использования импульсов сразу после выстрела из sniperrifle
 
 ////////////////////////////////////////////////////
 Внесенные изменения (на 06.05.2005 r1):

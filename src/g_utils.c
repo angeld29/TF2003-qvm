@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_utils.c,v 1.8 2005-05-16 09:35:45 AngelD Exp $
+ *  $Id: g_utils.c,v 1.9 2005-05-23 18:54:02 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -321,6 +321,43 @@ void makevectors( vec3_t vector )
 print functions
 ==============
 */
+//===================================================================
+void G_dprintf( const char *fmt, ... )
+{
+	va_list         argptr;
+	char            text[1024];
+
+	va_start( argptr, fmt );
+	vsprintf( text, fmt, argptr );
+	va_end( argptr );
+
+	trap_DPrintf( text );
+}
+
+void G_conprintf( const char *fmt, ... )
+{
+	va_list         argptr;
+	char            text[1024];
+
+	va_start( argptr, fmt );
+	vsprintf( text, fmt, argptr );
+	va_end( argptr );
+
+	trap_conprint( text );
+}
+
+void G_Error( const char *fmt, ... )
+{
+	va_list         argptr;
+	char            text[1024];
+
+	va_start( argptr, fmt );
+	vsprintf( text, fmt, argptr );
+	va_end( argptr );
+
+	trap_Error( text );
+}
+
 void G_sprint( gedict_t * ed, int level, const char *fmt, ... )
 {
 	va_list argptr;
@@ -355,18 +392,6 @@ void G_centerprint( gedict_t * ed, const char *fmt, ... )
 	va_end( argptr );
 
 	trap_CenterPrint( NUM_FOR_EDICT( ed ), text );
-}
-
-void G_dprint( const char *fmt, ... )
-{
-	va_list argptr;
-	char    text[1024];
-
-	va_start( argptr, fmt );
-	vsprintf( text, fmt, argptr );
-	va_end( argptr );
-
-	trap_DPrintf( text );
 }
 
 void localcmd( const char *fmt, ... )

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: player.c,v 1.13 2005-05-19 23:29:18 AngelD Exp $
+ *  $Id: player.c,v 1.14 2005-05-23 18:54:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -149,7 +149,7 @@ void player_touch(  )
 						}
 						if(!te)
 						{
-							G_dprint( "***BUG TFSTATE_INFECTED without BioInfection_Decay timer ***\n" );
+							G_dprintf( "***BUG TFSTATE_INFECTED without BioInfection_Decay timer ***\n" );
 							return;
 						}
 						Bio = spawn(  );

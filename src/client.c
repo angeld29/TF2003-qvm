@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.37 2005-05-17 03:56:00 AngelD Exp $
+ *  $Id: client.c,v 1.38 2005-05-23 18:54:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -787,10 +787,10 @@ void GotoNextMap()
 
 void ExitIntermission()
 {
-	G_dprint( "Exiting intermission...\n" );
+	G_conprintf( "Exiting intermission...\n" );
 	if ( deathmatch )
 	{
-		G_dprint( "Exit Intermission in Deathmatch.\n" );
+		G_conprintf( "Exit Intermission in Deathmatch.\n" );
 		GotoNextMap();
 		return;
 	}
@@ -869,7 +869,7 @@ void ExitIntermission()
 			return;
 		}
 	}
-	G_dprint( "Exit Intermission.\n" );
+	G_conprintf( "Exit Intermission.\n" );
 	GotoNextMap();
 }
 
@@ -887,7 +887,7 @@ void IntermissionThink()
 		return;
 
 
-	G_dprint( "Intermission think.\n" );
+	G_conprintf( "Intermission think.\n" );
 	GotoNextMap();
 
 	if ( GetSVInfokeyString( "nmap", NULL, sl, sizeof( sl ), "" ) )
@@ -895,16 +895,16 @@ void IntermissionThink()
 		minp = GetSVInfokeyInt( "minp", NULL, 0 );
 		maxp = GetSVInfokeyInt( "maxp", NULL, 0 );
 		currp = TeamFortress_GetNoPlayers();
-		G_dprint( "MAP CYCLING: Player Counting... " );
+		G_dprintf( "MAP CYCLING: Player Counting... " );
 		if ( currp >= minp && currp <= maxp )
 		{
-			G_dprint( "within range. Changing maps...\n" );
+			G_dprintf( "within range. Changing maps...\n" );
 
 			GetSVInfokeyString( "cd", "cycledir", str, sizeof( str ), "qwmcycle" );
 			localcmd( "exec %s/%s.cfg", str, sl );
 		} else
 		{
-			G_dprint( "outside range. Next map.\n" );
+			G_dprintf( "outside range. Next map.\n" );
 			tf_data.already_chosen_map = 0;
 		}
 		localcmd( "localinfo minp \"\"\n" );
@@ -917,7 +917,7 @@ void execute_changelevel()
 {
 	gedict_t *pos;
 
-	G_dprint( "execute_changelevel()\n" );
+	G_conprintf( "execute_changelevel()\n" );
 
 	intermission_running = 1;
 
@@ -1250,7 +1250,7 @@ gedict_t *FindRandomTeamSpawnPoint( int team_num )
 	if ( spot )
 		return spot;
 
-	G_dprint( "FindRandomTeamSpawnPoint: error\n" );
+	G_conprintf( "FindRandomTeamSpawnPoint: error\n" );
 
 	return world;
 }

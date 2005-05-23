@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: q_shared.h,v 1.1 2004-09-05 22:48:30 AngelD Exp $
+ *  $Id: q_shared.h,v 1.2 2005-05-23 18:54:02 AngelD Exp $
  */
 
 #ifndef __Q_SHARED_H
@@ -201,7 +201,7 @@ typedef enum {
 	ERR_NEED_CD					// pop up the need-cd dialog
 } errorParm_t;
 // this is only here so the functions in q_shared.c and bg_*.c can link
-void	QDECL Com_Error( int level, const char *error, ... );
-void	QDECL Com_Printf( const char *msg, ... );
+//void	QDECL Com_Error( int level, const char *error, ... );
+//void	QDECL Com_Printf( const char *msg, ... );
 
 #endif	// __Q_SHARED_H

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.25 2005-05-17 03:56:00 AngelD Exp $
+ *  $Id: weapons.c,v 1.26 2005-05-23 18:54:02 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -347,7 +347,7 @@ void W_FireMedikit(  )
 						break;
 					}
 					if ( !te )
-						G_dprint( "Warning: Error in Hallucination Timer logic.\n" );
+						G_conprintf( "Warning: Error in Hallucination Timer logic.\n" );
 				}
 				if ( trace_ent->tfstate & TFSTATE_TRANQUILISED )
 				{
@@ -369,7 +369,7 @@ void W_FireMedikit(  )
 						break;
 					}
 					if ( !te )
-						G_dprint( "Warning: Error in Tranquilisation Timer logic.\n" );
+						G_conprintf( "Warning: Error in Tranquilisation Timer logic.\n" );
 				}
 				if ( trace_ent->FlashTime > 0 )
 				{
@@ -392,7 +392,7 @@ void W_FireMedikit(  )
 					}
 					if ( !te )
 					{
-						G_dprint( "Warning: Error in Flash Timer logic.\n" );
+						G_conprintf( "Warning: Error in Flash Timer logic.\n" );
 						trace_ent->FlashTime = 0;
 					}
 				}
@@ -2361,7 +2361,7 @@ void W_Attack(  )
 			player_shot1(  );
 			W_FireSniperRifle(  );
 			self->allow_snip_time = g_globalvars.time + tf_data.snip_time;
-			//Attack_Finished( 1.5 );
+			Attack_Finished( 1.5 );
 		}
 		break;
 	case WEAP_AUTO_RIFLE:

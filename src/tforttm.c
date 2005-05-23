@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tforttm.c,v 1.14 2005-05-16 09:35:46 AngelD Exp $
+ *  $Id: tforttm.c,v 1.15 2005-05-23 18:54:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -736,7 +736,7 @@ float TeamEqualiseDamage( gedict_t * targ, gedict_t * attacker, float damage )
 
 	if ( !adv )
 	{
-		G_dprint( "There is a team with an advantage of 0\n" );
+		G_conprintf( "There is a team with an advantage of 0\n" );
 		adv = 0.1;
 	}
 	newdam = damage * adv;
@@ -745,7 +745,7 @@ float TeamEqualiseDamage( gedict_t * targ, gedict_t * attacker, float damage )
 
 	if ( !adv )
 	{
-		G_dprint( "There is a team with an advantage of 0\n" );
+		G_conprintf( "There is a team with an advantage of 0\n" );
 		adv = 0.1;
 	}
 	newdam = newdam * 1 / adv;

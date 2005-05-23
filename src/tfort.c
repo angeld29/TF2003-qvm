@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.34 2005-05-19 23:29:18 AngelD Exp $
+ *  $Id: tfort.c,v 1.35 2005-05-23 18:54:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1156,7 +1156,7 @@ void TeamFortress_GrenadePrimed(  )
 		return;
 	}
 	if ( !( user->tfstate & TFSTATE_GRENPRIMED ) )
-		G_dprint( "GrenadePrimed logic error\n" );
+		G_conprintf( "GrenadePrimed logic error\n" );
 	user->tfstate -= ( user->tfstate & TFSTATE_GRENPRIMED );
 	user->tfstate -= ( user->tfstate & TFSTATE_GRENTHROWING );
 	sound( user, 1, "weapons/grenade.wav", 1, 1 );
@@ -1694,8 +1694,8 @@ int TeamFortress_GetMaxAmmo( gedict_t * Retriever, int AmmoType )
 			}
 		}
 	}
-	G_dprint( "Error in TeamFortress_GetMaxAmmo()\n" );
-	G_dprint( "Invalid ammo type passed.\n" );
+	G_conprintf( "Error in TeamFortress_GetMaxAmmo()\n" );
+	G_conprintf( "Invalid ammo type passed.\n" );
 	return 0;
 }
 
@@ -2218,7 +2218,7 @@ void RemoveOldAmmobox( int tno )
 			continue;
 		if( old->s.v.think != ( func_t ) TeamFortress_AmmoboxRemove )
 		{
-			G_dprint("Warning: ammobox ent with bad remove func\n");
+			G_conprintf("Warning: ammobox ent with bad remove func\n");
 		}
 		time = old->s.v.nextthink;
 		lastgood = old;

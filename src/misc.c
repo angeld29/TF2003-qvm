@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: misc.c,v 1.4 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: misc.c,v 1.5 2005-05-23 18:54:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -319,7 +319,7 @@ void SP_misc_explobox(  )
 	droptofloor( self );
 	if ( oldz - self->s.v.origin[2] > 250 )
 	{
-		G_Printf( "item fell out of level at '%f %f %f'\n", PASSVEC3( self->s.v.origin ) );
+		G_dprintf( "item fell out of level at '%f %f %f'\n", PASSVEC3( self->s.v.origin ) );
 		dremove( self );
 	}
 }
@@ -357,7 +357,7 @@ void SP_misc_explobox2(  )
 
 	if ( oldz - self->s.v.origin[2] > 250 )
 	{
-		G_Printf( "item fell out of level at '%f %f %f'\n", PASSVEC3( self->s.v.origin ) );
+		G_dprintf( "item fell out of level at '%f %f %f'\n", PASSVEC3( self->s.v.origin ) );
 		ent_remove( self );
 	}
 }

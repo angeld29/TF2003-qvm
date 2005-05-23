@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_local.h,v 1.17 2005-05-16 09:35:43 AngelD Exp $
+ *  $Id: g_local.h,v 1.18 2005-05-23 18:54:02 AngelD Exp $
  */
 //
 // g_local.h -- local definitions for game module
@@ -71,8 +71,9 @@ extern int      timelimit, fraglimit, teamplay, deathmatch, framecount, coop;
 #define	EDICT_TO_PROG(e) ((byte *)(e) - (byte *)g_edicts)
 #define PROG_TO_EDICT(e) ((gedict_t *)((byte *)g_edicts + (e)))
 
-void            G_Printf( const char *fmt, ... );
+void            G_dprintf( const char *fmt, ... );
 void            G_Error( const char *fmt, ... );
+void            G_conprintf( const char *fmt, ... );
 
 #define PASSVEC3(x) (x[0]),(x[1]),(x[2])
 #define SetVector(v,x,y,z) (v[0]=x,v[1]=y,v[2]=z)
@@ -95,7 +96,6 @@ void            makevectors( vec3_t vector );
 void            G_sprint( gedict_t * ed, int level, const char *fmt, ... );
 void            G_bprint( int level, const char *fmt, ... );
 void            G_centerprint( gedict_t * ed, const char *fmt, ... );
-void            G_dprint( const char *fmt, ... );
 void 		localcmd( const char *fmt, ... );
 void		stuffcmd( gedict_t * ed, const char *fmt, ... );
 int             streq( char *s1, char *s2 );

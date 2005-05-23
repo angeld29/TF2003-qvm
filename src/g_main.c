@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.14 2005-05-16 09:35:45 AngelD Exp $
+ *  $Id: g_main.c,v 1.15 2005-05-23 18:54:02 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -69,7 +69,7 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 	        api_ver = trap_GetApiVersion();
 		if ( api_ver < GAME_API_VERSION )
 		{
-			G_dprint("Mod requried API_VERSION %d or higher, server have %d\n", GAME_API_VERSION,api_ver);
+			G_conprintf("Mod requried API_VERSION %d or higher, server have %d\n", GAME_API_VERSION,api_ver);
 			return 0;
 		}
 
@@ -165,54 +165,6 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 	return 0;
 }
 
-//===================================================================
-void G_Printf( const char *fmt, ... )
-{
-	va_list         argptr;
-	char            text[1024];
-
-	va_start( argptr, fmt );
-	vsprintf( text, fmt, argptr );
-	va_end( argptr );
-
-	trap_DPrintf( text );
-}
-
-void G_Error( const char *fmt, ... )
-{
-	va_list         argptr;
-	char            text[1024];
-
-	va_start( argptr, fmt );
-	vsprintf( text, fmt, argptr );
-	va_end( argptr );
-
-	trap_Error( text );
-}
-
-void Com_Error( int level, const char *error, ... )
-{
-	va_list         argptr;
-	char            text[1024];
-
-	va_start( argptr, error );
-	vsprintf( text, error, argptr );
-	va_end( argptr );
-
-	G_Error( "%s", text );
-}
-
-void Com_Printf( const char *msg, ... )
-{
-	va_list         argptr;
-	char            text[1024];
-
-	va_start( argptr, msg );
-	vsprintf( text, msg, argptr );
-	va_end( argptr );
-
-	G_Printf( "%s", text );
-}
 
 //===================================================================
 
@@ -227,7 +179,7 @@ void G_InitGame( int levelTime, int randomSeed )
 	srand( randomSeed );
 	framecount = 0;
 	starttime = levelTime * 0.001;
-	G_Printf( "Init Game\n" );
+	G_dprintf( "Init Game\n" );
 	G_InitMemory();
 	memset( g_edicts, 0, sizeof( gedict_t ) * MAX_EDICTS );
 	
@@ -273,12 +225,12 @@ void G_EdictTouch()
 /*#ifdef DEBUG
 	        if(self->s.v.classname && other->s.v.classname)
 	        	if(!strcmp(self->s.v.classname,"player")||!strcmp(other->s.v.classname,"player"))
-	         G_dprint( "touch %s <-> %s\n", self->s.v.classname,other->s.v.classname);
+	         G_dprintf( "touch %s <-> %s\n", self->s.v.classname,other->s.v.classname);
 #endif*/
 		( ( void ( * )() ) ( self->s.v.touch ) ) ();
 	} else
 	{
-		G_Printf( "Null touch func" );
+		G_dprintf( "Null touch func" );
 	}
 }
 
@@ -297,7 +249,7 @@ void G_EdictThink()
 		( ( void ( * )() ) ( self->s.v.think ) ) ();
 	} else
 	{
-		G_Printf( "Null think func" );
+		G_dprintf( "Null think func" );
 	}
 
 }
@@ -321,7 +273,7 @@ void G_EdictBlocked()
 	} else
 	{
 #ifdef PARANOID
-		G_Printf("Null blocked func");
+		G_dprintf("Null blocked func");
 #endif
 	}
 

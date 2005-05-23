@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: spy.c,v 1.13 2005-05-16 09:35:46 AngelD Exp $
+ *  $Id: spy.c,v 1.14 2005-05-23 18:54:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1703,7 +1703,7 @@ void ResetGasSkins( gedict_t*pl)
 		
 		if( entnum > MAX_CLIENTS )
 		{
-			G_dprint("ResetGasSkins: entnum > MAX_CLIENTS\n");
+			G_conprintf("ResetGasSkins: entnum > MAX_CLIENTS\n");
 			continue;
 		}
 
@@ -1763,7 +1763,7 @@ void SetGasSkins( gedict_t*pl)
 		
 		if( entnum > MAX_CLIENTS )
 		{
-			G_dprint("SetGasSkins: entnum > MAX_CLIENTS\n");
+			G_conprintf("SetGasSkins: entnum > MAX_CLIENTS\n");
 			continue;
 		}
 

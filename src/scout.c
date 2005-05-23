@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: scout.c,v 1.19 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: scout.c,v 1.20 2005-05-23 18:54:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -238,7 +238,7 @@ void FlashGrenadeExplode(  )
 				}
 				if ( !tmpte )
 				{
-					G_dprint( "Warning: Error in Flash Timer logic.\n" );
+					G_conprintf( "Warning: Error in Flash Timer logic.\n" );
 				}
 
 			}
@@ -282,7 +282,7 @@ void FlashGrenadeExplode(  )
 				}
 				if ( !tmpte )
 				{
-					G_dprint( "Warning: Error in Flash Timer logic.\n" );
+					G_conprintf( "Warning: Error in Flash Timer logic.\n" );
 				}
 
 			}
@@ -860,7 +860,7 @@ void TG_Eff_Flash( gedict_t * te )
 			}
 			if ( !tmp )
 			{
-				G_dprint( "Warning: Error in Flash Timer logic.\n" );
+				G_conprintf( "Warning: Error in Flash Timer logic.\n" );
 			}
 
 		}
@@ -891,7 +891,7 @@ void TG_Eff_Flash( gedict_t * te )
 			}
 			if ( !tmp )
 			{
-				G_dprint( "Warning: Error in Flash Timer logic.\n" );
+				G_conprintf( "Warning: Error in Flash Timer logic.\n" );
 			}
 
 		}
@@ -1007,7 +1007,7 @@ void TG_Eff_Remove( gedict_t * pl )
 			break;
 		}
 		if ( !te )
-			G_dprint( "Warning: Error in Hallucination Timer logic.\n" );
+			G_conprintf( "Warning: Error in Hallucination Timer logic.\n" );
 	}
 	if ( pl->tfstate & TFSTATE_TRANQUILISED )
 	{
@@ -1024,7 +1024,7 @@ void TG_Eff_Remove( gedict_t * pl )
 			break;
 		}
 		if ( !te )
-			G_dprint( "Warning: Error in Tranquilisation Timer logic.\n" );
+			G_conprintf( "Warning: Error in Tranquilisation Timer logic.\n" );
 	}
 	if ( pl->FlashTime > 0 )
 	{
@@ -1042,7 +1042,7 @@ void TG_Eff_Remove( gedict_t * pl )
 		}
 		if ( !te )
 		{
-			G_dprint( "Warning: Error in Flash Timer logic.\n" );
+			G_conprintf( "Warning: Error in Flash Timer logic.\n" );
 			pl->FlashTime = 0;
 		}
 	}
