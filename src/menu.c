@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: menu.c,v 1.19 2005-05-16 09:35:45 AngelD Exp $
+ *  $Id: menu.c,v 1.20 2005-05-27 21:27:04 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -1382,11 +1382,11 @@ void 	TG_SGOptions_Menu(menunum_t menu)
   {
   		s_sg_newfind =  "1)‰Sentry New Find Target ON  \n";
 //        sprintf(s_sgppl,"2)-    %3d ppl emulation   3)+\n",tf_data.sgppl);
-        sprintf(s_sgppl,"       %3d ppl emulation      \n",tf_data.sgppl);
+        _snprintf(s_sgppl ,sizeof(s_sgppl) ,"       %3d ppl emulation      \n",tf_data.sgppl);
   }else
   {
   	s_sg_newfind = "1)‡Sentry New Find Target OFF \n";
-  	sprintf(s_sgppl,"\n");
+  	_snprintf(s_sgppl, sizeof(s_sgppl) ,"\n");
   }
   if ( tf_data.sg_rfire)
   	s_sg_rfire = "3)‰Sentry Rocket Fire: NEW    \n";

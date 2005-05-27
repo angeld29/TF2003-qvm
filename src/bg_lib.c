@@ -176,11 +176,11 @@ loop:	SWAPINIT(a, es);
 	pn = (char *)a + n * es;
 	r = min(pa - (char *)a, pb - pa);
 	vecswap(a, pb - r, r);
-	r = min(pd - pc, pn - pd - (int) es);
+	r = min(pd - pc, pn - pd - (int)es);
 	vecswap(pb, pn - r, r);
-	if ((r = pb - pa) > (int) es)
+	if ((r = pb - pa) > (int)es)
 		qsort(a, r / es, es, cmp);
-	if ((r = pd - pc) > (int) es) {
+	if ((r = pd - pc) > (int)es) {
 		/* Iterate rather than recurse to save stack space */
 		a = pn - r;
 		n = r / es;
@@ -301,7 +301,7 @@ void *memmove( void *dest, const void *src, size_t count ) {
 			((char *)dest)[i] = ((char *)src)[i];
 		}
 	} else {
-		for ( i = 0 ; i < (int) count ; i++ ) {
+		for ( i = 0 ; i < count ; i++ ) {
 			((char *)dest)[i] = ((char *)src)[i];
 		}
 	}
@@ -1038,16 +1038,29 @@ double fabs( double x ) {
 #define SHORTINT	0x00000040		/* short integer */
 #define ZEROPAD		0x00000080		/* zero (as opposed to blank) pad */
 #define FPT			0x00000100		/* floating point number */
+#define UNSIGNED	0x00000200		/* unsigned integer. */
 
 #define to_digit(c)		((c) - '0')
 #define is_digit(c)		((unsigned)to_digit(c) <= 9)
 #define to_char(n)		((n) + '0')
 
-void AddInt( char **buf_p, int val, int width, int flags ) {
+#undef TRY_APPEND
+#define TRY_APPEND(ch) do { if (fill < maxlen) { *buf++ = (ch); } fill++; } while (0)
+
+int AddInt( char **buf_p, size_t maxlen, int val, int width, int flags, char *charset ) {
 	char	text[32];
 	int		digits;
 	int		signedVal;
 	char	*buf;
+	int     base;
+	int		fill;
+
+	fill = 0;
+	if (charset == NULL)
+		charset = "0123456789";  /* Decimal by default. */
+
+	for (base = 0; charset[base]; base++);  /* Note NOP operation. */
+	/* Offset of NULL is the number base.  So "0123456789" -> base-10. */
 
 	digits = 0;
 	signedVal = val;
@@ -1055,11 +1068,11 @@ void AddInt( char **buf_p, int val, int width, int flags ) {
 		val = -val;
 	}
 	do {
-		text[digits++] = '0' + val % 10;
-		val /= 10;
+		text[digits++] = charset[val % base]; //'0' + val % 10;
+		val /= base; //10;
 	} while ( val );
 
-	if ( signedVal < 0 ) {
+	if (( signedVal < 0 ) && !(flags & UNSIGNED)) {
 		text[digits++] = '-';
 	}
 
@@ -1067,32 +1080,39 @@ void AddInt( char **buf_p, int val, int width, int flags ) {
 
 	if( !( flags & LADJUST ) ) {
 		while ( digits < width ) {
-			*buf++ = ( flags & ZEROPAD ) ? '0' : ' ';
+//			*buf++ = ( flags & ZEROPAD ) ? '0' : ' ';
+			TRY_APPEND(( flags & ZEROPAD ) ? '0' : ' ');
 			width--;
 		}
 	}
 
 	while ( digits-- ) {
-		*buf++ = text[digits];
+//		*buf++ = text[digits];
+		TRY_APPEND(text[digits]);
 		width--;
 	}
 
 	if( flags & LADJUST ) {
 		while ( width-- ) {
-			*buf++ = ( flags & ZEROPAD ) ? '0' : ' ';
+//			*buf++ = ( flags & ZEROPAD ) ? '0' : ' ';
+			TRY_APPEND(( flags & ZEROPAD ) ? '0' : ' ');
 		}
 	}
 
 	*buf_p = buf;
+	return fill;
 }
 
-void AddFloat( char **buf_p, float fval, int width, int prec ) {
+int AddFloat( char **buf_p, size_t maxlen, float fval, int width, int prec ) {
 	char	text[32];
 	int		digits;
 	float	signedVal;
 	char	*buf;
 	int		val;
+	int		zerofrac;  /* Fractional part remains zero? */
+	int		fill;
 
+	fill = 0;
 	// get the sign
 	signedVal = fval;
 	if ( fval < 0 ) {
@@ -1114,12 +1134,14 @@ void AddFloat( char **buf_p, float fval, int width, int prec ) {
 	buf = *buf_p;
 
 	while ( digits < width ) {
-		*buf++ = ' ';
+//		*buf++ = ' ';
+		TRY_APPEND(' ');
 		width--;
 	}
 
 	while ( digits-- ) {
-		*buf++ = text[digits];
+//		*buf++ = text[digits];
+		TRY_APPEND(text[digits]);
 	}
 
 	*buf_p = buf;
@@ -1127,29 +1149,42 @@ void AddFloat( char **buf_p, float fval, int width, int prec ) {
 	if (prec < 0)
 		prec = 6;
 	// write the fraction
+	zerofrac = 1; /* Assume fractional part is zero. */
 	digits = 0;
 	while (digits < prec) {
 		fval -= (int) fval;
 		fval *= 10.0;
 		val = (int) fval;
 		text[digits++] = '0' + val % 10;
+		zerofrac &= (val == 0); /* Does fractional part remain zero? */
+	}
+
+	if (zerofrac) {
+		/* Fractional part is zero.  Don't bother with fractional. */
+		/* Um... how do we figure out if we need to do alternate form? */
+		return fill;
 	}
 
 	if (digits > 0) {
 		buf = *buf_p;
-		*buf++ = '.';
+//		*buf++ = '.';
+		TRY_APPEND('.');
 		for (prec = 0; prec < digits; prec++) {
-			*buf++ = text[prec];
+//			*buf++ = text[prec];
+			TRY_APPEND(text[prec]);
 		}
 		*buf_p = buf;
 	}
+	return fill;
 }
 
 
-void AddString( char **buf_p, char *string, int width, int prec ) {
+int AddString( char **buf_p, size_t maxlen, char *string, int width, int prec ) {
 	int		size;
 	char	*buf;
+	int		fill;
 
+	fill = 0;
 	buf = *buf_p;
 
 	if ( string == NULL ) {
@@ -1171,16 +1206,21 @@ void AddString( char **buf_p, char *string, int width, int prec ) {
 	width -= size;
 
 	while( size-- ) {
-		*buf++ = *string++;
+//		*buf++ = *string++;
+		TRY_APPEND((*string++));
 	}
 
 	while( width-- > 0 ) {
-		*buf++ = ' ';
+//		*buf++ = ' ';
+		TRY_APPEND(' ');
 	}
 
 	*buf_p = buf;
+	return fill;
 }
 
+
+#if 0
 /*
 vsprintf
 
@@ -1257,12 +1297,17 @@ reswitch:
 			*buf_p++ = (char)*arg;
 			arg++;
 			break;
+		case 'l':
+			/* Just ignore. */
+			goto rflag;
+			break;
 		case 'd':
 		case 'i':
-			AddInt( &buf_p, *arg, width, flags );
+			AddInt( &buf_p, *arg, width, flags, "0123456789" );
 			arg++;
 			break;
 		case 'f':
+		case 'g':
 			AddFloat( &buf_p, *(double *)arg, width, prec );
 #ifdef __LCC__
 			arg += 1;	// everything is 32 bit in my compiler
@@ -1277,6 +1322,24 @@ reswitch:
 		case '%':
 			*buf_p++ = ch;
 			break;
+
+		case 'u':  /* Unsigned decimal. */
+			AddInt (&buf_p, *arg, width, flags | UNSIGNED, "0123456789");
+			arg++;
+			break;
+		case 'o':  /* (Unsigned) Octal. */
+			AddInt (&buf_p, *arg, width, flags | UNSIGNED, "01234567");
+			arg++;
+			break;
+		case 'x':  /* (unsigned) hexadecimal (lower-case letters). */
+			AddInt (&buf_p, *arg, width, flags | UNSIGNED, "0123456789abcdef");
+			arg++;
+			break;
+		case 'X':  /* (unsigned) Hexadecimal (upper-case letters). */
+			AddInt (&buf_p, *arg, width, flags | UNSIGNED, "0123456789ABCDEF");
+			arg++;
+			break;
+
 		default:
 			*buf_p++ = (char)*arg;
 			arg++;
@@ -1288,6 +1351,7 @@ done:
 	*buf_p = 0;
 	return buf_p - buffer;
 }
+#endif /* 0 */
 
 /* this is really crappy */
 int sscanf( const char *buffer, const char *fmt, ... ) {
@@ -1323,18 +1387,174 @@ int sscanf( const char *buffer, const char *fmt, ... ) {
 	return count;
 }
 
-int sprintf( char *str, const char *fmt, ... ) 
+
+
+
+/* vsnprintf, extended version of Q3A 1.29h bg_libc.c:vsprintf() */
+/* Return value is how many characters filled, or how many would have been filled had there been enough space. */
+/*
+vsnprintf
+
+I'm not going to support a bunch of the more arcane stuff in here
+just to keep it simpler.  For example, the '*' and '$' are not
+currently supported.  I've tried to make it so that it will just
+parse and ignore formats we don't support.
+*/
+int _vsnprintf( char *buffer, size_t size, const char *fmt, va_list argptr ) {
+	int		*arg;
+	char	*buf_p;
+	char	ch;
+	int		flags;
+	int		width;
+	int		prec;
+	int		n;
+	char	sign;
+	int		pneumonoultramicroscopicsilicovolcanoconiosis; /* Just for you, vogon_jeltz. */
+
+#undef TRY_APPEND
+#define TRY_APPEND(ch) do { if (pneumonoultramicroscopicsilicovolcanoconiosis < size) { *buf_p++ = (ch); } pneumonoultramicroscopicsilicovolcanoconiosis++; } while (0)
+
+	if (size < 1)
+		return 0;
+	pneumonoultramicroscopicsilicovolcanoconiosis = 0;
+	size--; /* Make room for trailing \0. */
+	buf_p = buffer;
+	arg = (int *)argptr;
+
+	while( true ) {
+		// run through the format string until we hit a '%' or '\0'
+		for ( ch = *fmt; (ch = *fmt) != '\0' && ch != '%'; fmt++ ) {
+//			*buf_p++ = ch;
+			TRY_APPEND(ch);
+		}
+		if ( ch == '\0' ) {
+			goto done;
+		}
+
+		// skip over the '%'
+		fmt++;
+
+		// reset formatting state
+		flags = 0;
+		width = 0;
+		prec = -1;
+		sign = '\0';
+
+rflag:
+		ch = *fmt++;
+reswitch:
+		switch( ch ) {
+		case '-':
+			flags |= LADJUST;
+			goto rflag;
+		case '.':
+			n = 0;
+			while( is_digit( ( ch = *fmt++ ) ) ) {
+				n = 10 * n + ( ch - '0' );
+			}
+			prec = n < 0 ? -1 : n;
+			goto reswitch;
+		case '0':
+			flags |= ZEROPAD;
+			goto rflag;
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+			n = 0;
+			do {
+				n = 10 * n + ( ch - '0' );
+				ch = *fmt++;
+			} while( is_digit( ch ) );
+			width = n;
+			goto reswitch;
+		case 'c':
+//			*buf_p++ = (char)*arg;
+			TRY_APPEND((char)*arg);
+			arg++;
+			break;
+		case 'l':
+			/* Just ignore. */
+			goto rflag;
+			break;
+		case 'd':
+		case 'i':
+			pneumonoultramicroscopicsilicovolcanoconiosis += AddInt( &buf_p, size - pneumonoultramicroscopicsilicovolcanoconiosis, *arg, width, flags, "0123456789" );
+			arg++;
+			break;
+		case 'f':
+		case 'g':
+			pneumonoultramicroscopicsilicovolcanoconiosis += AddFloat( &buf_p, size - pneumonoultramicroscopicsilicovolcanoconiosis, *(double *)arg, width, prec );
+#ifdef __LCC__
+			arg += 1;	// everything is 32 bit in my compiler
+#else
+			arg += 2;
+#endif
+			break;
+		case 's':
+			pneumonoultramicroscopicsilicovolcanoconiosis += AddString( &buf_p, size - pneumonoultramicroscopicsilicovolcanoconiosis, (char *)*arg, width, prec );
+			arg++;
+			break;
+		case '%':
+//			*buf_p++ = ch;
+			TRY_APPEND(ch);
+			break;
+
+		case 'u':  /* Unsigned decimal. */
+			pneumonoultramicroscopicsilicovolcanoconiosis += AddInt (&buf_p, size - pneumonoultramicroscopicsilicovolcanoconiosis, *arg, width, flags | UNSIGNED, "0123456789");
+			arg++;
+			break;
+		case 'o':  /* (Unsigned) Octal. */
+			pneumonoultramicroscopicsilicovolcanoconiosis += AddInt (&buf_p, size - pneumonoultramicroscopicsilicovolcanoconiosis, *arg, width, flags | UNSIGNED, "01234567");
+			arg++;
+			break;
+		case 'x':  /* (unsigned) hexadecimal (lower-case letters). */
+			pneumonoultramicroscopicsilicovolcanoconiosis += AddInt (&buf_p, size - pneumonoultramicroscopicsilicovolcanoconiosis, *arg, width, flags | UNSIGNED, "0123456789abcdef");
+			arg++;
+			break;
+		case 'X':  /* (unsigned) Hexadecimal (upper-case letters). */
+			pneumonoultramicroscopicsilicovolcanoconiosis += AddInt (&buf_p, size - pneumonoultramicroscopicsilicovolcanoconiosis, *arg, width, flags | UNSIGNED, "0123456789ABCDEF");
+			arg++;
+			break;
+
+		default:
+//			*buf_p++ = (char)*arg;
+			TRY_APPEND((char)*arg);
+			arg++;
+			break;
+		}
+	}
+
+done:
+	*buf_p = 0;
+//	return buf_p - buffer;
+	return pneumonoultramicroscopicsilicovolcanoconiosis;
+}
+
+
+int vsprintf( char *buffer, const char *fmt, va_list argptr ) {
+  return _vsnprintf(buffer, INT_MAX, fmt, argptr);
+}
+
+int _snprintf(char *buffer, int size, const char *fmt, ...)
 {
-	va_list		argptr;
-	int		ret;
-	va_start (argptr, fmt);
-	ret =  vsprintf (str, fmt, argptr);
-	va_end (argptr);
-	return ret;
+  va_list vp;
+  int retval;
+
+  va_start(vp, fmt);
+  retval = _vsnprintf(buffer, size, fmt, vp);
+  va_end(vp);
+  return retval;
 }
 
 float asin(float x)
 {
         return atan2(x, -x*x+1);
 }
+
 #endif

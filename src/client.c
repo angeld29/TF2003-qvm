@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.38 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: client.c,v 1.39 2005-05-27 21:27:04 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -314,7 +314,7 @@ void DecodeLevelParms()
        		if ( timelimit && ( ( timelimit ) < tf_data.cb_prematch_time ) )
        		{
        			timelimit += tf_data.cb_prematch_time;
-       			sprintf( st, "%d", (int)( timelimit / 60 ) );
+       			_snprintf( st, sizeof(st), "%d", (int)( timelimit / 60 ) );
        			trap_cvar_set( "timelimit", st );
        		}
 

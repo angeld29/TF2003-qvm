@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.26 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: weapons.c,v 1.27 2005-05-27 21:27:04 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -98,8 +98,8 @@ void W_FireAxe(  )
 	source[2] += 16;
 	VectorScale( g_globalvars.v_forward, 64, dest );
 	VectorAdd( dest, source, dest )
-	    //source = self->s.v.origin + '0 0 16';
-	    traceline( PASSVEC3( source ), PASSVEC3( dest ), false, self );
+        //source = self->s.v.origin + '0 0 16';
+        traceline( PASSVEC3( source ), PASSVEC3( dest ), false, self );
 	if ( g_globalvars.trace_fraction == 1.0 )
 		return;
 

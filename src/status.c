@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: status.c,v 1.10 2005-05-16 09:35:46 AngelD Exp $
+ *  $Id: status.c,v 1.11 2005-05-27 21:27:04 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -28,13 +28,16 @@ char   *DispHealthToSbar( gedict_t * pl, char *str );
 char   *AddStatusSize( gedict_t * pl, char *strp );
 char   *ClipSizeToString( gedict_t * pl, char *str );
 
+#define MAX_SBAR_STR 16000
+
+
 void CenterPrint( gedict_t * pl, const char *fmt, ... )
 {
 	va_list argptr;
-	char    text[1024];
+	char text[2048];
 
 	va_start( argptr, fmt );
-	vsprintf( text, fmt, argptr );
+	_vsnprintf( text, sizeof(text), fmt, argptr );
 	va_end( argptr );
 
 	trap_CenterPrint( NUM_FOR_EDICT( pl ), text );
@@ -45,10 +48,10 @@ void CenterPrint( gedict_t * pl, const char *fmt, ... )
 void StatusPrint( gedict_t * pl, float fTime, const char *fmt, ... )
 {
 	va_list argptr;
-	char    text[1024];
+	char text[2048];
 
 	va_start( argptr, fmt );
-	vsprintf( text, fmt, argptr );
+	_vsnprintf( text, sizeof(text), fmt, argptr );
 	va_end( argptr );
 
 	trap_CenterPrint( NUM_FOR_EDICT( pl ), text );
@@ -64,7 +67,7 @@ const char   *teamnames[5] = {
 	"  Gren:"
 };
 
-#define MAX_SBAR_STR 16000
+
 char    sbar_str[MAX_SBAR_STR];
 char   *end_of_sbar_str = sbar_str + MAX_SBAR_STR;
 
@@ -134,7 +137,7 @@ void RefreshStatusBar( gedict_t * pl )
 				{
 					if ( te->s.v.owner != EDICT_TO_PROG( self ) )
 						continue;
-					sprintf( sbar_p, "Detpack: %d                 ",
+					_snprintf( sbar_p, MAX_SBAR_STR , "Detpack: %d                 ",
 						 ( int ) ( te->s.v.nextthink - g_globalvars.time ) );
 					while ( *( ++sbar_p ) );
 					break;
@@ -143,7 +146,7 @@ void RefreshStatusBar( gedict_t * pl )
 		}
 		if ( pl->playerclass == 1 )
 		{
-			sprintf( sbar_p, "Scan %3d %s%s %3s                       ",
+			_snprintf( sbar_p,MAX_SBAR_STR, "Scan %3d %s%s %3s                       ",
 				 pl->ScanRange, ( pl->tf_items_flags & 1 ) ? "En" : "  ",
 				 ( pl->tf_items_flags & 2 ) ? "Fr" : "  ", ( pl->ScannerOn ) ? "On " : "Off" );
 			while ( *( ++sbar_p ) );
@@ -156,7 +159,7 @@ void RefreshStatusBar( gedict_t * pl )
 	win = TeamFortress_TeamGetWinner(  );
 	sec = TeamFortress_TeamGetSecond(  );
 
-	sprintf( sbar_p, "%s%3d %s%3d",
+	_snprintf( sbar_p, MAX_SBAR_STR, "%s%3d %s%3d",
 		 teamnames[win], TeamFortress_TeamGetScore( win ), teamnames[sec], TeamFortress_TeamGetScore( sec ) );
 
 	while ( *( ++sbar_p ) );
@@ -263,7 +266,7 @@ char   *ClipSizeToString( gedict_t * pl, char *str )
 		while ( *( ++str ) );
 		return str;
 	}
-	sprintf( str, "  ÃÌÉĞ:%2d", num );
+	_snprintf( str, MAX_SBAR_STR, "  ÃÌÉĞ:%2d", num );
 	while ( *( ++str ) );
 	return str;
 }
@@ -310,7 +313,7 @@ char   *DisguiseToSbar( gedict_t * pl, char *str )
 		while ( *( ++str ) );
 		return str;
 	}
-	sprintf( str, "%s %s                             ",
+	_snprintf( str, MAX_SBAR_STR,"%s %s                             ",
 		 spy_teams[pl->undercover_team], spy_skins[pl->undercover_skin] );
 	while ( *( ++str ) );
 	return str;
@@ -326,11 +329,11 @@ char   *SentryInfoToSBar( gedict_t * pl, char *str )
 			continue;
 		if ( (te->has_sentry && te->s.v.health <= 0 ) && tg_data.tg_enabled )
 		{
-			sprintf( str, "SENTRY:dead" );
+			_snprintf( str, MAX_SBAR_STR,"SENTRY:dead" );
 			break;
 		}
 		if ( te->s.v.health > 0 )
-			sprintf( str, " SENTRY: %3d ", ( int ) te->s.v.health );
+			_snprintf( str, MAX_SBAR_STR, " SENTRY: %3d ", ( int ) te->s.v.health );
 		while ( *( ++str ) );
 		if ( !te->s.v.ammo_shells )
 		{
@@ -359,7 +362,7 @@ char   *DispHealthToSbar( gedict_t * pl, char *str )
 	{
 		if ( te->real_owner != pl )
 			continue;
-		sprintf( str, "DISP: %3d ", ( int ) te->s.v.health );
+		_snprintf( str, MAX_SBAR_STR, "DISP: %3d ", ( int ) te->s.v.health );
 		while ( *( ++str ) );
 		return str;
 	}

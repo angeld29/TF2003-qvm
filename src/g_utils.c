@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_utils.c,v 1.9 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: g_utils.c,v 1.10 2005-05-27 21:27:04 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -322,13 +322,13 @@ print functions
 ==============
 */
 //===================================================================
+static char text[2048];
 void G_dprintf( const char *fmt, ... )
 {
 	va_list         argptr;
-	char            text[1024];
 
 	va_start( argptr, fmt );
-	vsprintf( text, fmt, argptr );
+	_vsnprintf( text, sizeof(text), fmt, argptr );
 	va_end( argptr );
 
 	trap_DPrintf( text );
@@ -337,10 +337,9 @@ void G_dprintf( const char *fmt, ... )
 void G_conprintf( const char *fmt, ... )
 {
 	va_list         argptr;
-	char            text[1024];
 
 	va_start( argptr, fmt );
-	vsprintf( text, fmt, argptr );
+	_vsnprintf( text, sizeof(text), fmt, argptr );
 	va_end( argptr );
 
 	trap_conprint( text );
@@ -349,10 +348,9 @@ void G_conprintf( const char *fmt, ... )
 void G_Error( const char *fmt, ... )
 {
 	va_list         argptr;
-	char            text[1024];
 
 	va_start( argptr, fmt );
-	vsprintf( text, fmt, argptr );
+	_vsnprintf( text, sizeof(text), fmt, argptr );
 	va_end( argptr );
 
 	trap_Error( text );
@@ -361,10 +359,9 @@ void G_Error( const char *fmt, ... )
 void G_sprint( gedict_t * ed, int level, const char *fmt, ... )
 {
 	va_list argptr;
-	char    text[1024];
 
 	va_start( argptr, fmt );
-	vsprintf( text, fmt, argptr );
+	_vsnprintf( text, sizeof(text), fmt, argptr );
 	va_end( argptr );
 
 	trap_SPrint( NUM_FOR_EDICT( ed ), level, text );
@@ -373,10 +370,9 @@ void G_sprint( gedict_t * ed, int level, const char *fmt, ... )
 void G_bprint( int level, const char *fmt, ... )
 {
 	va_list argptr;
-	char    text[1024];
 
 	va_start( argptr, fmt );
-	vsprintf( text, fmt, argptr );
+	_vsnprintf( text, sizeof(text), fmt, argptr );
 	va_end( argptr );
 
 	trap_BPrint( level, text );
@@ -385,10 +381,9 @@ void G_bprint( int level, const char *fmt, ... )
 void G_centerprint( gedict_t * ed, const char *fmt, ... )
 {
 	va_list argptr;
-	char    text[1024];
 
 	va_start( argptr, fmt );
-	vsprintf( text, fmt, argptr );
+	_vsnprintf( text, sizeof(text), fmt, argptr );
 	va_end( argptr );
 
 	trap_CenterPrint( NUM_FOR_EDICT( ed ), text );
@@ -400,7 +395,7 @@ void localcmd( const char *fmt, ... )
 	char    text[1024];
 
 	va_start( argptr, fmt );
-	vsprintf( text, fmt, argptr );
+	_vsnprintf( text, sizeof(text), fmt, argptr );
 	va_end( argptr );
 
 	trap_localcmd( text );
@@ -412,7 +407,7 @@ void stuffcmd( gedict_t * ed, const char *fmt, ... )
 	char    text[1024];
 
 	va_start( argptr, fmt );
-	vsprintf( text, fmt, argptr );
+	_vsnprintf( text, sizeof(text), fmt, argptr );
 	va_end( argptr );
 
 	trap_stuffcmd( NUM_FOR_EDICT( ed ), text );

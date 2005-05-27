@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.35 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: tfort.c,v 1.36 2005-05-27 21:27:04 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1480,9 +1480,9 @@ void TeamFortress_SetColor( gedict_t * p, int top, int bottom )
         char tmp[0x20];
         if( p->isBot )
         {
-                sprintf(tmp,"%d",top);
+                _snprintf(tmp, sizeof(tmp), "%d",top);
                 trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"topcolor",tmp);
-                sprintf(tmp,"%d",bottom);
+                _snprintf(tmp, sizeof(tmp),"%d",bottom);
                 trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"bottomcolor",tmp);
         }else
         {

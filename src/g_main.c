@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.15 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: g_main.c,v 1.16 2005-05-27 21:27:04 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -157,11 +157,19 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 		return 0;
 
 	case GAME_CONSOLE_COMMAND:
+	        
 		// called on server console command "mod"
 		// params like GAME_CLIENT_COMMAND, but argv(0) always "mod"
+		// self - rconner if can detect else world
+		// other 
+		//SV_CMD_CONSOLE		0          
+		//SV_CMD_RCON			1  
+		//SV_CMD_MASTER		2          
+		//SV_CMD_BOT			3  
+
 		return 0;//ConsoleCommand();
 	}
-
+	
 	return 0;
 }
 

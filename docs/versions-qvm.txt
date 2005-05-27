@@ -2,6 +2,11 @@ QuakeWorld TeamFortress 2003 (QVM/DDL/SO Versions)
 by [sd] angel for MTFL
 
 ////////////////////////////////////////////////////
+#define	SV_CMD_CONSOLE		0
+#define	SV_CMD_RCON			1
+#define	SV_CMD_MASTER		2
+#define	SV_CMD_BOT			3
+
 при попадании из снайперки в тело эффект попадания в стену не выводится
 Убрана ошибка (портирования) сохранения armorclass при потере всего армора
 cmd tg god - индивидуальный god mode

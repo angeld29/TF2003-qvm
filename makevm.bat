@@ -6,7 +6,7 @@ set CC=lcc
 
 set Q3ASM=q3asm
 
-set CFLAGS=-DQ3_VM -S -Wf-target=bytecode -Wf-g
+set CFLAGS=-DQ3_VM -S -Wf-target=bytecode -Wf-g -w
 
 set INCFLAGS=-I..\include
 

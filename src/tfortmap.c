@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfortmap.c,v 1.18 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: tfortmap.c,v 1.19 2005-05-27 21:27:04 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1933,9 +1933,6 @@ void item_tfgoal_touch(  )
 void tfgoalitem_GiveToPlayer( gedict_t * Item, gedict_t * AP, gedict_t * Goal )
 {
 
-        //REMOVE ME !!!!
-        //G_sprint(AP,2,"tfgoalitem_GiveToPlayer %s %s\n",Item->s.v.netname,Goal->s.v.netname);
-
 	Item->s.v.owner = EDICT_TO_PROG( AP );
 	if ( Item->mdl )
 		setmodel( Item, "" );
@@ -2016,8 +2013,6 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 	float   spyoff;
 	gedict_t *DelayReturn;
 
-        //REMOVE ME !!!!
-        //G_sprint(AP,2,"tfgoalitem_RemoveFromPlayer %s\n",Item->s.v.netname);
 	if ( !Item || Item == world )
 	{
 		G_Error( "error: tfgoalitem_RemoveFromPlayer(): Item == world" );

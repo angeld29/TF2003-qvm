@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: spy.c,v 1.14 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: spy.c,v 1.15 2005-05-27 21:27:04 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1773,14 +1773,14 @@ void SetGasSkins( gedict_t*pl)
 			rteam = pl->team_no%2 + 1;
 
 			rcol = TeamFortress_TeamGetTopColor(rteam);
-			sprintf(st, "%d",rcol);
+			_snprintf(st, sizeof(st), "%d",rcol);
 			trap_WriteByte(MSG_ONE,SVC_SETINFO );
 			trap_WriteByte(MSG_ONE, entnum );
 			trap_WriteString(MSG_ONE,"topcolor" );
 			trap_WriteString(MSG_ONE, st);
 
 			rcol = TeamFortress_TeamGetColor(rteam) - 1;
-			sprintf(st, "%d",rcol);
+			_snprintf(st, sizeof(st), "%d",rcol);
 
 			trap_WriteByte(MSG_ONE, SVC_SETINFO );
 			trap_WriteByte(MSG_ONE, entnum );
@@ -1814,7 +1814,7 @@ void SetGasSkins( gedict_t*pl)
 					rcol = TeamFortress_TeamGetTopColor( rteam  );
 				}
 
-				sprintf(st, "%d",rcol);
+				_snprintf(st, sizeof(st), "%d",rcol);
 				trap_WriteByte(MSG_ONE,SVC_SETINFO );
 				trap_WriteByte(MSG_ONE, entnum );
 				trap_WriteString(MSG_ONE,"topcolor" );
@@ -1823,7 +1823,7 @@ void SetGasSkins( gedict_t*pl)
 				if( !(tf_data.new_gas & GAS_MASK_ALLCOLORS))
 				{
 					rcol = TeamFortress_TeamGetColor(rteam) - 1;
-					sprintf(st, "%d",rcol);
+					_snprintf(st, sizeof(st), "%d",rcol);
 				}
 				trap_WriteByte(MSG_ONE,SVC_SETINFO );
 				trap_WriteByte(MSG_ONE, entnum );
