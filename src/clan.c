@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: clan.c,v 1.8 2005-04-28 15:42:55 AngelD Exp $
+ *  $Id: clan.c,v 1.9 2005-05-28 19:03:46 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -149,7 +149,8 @@ void DumpClanScores(  )
 	int     winners, no_teams = 0, printed = 0, ti = 0, teamfrags_q;
 	int     t_pl[5], t_unacc[5], i;
 	gedict_t *te;
-	char   *st, st2[10];
+	const char   *st;
+    char st2[10];
 
 	for ( i = 1; i <= 4; i++ )
 	{

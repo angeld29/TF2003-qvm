@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.c,v 1.9 2005-05-16 09:35:45 AngelD Exp $
+ *  $Id: g_syscalls.c,v 1.10 2005-05-28 19:03:46 AngelD Exp $
  */
 
 //#include "g_local.h"
@@ -310,7 +310,7 @@ void trap_WriteCoord( int to, float data )
 	syscall( G_WRITECOORD, to, PASSFLOAT( data ));
 }
 
-void trap_WriteString( int to, char *data )
+void trap_WriteString( int to, const char *data )
 {
 	syscall( G_WRITESTRING, to, (int)data );
 }

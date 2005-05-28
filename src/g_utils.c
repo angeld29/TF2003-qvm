@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_utils.c,v 1.11 2005-05-28 15:18:32 AngelD Exp $
+ *  $Id: g_utils.c,v 1.12 2005-05-28 19:03:46 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -143,7 +143,7 @@ void aim( vec3_t ret )
 }
 
 char    null_str[] = "";
-int streq( char *s1, char *s2 )
+int streq( const char *s1, const  char *s2 )
 {
 	if ( !s1 )
 		s1 = null_str;
@@ -151,7 +151,7 @@ int streq( char *s1, char *s2 )
 		s2 = null_str;
 	return ( !strcmp( s1, s2 ) );
 }
-int strneq( char *s1, char *s2 )
+int strneq( const char *s1, const char *s2 )
 {
 	if ( !s1 )
 		s1 = null_str;

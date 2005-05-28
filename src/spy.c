@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: spy.c,v 1.15 2005-05-27 21:27:04 AngelD Exp $
+ *  $Id: spy.c,v 1.16 2005-05-28 19:03:46 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1788,13 +1788,10 @@ void SetGasSkins( gedict_t*pl)
 			trap_WriteString(MSG_ONE, st);
 
 
-			GetSVInfokeyString( class_set[8].infokey4skin[rteam], NULL,
-			    st, sizeof( st ), class_set[8].defaultskin );
-	
 			trap_WriteByte(MSG_ONE, SVC_SETINFO );
 			trap_WriteByte(MSG_ONE, entnum );
 			trap_WriteString(MSG_ONE,"skin" );
-			trap_WriteString(MSG_ONE, st);
+			trap_WriteString(MSG_ONE, TeamFortress_GetSkinByTeamClass(rteam, 8));
 		}else
 		{
 			rteam = pl->team_no;
@@ -1835,13 +1832,11 @@ void SetGasSkins( gedict_t*pl)
 			{
 				rskin = g_random() *9 +1;
 
-				GetSVInfokeyString( class_set[rskin].infokey4skin[rteam], NULL,
-						st, sizeof( st ), class_set[rskin].defaultskin );
-	
+				
 				trap_WriteByte(MSG_ONE, SVC_SETINFO );
 				trap_WriteByte(MSG_ONE, entnum );
 				trap_WriteString(MSG_ONE,"skin" );
-				trap_WriteString(MSG_ONE, st);
+				trap_WriteString(MSG_ONE, TeamFortress_GetSkinByTeamClass(rteam, rskin) );
 			}
 	
 		}

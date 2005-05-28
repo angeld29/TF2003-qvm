@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.15 2005-05-28 18:33:52 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.16 2005-05-28 19:03:46 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -104,7 +104,7 @@ qboolean ClientUserInfoChanged(  )
 {
 	char    key[1024];
 	char    value[1024];
-	char   *sk;
+	const   char   *sk;
 	int     color;
 
 	self = PROG_TO_EDICT( g_globalvars.self );

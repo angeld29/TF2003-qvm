@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: actions.c,v 1.17 2005-05-16 09:35:45 AngelD Exp $
+ *  $Id: actions.c,v 1.18 2005-05-28 19:03:46 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -478,7 +478,7 @@ void TeamFortress_ReloadCurrentWeapon(  )
 
 void TeamFortress_ID_Player( gedict_t * trace_ent )
 {
-	char   *cls;
+	const char   *cls;
 
 	if ( self->team_no && TeamFortress_isTeamsAllied(self->team_no , trace_ent->team_no) )
 	{

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.37 2005-05-28 18:33:52 AngelD Exp $
+ *  $Id: tfort.c,v 1.38 2005-05-28 19:03:46 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -28,7 +28,7 @@ int FLAME_MAXWORLDNUM, MAX_WORLD_PIPEBOMBS, MAX_WORLD_AMMOBOXES, GR_TYPE_MIRV_NO
 
 static int     num_team_ammoboxes[5] = { 0, 0, 0, 0, 0 };
 
-static char class_skin[][20]={
+/*static char class_skin[][20]={
  "base",
  "tf_scout",
  "tf_snipe",
@@ -41,7 +41,27 @@ static char class_skin[][20]={
  "tf_eng",
  "",
  "base"
-};
+};*/
+typedef struct {
+	int     bitmask;
+	int     maxhealth, maxspeed, maxstrafespeed;
+	int     weapons_carried, current_weapon;
+	int     ammo_shells, ammo_nails, ammo_rockets, ammo_cells, ammo_detpack, ammo_medikit;
+	int     maxammo_shells, maxammo_nails, maxammo_rockets, 
+		maxammo_cells, maxammo_detpack, maxammo_medikit;
+	int     no_grenades_1, no_grenades_2;
+	int     tp_grenades_1, tp_grenades_2;
+	int     og_tp_grenades_1, og_tp_grenades_2;
+	int     tf_items, tf_items_flags;
+	int     armorclass, armorvalue, maxarmor;
+	float   armortype, armor_allowed;
+	int     items_allowed, items;
+	const   char   *name;
+	const   char   *defaultskin;
+	const   char   *infokey4skin[4];
+} class_settings_t;
+
+
 const class_settings_t class_set[] = {
 	{
 	 0,
@@ -1428,8 +1448,16 @@ void TeamFortress_SetHealth(  )
 	self->s.v.health = self->s.v.max_health = class_set[pc].maxhealth;
 }
 
+const char* TeamFortress_GetSkinByTeamClass( int tn, int pc )
+{
+        static char skin[20];
 
-char   *TeamFortress_GetSkin( gedict_t * p )
+	GetSVInfokeyString( class_set[pc].infokey4skin[tn - 1], NULL,
+			    skin, sizeof( skin ), class_set[pc].defaultskin );
+
+	return skin;
+}
+const char* TeamFortress_GetSkin( gedict_t * p )
 {
 	int     tn;
 	int     pc;
@@ -1446,9 +1474,7 @@ char   *TeamFortress_GetSkin( gedict_t * p )
 			pc = p->undercover_skin;
 	}
 
-	GetSVInfokeyString( class_set[pc].infokey4skin[tn - 1], NULL,
-			    class_skin[pc], sizeof( class_skin[pc] ), class_set[pc].defaultskin );
-	return class_skin[pc];
+	return TeamFortress_GetSkinByTeamClass( tn, pc );
 }
 
 void TeamFortress_SetSkin( gedict_t * p )
@@ -1730,7 +1756,7 @@ void TeamFortress_AddBackpackItems( gedict_t * Retriever, gedict_t * Items )
 	return;
 }
 
-char   *TeamFortress_GetClassName( int pc )
+const char   *TeamFortress_GetClassName( int pc )
 {
 	return class_set[pc].name;
 }

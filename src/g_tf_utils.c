@@ -18,11 +18,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_tf_utils.c,v 1.6 2005-05-16 09:35:45 AngelD Exp $
+ *  $Id: g_tf_utils.c,v 1.7 2005-05-28 19:03:46 AngelD Exp $
  */
 #include "g_local.h"
 
-qboolean GetInfokeyString( gedict_t * pl, const char *key, const char *key2, char *value, int size, char *defaultval )
+qboolean GetInfokeyString( gedict_t * pl, const char *key, const char *key2, char *value, int size, const char *defaultval )
 {
 	infokey( pl, key, value, size );
 	if ( value[0] )
@@ -57,7 +57,7 @@ int GetInfokeyInt( gedict_t * pl, const char *key, const char *key2, int default
 	return defaultval;
 }
 
-qboolean GetSVInfokeyString( const char *key, const char *key2, char *value, int size, char *defaultval )
+qboolean GetSVInfokeyString( const char *key, const char *key2, char *value, int size, const  char *defaultval )
 {
 	infokey( world, key, value, size );
 	if ( value[0] )

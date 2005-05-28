@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tforttm.c,v 1.16 2005-05-28 18:33:52 AngelD Exp $
+ *  $Id: tforttm.c,v 1.17 2005-05-28 19:03:46 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -85,7 +85,7 @@ void LoadTeamNames(  )
 	GetSVInfokeyString( "team4", "t4", team_names[3], 10, "gren" );
 }
 
-char   *GetTeamName( int tno )
+const char  *GetTeamName( int tno )
 {
 	LoadTeamNames();
 	if ( tno > 0 && tno <= 4 )
@@ -187,7 +187,8 @@ int TeamFortress_TeamSet( int tno )
 
 void TeamFortress_CheckTeamCheats(  )
 {
-	char    st[20], *sk;
+	char    st[20];
+	const char *sk;
 	int     tc;
 
 	if ( self->immune_to_check > g_globalvars.time )

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_local.h,v 1.19 2005-05-28 15:18:32 AngelD Exp $
+ *  $Id: g_local.h,v 1.20 2005-05-28 19:03:44 AngelD Exp $
  */
 //
 // g_local.h -- local definitions for game module
@@ -99,8 +99,8 @@ void            G_bprint( int level, const char *fmt, ... );
 void            G_centerprint( gedict_t * ed, const char *fmt, ... );
 void 		localcmd( const char *fmt, ... );
 void		stuffcmd( gedict_t * ed, const char *fmt, ... );
-int             streq( char *s1, char *s2 );
-int             strneq( char *s1, char *s2 );
+int             streq( const char *s1, const char *s2 );
+int             strneq( const char *s1, const char *s2 );
 void            aim( vec3_t ret );
 void    	setorigin( gedict_t * ed, float origin_x, float origin_y, float origin_z );
 void    	setsize( gedict_t * ed, float min_x, float min_y, float min_z, float max_x,
@@ -254,11 +254,11 @@ extern char * ANGEL_VERSION;
 int build_number (void);
 //g_tf_utils.c
 
-qboolean 	GetSVInfokeyString( const char*key, const char* key2, char*value, int size, char*defaultval);
+qboolean 	GetSVInfokeyString( const char*key, const char* key2, char*value, int size, const char*defaultval);
 int		GetSVInfokeyInt   ( const char*key, const char* key2, int defalutval);
 float 		GetSVInfokeyFloat ( const char*key, const char* key2, float defalutval);
 
-qboolean 	GetInfokeyString( gedict_t*pl, const char*key, const char* key2, char*value, int size, char*defaultval);
+qboolean 	GetInfokeyString( gedict_t*pl, const char*key, const char* key2, char*value, int size, const char*defaultval);
 int		GetInfokeyInt   ( gedict_t*pl, const char*key, const char* key2, int defalutval);
 
 void  		KickPlayer( int psize, gedict_t* p);

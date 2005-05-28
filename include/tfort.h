@@ -18,33 +18,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.h,v 1.11 2005-05-28 18:33:52 AngelD Exp $
+ *  $Id: tfort.h,v 1.12 2005-05-28 19:03:44 AngelD Exp $
  */
 
-typedef struct {
-	int     bitmask;
-	int     maxhealth, maxspeed, maxstrafespeed;
-	int     weapons_carried, current_weapon;
-	int     ammo_shells, ammo_nails, ammo_rockets, ammo_cells, ammo_detpack, ammo_medikit;
-	int     maxammo_shells, maxammo_nails, maxammo_rockets, 
-		maxammo_cells, maxammo_detpack, maxammo_medikit;
-	int     no_grenades_1, no_grenades_2;
-	int     tp_grenades_1, tp_grenades_2;
-	int     og_tp_grenades_1, og_tp_grenades_2;
-	int     tf_items, tf_items_flags;
-	int     armorclass, armorvalue, maxarmor;
-	float   armortype, armor_allowed;
-	int     items_allowed, items;
-	char   *name;
-	char   *defaultskin;
-	char   *infokey4skin[4];
-} class_settings_t;
-
-//extern char class_skin[][20];
-extern const class_settings_t class_set[];
-
 //tfort.c
-char   *TeamFortress_GetClassName( int pc );
+const   char   *TeamFortress_GetClassName( int pc );
 void    TF_AddFrags( gedict_t * pl, int fr );
 void    TeamFortress_RemoveTimers(  );
 void    TeamFortress_SetupRespawn( int Suicided );
@@ -64,7 +42,8 @@ int     TeamFortress_TeamPutPlayerInTeam(  );
 void    KickCheater( gedict_t * p );
 void    TeamFortress_Alias( char *halias, int himpulse1, int himpulse2 );
 const char   *TeamFortress_TeamGetColorString( int tno );
-char   *TeamFortress_GetSkin( gedict_t * p );
+const char   *TeamFortress_GetSkin( gedict_t * p );
+const char* TeamFortress_GetSkinByTeamClass( int tn, int pc );
 void    TeamFortress_AmmoboxRemove(  );
 
 //tforttm.c
@@ -136,7 +115,7 @@ void    Admin_CeaseFire(  );
 
 //tforttm
 float   TeamEqualiseDamage( gedict_t * targ, gedict_t * attacker, float damage );
-char   *GetTeamName( int tno );
+const   char   *GetTeamName( int tno );
 int     TeamFortress_TeamGetWinner(  );
 int     TeamFortress_TeamGetScore( int tno );
 int     TeamFortress_TeamGetSecond(  );

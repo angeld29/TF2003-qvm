@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.h,v 1.10 2005-05-16 09:35:43 AngelD Exp $
+ *  $Id: g_syscalls.h,v 1.11 2005-05-28 19:03:44 AngelD Exp $
  */
 
 int     trap_GetApiVersion(  );
@@ -77,7 +77,7 @@ void    trap_WriteShort( int to, int data );
 void    trap_WriteLong( int to, int data );
 void    trap_WriteAngle( int to, float data );
 void    trap_WriteCoord( int to, float data );
-void    trap_WriteString( int to, char *data );
+void    trap_WriteString( int to, const char *data );
 void    trap_WriteEntity( int to, int edn );
 void    trap_FlushSignon(  );
 void    trap_disableupdates( int edn, float time );
