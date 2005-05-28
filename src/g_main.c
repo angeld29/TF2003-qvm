@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.16 2005-05-27 21:27:04 AngelD Exp $
+ *  $Id: g_main.c,v 1.17 2005-05-28 22:35:46 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -188,7 +188,7 @@ void G_InitGame( int levelTime, int randomSeed )
 	framecount = 0;
 	starttime = levelTime * 0.001;
 	G_dprintf( "Init Game\n" );
-	G_InitMemory();
+	//G_InitMemory();
 	memset( g_edicts, 0, sizeof( gedict_t ) * MAX_EDICTS );
 	
 

@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_spawn.c,v 1.7 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: g_spawn.c,v 1.8 2005-05-28 22:35:46 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -677,6 +677,7 @@ char           *G_NewString( const char *string )
 	l = strlen( string ) + 1;
 
 	newb = G_Alloc( l );
+	//newb = malloc( l );
 
 	new_p = newb;
 

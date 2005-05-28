@@ -9,7 +9,7 @@
 #define POOLSIZE	(256 * 1024)
 
 static char     memoryPool[POOLSIZE];
-static int      allocPoint;
+static int      allocPoint = 0;
 
 void           *G_Alloc( int size )
 {
@@ -32,7 +32,7 @@ void           *G_Alloc( int size )
 	return p;
 }
 
-void G_InitMemory( void )
+/*void G_InitMemory( void )
 {
 	allocPoint = 0;
-}
+}*/

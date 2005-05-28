@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.41 2005-05-28 18:33:52 AngelD Exp $
+ *  $Id: client.c,v 1.42 2005-05-28 22:35:46 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -44,8 +44,8 @@ float   rj;
 
 =============================================================================
 */
-float   intermission_running;
-float   intermission_exittime;
+float   intermission_running = 0;
+float   intermission_exittime = 0;
 char    nextmap[64] = "";
 
 /*QUAKED info_intermission (1 0.5 0.5) (-16 -16 -16) (16 16 16)
@@ -755,17 +755,18 @@ void GotoNextMap()
 {
 	int     nextlevel;
 	char    str[64];
+	static  int map_try_change = 0;
 
 //      gedict_t *te;
 
-	if ( Q_strncmp( nextmap, g_globalvars.mapname, 64 ) )
+	if ( Q_strncmp( nextmap, g_globalvars.mapname, sizeof(nextmap) ) )
 	{
 		trap_changelevel( nextmap );
 		tf_data.already_chosen_map = 1;
 	}
 	if ( GetSVInfokeyString( g_globalvars.mapname, NULL, str, sizeof( str ), "" ) )
 	{
-		strncpy( nextmap, str, 64 );
+		strncpy( nextmap, str, sizeof(nextmap) );
 		tf_data.already_chosen_map = 1;
 		return;
 	}
@@ -774,7 +775,6 @@ void GotoNextMap()
 	{
 		nextlevel = GetSVInfokeyInt( "n", NULL, 0 );
 		nextlevel++;
-
 
 		localcmd( "serverinfo n %d\n", nextlevel );
 		GetSVInfokeyString( "cd", "cycledir", str, sizeof( str ), "qwmcycle" );
@@ -1000,7 +1000,7 @@ void SP_trigger_changelevel()
 		return;
 	}
 	if ( !self->map )
-		G_Error( "chagnelevel trigger doesn't have map" );
+		G_Error( "changelevel trigger doesn't have map" );
 
 	InitTrigger();
 	self->s.v.touch = ( func_t ) changelevel_touch;
@@ -1562,7 +1562,7 @@ RULES
 
 ===============================================================================
 */
-int     already_cycled;
+static int     already_cycled = 0;
 
 /*
 go to the next level 

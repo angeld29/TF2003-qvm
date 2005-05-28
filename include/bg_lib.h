@@ -70,4 +70,4 @@ double fabs( double x );
 double acos( double x );
 int abs( int n );
 float asin( float x );
-
+int memcmp (const void *s1, const void *s2, size_t n);
