@@ -5,6 +5,7 @@
   Permission granted to copy, modify, distribute, and use, provided this
   copyright notice remains intact.  Source is provided on an as-is basis,
   with no warranties.
+  $Id: qmalloc.c,v 1.2 2005-05-28 16:39:52 AngelD Exp $
 */
 
 typedef int size_t;
