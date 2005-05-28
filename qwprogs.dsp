@@ -281,6 +281,10 @@ SOURCE=.\src\q_shared.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\qmd5.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\scout.c
 # End Source File
 # Begin Source File
@@ -417,6 +421,10 @@ SOURCE=.\include\progs.h
 # Begin Source File
 
 SOURCE=.\include\q_shared.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\qmd5.h
 # End Source File
 # Begin Source File
 
