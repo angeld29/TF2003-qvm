@@ -5,7 +5,7 @@
   Permission granted to copy, modify, distribute, and use, provided this
   copyright notice remains intact.  Source is provided on an as-is basis,
   with no warranties.
-  $Id: qmalloc.c,v 1.2 2005-05-28 16:39:52 AngelD Exp $
+  $Id: qmalloc.c,v 1.3 2005-05-28 18:33:52 AngelD Exp $
 */
 
 typedef int size_t;
@@ -13,12 +13,12 @@ typedef int size_t;
 #include "qmalloc.h"
 
 
-unsigned char arena[MALLOC_ARENA];
+static unsigned char arena[MALLOC_ARENA];
 
-int *_arena_metadata = 0;
-unsigned char *_arena_data = 0;
-int _arena_pages = 0;
-int _arena_freestart = 1;
+static int *_arena_metadata = 0;
+static unsigned char *_arena_data = 0;
+static int _arena_pages = 0;
+static int _arena_freestart = 1;
 
 enum {
   MALLOC_MAGIC = 0x6B8E6EB9,
@@ -33,7 +33,7 @@ number of metadata integers.
 */
 
 
-void
+static void
 malloc_init ()
 {
   if (((int*)arena)[0] == MALLOC_MAGIC)
@@ -51,7 +51,7 @@ malloc_init ()
 }
 
 
-int
+static int
 findspot (int pages)
 {
   int i, j;
@@ -90,7 +90,7 @@ findspot (int pages)
 }
 
 
-int
+static int
 usedblocks (void *ptr)
 {
   int i;

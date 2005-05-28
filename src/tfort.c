@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.36 2005-05-27 21:27:04 AngelD Exp $
+ *  $Id: tfort.c,v 1.37 2005-05-28 18:33:52 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -26,9 +26,9 @@ tf_server_data_t tf_data;
 int FLAME_MAXWORLDNUM, MAX_WORLD_PIPEBOMBS, MAX_WORLD_AMMOBOXES, GR_TYPE_MIRV_NO, GR_TYPE_NAPALM_NO;
 
 
-int     num_team_ammoboxes[5] = { 0, 0, 0, 0, 0 };
+static int     num_team_ammoboxes[5] = { 0, 0, 0, 0, 0 };
 
-char class_skin[][20]={
+static char class_skin[][20]={
  "base",
  "tf_scout",
  "tf_snipe",

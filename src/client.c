@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.40 2005-05-28 15:18:32 AngelD Exp $
+ *  $Id: client.c,v 1.41 2005-05-28 18:33:52 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1554,56 +1554,6 @@ void PrintClientScore( gedict_t * c )
 	G_bprint( 1, "%3d %s\n", c->s.v.frags, c->s.v.netname );
 }
 
-
-void DumpScore()
-{
-///FIX ME !!!!!!!! not used???
-/* gedict_t* e;
- gedict_t* sort;
- gedict_t* walk;
-
- if (world.chain) 
-  error("DumpScore: world.chain is set");
- e = trap_find(world, FOFS(s.v.classname), "player");
- sort = world;
- while (e) {
-  if (!sort) {
-   sort = e;
-   e.chain = world;
-  }
-  else {
-   if (e.frags > sort.frags) {
-    e.chain = sort;
-    sort = e;
-   }
-   else {
-    walk = sort;
-    do {
-     if (!walk.chain) {
-      e.chain = world;
-      walk.chain = e;
-     }
-     else {
-      if (walk.chain.frags < e.frags) {
-       e.chain = walk.chain;
-       walk.chain = e;
-      }
-      else 
-       walk = walk.chain;
-     }
-    } while (walk.chain != e);
-   }
-  }
-  e = trap_find(e, FOFS(s.v.classname), "player");
- }
- bprint(1, "\n");
- while (sort) {
-  PrintClientScore(sort);
-  sort = sort.chain;
- }
- bprint(1, "\n");
- */
-}
 
 /*
 ===============================================================================

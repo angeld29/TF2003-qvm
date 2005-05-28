@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: admin_cmd.c,v 1.2 2005-05-16 09:35:45 AngelD Exp $
+ *  $Id: admin_cmd.c,v 1.3 2005-05-28 18:33:52 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -28,15 +28,15 @@ typedef struct {
 	int		level;
 }admin_cmd_t;
 
-void Admin_Auth(int argc);
+static void Admin_Auth(int argc);
 //void Admin_ListPlayers(int argc);
-void Admin_Status(int argc);
-void Admin_Kick(int argc);
-void Admin_Ban(int argc);
-void Admin_UnBan(int argc);
-void Admin_BanList(int argc);
-void Admin_Console(int argc);
-void Admin_Map(int argc);
+static void Admin_Status(int argc);
+static void Admin_Kick(int argc);
+static void Admin_Ban(int argc);
+static void Admin_UnBan(int argc);
+static void Admin_BanList(int argc);
+static void Admin_Console(int argc);
+static void Admin_Map(int argc);
 
 static const admin_cmd_t admin_cmds[] = 
 {
@@ -52,7 +52,7 @@ static const admin_cmd_t admin_cmds[] =
 	{NULL,NULL,0}
 };
 
-int CheckString(char *str)
+static int CheckString(char *str)
 {
 	char *strp =str,ch;
 	while(ch = *strp++)
@@ -68,24 +68,6 @@ int CheckString(char *str)
 		}
 	}
 	return 1;
-}
-gedict_t* Admin_FindPlayerById(int id)
-{
-	
-    	int i;
-    	int plid;
-    	
-
-	for ( i = 0 ; i < MAX_CLIENTS ; i++ )
-	{
-
-		if( g_edicts[i + 1].s.v.netname[0]  == 0)
-			continue;
-		plid = GetInfokeyInt( &g_edicts[i + 1], "*userid", NULL, -1 );
-		if( id == plid)
-			return &g_edicts[i + 1];
-	}
-	return NULL;
 }
 
 void Admin_Cmd()
@@ -127,7 +109,27 @@ void Admin_Cmd()
 	G_sprint( self, 2, "Unknown admin command.\n");
 }
 
-void Admin_Auth(int argc)
+static gedict_t* Admin_FindPlayerById(int id)
+{
+	
+    	int i;
+    	int plid;
+    	
+
+	for ( i = 0 ; i < MAX_CLIENTS ; i++ )
+	{
+
+		if( g_edicts[i + 1].s.v.netname[0]  == 0)
+			continue;
+		plid = GetInfokeyInt( &g_edicts[i + 1], "*userid", NULL, -1 );
+		if( id == plid)
+			return &g_edicts[i + 1];
+	}
+	return NULL;
+}
+
+
+static void Admin_Auth(int argc)
 {
         char    sv_admin_pwd[100];
         char    admin_pwd[100];
@@ -166,7 +168,7 @@ void Admin_Auth(int argc)
 	}
 }*/
 
-void Admin_Kick(int argc)
+static void Admin_Kick(int argc)
 {
 	char    value[100];
 	gedict_t*p;
@@ -192,7 +194,7 @@ void Admin_Kick(int argc)
 	KickCheater( p );
 }
 
-void Admin_Ban(int argc)
+static void Admin_Ban(int argc)
 {
 	char    value[100];
 	int id;
@@ -219,7 +221,7 @@ void Admin_Ban(int argc)
 	trap_executecmd();
 }
 
-void Admin_UnBan(int argc)
+static void Admin_UnBan(int argc)
 {
 	char    value[100];
 
@@ -238,19 +240,19 @@ void Admin_UnBan(int argc)
 	trap_executecmd();
 }
 
-void Admin_BanList(int argc)
+static void Admin_BanList(int argc)
 {
 	localcmd("listip\n");
 	trap_executecmd();
 }
 
-void Admin_Status(int argc)
+static void Admin_Status(int argc)
 {
 	localcmd("status\n");
 	trap_executecmd();
 }
 
-void Admin_Map(int argc)
+static void Admin_Map(int argc)
 {
 	char    value[100];
 
@@ -267,9 +269,10 @@ void Admin_Map(int argc)
 //	trap_executecmd();
 }
 
-void Admin_Console(int argc)
+static void Admin_Console(int argc)
 {
 
 }
+
 
 

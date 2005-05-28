@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: progs.h,v 1.20 2005-05-17 03:56:00 AngelD Exp $
+ *  $Id: progs.h,v 1.21 2005-05-28 18:33:52 AngelD Exp $
  */
 #include "progdefs.h"
 
@@ -325,26 +325,20 @@ typedef struct gedict_s {
 ///
 
 } gedict_t;
-extern float sv_gravity;
+extern  float           sv_gravity;
 extern  int 		skill;
 extern  int 		number_of_teams; 
 extern  int             illegalclasses[5];
 extern  int             civilianteams;		
-//extern  int		team_col[5];            //
 extern  int             teamscores[5];
 extern  int             teamfrags[5];
 extern  int             teamlives[5];
 extern	int             teammaxplayers[5];
-extern  float		teamadvantage[5];       
+//extern  float		teamadvantage[5];       
 extern 	int 		teams_allied;
 
 extern  int             CTF_Map;                
 extern  float           rj;                     
-extern  int             num_world_flames;       
-extern  int             num_team_pipebombs[5];  
-extern  int             num_team_flares[5];     
-extern  int             num_team_ammoboxes[5];  
-//extern	int             item_list_bit;
 extern char           *team_menu_string;  
 
 extern int FLAME_MAXWORLDNUM, MAX_WORLD_PIPEBOMBS, MAX_WORLD_AMMOBOXES, GR_TYPE_MIRV_NO, GR_TYPE_NAPALM_NO;

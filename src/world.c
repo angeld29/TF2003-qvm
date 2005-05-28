@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: world.c,v 1.8 2005-05-19 23:29:18 AngelD Exp $
+ *  $Id: world.c,v 1.9 2005-05-28 18:33:52 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -33,7 +33,7 @@ BODY QUE
 ==============================================================================
 */
 
-void InitBodyQue(  )
+static void InitBodyQue(  )
 {
 	int     i;
 

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: status.c,v 1.11 2005-05-27 21:27:04 AngelD Exp $
+ *  $Id: status.c,v 1.12 2005-05-28 18:33:52 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -68,8 +68,8 @@ const char   *teamnames[5] = {
 };
 
 
-char    sbar_str[MAX_SBAR_STR];
-char   *end_of_sbar_str = sbar_str + MAX_SBAR_STR;
+static char    sbar_str[MAX_SBAR_STR];
+static char   *end_of_sbar_str = sbar_str + MAX_SBAR_STR;
 
 void RefreshStatusBar( gedict_t * pl )
 {
@@ -169,24 +169,6 @@ void RefreshStatusBar( gedict_t * pl )
 	trap_CenterPrint( NUM_FOR_EDICT( pl ), sbar_str );
 }
 
-static const int     SbarReSizes_old[] = { 0, 5, 12, 17, 23, 25, 35, 50, 70 };
-char   *AddStatusSize_old( gedict_t * pl, char *strp )
-{
-	int     i;
-
-	for ( i = 0; i < 11; i++ )
-		*strp++ = '\n';
-	if ( pl->StatusBarSize != 1 )
-	{
-		*strp++ = '\n';
-		*strp++ = '\n';
-		*strp++ = '\n';
-	}
-	for ( i = 0; i < SbarReSizes_old[pl->StatusBarRes]; i++ )
-		*strp++ = '\n';
-	*strp = 0;
-	return strp;
-}
 static const int     SbarReSizes[2][9] = {{ 14 ,19, 26, 32, 37, 39, 49, 64, 84 },
 			     { 11 ,16, 23, 29, 34, 36, 46, 61, 81 }};
 
@@ -205,7 +187,7 @@ char   *AddStatusSize( gedict_t * pl, char *strp )
 	return strp;
 }
 
-const char   *sbar_msg[] = {
+static const char   *sbar_msg[] = {
 	"Status Bar Res set to 320x200.\n",
 	"Status Bar Res set to 320x240.\n",
 	"Status Bar Res set to 400x300.\n",
@@ -231,29 +213,21 @@ char   *ClipSizeToString( gedict_t * pl, char *str )
 
 	if ( pl->current_weapon == 128 )
 	{
-//  if (8 - pl.reload_shotgun > pl.ammo_shells) 
-//   pl.reload_shotgun = 8 - pl.ammo_shells;
 		num = 8 - pl->reload_shotgun;
 	} else
 	{
 		if ( pl->current_weapon == 256 )
 		{
-//   if (16 - pl.reload_super_shotgun > pl.ammo_shells) 
-//    pl.reload_super_shotgun = 16 - pl.ammo_shells;
 			num = 16 - pl->reload_super_shotgun;
 		} else
 		{
 			if ( pl->current_weapon == 2048 )
 			{
-//    if (6 - pl.reload_grenade_launcher > pl.ammo_rockets) 
-//     pl.reload_grenade_launcher = 6 - pl.ammo_rockets;
 				num = 6 - pl->reload_grenade_launcher;
 			} else
 			{
 				if ( pl->current_weapon == 8192 )
 				{
-//     if (4 - pl.reload_rocket_launcher > pl.ammo_rockets) 
-//      pl.reload_rocket_launcher = 4 - pl.ammo_rockets;
 					num = 4 - pl->reload_rocket_launcher;
 				} else
 					num = -1;

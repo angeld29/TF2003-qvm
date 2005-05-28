@@ -18,14 +18,14 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: flare.c,v 1.6 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: flare.c,v 1.7 2005-05-28 18:33:52 AngelD Exp $
  */
 /*==================================
 This file handles all the functions
 to deal with the flare 'grenade'.
 ==================================*/
 #include "g_local.h"
-int     num_team_flares[5] = { 0, 0, 0, 0, 0 };
+static int     num_team_flares[5] = { 0, 0, 0, 0, 0 };
 
 void FlareGrenadeTouch(  )
 {
@@ -158,3 +158,18 @@ void RemoveOldFlare( int tno )
 		old = trap_find( old, FOFS( mdl ), "flare" );
 	}
 }
+
+/*void increment_team_flares( int tno )
+{
+	if ( tno < 0 || tno > 4 )
+		return;
+	num_team_flares[tno]++;
+}*/
+
+/*void decrement_team_flares( int tno )
+{
+	if ( tno < 0 || tno > 4 )
+		return;
+	num_team_flares[tno]--;
+}*/
+

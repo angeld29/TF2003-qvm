@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: pyro.c,v 1.12 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: pyro.c,v 1.13 2005-05-28 18:33:52 AngelD Exp $
  */
 #include "g_local.h"
 #define FLAME_PLYRMAXTIME 45
@@ -26,7 +26,7 @@ void    NapalmGrenadeTouch(  );
 void    NapalmGrenadeLaunch( vec3_t org, gedict_t * shooter );
 void    Napalm_touch(  );
 int     RemoveFlameFromQueue( int id_flame );
-int     num_world_flames = 0;
+static int     num_world_flames = 0;
 
 //** different types of flames (decreasing priority)
 

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tforttm.c,v 1.15 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: tforttm.c,v 1.16 2005-05-28 18:33:52 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -26,7 +26,7 @@ int     teamscores[5];
 int     teamfrags[5];
 int     teamlives[5];
 int     teammaxplayers[5];
-float   teamadvantage[5];
+static float   teamadvantage[5];
 int     illegalclasses[5];
 int     civilianteams;
 

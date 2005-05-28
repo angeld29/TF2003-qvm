@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.27 2005-05-27 21:27:04 AngelD Exp $
+ *  $Id: weapons.c,v 1.28 2005-05-28 18:33:52 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -1381,6 +1381,8 @@ int CountPlayerPipebombs( gedict_t * player )
 	return num_pipes;
 }
 
+static int     num_team_pipebombs[5];
+
 void ExplodeOldPipebomb( int tno, int extra )
 {
 	gedict_t *old;
@@ -1422,26 +1424,12 @@ void increment_team_pipebombs( int tno )
 	num_team_pipebombs[tno]++;
 }
 
-void increment_team_flares( int tno )
-{
-	if ( tno < 0 || tno > 4 )
-		return;
-	num_team_flares[tno]++;
-}
-
 void decrement_team_pipebombs( int tno )
 {
 	if ( tno < 0 || tno > 4 )
 		return;
 	num_team_pipebombs[tno]--;
 
-}
-
-void decrement_team_flares( int tno )
-{
-	if ( tno < 0 || tno > 4 )
-		return;
-	num_team_flares[tno]--;
 }
 
 //=============================================================================

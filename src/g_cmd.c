@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.14 2005-05-16 09:35:45 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.15 2005-05-28 18:33:52 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -205,6 +205,5 @@ qboolean ClientUserInfoChanged(  )
 
 void Test(  )
 {
-
 }
 

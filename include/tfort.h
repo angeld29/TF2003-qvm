@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.h,v 1.10 2005-05-16 09:35:43 AngelD Exp $
+ *  $Id: tfort.h,v 1.11 2005-05-28 18:33:52 AngelD Exp $
  */
 
 typedef struct {
@@ -40,7 +40,7 @@ typedef struct {
 	char   *infokey4skin[4];
 } class_settings_t;
 
-extern char class_skin[][20];
+//extern char class_skin[][20];
 extern const class_settings_t class_set[];
 
 //tfort.c

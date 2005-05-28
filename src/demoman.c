@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: demoman.c,v 1.15 2005-05-17 03:56:00 AngelD Exp $
+ *  $Id: demoman.c,v 1.16 2005-05-28 18:33:52 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -32,7 +32,6 @@ void    TeamFortress_DetpackExplode(  );
 void    TeamFortress_DetpackTouch(  );
 void    TeamFortress_DetpackDisarm(  );
 void    TeamFortress_DetpackCountDown(  );
-int     num_team_pipebombs[5];
 
 //=========================================================================
 // Detonate all thrown pipebombs
