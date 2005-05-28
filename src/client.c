@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.39 2005-05-27 21:27:04 AngelD Exp $
+ *  $Id: client.c,v 1.40 2005-05-28 15:18:32 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -971,7 +971,7 @@ void changelevel_touch()
 	}
 
 	G_bprint( PRINT_HIGH, "%s exited the level\n", other->s.v.netname );
-	strcpy( nextmap, self->map );
+	Q_strncpyz( nextmap, self->map, sizeof(nextmap) );
 
 	SUB_UseTargets();
 

@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_utils.c,v 1.10 2005-05-27 21:27:04 AngelD Exp $
+ *  $Id: g_utils.c,v 1.11 2005-05-28 15:18:32 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -322,10 +322,10 @@ print functions
 ==============
 */
 //===================================================================
-static char text[2048];
 void G_dprintf( const char *fmt, ... )
 {
 	va_list         argptr;
+	char text[1024];
 
 	va_start( argptr, fmt );
 	_vsnprintf( text, sizeof(text), fmt, argptr );
@@ -337,6 +337,7 @@ void G_dprintf( const char *fmt, ... )
 void G_conprintf( const char *fmt, ... )
 {
 	va_list         argptr;
+	char text[1024];
 
 	va_start( argptr, fmt );
 	_vsnprintf( text, sizeof(text), fmt, argptr );
@@ -348,6 +349,7 @@ void G_conprintf( const char *fmt, ... )
 void G_Error( const char *fmt, ... )
 {
 	va_list         argptr;
+	char text[1024];
 
 	va_start( argptr, fmt );
 	_vsnprintf( text, sizeof(text), fmt, argptr );
@@ -359,6 +361,7 @@ void G_Error( const char *fmt, ... )
 void G_sprint( gedict_t * ed, int level, const char *fmt, ... )
 {
 	va_list argptr;
+	char text[1024];
 
 	va_start( argptr, fmt );
 	_vsnprintf( text, sizeof(text), fmt, argptr );
@@ -370,6 +373,7 @@ void G_sprint( gedict_t * ed, int level, const char *fmt, ... )
 void G_bprint( int level, const char *fmt, ... )
 {
 	va_list argptr;
+	char text[1024];
 
 	va_start( argptr, fmt );
 	_vsnprintf( text, sizeof(text), fmt, argptr );
@@ -381,6 +385,7 @@ void G_bprint( int level, const char *fmt, ... )
 void G_centerprint( gedict_t * ed, const char *fmt, ... )
 {
 	va_list argptr;
+	char text[1024];
 
 	va_start( argptr, fmt );
 	_vsnprintf( text, sizeof(text), fmt, argptr );

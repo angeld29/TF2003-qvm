@@ -251,6 +251,14 @@ cd VM
 
 @if errorlevel 1 goto quit
 
+%CC% %CFLAGS% %INCFLAGS% %SRC%\qmalloc.c -o qmalloc.asm
+
+@if errorlevel 1 goto quit
+
+%CC% %CFLAGS% %INCFLAGS% %SRC%\qmd5.c -o qmd5.asm
+
+@if errorlevel 1 goto quit
+
 copy %SRC%\g_syscalls.asm .
 
 @if errorlevel 1 goto quit

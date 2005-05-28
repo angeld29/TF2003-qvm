@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_local.h,v 1.18 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: g_local.h,v 1.19 2005-05-28 15:18:32 AngelD Exp $
  */
 //
 // g_local.h -- local definitions for game module
@@ -27,6 +27,7 @@
 #define __G_LOCAL
 #include "q_shared.h"
 #include "mathlib.h"
+#include "qmd5.h"
 #include "g_consts.h"
 #include "g_tf_consts.h"
 #include "progs.h"

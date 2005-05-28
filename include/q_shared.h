@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: q_shared.h,v 1.2 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: q_shared.h,v 1.3 2005-05-28 15:18:32 AngelD Exp $
  */
 
 #ifndef __Q_SHARED_H
@@ -53,6 +53,7 @@
 #ifdef Q3_VM
 
 #include "bg_lib.h"
+#include "qmalloc.h"
 
 #else
 

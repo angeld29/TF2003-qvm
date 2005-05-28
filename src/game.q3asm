@@ -30,6 +30,8 @@ plats
 player
 pyro
 q_shared
+qmalloc
+qmd5
 scout
 sentry
 server

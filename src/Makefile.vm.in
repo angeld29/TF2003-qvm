@@ -16,7 +16,7 @@
 #   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 #
-#   $Id: Makefile.vm.in,v 1.7 2005-05-06 14:01:36 AngelD Exp $
+#   $Id: Makefile.vm.in,v 1.8 2005-05-28 15:18:32 AngelD Exp $
 
 LCC=@LCC@
 Q3ASM=@Q3ASM@
@@ -31,7 +31,7 @@ INCFLAGS=-I../include
 SOURCES= g_main.c actions.c admin.c admin_cmd.c bg_lib.c buttons.c clan.c client.c combat.c coop.c ctf.c debug.c \
          demoman.c doors.c engineer.c flare.c g_cmd.c g_mem.c g_spawn.c\
          g_tf_utils.c g_utils.c hook.c items.c mathlib.c menu.c misc.c plats.c player.c\
-         pyro.c q_shared.c scout.c sentry.c server.c sniper.c  spectate.c spy.c status.c subs.c\
+         pyro.c q_shared.c qmalloc.c qmd5.c scout.c sentry.c server.c sniper.c  spectate.c spy.c status.c subs.c\
          tfort.c  tforthlp.c tfortmap.c tforttm.c tg.c triggers.c tsoldier.c version.c\
          vote.c weapons.c world.c bot\ai.c bot\ai-misc.c bot\fighting.c bot\move.c bot\qw.c bot\ui.c
 
