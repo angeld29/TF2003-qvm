@@ -14,3 +14,28 @@ Missile spawn requires g_globalvars.newmis set.
 dont use string arrys in one structure with other types ( q3asm place strings in different segment )
 
 dont use map command with redirectcmd, executecmd, readcmd
+
+áompiler bugs/features:
+
+# switch statements sometimes produce unsafe code if you use run-on in case 
+labels. ie. each case label must have it's own break statement OR no lines of 
+logic between the next case label. 
+# For integer types avoid using data types other than int. Specifically don't 
+use the short or unsigned char data types at all (info from ID). The Q3VM and 
+compiler do not deal with non-wordsize types well -- using them often results 
+in unpredictable behaviour. 
+# double does not exist, everything is 32bit. float does not undergo type 
+promotion when passed as a parameter. 
+
+Mac VM Endianness
+
+The Mac VM is big endian (high byte first in integers and shorts), which means 
+you need to be careful with certain I/O operations. For example, you can't 
+serialize an integer to a file stream just by writing its bytes. 
+("trap_FS_Write(&i, 4, f)" - if "i" is an int - will produce different results 
+in the Mac VM than in the PC VM, in other words.) 
+
+Extracting bytes using shift operators and writing them to a temporary buffer 
+will work. Or write your own htonl(), etc. (It's easy to tell if you need to 
+swap bytes: assign an int to a constant, get a char* pointer to it, and check 
+the bytes.) 
