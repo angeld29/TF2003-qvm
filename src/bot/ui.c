@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: ui.c,v 1.5 2005-05-17 03:56:00 AngelD Exp $
+ *  $Id: ui.c,v 1.6 2005-05-31 20:01:30 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -153,6 +153,12 @@ void Bot()
         int argc,i;
         bot_cmd_t*ucmd;
 
+        if( api_ver < 7 )
+        {
+                G_sprint( self, 2, "Bots disabled (API version %d)\n",api_ver );
+                return;
+        }
+
 	if ( !tf_data.enable_bot )
 	{
 		G_sprint( self, 2, "Bots disabled\n" );
@@ -218,7 +224,7 @@ void BotSet()
 
 void BotTest()
 {
- 	gedict_t *te;
+/* 	gedict_t *te;
         char    cmd_command[50];
         int argc;
         float origin,speed;
@@ -245,4 +251,5 @@ void BotTest()
                    return;
 		}
 	}
+*/
 }

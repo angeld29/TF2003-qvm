@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_local.h,v 1.21 2005-05-28 22:35:45 AngelD Exp $
+ *  $Id: g_local.h,v 1.22 2005-05-31 20:01:30 AngelD Exp $
  */
 //
 // g_local.h -- local definitions for game module
@@ -67,7 +67,7 @@ extern globalvars_t g_globalvars;
 extern gedict_t *world;
 extern gedict_t *self, *other;
 extern gedict_t *newmis;
-extern int      timelimit, fraglimit, teamplay, deathmatch, framecount, coop;
+extern int      timelimit, fraglimit, teamplay, deathmatch, framecount, coop, api_ver;
 
 #define	EDICT_TO_PROG(e) ((byte *)(e) - (byte *)g_edicts)
 #define PROG_TO_EDICT(e) ((gedict_t *)((byte *)g_edicts + (e)))
@@ -279,7 +279,7 @@ void Service_Grapple();
 void    Throw_Grapple(  );
 //status
 void CenterPrint( gedict_t * pl, const char *fmt, ... );
-void StatusPrint( gedict_t * pl, float fTime, const char *fmt, ... );
+//void StatusPrint( gedict_t * pl, float fTime, const char *fmt, ... );
 void RefreshStatusBar( gedict_t * pl );
 void StatusRes( int res );
 //menu

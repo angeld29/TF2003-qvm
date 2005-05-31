@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: admin_cmd.c,v 1.4 2005-05-28 22:35:46 AngelD Exp $
+ *  $Id: admin_cmd.c,v 1.5 2005-05-31 20:01:30 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -38,6 +38,7 @@ static void Admin_BanList(int argc);
 static void Admin_Console(int argc);
 static void Admin_Map(int argc);
 
+static const int max_adminlevel = 100;
 static const admin_cmd_t admin_cmds[] = 
 {
 	{"auth", Admin_Auth,0},
@@ -153,8 +154,8 @@ static void Admin_Auth(int argc)
 	                                     0x5D, 0x74, 0xF7, 0x70, 
 	                                     0xC1, 0x8D, 0xB7, 0x3B, };
 	        int i;
-
 	        struct MD5Context md5c;
+
 	        MD5Init(&md5c);
 	        MD5Update(&md5c, (unsigned char*)admin_pwd,strlen(admin_pwd));
 	        MD5Final(digest,&md5c);
@@ -180,6 +181,8 @@ static void Admin_Auth(int argc)
 		if( self->is_admin )
 		{
 	        	G_sprint( self, 2, "You gain admin level %d\n",self->is_admin);
+	        	if( self->is_admin > max_adminlevel )
+	        	        self->is_admin = max_adminlevel;
 	        	return;
 		}
 	}
@@ -222,7 +225,7 @@ static void Admin_Kick(int argc)
 		return;
 	}
 
-	G_bprint(  2, "%s was kicked by %s\n",p->s.v.netname, self->s.v.netname);
+        G_bprint(  2, "%s was kicked by %s\n",p->s.v.netname, self->s.v.netname);
 //	localcmd("kick %d",id);
 	KickCheater( p );
 }
@@ -315,6 +318,3 @@ static void Admin_Console(int argc)
         localcmd("%s\n",value);
         trap_executecmd();
 }
-
-
-

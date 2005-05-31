@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.17 2005-05-28 22:35:46 AngelD Exp $
+ *  $Id: g_main.c,v 1.18 2005-05-31 20:01:30 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -37,9 +37,13 @@ static field_t         expfields[] = {
 static char     mapname[64];
 static char     worldmodel[64] = "worldmodel";
 static char     netnames[MAX_CLIENTS][32];
+int             api_ver;
+
+#define MIN_API_VERSION 6
+//#define MIN_API_VERSION GAME_API_VERSION
 
 static gameData_t      gamedata =
-    { ( edict_t * ) g_edicts, sizeof( gedict_t ), &g_globalvars, expfields , GAME_API_VERSION};
+    { ( edict_t * ) g_edicts, sizeof( gedict_t ), &g_globalvars, expfields , MIN_API_VERSION};
 float           starttime;
 void            G_InitGame( int levelTime, int randomSeed );
 void            StartFrame( int time );
@@ -58,18 +62,18 @@ This is the only way control passes into the module.
 This must be the very first function compiled into the .q3vm file
 ================
 */
+
 int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
 	    int arg6, int arg7, int arg8, int arg9, int arg10, int arg11 )
 {
-        int api_ver;
 	ClearGlobals();
 	switch ( command )
 	{
 	case GAME_INIT:
 	        api_ver = trap_GetApiVersion();
-		if ( api_ver < GAME_API_VERSION )
+		if ( api_ver < MIN_API_VERSION ) 
 		{
-			G_conprintf("Mod requried API_VERSION %d or higher, server have %d\n", GAME_API_VERSION,api_ver);
+			G_conprintf("Mod requried API_VERSION %d or higher, server have %d\n", MIN_API_VERSION, api_ver);
 			return 0;
 		}
 

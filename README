@@ -15,7 +15,7 @@ dont use string arrys in one structure with other types ( q3asm place strings in
 
 dont use map command with redirectcmd, executecmd, readcmd
 
-áompiler bugs/features:
+compiler bugs/features:
 
 # switch statements sometimes produce unsafe code if you use run-on in case 
 labels. ie. each case label must have it's own break statement OR no lines of 

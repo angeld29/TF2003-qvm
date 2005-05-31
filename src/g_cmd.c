@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.16 2005-05-28 19:03:46 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.17 2005-05-31 20:01:30 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -50,7 +50,9 @@ void    Admin_Cmd(  );
 const static cmd_t   cmds[] = {
 	{"kill", ClientKill},
 	{"test", Test},
+//#if ( GAME_API_VERSION >= 7 )
 	{"bot", Bot},
+//#endif
 	{"tg", TG_Cmd},
 	{"vote", Vote_Cmd, CMD_NOT_PREMATCH},
 	{"admin", Admin_Cmd},
