@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: move.c,v 1.8 2005-06-03 04:27:54 AngelD Exp $
+ *  $Id: move.c,v 1.9 2005-06-03 08:50:33 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -192,19 +192,29 @@ void DoMovement()
 
 	if ( velocity && (( vlen( dir2move ) / velocity) < 0.5) )
 	{
-		if ( VectorCompareF( self->waypoint2, 0, 0, 0 ) )
-		{
-			SetVector( self->waypoint1, 0, 0, 0 );
-			self->keys = 0;
-			return;
-		} else
-		{
-			VectorCopy( self->waypoint2, self->waypoint1 );
-			VectorCopy( self->waypoint3, self->waypoint2 );
-			VectorCopy( self->waypoint4, self->waypoint3 );
-			VectorCopy( self->waypoint5, self->waypoint4 );
-			SetVector( self->waypoint5, 0, 0, 0 );
-		}
+	        wp_path_t *path = self->wp_path;
+	        if( !path )
+	        {
+	                if( vlen( dir2move ) < 10 )
+	                {
+			   SetVector( self->waypoint1, 0, 0, 0 );
+			   self->keys = 0;
+			   return;
+	                }
+	        }else
+	        {
+              	        if( path->next )
+              	        {
+              	                self->wp_path = path->next;
+              	                free(path);
+              	                VectorCopy( self->wp_path->link->src_wp->origin, self->waypoint1 );
+              	        }else
+              	        {
+              	                VectorCopy( self->wp_path->link->dest_wp->origin, self->waypoint1 );
+              	                free( path );
+              	                self->wp_path = NULL;
+              	        }
+              	}
 	}
 
 

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: waypoint.c,v 1.2 2005-06-03 04:27:54 AngelD Exp $
+ *  $Id: waypoint.c,v 1.3 2005-06-03 08:50:33 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -29,8 +29,8 @@ typedef struct wp_list_s
 }wp_list_t;
 
 static wp_list_t* wp_list_start = NULL;
-//waypoint_t waypoints[MAX_WAYPOINTS];
 static int     numwaypoints = 0;
+
 waypoint_t* AddWaypoint(waypoint_t* newwp)
 {
 
@@ -161,13 +161,26 @@ wp_path_t*     WaypointFindPath( vec3_t srcpoint, vec3_t destpoint )
         wp_path_t       *path = NULL,*tmpp;
 
 
-        wp_src = WaypointFindNearest( srcpoint );
-        wp_dst = WaypointFindNearest( destpoint );
+        wp_src = WaypointFindNearestVisible( srcpoint );
+        wp_dst = WaypointFindNearestVisible( destpoint );
 
-        if( !wp_src || !wp_dst )
+        if( !wp_dst )
         {
-                G_dprintf("WaypointFindPath: cannot find src or dest wp\n");
-                return NULL;
+                wp_dst = WaypointFindNearest( destpoint );
+                if( !wp_dst )
+                {
+                    G_dprintf("WaypointFindPath: cannot find dest wp\n");
+                    return NULL;
+                }
+        }
+        if( !wp_src  )
+        {
+                wp_src = WaypointFindNearest( srcpoint );
+                if( !wp_src  )
+                {
+                        G_dprintf("WaypointFindPath: cannot find src wp\n");
+                        return NULL;
+                }
         }
         if( wp_src == wp_dst )
         {
@@ -222,16 +235,16 @@ found:
         path->link = tmppath[0].wp->links[tmppath[0].link_index];
         path->next = NULL;
         tmpp = path;
-        G_bprint(2,"WaypointFindPath: pathlen = %d\nWP  0 = %3f %3f %3f\n", pathlen, PASSVEC3( tmpp->link->src_wp->origin));
+//        G_bprint(2,"WaypointFindPath: pathlen = %d\nWP  0 = %3f %3f %3f\n", pathlen, PASSVEC3( tmpp->link->src_wp->origin));
         for ( i = 1 ; i < pathlen ; i++ )
         {
                 tmpp->next = malloc( sizeof( wp_path_t ));
                 tmpp = tmpp->next;
                 tmpp->link = tmppath[i].wp->links[tmppath[i].link_index];
                 tmpp->next = NULL;
-                G_bprint(2,"WP %2d = %3f %3f %3f\n", i,PASSVEC3( tmpp->link->src_wp->origin));
+//                G_bprint(2,"WP %2d = %3f %3f %3f\n", i,PASSVEC3( tmpp->link->src_wp->origin));
         }
-        G_bprint(2,"WP %2d = %3f %3f %3f\n", i, PASSVEC3( tmpp->link->dest_wp->origin));
+//        G_bprint(2,"WP %2d = %3f %3f %3f\n", i, PASSVEC3( tmpp->link->dest_wp->origin));
         return path;
 }
 
@@ -240,11 +253,6 @@ void InitWps()
         waypoint_t wp;
         wp_link_t link;
         int index = 0;
-
-/*        vec3_t                  origin;
-        float                   radius;
-        int                     index;
-        int                     flags;*/
 
         SetVector( wp.origin, -1000, -400 , 24);
         wp.index = index++;
@@ -291,7 +299,69 @@ void InitWps()
         AddLink( 6, 9, &link);
         AddLink( 7, 9, &link);
         AddLink( 8, 9, &link);
+}
 
 
+void InitWps2()
+{
+        waypoint_t wp;
+        wp_link_t link;
+        int index = 0;
+
+/*        vec3_t                  origin;
+        float                   radius;
+        int                     index;
+        int                     flags;*/
+
+        SetVector( wp.origin, 1088, 1491 , 152);
+        wp.index = index++;
+        AddWaypoint(&wp);
+        SetVector( wp.origin, 716, 1491 , 152);
+        wp.index = index++;
+        AddWaypoint(&wp);
+        SetVector( wp.origin, 925, 1742 , 168);
+        wp.index = index++;
+        AddWaypoint(&wp);
+        
+        SetVector( wp.origin, 926, 2116 , 216);
+        wp.index = index++;
+        AddWaypoint(&wp);
+        SetVector( wp.origin, 467, 2118 , 216);
+        wp.index = index++;
+        AddWaypoint(&wp);
+        SetVector( wp.origin, -8, 1763 , 216);
+        wp.index = index++;
+        AddWaypoint(&wp);
+
+        SetVector( wp.origin, 0, 655 , 24);
+        wp.index = index++;
+        AddWaypoint(&wp);
+        SetVector( wp.origin, -231, 628 , 24);
+        wp.index = index++;
+        AddWaypoint(&wp);
+        SetVector( wp.origin, 526, 331 , 88);
+        wp.index = index++;
+        AddWaypoint(&wp);
+
+        SetVector( wp.origin, 526, -331 , 88);
+        wp.index = index++;
+        AddWaypoint(&wp);
+
+        SetVector( wp.origin, 1510, 0, 24);
+        wp.index = index++;
+        AddWaypoint(&wp);
+        
+        AddLink( 0, 1, &link);
+        AddLink( 0, 2, &link);
+        AddLink( 2, 3, &link);
+        AddLink( 3, 4, &link);
+
+        AddLink( 4, 5, &link);
+        AddLink( 5, 6, &link);
+        AddLink( 6, 7, &link);
+
+        AddLink( 7, 8, &link);
+        AddLink( 8, 9, &link);
+        AddLink( 9, 10, &link);
 }
 

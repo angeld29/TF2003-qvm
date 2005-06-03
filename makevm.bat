@@ -252,6 +252,14 @@ cd VM
 
 @if errorlevel 1 goto quit
 
+%CC% %CFLAGS% %INCFLAGS% %SRC%\bot\waypoint.c -o bot\waypoint.asm
+
+@if errorlevel 1 goto quit
+
+%CC% %CFLAGS% %INCFLAGS% %SRC%\g_mod_command.c -o g_mod_command.asm
+
+@if errorlevel 1 goto quit
+
 %CC% %CFLAGS% %INCFLAGS% %SRC%\qmalloc.c -o qmalloc.asm
 
 @if errorlevel 1 goto quit
@@ -259,6 +267,7 @@ cd VM
 %CC% %CFLAGS% %INCFLAGS% %SRC%\qmd5.c -o qmd5.asm
 
 @if errorlevel 1 goto quit
+
 
 copy %SRC%\g_syscalls.asm .
 

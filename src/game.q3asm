@@ -18,6 +18,7 @@ engineer
 flare
 g_cmd
 g_mem
+g_mod_command
 g_spawn
 g_tf_utils
 g_utils
@@ -57,3 +58,5 @@ bot\fighting
 bot\move
 bot\qw
 bot\ui
+bot\waypoint
+

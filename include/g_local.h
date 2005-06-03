@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_local.h,v 1.23 2005-06-03 04:27:52 AngelD Exp $
+ *  $Id: g_local.h,v 1.24 2005-06-03 08:50:33 AngelD Exp $
  */
 //
 // g_local.h -- local definitions for game module
@@ -289,5 +289,7 @@ void Menu_Input(int impulse);
 void Menu_Team_Input(int impulse);
 void Menu_Class_Input(int impulse);
 void CheckAutoKick( gedict_t * p );
+//mod_commnad
+void ModCommand();
 
 #endif

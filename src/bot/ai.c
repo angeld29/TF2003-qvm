@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: ai.c,v 1.7 2005-06-03 04:27:54 AngelD Exp $
+ *  $Id: ai.c,v 1.8 2005-06-03 08:50:33 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -193,18 +193,26 @@ void Bot_AI(  )
 
 void SelectWP()
 {
-        int nexty;
+        //int nexty;
         vec3_t v;
-        wp_path_t *path,*tmp;
+        //wp_path_t *path,*tmp;
 
+        if( self->s.v.health <= 0 )
+                return;
 	if ( !VectorCompareF( self->waypoint1, 0, 0, 0 ) )
 	{
 	        return;
 	}
+
 	SetVector(v , 1510,0,24);
-	path = WaypointFindPath( self->s.v.origin, v );
-//	self->wp_path = path;
-	while( path )
+	self->wp_path = WaypointFindPath( self->s.v.origin, v );
+	if(!self->wp_path)
+	{
+	        return;
+	}
+	VectorCopy( self->wp_path->link->src_wp->origin, self->waypoint1 );
+
+/*	while( path )
 	{
 	        tmp = path->next;
 	        free(path);
@@ -220,7 +228,7 @@ void SelectWP()
 	nexty = g_random() * 700 *2 + (- 700); 
 
 	SetVector( self->waypoint1, 200, nexty, 24 );
-	SetVector( self->waypoint2, 1800, 0, 24 );
+	SetVector( self->waypoint2, 1800, 0, 24 );*/
 
 }
 void SelectWPOld()
