@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: status.c,v 1.13 2005-05-31 20:01:30 AngelD Exp $
+ *  $Id: status.c,v 1.14 2005-06-03 04:27:54 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -329,6 +329,7 @@ void StatusRes( int res )
 {
 	if ( res > 8 )
 		res = 8;
+
 	self->StatusBarRes = res;
 	G_sprint( self, 2, sbar_msg[res] );
 }

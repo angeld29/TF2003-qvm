@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: admin_cmd.c,v 1.5 2005-05-31 20:01:30 AngelD Exp $
+ *  $Id: admin_cmd.c,v 1.6 2005-06-03 04:27:54 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -153,7 +153,7 @@ static void Admin_Auth(int argc)
 	                                     0x3C, 0xAF, 0x2D, 0x42, 
 	                                     0x5D, 0x74, 0xF7, 0x70, 
 	                                     0xC1, 0x8D, 0xB7, 0x3B, };
-	        int i;
+//	        int i;
 	        struct MD5Context md5c;
 
 	        MD5Init(&md5c);

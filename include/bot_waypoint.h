@@ -18,34 +18,40 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: bot_waypoint.h,v 1.1 2005-05-16 09:35:43 AngelD Exp $
+ *  $Id: bot_waypoint.h,v 1.2 2005-06-03 04:27:52 AngelD Exp $
  */
 
 #define MAX_WP_LINKS 20
-#define MAX_WAYPOINTS 10000
+//#define MAX_WAYPOINTS 10000
 
-typedef struct{
-        int     desp_wp_index;
-        int     flags;
-        float   length;
-        float   req_velocity;
+struct waypoint_s;
+
+typedef struct wp_link_s
+{
+        struct waypoint_s       *src_wp,*dest_wp;
+        int                     flags;
+        float                   length;
+        float                   req_velocity;
 }wp_link_t;
 
-typedef struct{
-        vec3_t          origin;
-        float           radius;
-        int             index;
-        int             flags;
-        wp_link_t       links[MAX_WP_LINKS];
+typedef struct waypoint_s
+{
+        vec3_t                  origin;
+        float                   radius;
+        int                     index;
+        int                     flags;
+        wp_link_t*              links[MAX_WP_LINKS];
 }waypoint_t;
 
-typedef struct{
-        waypoint_t      *wp;
-        int             link;
-}path_t;
+typedef struct wp_path_s
+{
+        wp_link_t               *link;
+        struct wp_path_s        *next;
+}wp_path_t;
 
-int             WaypointFindPath( vec3_t srcpoint, vec3_t destpoint, path_t* path, int maxpathlen );
-int             WaypointFindInRadius( vec3_t vPos, float fRadius, int* pTab, int maxcount);
+wp_path_t*      WaypointFindPath( vec3_t srcpoint, vec3_t destpoint );
+//int             WaypointFindInRadius( vec3_t vPos, float fRadius, int* pTab, int maxcount);
 waypoint_t*     WaypointFindNearestVisible(vec3_t point);
 waypoint_t*     WaypointFindNearest(vec3_t point);
-waypoint_t*     AddWaypoint(waypoint_t* wp);
+waypoint_t*     AddWaypoint(waypoint_t* );
+qboolean        AddLink( int src_index, int dest_index, wp_link_t* newlink);

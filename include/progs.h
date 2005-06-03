@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: progs.h,v 1.21 2005-05-28 18:33:52 AngelD Exp $
+ *  $Id: progs.h,v 1.22 2005-06-03 04:27:52 AngelD Exp $
  */
 #include "progdefs.h"
 
@@ -320,6 +320,7 @@ typedef struct gedict_s {
 //movment
         float          botNoMoveTime;
 	vec3_t         waypoint1, waypoint2, waypoint3,	waypoint4, waypoint5;
+        struct wp_path_s      *wp_path;
 	int            distanceToWaypoint;
 
 ///

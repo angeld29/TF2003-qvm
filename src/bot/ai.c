@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: ai.c,v 1.6 2005-05-16 06:31:39 AngelD Exp $
+ *  $Id: ai.c,v 1.7 2005-06-03 04:27:54 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -194,11 +194,23 @@ void Bot_AI(  )
 void SelectWP()
 {
         int nexty;
+        vec3_t v;
+        wp_path_t *path,*tmp;
 
 	if ( !VectorCompareF( self->waypoint1, 0, 0, 0 ) )
 	{
 	        return;
 	}
+	SetVector(v , 1510,0,24);
+	path = WaypointFindPath( self->s.v.origin, v );
+//	self->wp_path = path;
+	while( path )
+	{
+	        tmp = path->next;
+	        free(path);
+	        path = tmp;
+	}
+
 	if( self->s.v.origin[0] > 200 )
 	{
 	        SetVector( self->waypoint1, 1800, 0, 24 );

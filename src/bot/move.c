@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: move.c,v 1.7 2005-05-17 03:56:00 AngelD Exp $
+ *  $Id: move.c,v 1.8 2005-06-03 04:27:54 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -55,11 +55,18 @@ qboolean AtLocation( vec3_t vDestination )
 
 void ClearAllWaypoints()
 {
+        wp_path_t *path;
 	SetVector( self->waypoint1, 0, 0, 0 );
 	SetVector( self->waypoint2, 0, 0, 0 );
 	SetVector( self->waypoint3, 0, 0, 0 );
 	SetVector( self->waypoint4, 0, 0, 0 );
 	SetVector( self->waypoint5, 0, 0, 0 );
+	while( self->wp_path )
+	{
+	        path = self->wp_path->next;
+	        free(self->wp_path);
+	        self->wp_path = path;
+	}
 	self->distanceToWaypoint = 5000;
 	self->checkMovementTime = g_globalvars.time + 0.7;
 }
