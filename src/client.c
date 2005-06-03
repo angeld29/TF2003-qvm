@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.42 2005-05-28 22:35:46 AngelD Exp $
+ *  $Id: client.c,v 1.43 2005-06-03 21:19:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -241,7 +241,7 @@ void DecodeLevelParms()
 
 		tf_data.toggleflags -= ( tf_data.toggleflags & TFLAG_CHEATCHECK );
 
-		tf_data.toggleflags |= 256 | GetSVInfokeyInt( "temp1", NULL, 0 );
+		tf_data.toggleflags |= TFLAG_FIRSTENTRY | GetSVInfokeyInt( "temp1", NULL, 0 );
 
 		autoteam_time = 30;
 
@@ -637,6 +637,8 @@ void DecodeLevelParms()
 		}
                 if( tg_data.tg_enabled )
 			TG_LoadSettings();
+		if( tf_data.enable_bot )
+		        localcmd( "exec maps/%s.wps\n", g_globalvars.mapname );
 	}
 	if ( g_globalvars.parm11 )
 		self->tfstate = g_globalvars.parm11;

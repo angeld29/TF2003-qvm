@@ -17,25 +17,48 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_mod_command.c,v 1.1 2005-06-03 08:50:33 AngelD Exp $
+ *  $Id: g_mod_command.c,v 1.2 2005-06-03 21:19:44 AngelD Exp $
  */
 
 #include "g_local.h"
-
+typedef struct {
+	char   *command;
+	void    ( *Action ) ( int );
+} mod_t;
 void WP_command( int argc );
+
+const static mod_t   mod_cmds[] = {
+	{"wp", WP_command},
+	{NULL, NULL}
+};
+
+
+
 void ModCommand()
 {
         char    cmd_command[1024];
         int argc;
+        const mod_t  *ucmd;
+
         argc = trap_CmdArgc();
         if( argc < 2 )
                 return;
 
+
         trap_CmdArgv( 1, cmd_command, sizeof( cmd_command ) );
-        if( !strcmp(cmd_command,"wp") )
-                WP_command( argc );
+
+	for ( ucmd = mod_cmds; ucmd->command; ucmd++ )
+	{
+		if ( strcmp( cmd_command, ucmd->command ) )
+			continue;
+		ucmd->Action( argc );
+		return;
+	}
+	return;
 
 }
+extern vec3_t end_pos;
+
 void WP_command( int argc )
 {
         char    cmd_command[1024];
@@ -51,6 +74,7 @@ void WP_command( int argc )
                 if( argc < 7 )
                         return;
 
+                memset(&wp, 0 ,sizeof(wp));
                 trap_CmdArgv( 3, cmd_command, sizeof( cmd_command ) );
                 wp.index = atoi( cmd_command );
                 trap_CmdArgv( 4, cmd_command, sizeof( cmd_command ) );
@@ -70,6 +94,7 @@ void WP_command( int argc )
                 if( argc < 5 )
                         return;
 
+                memset(&link, 0 ,sizeof(link));
                 trap_CmdArgv( 3, cmd_command, sizeof( cmd_command ) );
                 i1 = atoi( cmd_command );
                 trap_CmdArgv( 4, cmd_command, sizeof( cmd_command ) );
@@ -77,4 +102,18 @@ void WP_command( int argc )
                 AddLink( i1, i2, &link);
                 return;
         }
+        if(!strcmp(cmd_command, "target"))
+        {
+                if( argc < 6 )
+                        return;
+
+                trap_CmdArgv( 3, cmd_command, sizeof( cmd_command ) );
+                end_pos[0] = atof( cmd_command );
+                trap_CmdArgv( 4, cmd_command, sizeof( cmd_command ) );
+                end_pos[1] = atof( cmd_command );
+                trap_CmdArgv( 5, cmd_command, sizeof( cmd_command ) );
+                end_pos[2] = atof( cmd_command );
+                return;
+        }
+        
 }

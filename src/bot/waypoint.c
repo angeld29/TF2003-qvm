@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: waypoint.c,v 1.3 2005-06-03 08:50:33 AngelD Exp $
+ *  $Id: waypoint.c,v 1.4 2005-06-03 21:19:46 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -248,7 +248,7 @@ found:
         return path;
 }
 
-void InitWps()
+/*void InitWps()
 {
         waypoint_t wp;
         wp_link_t link;
@@ -308,11 +308,6 @@ void InitWps2()
         wp_link_t link;
         int index = 0;
 
-/*        vec3_t                  origin;
-        float                   radius;
-        int                     index;
-        int                     flags;*/
-
         SetVector( wp.origin, 1088, 1491 , 152);
         wp.index = index++;
         AddWaypoint(&wp);
@@ -365,3 +360,4 @@ void InitWps2()
         AddLink( 9, 10, &link);
 }
 
+*/
