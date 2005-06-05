@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tforttm.c,v 1.17 2005-05-28 19:03:46 AngelD Exp $
+ *  $Id: tforttm.c,v 1.18 2005-06-05 05:10:41 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -314,7 +314,7 @@ void TeamFortress_TeamIncreaseScore( int tno, int scoretoadd )
 		return;
 	teamscores[tno] += scoretoadd;
 
-	if ( ( tf_data.toggleflags & 128 ) || ( tf_data.toggleflags & 2048 ) )
+	if ( ( tf_data.toggleflags & TFLAG_TEAMFRAGS ) || ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
 	{
 		
 		for ( e = world; ( e = trap_find( e, FOFS( s.v.classname ), "player" ) ) ; )
@@ -331,12 +331,12 @@ int TeamFortress_TeamGetScoreFrags( int tno )
 	if ( tno <= 0 || tno > 4 )
 		return 0;
 
-	if ( ( tf_data.toggleflags & 128 ) || ( tf_data.toggleflags & 2048 ) )
+	if ( ( tf_data.toggleflags & TFLAG_TEAMFRAGS ) || ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
 		return teamscores[tno];
 	else
 		return teamfrags[tno];
 
-	return 0;
+//	return 0;
 }
 
 int TeamFortress_TeamGetLives( int tno )

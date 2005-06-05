@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: ui.c,v 1.6 2005-05-31 20:01:30 AngelD Exp $
+ *  $Id: ui.c,v 1.7 2005-06-05 05:10:41 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -55,13 +55,21 @@ void BotReport(  )
 			continue;
 		if ( te->isBot )
 		{
-                   G_bprint(2,"Bot: %s, state %d, menu %d\nflags %d\n velocity %3.0f  ,origin %4.0f %4.0f %4.0f\nwp     %4.0f %4.0f %4.0f\n",
+                   G_bprint(3,"Bot: %s, state %d, menu %d flags %d velocity %3.0f\norigin [%.0f %.0f %.0f]\n",
                            te->s.v.netname,te->action,te->current_menu,
                            (int)(te->s.v.flags),
                            vlen(te->s.v.velocity),
-                           PASSVEC3(te->s.v.origin),
-                           PASSVEC3(te->waypoint1)
+                           PASSVEC3(te->s.v.origin)
                    );
+
+                   if( te->wp )
+                       G_bprint(3, "wp     [%.0f %.0f %.0f]\n", PASSVEC3(te->wp->origin));
+                   else
+                       G_bprint(3, "nowp\n");
+
+                   if( te->end_wp )
+                       G_bprint(3, "endwp  [%.0f %.0f %.0f]\n", PASSVEC3(te->end_wp->origin));
+
 		}
 	}
 }

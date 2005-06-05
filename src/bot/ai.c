@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: ai.c,v 1.9 2005-06-03 21:19:46 AngelD Exp $
+ *  $Id: ai.c,v 1.10 2005-06-05 05:10:41 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -93,7 +93,6 @@ void Bot_AI(  )
 		self->action = BOT_DEFEND;
 		goto retry;
 	case BOT_DEFEND:
-//	        if( VectorCompareF( self->waypoint1, 0, 0, 0 ) )
                 SelectWP();
 		break;
 /*		if ( !ThrowGrenade(  ) )
@@ -196,62 +195,57 @@ vec3_t end_pos = { 0,0,24 };
 
 void SelectWP()
 {
+        waypoint_t* wpsrc,*wpdst;
+        vec3_t v;
 
         if( self->s.v.health <= 0 )
                 return;
-	if ( !VectorCompareF( self->waypoint1, 0, 0, 0 ) )
+
+	if ( self->wp || self->wp_path )
 	{
 	        return;
 	}
 
-	
-	self->wp_path = WaypointFindPath( self->s.v.origin, end_pos );
-	if(!self->wp_path)
-	{
-	        return;
-	}
-	VectorCopy( self->wp_path->link->src_wp->origin, self->waypoint1 );
+	VectorSubtract( self->s.v.origin, end_pos, v );
 
-/*	while( path )
-	{
-	        tmp = path->next;
-	        free(path);
-	        path = tmp;
-	}
-
-	if( self->s.v.origin[0] > 200 )
-	{
-	        SetVector( self->waypoint1, 1800, 0, 24 );
+	if( vlen(v) < 50 )
 	        return;
-	}
+
+        wpsrc = WaypointFindNearestVisible( self->s.v.origin, 0 );
+        if( !wpsrc )
+                wpsrc = WaypointFindNearest( self->s.v.origin );
+        
+        wpdst = WaypointFindNearestVisible( end_pos, 0 );
+        if( !wpdst )
+                wpdst = WaypointFindNearest( end_pos );
+
+        if( !wpsrc || !wpdst )
+                return;
+
+        if( wpsrc == wpdst )
+                return;
+	if( !self->end_wp )
+	        self->end_wp = malloc(sizeof(waypoint_t));
+
+	memset( self->end_wp, 0, sizeof(waypoint_t));
+	self->end_wp->flags = WP_FL_TEMP;
+	self->end_wp->radius = 30;
+	VectorCopy( end_pos, self->end_wp->origin );
+
+        self->wp_path = NULL;
+
+        if( wpsrc != wpdst )
+        {
+	       if( !(self->wp_path = WaypointFindPath( wpsrc, wpdst ) ) )
+	               return;
+               self->wp = self->wp_path->link->src_wp;
+        }else
+        {
+                self->wp = self->end_wp;
+                self->end_wp = NULL;
+        }
+
 	        
-	nexty = g_random() * 700 *2 + (- 700); 
-
-	SetVector( self->waypoint1, 200, nexty, 24 );
-	SetVector( self->waypoint2, 1800, 0, 24 );*/
-
-}
-void SelectWPOld()
-{
-        int nexty;
-
-        nexty = g_random() * 600 *2 + (- 600); 
-
-      	if ( self->team_no == 1 )
-      	{
-      		if ( self->s.v.origin[0] < -1300 )
-      		{
-      			SetVector( self->waypoint1, 1600, nexty, 24 );
-      		}
-      	} else
-      	{
-      		if ( self->s.v.origin[0] > 1300 )
-      		{
-      			SetVector( self->waypoint1, -1600, nexty, 24 );
-      		}
-      		
-      	}
-        return;
-
+	self->wp_link = &default_link;
 }
 

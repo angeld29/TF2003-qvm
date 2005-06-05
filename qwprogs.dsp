@@ -225,6 +225,10 @@ SOURCE=.\src\g_mem.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\g_mod_command.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\g_spawn.c
 # End Source File
 # Begin Source File

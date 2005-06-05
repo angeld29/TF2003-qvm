@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_mod_command.c,v 1.2 2005-06-03 21:19:44 AngelD Exp $
+ *  $Id: g_mod_command.c,v 1.3 2005-06-05 05:10:41 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -83,6 +83,18 @@ void WP_command( int argc )
                 wp.origin[1] = atof( cmd_command );
                 trap_CmdArgv( 6, cmd_command, sizeof( cmd_command ) );
                 wp.origin[2] = atof( cmd_command );
+                if( argc > 7 )
+                {
+                        trap_CmdArgv( 7, cmd_command, sizeof( cmd_command ) );
+                        wp.flags = atoi( cmd_command );
+                        
+                }
+                if( argc > 8 )
+                {
+                        trap_CmdArgv( 8, cmd_command, sizeof( cmd_command ) );
+                        wp.radius = atof( cmd_command );
+                        
+                }
                 AddWaypoint(&wp);
                 return;
         }
@@ -99,6 +111,17 @@ void WP_command( int argc )
                 i1 = atoi( cmd_command );
                 trap_CmdArgv( 4, cmd_command, sizeof( cmd_command ) );
                 i2 = atoi( cmd_command );
+                if( argc > 5 )
+                {
+                        trap_CmdArgv( 5, cmd_command, sizeof( cmd_command ) );
+                        link.flags = atoi( cmd_command );
+                }
+                if( argc > 6 )
+                {
+                        trap_CmdArgv( 6, cmd_command, sizeof( cmd_command ) );
+                        link.req_velocity = atof( cmd_command );
+                        
+                }
                 AddLink( i1, i2, &link);
                 return;
         }
@@ -115,5 +138,4 @@ void WP_command( int argc )
                 end_pos[2] = atof( cmd_command );
                 return;
         }
-        
 }

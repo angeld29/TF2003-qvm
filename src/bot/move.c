@@ -18,10 +18,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: move.c,v 1.9 2005-06-03 08:50:33 AngelD Exp $
+ *  $Id: move.c,v 1.10 2005-06-05 05:10:41 AngelD Exp $
  */
 #include "g_local.h"
 
+void SelectWP();
 #define DEFAULT_MAX_YAW_PER_SEK 250
 //#define SPEED_REPORT
 //#define MAX_YAW_PER_SEK 1800
@@ -36,6 +37,7 @@ static float last_report = 0;
 #endif
 static float maxspeed = 0;
 
+const wp_link_t default_link = { NULL, NULL, 0, 0, 0};
 float max_yaw_per_sek = DEFAULT_MAX_YAW_PER_SEK;
 float bot_frametime;
 static float max_yaw_pf;
@@ -55,19 +57,19 @@ qboolean AtLocation( vec3_t vDestination )
 
 void ClearAllWaypoints()
 {
-        wp_path_t *path;
-	SetVector( self->waypoint1, 0, 0, 0 );
-	SetVector( self->waypoint2, 0, 0, 0 );
-	SetVector( self->waypoint3, 0, 0, 0 );
-	SetVector( self->waypoint4, 0, 0, 0 );
-	SetVector( self->waypoint5, 0, 0, 0 );
-	while( self->wp_path )
-	{
-	        path = self->wp_path->next;
-	        free(self->wp_path);
-	        self->wp_path = path;
-	}
-	self->distanceToWaypoint = 5000;
+
+        FreePath( self->wp_path );
+
+        if( self->end_wp && (self->end_wp->flags & WP_FL_TEMP ) )
+                free( self->end_wp );
+
+        if( self->wp && (self->wp->flags & WP_FL_TEMP ) )
+                free( (void*)self->wp );
+                
+        self->end_wp = NULL;
+        self->wp = NULL;
+        self->wp_link = NULL;
+        self->wp_path = NULL;
 	self->checkMovementTime = g_globalvars.time + 0.7;
 }
 
@@ -121,23 +123,12 @@ void InitCalcMovement()
 	velocity = vlen( self->s.v.velocity );
 	velocity = vlen( curr_vel );
 
-	VectorSubtract( self->waypoint1, self->s.v.origin, dir2move );
+	VectorSubtract( self->wp->origin, self->s.v.origin, dir2move );
 
 	dir2move[2] = 0;
 	vectoangles( dir2move, vtmp );
 
 	dir_yaw = vtmp[1];
-
-/*	{
-	        vec3_t end;
-	        normalize( dir2move, vtmp );
-	        VectorScale(vtmp, 120, vtmp);
-	        VectorAdd(self->s.v.origin,vtmp,end);
-	        TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( end ), 0, self 
-	        , PASSVEC3( self->s.v.mins), PASSVEC3( self->s.v.maxs));
-	        if( g_globalvars.trace_fraction != 1)
-                        dir_yaw += (g_random()<0.5)?90:-90;
-	}*/
 
 	VectorCopy( self->s.v.v_angle, cur_angle);
 
@@ -163,14 +154,85 @@ void ChangeBotYaw( float wish_yaw, float max_delta_yaw )
         }
 }
 
+int WPChange()
+{
+        int dist;
+	if( self->s.v.fixangle )
+	{
+	        self->botNoMoveTime = g_globalvars.time + BOT_TIMEWAIT_AFTER_TELEPORT;
+	        SelectWP();
+	        return 0;
+	}
+
+        TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( self->wp->origin ), 1, self,
+                             PASSVEC3( self->s.v.mins)+5, PASSVEC3( self->s.v.maxs)-5 );
+
+        if( g_globalvars.trace_fraction != 1 )
+        {
+                SelectWP();
+        }
+
+        InitCalcMovement();
+        dist = vlen( dir2move );
+                
+	if ( velocity && (( dist / velocity) < 0.1) )
+	{
+	        wp_path_t *path = self->wp_path;
+	        if( !path )
+	        {
+	                if( self->end_wp )
+	                {
+	                       if( dist >  self->wp->radius ) 
+	                       {
+ 	                         TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( self->end_wp->origin ), 1, self,
+	                               PASSVEC3( self->s.v.mins)+5, PASSVEC3( self->s.v.maxs)-5 );
+                                 if( g_globalvars.trace_fraction != 1 )  
+                                      return 1;
+	                       }
+                               self->wp_link = &default_link;
+                               self->wp = self->end_wp;
+                               self->end_wp = NULL;
+	                }else
+	                {
+         	                if( dist < self->wp->radius )
+         	                {
+         	                   ClearAllWaypoints();
+         			   self->keys = 0;
+         			   return 0;
+         	                }
+	                }
+	        }else
+	        {
+	                if( dist >  self->wp->radius )
+	                {
+	                       //traceline( PASSVEC3( self->s.v.origin ), PASSVEC3( path->link->dest_wp->origin ), 0, self );
+ 	                       TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( path->link->dest_wp->origin ), 1, self,
+	                               PASSVEC3( self->s.v.mins)+5, PASSVEC3( self->s.v.maxs)-5 );
+                                if( g_globalvars.trace_fraction != 1 )  return 1;
+	                }
+
+       	                self->wp = path->link->dest_wp;
+       	                self->wp_link = path->link;
+              	        self->wp_path = path->next;
+              	        free(path);
+	        }
+	        InitCalcMovement();
+	        self->time_for_wpchange = g_globalvars.time + bot_frametime * 10;
+	        return 2;
+	}
+	return 1;
+}
 
 void DoMovement()
 {
         float ftmp;
         float max_strafe_angle;
+        vec3_t v;
 
         self->keys = 0;
-	if ( VectorCompareF( self->waypoint1, 0, 0, 0 ) )
+        if( self->checkMovementTime > g_globalvars.time )
+                return;
+	if ( !self->wp )
 	{
 		self->keys = 0;
 		return;
@@ -181,57 +243,21 @@ void DoMovement()
 		self->keys = 0;
 	        return;
 	}
-	//VectorSubtract( self->waypoint1, self->s.v.origin, dir2move );
-
-
-	/*range = vlen(self->s.v.velocity) * bot_frametime;
-	if( range < CHANGE_WP_DISTANCE )
-	        range  = CHANGE_WP_DISTANCE;*/
-
-	InitCalcMovement();
-
-	if ( velocity && (( vlen( dir2move ) / velocity) < 0.5) )
-	{
-	        wp_path_t *path = self->wp_path;
-	        if( !path )
-	        {
-	                if( vlen( dir2move ) < 10 )
-	                {
-			   SetVector( self->waypoint1, 0, 0, 0 );
-			   self->keys = 0;
-			   return;
-	                }
-	        }else
-	        {
-              	        if( path->next )
-              	        {
-              	                self->wp_path = path->next;
-              	                free(path);
-              	                VectorCopy( self->wp_path->link->src_wp->origin, self->waypoint1 );
-              	        }else
-              	        {
-              	                VectorCopy( self->wp_path->link->dest_wp->origin, self->waypoint1 );
-              	                free( path );
-              	                self->wp_path = NULL;
-              	        }
-              	}
-	}
-
-
-	if( self->s.v.fixangle )
-	        self->botNoMoveTime = g_globalvars.time + BOT_TIMEWAIT_AFTER_TELEPORT;
 
 	if( g_globalvars.time < self->botNoMoveTime )
 	{
 	        return;
 	}
-	        
-	
+
+	if(! WPChange())
+	        return;
+
 
         if ( ( int ) ( self->s.v.flags ) & FL_ONGROUND )
 	{
-	        if( velocity < self->maxfbspeed * 0.95 )
+	        if( velocity < self->maxfbspeed * 0.95 || (self->wp_link && (self->wp_link->flags & WPLINK_FL_WALK)) )
 	        {
+	                
 	                if( fabs(dir_yaw - vel_yaw) > 5 )
 	                {
 	                       self->s.v.v_angle[1] = dir_yaw;
@@ -255,8 +281,10 @@ void DoMovement()
 	        }
                 return;
 	}
+
 	//Air Move
 	self->s.v.button2 = 0;
+
 
 	ftmp = atan2( 30, velocity) * 180 / M_PI; // angle per frame
 
@@ -285,9 +313,17 @@ void DoMovement()
 	        else
       	                max_strafe_angle = 30;*/
 
+	VectorScale(self->s.v.velocity, bot_frametime * 3, v);
+	VectorAdd(self->s.v.origin, v,v);
+        TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( v ), 1, self,
+                           PASSVEC3( self->s.v.mins)+10, PASSVEC3( self->s.v.maxs)-10 );
+
       	ftmp =  subangle( dir_yaw,vel_yaw );
-	if( abs( ftmp) >  max_strafe_angle )
+	if( abs( ftmp) >  max_strafe_angle  || g_globalvars.trace_fraction != 1  || self->time_for_wpchange > g_globalvars.time )
 	{
+	        if( abs( ftmp ) < 1 )
+	                self->time_for_wpchange = 0;
+	                
 	        if( ftmp < 0 )
 	        {
 	                self->bot_strafe_state = BOT_STRAFE_RIGHT;

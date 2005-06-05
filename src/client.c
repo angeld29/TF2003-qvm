@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.43 2005-06-03 21:19:43 AngelD Exp $
+ *  $Id: client.c,v 1.44 2005-06-05 05:10:41 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1202,7 +1202,7 @@ gedict_t *FindTeamSpawnPoint( int team_num )
 			return spot;
 		}
 	}
-	return world;
+//	return world;
 }
 
 gedict_t *FindRandomTeamSpawnPoint( int team_num )
@@ -1285,7 +1285,7 @@ gedict_t *FindDeathmatchSpawnPoint()
 			return spot;
 		}
 	}
-	return world;
+//	return world;
 }
 
 

@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: q_shared.c,v 1.2 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: q_shared.c,v 1.3 2005-06-05 05:10:41 AngelD Exp $
  */
 
 // q_shared.c -- stateless support routines that are included in each code dll
@@ -231,13 +231,13 @@ Safe strncpy that ensures a trailing zero
 void Q_strncpyz( char *dest, const char *src, int destsize ) {
   // bk001129 - also NULL dest
   if ( !dest ) {
-    G_Error( ERR_FATAL, "Q_strncpyz: NULL dest" );
+    G_Error(  "Q_strncpyz: NULL dest" );
   }
 	if ( !src ) {
-		G_Error( ERR_FATAL, "Q_strncpyz: NULL src" );
+		G_Error(  "Q_strncpyz: NULL src" );
 	}
 	if ( destsize < 1 ) {
-		G_Error(ERR_FATAL,"Q_strncpyz: destsize < 1" ); 
+		G_Error("Q_strncpyz: destsize < 1" ); 
 	}
 
 	strncpy( dest, src, destsize-1 );
@@ -336,7 +336,7 @@ void Q_strcat( char *dest, int size, const char *src ) {
 
 	l1 = strlen( dest );
 	if ( l1 >= size ) {
-		G_Error( ERR_FATAL, "Q_strcat: already overflowed" );
+		G_Error( "Q_strcat: already overflowed" );
 	}
 	Q_strncpyz( dest + l1, src, size - l1 );
 }

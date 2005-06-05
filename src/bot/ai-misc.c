@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: ai-misc.c,v 1.2 2005-05-05 14:51:44 AngelD Exp $
+ *  $Id: ai-misc.c,v 1.3 2005-06-05 05:10:41 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -114,5 +114,5 @@ int BotImpulse()
 		return Temp;
 
 	}
-    return self->s.v.impulse;
+        return self->s.v.impulse;
 }

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: qw.c,v 1.7 2005-05-17 03:56:00 AngelD Exp $
+ *  $Id: qw.c,v 1.8 2005-06-05 05:10:41 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -50,13 +50,6 @@ void Bot_CL_KeyMove(  )
 		if ( self->s.v.v_angle[0] < -70 )
 			self->s.v.v_angle[0] = -70;
 	}
-/*	if (self->current_weapon == WEAP_ASSAULT_CANNON && self->s.v.button0) 
-	{
-                sidemove = 0;
-                forwardmove = 0;
-                upmove = 0;
-                return;
-        }*/
 
 	//self->s.v.v_angle[2] = 0;
 	self->s.v.v_angle[1] = anglemod( self->s.v.v_angle[1] );
@@ -128,7 +121,6 @@ void botConnect( int whichteam, int whichClass, char* name )
 	self->action = BOT_RESUPPLYING;
 	self->obs_time = 0;
 	self->oldAction = BOT_IDLE;
-//	SetVector( self->pipeLocation, 0, 0, 0 );
 
 	self = oself;
 
