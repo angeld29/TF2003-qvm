@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_mod_command.c,v 1.3 2005-06-05 05:10:41 AngelD Exp $
+ *  $Id: g_mod_command.c,v 1.4 2005-06-07 04:12:39 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -59,6 +59,7 @@ void ModCommand()
 }
 extern vec3_t end_pos;
 
+void DrawWPS();
 void WP_command( int argc )
 {
         char    cmd_command[1024];
@@ -83,6 +84,7 @@ void WP_command( int argc )
                 wp.origin[1] = atof( cmd_command );
                 trap_CmdArgv( 6, cmd_command, sizeof( cmd_command ) );
                 wp.origin[2] = atof( cmd_command );
+                wp.teams = 15 ;// (1<<0)+(1<<1)+(1<<2)+(1<<3);
                 if( argc > 7 )
                 {
                         trap_CmdArgv( 7, cmd_command, sizeof( cmd_command ) );
@@ -92,6 +94,12 @@ void WP_command( int argc )
                 if( argc > 8 )
                 {
                         trap_CmdArgv( 8, cmd_command, sizeof( cmd_command ) );
+                        wp.teams = atoi( cmd_command );
+                }
+
+                if( argc > 9 )
+                {
+                        trap_CmdArgv( 9, cmd_command, sizeof( cmd_command ) );
                         wp.radius = atof( cmd_command );
                         
                 }
@@ -111,6 +119,7 @@ void WP_command( int argc )
                 i1 = atoi( cmd_command );
                 trap_CmdArgv( 4, cmd_command, sizeof( cmd_command ) );
                 i2 = atoi( cmd_command );
+                link.teams = 15;
                 if( argc > 5 )
                 {
                         trap_CmdArgv( 5, cmd_command, sizeof( cmd_command ) );
@@ -119,12 +128,54 @@ void WP_command( int argc )
                 if( argc > 6 )
                 {
                         trap_CmdArgv( 6, cmd_command, sizeof( cmd_command ) );
+                        link.teams = atoi( cmd_command );
+                }
+
+                if( argc > 7 )
+                {
+                        trap_CmdArgv( 7, cmd_command, sizeof( cmd_command ) );
                         link.req_velocity = atof( cmd_command );
                         
                 }
                 AddLink( i1, i2, &link);
                 return;
         }
+
+        if(!strcmp(cmd_command, "dlink"))
+        {
+                wp_link_t link;
+                int i1,i2;
+                if( argc < 5 )
+                        return;
+
+                memset(&link, 0 ,sizeof(link));
+                trap_CmdArgv( 3, cmd_command, sizeof( cmd_command ) );
+                i1 = atoi( cmd_command );
+                trap_CmdArgv( 4, cmd_command, sizeof( cmd_command ) );
+                i2 = atoi( cmd_command );
+                link.teams = 15;
+                if( argc > 5 )
+                {
+                        trap_CmdArgv( 5, cmd_command, sizeof( cmd_command ) );
+                        link.flags = atoi( cmd_command );
+                }
+                if( argc > 6 )
+                {
+                        trap_CmdArgv( 6, cmd_command, sizeof( cmd_command ) );
+                        link.teams = atoi( cmd_command );
+                }
+
+                if( argc > 7 )
+                {
+                        trap_CmdArgv( 7, cmd_command, sizeof( cmd_command ) );
+                        link.req_velocity = atof( cmd_command );
+                        
+                }
+                AddLink( i1, i2, &link);
+                AddLink( i2, i1, &link);
+                return;
+        }
+
         if(!strcmp(cmd_command, "target"))
         {
                 if( argc < 6 )
@@ -138,4 +189,10 @@ void WP_command( int argc )
                 end_pos[2] = atof( cmd_command );
                 return;
         }
+        if(!strcmp(cmd_command, "draw"))
+        {
+                DrawWPS();
+                return;
+        }
+
 }

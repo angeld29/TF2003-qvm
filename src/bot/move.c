@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: move.c,v 1.10 2005-06-05 05:10:41 AngelD Exp $
+ *  $Id: move.c,v 1.11 2005-06-07 04:12:39 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -160,19 +160,43 @@ int WPChange()
 	if( self->s.v.fixangle )
 	{
 	        self->botNoMoveTime = g_globalvars.time + BOT_TIMEWAIT_AFTER_TELEPORT;
+	        ClearAllWaypoints(  );
 	        SelectWP();
 	        return 0;
 	}
 
-        TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( self->wp->origin ), 1, self,
-                             PASSVEC3( self->s.v.mins)+5, PASSVEC3( self->s.v.maxs)-5 );
+        //TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( self->wp->origin ), 1, self,PASSVEC3( self->s.v.mins)+TRACECAP_ADD, PASSVEC3( self->s.v.maxs)-TRACECAP_ADD );
+        traceline( PASSVEC3( self->s.v.origin ), PASSVEC3( self->wp->origin ), 1, self);
 
         if( g_globalvars.trace_fraction != 1 )
         {
+                ClearAllWaypoints(  );
                 SelectWP();
+                return 0;
         }
 
         InitCalcMovement();
+/*        if( self->wp_path ) // попробовать срезать путь( для случаев когда ближайший вп сзади )
+        {
+                int flags = self->wp_path->link->flags;
+                if( !flags || ( flags & WPLINK_FL_WALK) )
+                if( abs( subangle(dir_yaw, self->wp_path->link->dirangles[1] ) ) >= 160 )
+                {
+                      TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( self->wp_path->link->dest_wp->origin ), 1, self,
+                               PASSVEC3( self->s.v.mins)+TRACECAP_ADD, PASSVEC3( self->s.v.maxs)-TRACECAP_ADD );
+                      if( g_globalvars.trace_fraction == 1 )  
+                      {
+                               wp_path_t *path = self->wp_path;
+           	               self->wp = path->link->dest_wp;
+            	               self->wp_link = path->link;
+                    	       self->wp_path = path->next;
+                    	       free(path);
+                    	       InitCalcMovement();
+                               self->time_for_wpchange = g_globalvars.time + bot_frametime * 10;
+	                       return 2;
+                      }
+                }
+        }*/
         dist = vlen( dir2move );
                 
 	if ( velocity && (( dist / velocity) < 0.1) )
@@ -185,7 +209,7 @@ int WPChange()
 	                       if( dist >  self->wp->radius ) 
 	                       {
  	                         TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( self->end_wp->origin ), 1, self,
-	                               PASSVEC3( self->s.v.mins)+5, PASSVEC3( self->s.v.maxs)-5 );
+	                               PASSVEC3( self->s.v.mins)+TRACECAP_ADD, PASSVEC3( self->s.v.maxs)-TRACECAP_ADD );
                                  if( g_globalvars.trace_fraction != 1 )  
                                       return 1;
 	                       }
@@ -207,7 +231,7 @@ int WPChange()
 	                {
 	                       //traceline( PASSVEC3( self->s.v.origin ), PASSVEC3( path->link->dest_wp->origin ), 0, self );
  	                       TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( path->link->dest_wp->origin ), 1, self,
-	                               PASSVEC3( self->s.v.mins)+5, PASSVEC3( self->s.v.maxs)-5 );
+	                               PASSVEC3( self->s.v.mins)+TRACECAP_ADD, PASSVEC3( self->s.v.maxs)-TRACECAP_ADD );
                                 if( g_globalvars.trace_fraction != 1 )  return 1;
 	                }
 
@@ -252,8 +276,14 @@ void DoMovement()
 	if(! WPChange())
 	        return;
 
-
-        if ( ( int ) ( self->s.v.flags ) & FL_ONGROUND )
+	if ( ( int ) ( self->s.v.flags ) & ( FL_INWATER ) )
+	{
+	        self->keys |= KEY_MOVEFORWARD;
+	        self->s.v.button2 = 0;
+	        self->s.v.v_angle[1] = dir_yaw;
+	        return;
+	}
+        if ( ( int ) ( self->s.v.flags ) & ( FL_ONGROUND |FL_PARTIALGROUND ) )
 	{
 	        if( velocity < self->maxfbspeed * 0.95 || (self->wp_link && (self->wp_link->flags & WPLINK_FL_WALK)) )
 	        {
@@ -316,7 +346,7 @@ void DoMovement()
 	VectorScale(self->s.v.velocity, bot_frametime * 3, v);
 	VectorAdd(self->s.v.origin, v,v);
         TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( v ), 1, self,
-                           PASSVEC3( self->s.v.mins)+10, PASSVEC3( self->s.v.maxs)-10 );
+                           PASSVEC3( self->s.v.mins)+TRACECAP_ADD, PASSVEC3( self->s.v.maxs)-TRACECAP_ADD );
 
       	ftmp =  subangle( dir_yaw,vel_yaw );
 	if( abs( ftmp) >  max_strafe_angle  || g_globalvars.trace_fraction != 1  || self->time_for_wpchange > g_globalvars.time )
@@ -337,6 +367,18 @@ void DoMovement()
 	        self->s.v.v_angle[1] = vel_yaw;
                 return;
 	}
+        TraceCapsule( PASSVEC3( self->wp->origin ), PASSVEC3( v ), 1, self,
+                           PASSVEC3( self->s.v.mins)+TRACECAP_ADD, PASSVEC3( self->s.v.maxs)-TRACECAP_ADD );
+        if( g_globalvars.trace_fraction != 1 )
+        {
+	        if( ftmp < 0 )
+	        {
+	                self->bot_strafe_state = BOT_STRAFE_RIGHT;
+	        }else
+	        {
+	                self->bot_strafe_state = BOT_STRAFE_LEFT;
+	        }
+        }
 
         if(self->bot_strafe_state == BOT_STRAFE_RIGHT)
         {

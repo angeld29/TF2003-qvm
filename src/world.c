@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: world.c,v 1.9 2005-05-28 18:33:52 AngelD Exp $
+ *  $Id: world.c,v 1.10 2005-06-07 04:12:39 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -307,6 +307,8 @@ void SP_worldspawn(  )
 	trap_precache_model( "progs/w_g_key.mdl" );
 	trap_precache_model( "progs/m_g_key.mdl" );
 	trap_precache_model( "progs/b_g_key.mdl" );
+
+	trap_precache_model( "progs/s_light.spr" );
 //
 // Setup light animation tables. 'a' is total darkness, 'z' is maxbright.
 //
