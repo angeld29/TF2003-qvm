@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_mod_command.c,v 1.4 2005-06-07 04:12:39 AngelD Exp $
+ *  $Id: g_mod_command.c,v 1.5 2005-06-10 00:43:39 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -60,6 +60,7 @@ void ModCommand()
 extern vec3_t end_pos;
 
 void DrawWPS();
+void ClearWaypoints(  );
 void WP_command( int argc )
 {
         char    cmd_command[1024];
@@ -194,5 +195,9 @@ void WP_command( int argc )
                 DrawWPS();
                 return;
         }
-
+        if(!strcmp(cmd_command, "clear"))
+        {
+                ClearWaypoints();
+                return;
+        }
 }

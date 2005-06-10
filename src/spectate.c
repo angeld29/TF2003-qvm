@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: spectate.c,v 1.3 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: spectate.c,v 1.4 2005-06-10 00:43:39 AngelD Exp $
  */
 //===========================================================================
 // Spectator
@@ -36,6 +36,7 @@ void SpectatorConnect(  )
 	G_bprint( PRINT_MEDIUM, "Spectator %s entered the game\n", self->s.v.netname );
 
 	self->s.v.goalentity = EDICT_TO_PROG( world );	// used for impulse 1 below
+	self->s.v.classname = "spectator";
 
 }
 
@@ -46,6 +47,7 @@ void SpectatorConnect(  )
 void SpectatorDisconnect(  )
 {
 	G_bprint( PRINT_MEDIUM, "Spectator %s  left the game\n", self->s.v.netname );
+	self->has_disconnected = 1;
 }
 
 /*

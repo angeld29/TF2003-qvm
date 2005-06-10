@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: move.c,v 1.11 2005-06-07 04:12:39 AngelD Exp $
+ *  $Id: move.c,v 1.12 2005-06-10 00:43:39 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -162,7 +162,8 @@ int WPChange()
 	        self->botNoMoveTime = g_globalvars.time + BOT_TIMEWAIT_AFTER_TELEPORT;
 	        ClearAllWaypoints(  );
 	        SelectWP();
-	        return 0;
+	        if(!self->wp)
+       	              return 0;
 	}
 
         //TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( self->wp->origin ), 1, self,PASSVEC3( self->s.v.mins)+TRACECAP_ADD, PASSVEC3( self->s.v.maxs)-TRACECAP_ADD );
@@ -172,7 +173,8 @@ int WPChange()
         {
                 ClearAllWaypoints(  );
                 SelectWP();
-                return 0;
+	        if(!self->wp)
+       	              return 0;
         }
 
         InitCalcMovement();
@@ -369,6 +371,7 @@ void DoMovement()
 	}
         TraceCapsule( PASSVEC3( self->wp->origin ), PASSVEC3( v ), 1, self,
                            PASSVEC3( self->s.v.mins)+TRACECAP_ADD, PASSVEC3( self->s.v.maxs)-TRACECAP_ADD );
+
         if( g_globalvars.trace_fraction != 1 )
         {
 	        if( ftmp < 0 )
@@ -379,6 +382,17 @@ void DoMovement()
 	                self->bot_strafe_state = BOT_STRAFE_LEFT;
 	        }
         }
+/*        if ( velocity && (( vlen( dir2move ) / velocity) < 0.5) && self->wp_path ) 
+        {
+                ftmp = subangle( vel_yaw, self->wp_path->link->dirangles[1] );
+	        if( ftmp > 0 )
+	        {
+	                self->bot_strafe_state = BOT_STRAFE_RIGHT;
+	        }else
+	        {
+	                self->bot_strafe_state = BOT_STRAFE_LEFT;
+	        }
+        }*/
 
         if(self->bot_strafe_state == BOT_STRAFE_RIGHT)
         {

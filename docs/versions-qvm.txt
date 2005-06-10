@@ -14,10 +14,12 @@ test: headless gib added
 Removed the stuff regarding "imin1", "imin2", etc. (no longer used).
 пофикшена возможность использования импульсов сразу после выстрела из sniperrifle
 пофикшена неправильная работа сбар
+cmd комманды не работают для спектаторов
 
 добавлены команды
 mod wp add
 mod wp link
+mod wp dlink
 mod wp target
 
 ////////////////////////////////////////////////////

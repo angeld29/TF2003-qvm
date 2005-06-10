@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: waypoint.c,v 1.6 2005-06-07 04:12:39 AngelD Exp $
+ *  $Id: waypoint.c,v 1.7 2005-06-10 00:43:39 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -29,33 +29,76 @@ typedef struct wp_list_s {
 
 static wp_list_t *wp_list_start = NULL;
 static int numwaypoints = 0;
+static int wpdrawed = 0;
+void DrawWPS();
+void ClearWaypoints(  )
+{
+        int i;
+        wp_list_t *wp_l;
+        if( wpdrawed )
+                DrawWPS();
+                
+        while( wp_list_start )
+        {
+                wp_l = wp_list_start;
+                wp_list_start = wp_l->next;
+		for ( i = 0 ; i < MAX_WP_LINKS ; i++ )
+		{
+		        if( wp_l->wp->links[i] )
+        		        free(wp_l->wp->links[i]);
+		}
+                free(wp_l->wp);
+                free(wp_l);
+                numwaypoints--;
+        }
+
+
+}
 
 waypoint_t *AddWaypoint( waypoint_t * newwp )
 {
 
-	waypoint_t *wp;
+	waypoint_t *wp = NULL;
 	wp_list_t *wp_l;
 
-	wp = malloc( sizeof( waypoint_t ) );
-	memcpy( wp, newwp, sizeof( waypoint_t ) );
+	if ( newwp->flags & WP_FL_TEMP )	//dont allow temp wp in wp list
+		newwp->flags -= WP_FL_TEMP;
 
-	if ( wp->flags & WP_FL_TEMP )	//dont allow temp wp in wp list
-		wp->flags -= WP_FL_TEMP;
+	if ( newwp->radius == 0 )
+		newwp->radius = 60;
 
-	if ( wp->radius == 0 )
-		wp->radius = 60;
+	for ( wp_l = wp_list_start; wp_l; wp_l = wp_l->next )
+	{
+	        if( wp_l->wp->index == newwp->index )
+	        {
+	                wp = wp_l->wp;
+	                break;
+	        }
+	        
+	}
+	if( !wp)
+	{
+          	wp = malloc( sizeof( waypoint_t ) );
+         	memcpy( wp, newwp, sizeof( waypoint_t ) );
 
-	wp_l = malloc( sizeof( wp_list_t ) );
+         	wp_l = malloc( sizeof( wp_list_t ) );
 
-	wp_l->next = wp_list_start;
-	wp_l->prev = NULL;
-	wp_l->wp = wp;
-	if ( wp_list_start )
-		wp_list_start->prev = wp_l;
-	wp_list_start = wp_l;
-	memset( wp->links, 0, sizeof( wp->links ) );
-//FIXME!!!! add check for dublicate indexes
-	numwaypoints++;
+         	wp_l->next = wp_list_start;
+         	wp_l->prev = NULL;
+         	wp_l->wp = wp;
+         	if ( wp_list_start )
+         		wp_list_start->prev = wp_l;
+         	wp_list_start = wp_l;
+         	memset( wp->links, 0, sizeof( wp->links ) );
+         	numwaypoints++;
+	}else
+	{
+	        G_dprintf("WP index %3d replaced\n", newwp->index);
+	        VectorCopy( newwp->origin, wp->origin );
+	        wp->flags  = newwp->flags;
+	        wp->radius = newwp->radius;
+	        wp->teams  = newwp->teams;
+	}
 	return wp;
 }
 
@@ -116,8 +159,8 @@ int WaypointFindVisible( vec3_t point, int nomonsters, waypoint_t ** wps, int ma
 
 	for ( wp_l = wp_list_start; wp_l && num < maxcount; wp_l = wp_l->next )
 	{
-		//traceline( PASSVEC3( point ), PASSVEC3( wp_l->wp->origin ), nomonsters, self );
-                TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( wp_l->wp->origin ), 1, self, PASSVEC3( self->s.v.mins)+TRACECAP_ADD, PASSVEC3( self->s.v.maxs)-TRACECAP_ADD );
+		traceline( PASSVEC3( point ), PASSVEC3( wp_l->wp->origin ), nomonsters, self );
+//              TraceCapsule( PASSVEC3( self->s.v.origin ), PASSVEC3( wp_l->wp->origin ), 1, self, PASSVEC3( self->s.v.mins)+TRACECAP_ADD, PASSVEC3( self->s.v.maxs)-TRACECAP_ADD );
 		if ( g_globalvars.trace_fraction != 1 )
 			continue;
 		*wps++ = wp_l->wp;
@@ -424,7 +467,7 @@ wp_path_t *WaypointFindPath( waypoint_t * wp_src, waypoint_t * wp_dst )
 	return path;
 }
 
-static int wpdrawed = 0;
+
 void DrawWPS()
 {
         gedict_t* te;
@@ -445,6 +488,7 @@ void DrawWPS()
           	te->s.v.movetype = MOVETYPE_NONE;
           	te->s.v.solid = SOLID_NOT;
           	te->s.v.classname = "wp";
+          	te->wp = wp_l->wp;
           	setmodel( te, "progs/s_light.spr" );
           	setorigin( te, PASSVEC3( wp_l->wp->origin));
  	}

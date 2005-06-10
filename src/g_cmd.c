@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.17 2005-05-31 20:01:30 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.18 2005-06-10 00:43:39 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -70,6 +70,11 @@ qboolean ClientCommand(  )
 	const cmd_t  *ucmd;
 
 	self = PROG_TO_EDICT( g_globalvars.self );
+	if ( strcmp(self->s.v.classname, "player") )
+	{
+	        return false;
+	}
+
 	trap_CmdArgv( 0, cmd_command, sizeof( cmd_command ) );
 	for ( ucmd = cmds; ucmd->command; ucmd++ )
 	{
