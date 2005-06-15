@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.44 2005-06-05 05:10:41 AngelD Exp $
+ *  $Id: client.c,v 1.45 2005-06-15 11:48:13 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1348,7 +1348,6 @@ gedict_t *SelectSpawnPoint()
 void PutClientInServer()
 {
 	int     iszoom;
-	int     oldclass;
 	gedict_t *spot;
 	gedict_t *te;
 	vec3_t  v;
@@ -1399,25 +1398,61 @@ void PutClientInServer()
 			self->s.v.impulse = 1;
 			TeamFortress_ChangeClass();
 		}
+	}else
+	{
+	        int   savepc, savenextpc;
+
+             	savepc     = self->playerclass;
+             	savenextpc = self->nextpc;
+             	self->playerclass = 0;
+             	self->nextpc      = 0;
+
+             	if( !ClassIsRestricted( self->team_no, savepc ))
+             	        self->playerclass = savepc;
+             	self->nextpc = savenextpc;
 	}
+
 	if ( deathmatch == 3 && self->nextpc )
 	{
-		self->playerclass = self->nextpc;
+	        int   savepc, savenextpc;
+
+             	savepc     = self->playerclass;
+             	savenextpc = self->nextpc;
+             	self->playerclass = 0;
+             	self->nextpc      = 0;
+
+             	if( !ClassIsRestricted( self->team_no, savenextpc ))
+       		       self->playerclass = savenextpc;
+             	else
+             	       self->playerclass = savepc;
+             	        
 		self->nextpc = 0;
-		if ( self->playerclass == PC_RANDOM )
-			self->tfstate |= TFSTATE_RANDOMPC;
-		else
+		if( self->playerclass )
 		{
-			self->tfstate -= ( self->tfstate & TFSTATE_RANDOMPC );
-			TeamFortress_ExecClassScript( self );
+              		if ( self->playerclass == PC_RANDOM )
+              			self->tfstate |= TFSTATE_RANDOMPC;
+              		else
+              		{
+              			self->tfstate -= ( self->tfstate & TFSTATE_RANDOMPC );
+              			TeamFortress_ExecClassScript( self );
+              		}
 		}
 	}
+	if ( !self->playerclass )
+	{
+		if ( TeamFortress_TeamIsCivilian( self->team_no ) )
+		{
+			self->s.v.impulse = 1;
+			TeamFortress_ChangeClass();
+		}
+	}
+
 	iszoom = 0;
 	if ( self->tfstate & TFSTATE_ZOOMOFF )
 		iszoom = 1;
 	if ( self->tfstate & TFSTATE_RANDOMPC )
 	{
-		oldclass = self->playerclass;
+	        int  oldclass = self->playerclass;
 		self->playerclass = 1 + ( int ) ( g_random() * ( 9 ) );
 		while ( !IsLegalClass( self->playerclass )
 			|| self->playerclass == oldclass || ClassIsRestricted( self->team_no, self->playerclass ) )
@@ -1433,7 +1468,7 @@ void PutClientInServer()
 		Engineer_RemoveBuildings( self );
 
 	self->s.v.takedamage = 2;
-	TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & 8 );
+	TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & TFSTATE_RANDOMPC );
 	TeamFortress_SetEquipment();
 	TeamFortress_SetHealth();
 	TeamFortress_PrepareForArenaRespawn();

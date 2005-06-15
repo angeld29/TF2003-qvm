@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: player.c,v 1.14 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: player.c,v 1.15 2005-06-15 11:48:13 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1598,10 +1598,10 @@ void GibPlayer(  )
 	else
 	{
 #endif
-	ThrowHead( "progs/h_player.mdl", self->s.v.health );
-	ThrowGib( "progs/gib1.mdl", self->s.v.health );
-	ThrowGib( "progs/gib2.mdl", self->s.v.health );
-	ThrowGib( "progs/gib3.mdl", self->s.v.health );
+        	ThrowHead( "progs/h_player.mdl", self->s.v.health );
+        	ThrowGib( "progs/gib1.mdl", self->s.v.health );
+        	ThrowGib( "progs/gib2.mdl", self->s.v.health );
+        	ThrowGib( "progs/gib3.mdl", self->s.v.health );
 #ifdef HEADLESS_GIB
 	}
 #endif

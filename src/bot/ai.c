@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: ai.c,v 1.11 2005-06-07 04:12:39 AngelD Exp $
+ *  $Id: ai.c,v 1.12 2005-06-15 11:48:13 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -235,7 +235,10 @@ void SelectWP()
         if( wpsrc != wpdst )
         {
 	       if( !(self->wp_path = WaypointFindPath( wpsrc, wpdst ) ) )
+	       {
+	               G_dprintf("path not found\n");
 	               return;
+	       }
                self->wp = self->wp_path->link->src_wp;
         }else
         {
