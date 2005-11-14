@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: engineer.c,v 1.24 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: engineer.c,v 1.25 2005-11-14 15:36:21 AngelD Exp $
  */
 /*========================================================
 Weapons and functions for the ENGINEER class and associated weaponry                          
@@ -872,6 +872,12 @@ void 	Engineer_RotateSG(  )
         	return;
 
         trap_CmdArgv( 1, value, sizeof( value ) );
+        if( !strcmp( value,"point") )
+        {
+                self->building->waitmin = anglemod( ( int ) ( self->s.v.angles[1] - 50 ) );
+                self->building->waitmax = anglemod( ( int ) ( self->s.v.angles[1] + 50 ) );
+                return;
+        }
         angle = atoi(value);
 	self->building->waitmin = anglemod( self->building->waitmin + angle );
 	self->building->waitmax = anglemod( self->building->waitmax + angle );

@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_utils.c,v 1.12 2005-05-28 19:03:46 AngelD Exp $
+ *  $Id: g_utils.c,v 1.13 2005-11-14 15:36:21 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -143,6 +143,7 @@ void aim( vec3_t ret )
 }
 
 char    null_str[] = "";
+
 int streq( const char *s1, const  char *s2 )
 {
 	if ( !s1 )
@@ -151,6 +152,7 @@ int streq( const char *s1, const  char *s2 )
 		s2 = null_str;
 	return ( !strcmp( s1, s2 ) );
 }
+
 int strneq( const char *s1, const char *s2 )
 {
 	if ( !s1 )
@@ -434,7 +436,7 @@ void setmodel( gedict_t * ed, char *model )
 	trap_setmodel( NUM_FOR_EDICT( ed ), model );
 }
 
-void sound( gedict_t * ed, int channel, char *samp, int vol, float att )
+void sound( gedict_t * ed, int channel, char *samp, float vol, float att )
 {
 	trap_sound( NUM_FOR_EDICT( ed ), channel, samp, vol, att );
 }

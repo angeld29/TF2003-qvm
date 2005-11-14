@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_local.h,v 1.24 2005-06-03 08:50:33 AngelD Exp $
+ *  $Id: g_local.h,v 1.25 2005-11-14 15:36:20 AngelD Exp $
  */
 //
 // g_local.h -- local definitions for game module
@@ -107,7 +107,7 @@ void    	setorigin( gedict_t * ed, float origin_x, float origin_y, float origin_
 void    	setsize( gedict_t * ed, float min_x, float min_y, float min_z, float max_x,
 		 float max_y, float max_z );
 void    	setmodel( gedict_t * ed, char *model );
-void    	sound( gedict_t * ed, int channel, char *samp, int vol, float att );
+void    	sound( gedict_t * ed, int channel, char *samp, float vol, float att );
 gedict_t 	*checkclient(  );
 void    	traceline( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z,
 		   int nomonst, gedict_t * ed );
@@ -291,5 +291,4 @@ void Menu_Class_Input(int impulse);
 void CheckAutoKick( gedict_t * p );
 //mod_commnad
 void ModCommand();
-
 #endif

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: progs.h,v 1.23 2005-06-05 05:10:41 AngelD Exp $
+ *  $Id: progs.h,v 1.24 2005-11-14 15:36:21 AngelD Exp $
  */
 #include "progdefs.h"
 
@@ -294,6 +294,7 @@ typedef struct gedict_s {
 	int		admin_mode;
 	int		autokick_kills,autokick_time;
 	struct gedict_s*	admin_use;
+	float           auth_time; 
 
 	float		allow_snip_time;
 	int		has_fake_gas_setinfo;
@@ -303,7 +304,7 @@ typedef struct gedict_s {
 
 	int	 	k_voted;
 	float		last_vote_time;
-//	int		k_stuff;
+
 //BotFields
         int            old_button0,old_button1,old_button2,old_keys;
 	int            isBot;

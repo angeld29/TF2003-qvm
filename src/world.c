@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: world.c,v 1.10 2005-06-07 04:12:39 AngelD Exp $
+ *  $Id: world.c,v 1.11 2005-11-14 15:36:21 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -116,7 +116,7 @@ void SP_worldspawn(  )
 		{
 			infokey( world, "*gamedir", gamedir, sizeof( gamedir ) );
 			if ( strcmp( gamedir, "fortress" ) )
-				G_Error( "QW TF must be run with a sv_gamedir of \"fortress\".\n" );
+				G_Error( "QW TF must be run with a sv_gamedir or gamedir of \"fortress\". %s\n", gamedir );
 		}
 	}
 

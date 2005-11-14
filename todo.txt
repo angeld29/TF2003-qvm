@@ -2,7 +2,7 @@
 
 camera
 suicide body
-fix TeamFortress_TeamGetColor чтобы возвращал реальный цвет а не цвет+1
++fix TeamFortress_TeamGetColor чтобы возвращал реальный цвет а не цвет+1
 
 scanner на sentry, флаги
 sound on grens

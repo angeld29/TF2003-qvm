@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: actions.c,v 1.18 2005-05-28 19:03:46 AngelD Exp $
+ *  $Id: actions.c,v 1.19 2005-11-14 15:36:21 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -40,7 +40,7 @@ static const int     default_class_discard[10][4] = {
 	{0, 0, 1, 0}
 };
 
-void TeamFortress_Cmd_Discard(  )
+void TeamFortress_Cmd_Discard( void )
 {
 	int     ammo_tmp;
 	vec3_t  vtemp;

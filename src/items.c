@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: items.c,v 1.12 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: items.c,v 1.13 2005-11-14 15:36:21 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1636,7 +1636,7 @@ void BackpackTouch(  )
 {
 	float   best;
 	int		gotgren1 = 0;
-	int		gotgren2	= 0;
+	int		gotgren2 = 0;
 
 	if ( strneq( other->s.v.classname, "player" ) )
 		return;

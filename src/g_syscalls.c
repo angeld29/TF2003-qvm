@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.c,v 1.10 2005-05-28 19:03:46 AngelD Exp $
+ *  $Id: g_syscalls.c,v 1.11 2005-11-14 15:36:21 AngelD Exp $
  */
 
 //#include "g_local.h"
@@ -140,9 +140,9 @@ void trap_ambientsound( float pos_x, float pos_y, float pos_z, const char *samp,
 		 (int)samp, PASSFLOAT( vol), PASSFLOAT( atten ));
 }
 
-void trap_sound( int edn, int channel, const char *samp, int vol, float att )
+void trap_sound( int edn, int channel, const char *samp, float vol, float att )
 {
-	syscall( G_SOUND, edn, channel, (int)samp, vol, PASSFLOAT( att ));
+	syscall( G_SOUND, edn, channel, (int)samp, PASSFLOAT( vol ), PASSFLOAT( att ));
 }
 
 int trap_checkclient()

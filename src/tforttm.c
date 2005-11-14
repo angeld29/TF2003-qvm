@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tforttm.c,v 1.18 2005-06-05 05:10:41 AngelD Exp $
+ *  $Id: tforttm.c,v 1.19 2005-11-14 15:36:21 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -512,7 +512,7 @@ void TeamFortress_TeamShowMemberClasses_New( gedict_t * Player )
 	stf = GetInfokeyInt( self, "s", NULL, 0 );
 	for(e= world; (e = trap_find( e, FOFS( s.v.classname ), "player" )); )
 	{
-		if ( ( e->team_no == Player->team_no || !e->team_no ) && e != Player )
+		if ( ( e->team_no == Player->team_no /*|| !e->team_no*/ ) && e != Player )
 		{
 			if ( e->s.v.model && e->s.v.model[0] )
 			{

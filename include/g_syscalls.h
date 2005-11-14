@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.h,v 1.11 2005-05-28 19:03:44 AngelD Exp $
+ *  $Id: g_syscalls.h,v 1.12 2005-11-14 15:36:21 AngelD Exp $
  */
 
 int     trap_GetApiVersion(  );
@@ -42,7 +42,7 @@ void    trap_setsize( int edn, float min_x, float min_y, float min_z, float max_
 void    trap_setmodel( int edn, const char *model );
 void    trap_ambientsound( float pos_x, float pos_y, float pos_z, const char *samp, float vol,
 			   float atten );
-void    trap_sound( int edn, int channel, const char *samp, int vol, float att );
+void    trap_sound( int edn, int channel, const char *samp, float vol, float att );
 int     trap_checkclient(  );
 void    trap_traceline( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y,
 			float v2_z, int nomonst, int edn );

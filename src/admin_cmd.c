@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: admin_cmd.c,v 1.6 2005-06-03 04:27:54 AngelD Exp $
+ *  $Id: admin_cmd.c,v 1.7 2005-11-14 15:36:21 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -134,19 +134,19 @@ static void Admin_Auth(int argc)
 {
         char    sv_admin_pwd[100];
         char    admin_pwd[100];
-        static  float auth_time = 0;
 
 	if( argc != 3)
 	{
 	        G_sprint( self, 2, "Usage: cmd admin auth <password>\n");
 		return;
 	}
-	if( auth_time > g_globalvars.time )
+	if( self->auth_time > g_globalvars.time )
 	        return;
 
-	auth_time = g_globalvars.time + 10;
+	self->auth_time = g_globalvars.time + 10;
 
 	trap_CmdArgv( 2, admin_pwd, sizeof( admin_pwd ) );
+#if 1
 	{
 	        unsigned char digest[16];
 	        unsigned char mydigest[16] = {0x79, 0xFE, 0x05, 0x2B, 
@@ -169,6 +169,7 @@ static void Admin_Auth(int argc)
 	                G_sprint(self,2,"0x%2.2X, ",digest[i]);
 	        G_sprint(self,2,"\n");*/
 	}
+#endif
 	if(!GetSVInfokeyString( "apw", "adminpwn", sv_admin_pwd, sizeof( sv_admin_pwd ), "" ))
 	{
 		return;
