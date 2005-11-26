@@ -1,3 +1,4 @@
+fix stuffcmd func in server
 единая система обработки консоли (там где особые случаи не нужны)
 
 camera
@@ -9,6 +10,7 @@ sound on grens
 new menu system
 setting через cmd
 flare dmg
+auto flaginfo/flaginfo in sbar
 
 Arena Mode
 bot sold like sentry

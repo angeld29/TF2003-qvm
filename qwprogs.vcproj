@@ -497,6 +497,9 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src\crc32.c">
+			</File>
+			<File
 				RelativePath="src\ctf.c">
 				<FileConfiguration
 					Name="TG Debug|Win32">

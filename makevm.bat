@@ -268,6 +268,9 @@ cd VM
 
 @if errorlevel 1 goto quit
 
+%CC% %CFLAGS% %INCFLAGS% %SRC%\crc32.c -o crc32.asm
+
+@if errorlevel 1 goto quit
 
 copy %SRC%\g_syscalls.asm .
 

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_local.h,v 1.25 2005-11-14 15:36:20 AngelD Exp $
+ *  $Id: g_local.h,v 1.26 2005-11-26 14:44:38 AngelD Exp $
  */
 //
 // g_local.h -- local definitions for game module
@@ -79,6 +79,7 @@ void            G_conprintf( const char *fmt, ... );
 
 #define PASSVEC3(x) (x[0]),(x[1]),(x[2])
 #define SetVector(v,x,y,z) (v[0]=x,v[1]=y,v[2]=z)
+unsigned int crc32(unsigned int crc, unsigned char* buf, int len);
 //g_utils.c
 float           g_random( void );
 float           crandom( void );
