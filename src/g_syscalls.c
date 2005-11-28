@@ -20,10 +20,8 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.c,v 1.11 2005-11-14 15:36:21 AngelD Exp $
+ *  $Id: g_syscalls.c,v 1.12 2005-11-28 17:37:32 AngelD Exp $
  */
-
-//#include "g_local.h"
 
 // this file is only included when building a dll
 // g_syscalls.asm is included instead when building a qvm

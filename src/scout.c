@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: scout.c,v 1.20 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: scout.c,v 1.21 2005-11-28 17:37:32 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -603,8 +603,8 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 	float   any_detected2;
 	vec3_t  tmp;
 	float   multiscan;
-	char    st[10];
-	int     opt;
+//	char    st[10];
+//	int     opt;
 
 	// prevent scan impulse from triggering anything else
 	self->s.v.impulse = 0;
@@ -722,12 +722,15 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 		G_sprint( self, PRINT_HIGH, "All scanner functions are disabled.\n" );
 		return;
 	}
-	multiscan = 1;
+	multiscan = ( self->settings_bits & TF_MULTISCAN_MASK)? 1: 0;
+//REMOVE!!!!	
+/*	multiscan = 1;
 	GetInfokeyString( self, "ms", "multiscan", st, sizeof( st ), "on" );
 	opt = GetInfokeyInt( self, "s", NULL, 0 );
 
 	if ( !strcmp( st, "off" ) || ( opt & TF_MULTISCAN_MASK ) )
-		multiscan = 0;
+		multiscan = 0;*/
+
 
 	if ( typescan == 0 )
 		G_sprint( self, PRINT_HIGH, "Scanning...\n" );

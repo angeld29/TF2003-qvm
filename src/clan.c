@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: clan.c,v 1.9 2005-05-28 19:03:46 AngelD Exp $
+ *  $Id: clan.c,v 1.10 2005-11-28 17:37:32 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -272,7 +272,7 @@ void DumpClanScores(  )
 
 	for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
 	{
-		if ( GetInfokeyString( te, "take_sshot", NULL, st2, sizeof( st2 ), "" ) )
+		if ( te->take_sshot )
 		{
 			stuffcmd( te, "screenshot\n" );
 		}

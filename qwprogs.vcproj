@@ -105,7 +105,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="D:\games\qwtf\fortress\qwprogs.dll"
+				OutputFile="D:\games\qwtf\fortress\tf2003dbg.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				ModuleDefinitionFile=".\src\game.def"
@@ -152,7 +152,6 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/QaxK "
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				AdditionalIncludeDirectories="include"

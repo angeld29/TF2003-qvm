@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: progs.h,v 1.24 2005-11-14 15:36:21 AngelD Exp $
+ *  $Id: progs.h,v 1.25 2005-11-28 17:37:32 AngelD Exp $
  */
 #include "progdefs.h"
 
@@ -279,13 +279,21 @@ typedef struct gedict_s {
 	int             cheat_level;
 	float          	FlashTime;
 	int             nailpos;
+//player settings 
+        int             isSpectator;
 	float           StatusRefreshTime;
 	int             StatusBarSize;
 	int             StatusBarRes;
 	int             ScannerOn;
 	int             ScanRange;
 	int		assault_min_shells;
-
+	int             discard_shells;
+	int             discard_nails;
+	int             discard_rockets;
+	int             discard_cells;
+	int             settings_bits;
+	int             take_sshot;
+//player settings end
 	int             tf_id;
 	int             teamkills;
 	int 		tf_impulse,imp1,imp2,imp3,imp4;

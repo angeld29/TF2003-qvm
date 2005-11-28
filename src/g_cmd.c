@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.18 2005-06-10 00:43:39 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.19 2005-11-28 17:37:32 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -28,6 +28,7 @@
 #define CMD_NOT_ATTACK		4
 #define CMD_NOT_TEAM		8
 #define CMD_NOT_CLASS		16
+#define CMD_SPECTATOR_ALLOWED	32
 
 
 typedef struct {
@@ -46,16 +47,18 @@ void    TeamFortress_Cmd_Discard(  );
 void    Engineer_RotateSG(  );
 void    TeamFortress_Cmd_Detpack(  );
 void    Admin_Cmd(  );
+void    Client_Set_Cmd(  );
 
 const static cmd_t   cmds[] = {
 	{"kill", ClientKill},
 	{"test", Test},
 //#if ( GAME_API_VERSION >= 7 )
-	{"bot", Bot},
+	{"bot", Bot, CMD_SPECTATOR_ALLOWED},
 //#endif
-	{"tg", TG_Cmd},
+	{"tg", TG_Cmd, CMD_SPECTATOR_ALLOWED},
 	{"vote", Vote_Cmd, CMD_NOT_PREMATCH},
-	{"admin", Admin_Cmd},
+        {"set", Client_Set_Cmd},
+	{"admin", Admin_Cmd, CMD_SPECTATOR_ALLOWED},
 	{"discard", TeamFortress_Cmd_Discard, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
 	{"sg_rotate", Engineer_RotateSG, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
 	{"detpack", TeamFortress_Cmd_Detpack, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
@@ -70,16 +73,21 @@ qboolean ClientCommand(  )
 	const cmd_t  *ucmd;
 
 	self = PROG_TO_EDICT( g_globalvars.self );
-	if ( strcmp(self->s.v.classname, "player") )
+/*	if ( strcmp(self->s.v.classname, "player") )
 	{
 	        return false;
-	}
+	}*/
 
 	trap_CmdArgv( 0, cmd_command, sizeof( cmd_command ) );
 	for ( ucmd = cmds; ucmd->command; ucmd++ )
 	{
 		if ( strcmp( cmd_command, ucmd->command ) )
 			continue;
+		if ( (!( ucmd->allowed & CMD_SPECTATOR_ALLOWED )) && self->isSpectator)
+		{     
+			G_sprint( self, 2, "cmd '%s' not allowed for spectators\n", cmd_command );
+			return true;
+ 	        }
 		if ( ( ucmd->allowed & CMD_NOT_PREMATCH )
 		     && ( tf_data.cb_prematch_time > g_globalvars.time ) )
 		{
@@ -107,6 +115,8 @@ qboolean ClientCommand(  )
 }
 
 
+qboolean SetClientSetting( gedict_t*p , const char*key, const char* value );
+
 qboolean ClientUserInfoChanged(  )
 {
 	char    key[1024];
@@ -116,17 +126,13 @@ qboolean ClientUserInfoChanged(  )
 
 	self = PROG_TO_EDICT( g_globalvars.self );
 
-	if ( !self->team_no )
-		return 0;
-
 	trap_CmdArgv( 1, key, sizeof( key ) );
 	trap_CmdArgv( 2, value, sizeof( value ) );
 
 	if ( !strcmp( key, "team" ) )
 	{
-
-
-
+		if ( !self->team_no )
+			return 0;
 		sk = GetTeamName( self->team_no );
 		if ( strneq( value, sk ) )
 		{
@@ -136,12 +142,9 @@ qboolean ClientUserInfoChanged(  )
 		}
 		return 0;
 	}
-	if ( !self->playerclass )
-		return 0;
-
 	if ( !strcmp( key, "skin" ) )
 	{
-		if ( !self->playerclass )
+		if ( !self->playerclass || !self->team_no )
 			return 0;
 		sk = TeamFortress_GetSkin( self );
 		if ( strneq( value, sk ) )
@@ -154,15 +157,14 @@ qboolean ClientUserInfoChanged(  )
 	}
 	if ( ( !strcmp( key, "topcolor" ) ) && tf_data.topcolor_check )
 	{
+		if ( !self->team_no )
+			return 0;
 		color = atoi( value );
 		if ( self->playerclass == PC_SPY && self->undercover_team )
 		{
 			if ( TeamFortress_TeamGetTopColor( self->undercover_team ) != color )
 			{
 				G_sprint( self, 2, "you cannot change your topcolor setinfo\n" );
-/*       				stuffcmd( self, "color %d %d\n",
-       					  TeamFortress_TeamGetTopColor( self->undercover_team ),
-       					  TeamFortress_TeamGetColor( self->undercover_team ) - 1 );*/
 				return 1;
 			}
 		} else
@@ -170,9 +172,6 @@ qboolean ClientUserInfoChanged(  )
 			if ( TeamFortress_TeamGetTopColor( self->team_no ) != color )
 			{
 				G_sprint( self, 2, "you cannot change your topcolor setinfo\n" );
-/*       				stuffcmd( self, "color %d %d\n",
-       					  TeamFortress_TeamGetTopColor( self->undercover_team ),
-       					  TeamFortress_TeamGetColor( self->undercover_team ) - 1 );*/
 				return 1;
 			}
 		}
@@ -181,15 +180,14 @@ qboolean ClientUserInfoChanged(  )
 
 	if ( ( !strcmp( key, "bottomcolor" ) ) )
 	{
+		if ( !self->team_no )
+			return 0;
 		color = atoi( value );
 		if ( self->playerclass == PC_SPY && self->undercover_team )
 		{
 			if ( TeamFortress_TeamGetColor( self->undercover_team ) - 1 != color )
 			{
 				G_sprint( self, 2, "you cannot change your bottomcolor setinfo\n" );
-/*       				stuffcmd( self, "color %d %d\n",
-       					  TeamFortress_TeamGetTopColor( self->team_no ),
-       					  TeamFortress_TeamGetColor( self->team_no ) - 1 );*/
 				return 1;
 			}
 		} else
@@ -197,15 +195,14 @@ qboolean ClientUserInfoChanged(  )
 			if ( TeamFortress_TeamGetColor( self->team_no ) - 1 != color )
 			{
 				G_sprint( self, 2, "you cannot change your bottomcolor setinfo\n" );
-/*       				stuffcmd( self, "color %d %d\n",
-       					  TeamFortress_TeamGetTopColor( self->team_no ),
-       					  TeamFortress_TeamGetColor( self->team_no ) - 1 );*/
 				return 1;
 			}
 		}
 		return 0;
 	}
-
+	//G_dprintf("user %s setinfo \"%s\" \"%s\"\n",self->s.v.netname, key,value);
+	
+	SetClientSetting( self, Q_strlwr( key ), value);
 	return 0;
 
 }

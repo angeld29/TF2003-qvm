@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tforttm.c,v 1.19 2005-11-14 15:36:21 AngelD Exp $
+ *  $Id: tforttm.c,v 1.20 2005-11-28 17:37:32 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -509,7 +509,7 @@ void TeamFortress_TeamShowMemberClasses_New( gedict_t * Player )
 	int		stf;
 	gedict_t*	e,*te;
 	int	found = 0;
-	stf = GetInfokeyInt( self, "s", NULL, 0 );
+	stf = self->settings_bits;// GetInfokeyInt( self, "s", NULL, 0 );//REMOVE!!!!	
 	for(e= world; (e = trap_find( e, FOFS( s.v.classname ), "player" )); )
 	{
 		if ( ( e->team_no == Player->team_no /*|| !e->team_no*/ ) && e != Player )
@@ -546,7 +546,10 @@ void TeamFortress_TeamShowMemberClasses_New( gedict_t * Player )
 
 					if((e->playerclass == PC_SPY) && ((stf & TF_STATUS_SPY_MASK) ==0))
 					{
-						G_sprint(Player, 2, " %s %s", GetTeamName(e->undercover_team),TeamFortress_GetClassName(e->undercover_skin) );
+					        if( e->undercover_team ) 
+					                G_sprint(Player, 2, " %s", GetTeamName(e->undercover_team));
+					        if( e->undercover_skin ) 
+					                G_sprint(Player, 2, " %s", TeamFortress_GetClassName(e->undercover_skin));
 					}
 
 					if((e->playerclass == PC_DEMOMAN) && ((stf & TF_STATUS_DETPACK_MASK) !=0))

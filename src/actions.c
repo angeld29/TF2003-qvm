@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: actions.c,v 1.19 2005-11-14 15:36:21 AngelD Exp $
+ *  $Id: actions.c,v 1.20 2005-11-28 17:37:32 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -196,7 +196,7 @@ void TeamFortress_Discard(  )
 	if ( default_class_discard[self->playerclass][3] )
 		newmis->s.v.ammo_cells = self->s.v.ammo_cells;
 
-	ammo_tmp = GetInfokeyInt( self, "mxs", "1", -1 );
+	ammo_tmp = self->discard_shells;
 	if ( ammo_tmp >= 0 )
 	{
 		if ( ammo_tmp <= self->s.v.ammo_shells )
@@ -204,7 +204,7 @@ void TeamFortress_Discard(  )
 		else
 			newmis->s.v.ammo_shells = 0;
 	}
-	ammo_tmp = GetInfokeyInt( self, "mxn", "2", -1 );
+	ammo_tmp = self->discard_nails;
 	if ( ammo_tmp >= 0 )
 	{
 		if ( ammo_tmp <= self->s.v.ammo_nails )
@@ -212,7 +212,7 @@ void TeamFortress_Discard(  )
 		else
 			newmis->s.v.ammo_nails = 0;
 	}
-	ammo_tmp = GetInfokeyInt( self, "mxr", "3", -1 );
+	ammo_tmp = self->discard_rockets;
 	if ( ammo_tmp >= 0 )
 	{
 		if ( ammo_tmp <= self->s.v.ammo_rockets )
@@ -220,7 +220,7 @@ void TeamFortress_Discard(  )
 		else
 			newmis->s.v.ammo_rockets = 0;
 	}
-	ammo_tmp = GetInfokeyInt( self, "mxc", "4", -1 );
+	ammo_tmp = self->discard_cells;
 	if ( ammo_tmp >= 0 )
 	{
 		if ( ammo_tmp <= self->s.v.ammo_cells )

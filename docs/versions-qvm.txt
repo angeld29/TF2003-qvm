@@ -5,6 +5,15 @@ by [sd] angel for MTFL
 Внесенные изменения (на xx.xx.200x r1):
 "cmd sg_rotate point" - Поворачавает сг в направлении взгляда игрока, работает только если активно меню use_sg.
 
+добавлена команда  "cmd set <key> [<value>]" 
+возможные значения <key>: 
+"sb", "sbr", "sbar_res","sbs","sbar_size","mxs","1","mxn","2",
+"mxr","3","mxc","4", "ch","classhelp","multiscan","ms","ec","exec_class",
+"em","exec_map","take_sshot","s"
+
+при заходе на сервер на клиенте выполняется алиас tf_onconnect
+
+fixed: неправильное отображения спая в showclasses
 
 ////////////////////////////////////////////////////
 Внесенные изменения (на 08.10.2005 r1):

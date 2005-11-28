@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: menu.c,v 1.20 2005-05-27 21:27:04 AngelD Exp $
+ *  $Id: menu.c,v 1.21 2005-11-28 17:37:32 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -331,8 +331,8 @@ void Menu_Class( menunum_t menu )
 
 void Menu_Class_Input( int imp )
 {
-	int     new_class = 0, opt;
-	char    st[10];
+	int     new_class = 0;//, opt;
+	//char    st[10];
 
 	if ( imp > 10 && imp < 1 )
 		return;
@@ -344,7 +344,10 @@ void Menu_Class_Input( int imp )
 	if ( self->playerclass && new_class != 1 )
 	{
 
-		if( GetInfokeyString( self, "ch", "classhelp", st, sizeof( st ), "" ) )
+	        if( self->settings_bits &TF_CLASS_HELP_MASK )
+	                self->current_menu = MENU_CLASSHELP;
+//REMOVE!!!!	                
+/*		if( GetInfokeyString( self, "ch", "classhelp", st, sizeof( st ), "" ) )
 		{
 			if( strcmp(st,"off") )
 			{
@@ -357,7 +360,7 @@ void Menu_Class_Input( int imp )
 		        {
 		        	self->current_menu = MENU_CLASSHELP;
 		        }
-		}
+		}*/
 	}
 	self->menu_displaytime = 0;
 	self->s.v.impulse = 0;

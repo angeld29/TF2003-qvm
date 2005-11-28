@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.38 2005-05-28 19:03:46 AngelD Exp $
+ *  $Id: tfort.c,v 1.39 2005-11-28 17:37:32 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1522,8 +1522,8 @@ void TeamFortress_SetEquipment(  )
 	int     kept_items;
 	int     pc;
 	gedict_t *te;
-	char	st[10];
-	int		opt;
+//	char	st[10];
+//	int		opt;
 
 	if ( strneq( self->s.v.classname, "player" ) )
 		return;
@@ -1567,13 +1567,14 @@ void TeamFortress_SetEquipment(  )
 	self->s.v.items = ( int ) self->s.v.items | kept_items;
     
 	self->assault_min_shells = GetInfokeyInt( self, "sb", NULL, DEFAULT_ASSAULT_MIN_SHELLS );
-        
-	if( self->assault_min_shells < 0)
+//REMOVE!!!!	        
+/*	if( self->assault_min_shells < 0)
 		self->assault_min_shells = DEFAULT_ASSAULT_MIN_SHELLS;
 
 	GetInfokeyString( self, "s", NULL, st, sizeof(st), "off" );
 	opt = GetInfokeyInt( self, "s", NULL, 0 );
-	if(!strcmp(st, "on") || (opt &TF_AUTOID_MASK))
+	if(!strcmp(st, "on") || (opt &TF_AUTOID_MASK))*/
+	if( self->settings_bits & TF_AUTOID_MASK)
 	{
          te = spawn();
          te->s.v.nextthink = g_globalvars.time + TF_AUTOIDTIME;
@@ -2796,10 +2797,13 @@ const char   *ec_strings[] = {
 
 void TeamFortress_ExecClassScript( gedict_t * p )
 {
-	char    st[10];
-	int     pl_set;
+//	char    st[10];
+//	int     pl_set;
 
-	if ( GetInfokeyString( p, "ec", "exec_class", st, sizeof( st ), "" ) )
+	if( ! (self->settings_bits  & TF_EXEC_CLASS_MASK) )
+	        return;
+//REMOVE!!!!	
+/*	if ( GetInfokeyString( p, "ec", "exec_class", st, sizeof( st ), "" ) )
 	{
 		if ( Q_stricmp( st, "on" ) )
 			return;
@@ -2808,7 +2812,7 @@ void TeamFortress_ExecClassScript( gedict_t * p )
 		pl_set = GetInfokeyInt( p, "s", NULL, 0 );
 		if ( !( pl_set & TF_EXEC_CLASS_MASK ) )
 			return;
-	}
+	}*/
 	if ( !p->playerclass || p->playerclass > 9 )
 		return;
 	stuffcmd( p, ec_strings[p->playerclass] );
@@ -2816,10 +2820,13 @@ void TeamFortress_ExecClassScript( gedict_t * p )
 
 void TeamFortress_ExecMapScript( gedict_t * p )
 {
-	char    st[10];
-	int     pl_set;
+//	char    st[10];
+//	int     pl_set;
 
-	if ( GetInfokeyString( p, "em", "exec_map", st, sizeof( st ), "" ) )
+	if( ! (self->settings_bits  & TF_EXEC_MAP_MASK) )
+	        return;
+//REMOVE!!!!	
+/*	if ( GetInfokeyString( p, "em", "exec_map", st, sizeof( st ), "" ) )
 	{
 		if ( Q_stricmp( st, "on" ) )
 			return;
@@ -2828,7 +2835,7 @@ void TeamFortress_ExecMapScript( gedict_t * p )
 		pl_set = GetInfokeyInt( p, "s", NULL, 0 );
 		if ( !( pl_set & TF_EXEC_MAP_MASK ) )
 			return;
-	}
+	}*/
 
 	stuffcmd( p, "exec mapdefault.cfg\n" );
 	stuffcmd( p, "exec %s.cfg", g_globalvars.mapname );

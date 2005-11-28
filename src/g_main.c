@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.22 2005-11-14 15:36:21 AngelD Exp $
+ *  $Id: g_main.c,v 1.23 2005-11-28 17:37:32 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -91,6 +91,7 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 	case GAME_CLIENT_CONNECT:
 		self = PROG_TO_EDICT( g_globalvars.self );
 		self->auth_time = g_globalvars.time + 10.0;
+		self->isSpectator = arg0?1:0;
 		if ( arg0 )
 			SpectatorConnect();
 		else
