@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: menu.c,v 1.21 2005-11-28 17:37:32 AngelD Exp $
+ *  $Id: menu.c,v 1.22 2005-11-28 18:30:57 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -252,11 +252,6 @@ void Menu_Team_Input( int inp )
 		{
 			if ( !number_of_teams && inp <= 4 )
 				TeamFortress_TeamSet( inp );
-/*   //REMOVE!!! DoBinding menu?
-					else {
-    if (inp == 7) 
-     self.current_menu = 9;
-   }*/
 		}
 	}
 	ResetMenu(  );

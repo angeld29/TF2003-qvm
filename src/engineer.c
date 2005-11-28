@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: engineer.c,v 1.25 2005-11-14 15:36:21 AngelD Exp $
+ *  $Id: engineer.c,v 1.26 2005-11-28 18:30:57 AngelD Exp $
  */
 /*========================================================
 Weapons and functions for the ENGINEER class and associated weaponry                          
@@ -586,7 +586,6 @@ void TeamFortress_FinishedBuilding(  )
     gedict_t *oldself;
     gedict_t *owner;
     vec3_t  end;
-//      float   current_yaw;
 
 
     owner = PROG_TO_EDICT( self->s.v.owner );

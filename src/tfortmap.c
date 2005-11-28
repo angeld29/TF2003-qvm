@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfortmap.c,v 1.19 2005-05-27 21:27:04 AngelD Exp $
+ *  $Id: tfortmap.c,v 1.20 2005-11-28 18:30:57 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -30,77 +30,6 @@ void UpdateAbbreviations( gedict_t * Goal )
 
 	if ( !Goal->has_abbreviated )
 	{
-/*
-//REMOVE !!!
-  if (Goal->g_a && !Goal->goal_activation) 
-   Goal->goal_activation = Goal->g_a;
-  if (Goal->g_e && !Goal->goal_effects) 
-   Goal->goal_effects = Goal->g_e;
-  if (Goal->g_e && !Goal->goal_effects) 
-   Goal->goal_effects = Goal->g_e;
-  if (Goal->h_i_g && !Goal->has_item_from_group) 
-   Goal->has_item_from_group = Goal->h_i_g;
-  if (Goal->hn_i_g && !Goal->hasnt_item_from_group) 
-   Goal->hasnt_item_from_group = Goal->hn_i_g;
-  if (Goal->r_i_g && !Goal->remove_item_group) 
-   Goal->remove_item_group = Goal->r_i_g;
-  if (Goal->a_s && !Goal->s.v.ammo_shells) 
-   Goal->s.v.ammo_shells = Goal->a_s;
-  if (Goal->a_n && !Goal->s.v.ammo_nails) 
-   Goal->s.v.ammo_nails = Goal->a_n;
-  if (Goal->a_r && !Goal->s.v.ammo_rockets) 
-   Goal->s.v.ammo_rockets = Goal->a_r;
-  if (Goal->a_c && !Goal->s.v.ammo_cells) 
-   Goal->s.v.ammo_cells = Goal->a_c;
-  if (Goal->rv_s_h && !Goal->remove_spawngroup) 
-   Goal->remove_spawngroup = Goal->rv_s_h;
-  if (Goal->rs_s_h && !Goal->restore_spawngroup) 
-   Goal->restore_spawngroup = Goal->rs_s_h;
-  if (Goal->rv_gr && !Goal->remove_group_no) 
-   Goal->remove_group_no = Goal->rv_gr;
-  if (Goal->rs_gr && !Goal->restore_group_no) 
-   Goal->restore_group_no = Goal->rs_gr;
-  if (Goal->rv_g && !Goal->remove_goal_no) 
-   Goal->remove_goal_no = Goal->rv_g;
-  if (Goal->rs_g && !Goal->restore_goal_no) 
-   Goal->restore_goal_no = Goal->rs_g;
-  if (Goal->t_s_h ) 
-   Goal->team_str_home = Goal->t_s_h;
-  if (Goal->t_s_m ) 
-   Goal->team_str_moved = Goal->t_s_m;
-  if (Goal->t_s_c ) 
-   Goal->team_str_carried = Goal->t_s_c;
-  if (Goal->n_s_h ) 
-   Goal->non_team_str_home = Goal->n_s_h;
-  if (Goal->n_s_m ) 
-   Goal->non_team_str_moved = Goal->n_s_m;
-  if (Goal->n_s_c ) 
-   Goal->non_team_str_carried = Goal->n_s_c;
-  if (Goal->b_b ) 
-   Goal->broadcast = Goal->b_b;
-  if (Goal->b_t ) 
-   Goal->team_broadcast = Goal->b_t;
-  if (Goal->b_n ) 
-   Goal->non_team_broadcast = Goal->b_n;
-  if (Goal->b_o ) 
-   Goal->owners_team_broadcast = Goal->b_o;
-  if (Goal->n_b ) 
-   Goal->netname_broadcast = Goal->n_b;
-  if (Goal->n_t ) 
-   Goal->netname_team_broadcast = Goal->n_t;
-  if (Goal->n_n ) 
-   Goal->netname_non_team_broadcast = Goal->n_n;
-  if (Goal->n_o ) 
-   Goal->netname_owners_team_broadcast = Goal->n_o;
-  if (Goal->d_t ) 
-   Goal->team_drop = Goal->d_t;
-  if (Goal->d_n ) 
-   Goal->non_team_drop = Goal->d_n;
-  if (Goal->d_n_t ) 
-   Goal->netname_team_drop = Goal->d_n_t;
-  if (Goal->d_n_n ) 
-   Goal->netname_non_team_drop = Goal->d_n_n;
-   */
 		char    st[10];
 
 		if ( !tf_data.flagem_checked )
@@ -1866,7 +1795,6 @@ void item_tfgoal_touch(  )
 					self->s.v.solid = SOLID_TRIGGER;
 					self->s.v.touch = ( func_t ) item_tfgoal_touch;
 					VectorCopy( self->s.v.oldorigin, self->s.v.origin );
-//     self->s.v.origin = self->s.v.oldorigin;
 					setmodel( self, self->mdl );
 					setorigin( self, PASSVEC3( self->s.v.origin ) );
 					sound( self, 2, "items/itembk2.wav", 1, 1 );
@@ -1900,7 +1828,6 @@ void item_tfgoal_touch(  )
 						self->s.v.solid = SOLID_TRIGGER;
 						self->s.v.touch = ( func_t ) item_tfgoal_touch;
 						VectorCopy( self->s.v.oldorigin, self->s.v.origin );
-//      self->s.v.origin = self->s.v.oldorigin;
 						setmodel( self, self->mdl );
 						setorigin( self, PASSVEC3( self->s.v.origin ) );
 						sound( self, 2, "items/itembk2.wav", 1, 1 );

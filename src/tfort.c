@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.39 2005-11-28 17:37:32 AngelD Exp $
+ *  $Id: tfort.c,v 1.40 2005-11-28 18:30:57 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -28,20 +28,6 @@ int FLAME_MAXWORLDNUM, MAX_WORLD_PIPEBOMBS, MAX_WORLD_AMMOBOXES, GR_TYPE_MIRV_NO
 
 static int     num_team_ammoboxes[5] = { 0, 0, 0, 0, 0 };
 
-/*static char class_skin[][20]={
- "base",
- "tf_scout",
- "tf_snipe",
- "tf_sold",
- "tf_demo", 
- "tf_medic",
- "tf_hwguy",
- "tf_pyro",
- "tf_spy",
- "tf_eng",
- "",
- "base"
-};*/
 typedef struct {
 	int     bitmask;
 	int     maxhealth, maxspeed, maxstrafespeed;
@@ -403,10 +389,6 @@ void TeamFortress_ChangeClass(  )
 	gedict_t *spot;
 	gedict_t *te;
 	vec3_t  v;
-
-//      float   tc;
-
-// string st;
 
 	if ( self->playerclass )
 	{
@@ -1858,8 +1840,6 @@ void TeamFortress_RemoveTimers(  )
 void TeamFortress_SetupRespawn( int Suicided )
 {
 	float   restime;
-
-	//string db;
 
 	if ( self->respawn_time > g_globalvars.time )
 		return;

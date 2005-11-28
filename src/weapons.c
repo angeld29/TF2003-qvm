@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.29 2005-05-28 22:35:46 AngelD Exp $
+ *  $Id: weapons.c,v 1.30 2005-11-28 18:30:57 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -2109,7 +2109,6 @@ void W_Reload_grenade_launcher(  )
 	gedict_t *owner = PROG_TO_EDICT( self->s.v.owner );
 
 	owner->tfstate -= ( owner->tfstate & TFSTATE_RELOADING );
-// self->s.v.owner->s.v.weaponmodel = "progs/v_rock.mdl";
 	if ( owner->weaponmode == GL_NORMAL )
 		owner->s.v.weaponmodel = "progs/v_rock.mdl";
 	else

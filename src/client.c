@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.46 2005-11-28 17:37:32 AngelD Exp $
+ *  $Id: client.c,v 1.47 2005-11-28 18:30:57 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -958,11 +958,6 @@ void execute_changelevel()
 
 void changelevel_touch()
 {
-//      gedict_t *pos;
-//      float   ne;
-
-	//gedict_t*    pos;
-
 	if ( strneq( other->s.v.classname, "player" ) )
 		return;
 

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: player.c,v 1.15 2005-06-15 11:48:13 AngelD Exp $
+ *  $Id: player.c,v 1.16 2005-11-28 18:30:57 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -90,8 +90,6 @@ void player_touch(  )
 	gedict_t *Bio;
 	gedict_t *te;
 
-//      float   v1;
-//      float   v2;
 	float   found;
 
 	if ( !tf_data.invis_only && ( self->playerclass == PC_SPY || other->playerclass == PC_SPY ) )

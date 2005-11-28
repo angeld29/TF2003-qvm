@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.19 2005-11-28 17:37:32 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.20 2005-11-28 18:30:57 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -52,9 +52,7 @@ void    Client_Set_Cmd(  );
 const static cmd_t   cmds[] = {
 	{"kill", ClientKill},
 	{"test", Test},
-//#if ( GAME_API_VERSION >= 7 )
 	{"bot", Bot, CMD_SPECTATOR_ALLOWED},
-//#endif
 	{"tg", TG_Cmd, CMD_SPECTATOR_ALLOWED},
 	{"vote", Vote_Cmd, CMD_NOT_PREMATCH},
         {"set", Client_Set_Cmd},
@@ -73,10 +71,6 @@ qboolean ClientCommand(  )
 	const cmd_t  *ucmd;
 
 	self = PROG_TO_EDICT( g_globalvars.self );
-/*	if ( strcmp(self->s.v.classname, "player") )
-	{
-	        return false;
-	}*/
 
 	trap_CmdArgv( 0, cmd_command, sizeof( cmd_command ) );
 	for ( ucmd = cmds; ucmd->command; ucmd++ )
@@ -200,8 +194,7 @@ qboolean ClientUserInfoChanged(  )
 		}
 		return 0;
 	}
-	//G_dprintf("user %s setinfo \"%s\" \"%s\"\n",self->s.v.netname, key,value);
-	
+
 	SetClientSetting( self, Q_strlwr( key ), value);
 	return 0;
 
