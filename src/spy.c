@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: spy.c,v 1.16 2005-05-28 19:03:46 AngelD Exp $
+ *  $Id: spy.c,v 1.17 2005-11-29 14:22:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1340,11 +1340,11 @@ void GasGrenadeMakeGas(  )
 	self->heat = self->heat + 1;
 	if ( self->heat == 1 )
 	{
-		trap_WriteByte( 4, SVC_TEMPENTITY );
-		trap_WriteByte( 4, TE_TAREXPLOSION );
-		trap_WriteCoord( 4, self->s.v.origin[0] );
-		trap_WriteCoord( 4, self->s.v.origin[1] );
-		trap_WriteCoord( 4, self->s.v.origin[2] );
+		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+		trap_WriteByte( MSG_MULTICAST, TE_TAREXPLOSION );
+		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
 		trap_multicast( PASSVEC3( self->s.v.origin ), 2 );
 		return;
 	}
@@ -1353,11 +1353,11 @@ void GasGrenadeMakeGas(  )
 		self->s.v.weapon = self->s.v.weapon + 1;
 		if ( self->s.v.weapon == 1 )
 		{
-			trap_WriteByte( 4, SVC_TEMPENTITY );
-			trap_WriteByte( 4, TE_LAVASPLASH );
-			trap_WriteCoord( 4, self->s.v.origin[0] );
-			trap_WriteCoord( 4, self->s.v.origin[1] );
-			trap_WriteCoord( 4, self->s.v.origin[2] - 24 );
+			trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+			trap_WriteByte( MSG_MULTICAST, TE_LAVASPLASH );
+			trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+			trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+			trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] - 24 );
 			trap_multicast( PASSVEC3( self->s.v.origin ), 2 );
 		} else
 		{
@@ -1372,23 +1372,23 @@ void GasGrenadeMakeGas(  )
 void GasEffect1( gedict_t * owner )	//Random Temp Entites
 {
 	g_globalvars.msg_entity = EDICT_TO_PROG( owner );
-	trap_WriteByte( 1, SVC_TEMPENTITY );
+	trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
 
 	switch ( ( int ) ( g_random(  ) * 3 ) )
 	{
 	case 0:
-		trap_WriteByte( 1, 3 );
+		trap_WriteByte( MSG_ONE, TE_EXPLOSION );
 		break;
 	case 1:
-		trap_WriteByte( 1, 4 );
+		trap_WriteByte( MSG_ONE, TE_TAREXPLOSION );
 		break;
 	default:
-		trap_WriteByte( 1, 10 );
+		trap_WriteByte( MSG_ONE, TE_LAVASPLASH );
 		break;
 	}
-	trap_WriteCoord( 1, owner->s.v.origin[0] + g_random(  ) * 800 - 400 );
-	trap_WriteCoord( 1, owner->s.v.origin[1] + g_random(  ) * 800 - 400 );
-	trap_WriteCoord( 1, owner->s.v.origin[2] );
+	trap_WriteCoord( MSG_ONE, owner->s.v.origin[0] + g_random(  ) * 800 - 400 );
+	trap_WriteCoord( MSG_ONE, owner->s.v.origin[1] + g_random(  ) * 800 - 400 );
+	trap_WriteCoord( MSG_ONE, owner->s.v.origin[2] );
 	if( tf_data.new_gas & GAS_MASK_NEWGREN_DMG)
 		T_Damage( owner, owner, owner, 0 );
 }
@@ -1419,11 +1419,11 @@ void GasEffect2( gedict_t * owner )	//sounds
 	int     i;
 
 	g_globalvars.msg_entity = EDICT_TO_PROG( owner );
-	trap_WriteByte( 1, 23 );
-	trap_WriteByte( 1, 11 );
-	trap_WriteCoord( 1, owner->s.v.origin[0] + g_random(  ) * 800 - 400 );
-	trap_WriteCoord( 1, owner->s.v.origin[1] + g_random(  ) * 800 - 400 );
-	trap_WriteCoord( 1, owner->s.v.origin[2] );
+	trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
+	trap_WriteByte( MSG_ONE, TE_TELEPORT );
+	trap_WriteCoord( MSG_ONE, owner->s.v.origin[0] + g_random(  ) * 800 - 400 );
+	trap_WriteCoord( MSG_ONE, owner->s.v.origin[1] + g_random(  ) * 800 - 400 );
+	trap_WriteCoord( MSG_ONE, owner->s.v.origin[2] );
 
 	if ( !(tf_data.new_gas & GAS_MASK_NEWGREN_EFFECTS))
 		return;
@@ -1454,15 +1454,15 @@ void GasEffect3( gedict_t * owner )
 	te->s.v.origin[0] = owner->s.v.origin[0] + g_random(  ) * 800 - 400;
 	te->s.v.origin[1] = owner->s.v.origin[1] + g_random(  ) * 800 - 400;
 	te->s.v.origin[2] = owner->s.v.origin[2];
-	trap_WriteByte( 1, SVC_TEMPENTITY );
-	trap_WriteByte( 1, TE_LIGHTNING2 );
-	WriteEntity( 1, te );
-	trap_WriteCoord( 1, te->s.v.origin[0] );
-	trap_WriteCoord( 1, te->s.v.origin[1] );
-	trap_WriteCoord( 1, te->s.v.origin[2] );
-	trap_WriteCoord( 1, owner->s.v.origin[0] + g_random(  ) * 800 - 400 );
-	trap_WriteCoord( 1, owner->s.v.origin[1] + g_random(  ) * 800 - 400 );
-	trap_WriteCoord( 1, owner->s.v.origin[2] );
+	trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
+	trap_WriteByte( MSG_ONE, TE_LIGHTNING2 );
+	WriteEntity( MSG_ONE, te );
+	trap_WriteCoord( MSG_ONE, te->s.v.origin[0] );
+	trap_WriteCoord( MSG_ONE, te->s.v.origin[1] );
+	trap_WriteCoord( MSG_ONE, te->s.v.origin[2] );
+	trap_WriteCoord( MSG_ONE, owner->s.v.origin[0] + g_random(  ) * 800 - 400 );
+	trap_WriteCoord( MSG_ONE, owner->s.v.origin[1] + g_random(  ) * 800 - 400 );
+	trap_WriteCoord( MSG_ONE, owner->s.v.origin[2] );
 	dremove( te );
 
 	if ( !(tf_data.new_gas & GAS_MASK_NEWGREN_EFFECTS))
@@ -1603,19 +1603,19 @@ void T_TranqDartTouch(  )
 		}
 	} else
 	{
-		trap_WriteByte( 4, SVC_TEMPENTITY );
+		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
 		if ( streq( self->s.v.classname, "wizspike" ) )
-			trap_WriteByte( 4, TE_WIZSPIKE );
+			trap_WriteByte( MSG_MULTICAST, TE_WIZSPIKE );
 		else
 		{
 			if ( streq( self->s.v.classname, "knightspike" ) )
-				trap_WriteByte( 4, TE_KNIGHTSPIKE );
+				trap_WriteByte( MSG_MULTICAST, TE_KNIGHTSPIKE );
 			else
-				trap_WriteByte( 4, TE_SPIKE );
+				trap_WriteByte( MSG_MULTICAST, TE_SPIKE );
 		}
-		trap_WriteCoord( 4, self->s.v.origin[0] );
-		trap_WriteCoord( 4, self->s.v.origin[1] );
-		trap_WriteCoord( 4, self->s.v.origin[2] );
+		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
 		trap_multicast( PASSVEC3( self->s.v.origin ), 2 );
 	}
 	dremove( self );

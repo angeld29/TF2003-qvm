@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: demoman.c,v 1.16 2005-05-28 18:33:52 AngelD Exp $
+ *  $Id: demoman.c,v 1.17 2005-11-29 14:22:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -450,11 +450,11 @@ void TeamFortress_DetpackExplode(  )
 				}
 			}
 		}
-		trap_WriteByte( 4, SVC_TEMPENTITY );
-		trap_WriteByte( 4, TE_EXPLOSION );
-		trap_WriteCoord( 4, self->s.v.origin[0] );
-		trap_WriteCoord( 4, self->s.v.origin[1] );
-		trap_WriteCoord( 4, self->s.v.origin[2] );
+		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+		trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
+		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
 		trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
 	} else
 		G_sprint( self->real_owner, 2, "Your detpack fizzled out.\n" );

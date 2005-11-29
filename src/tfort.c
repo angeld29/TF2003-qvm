@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.40 2005-11-28 18:30:57 AngelD Exp $
+ *  $Id: tfort.c,v 1.41 2005-11-29 14:22:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -2829,7 +2829,7 @@ void KickCheater( gedict_t * p )
 	g_globalvars.msg_entity = EDICT_TO_PROG( p );
 	trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
 	trap_WriteByte( MSG_ONE, TE_LIGHTNING1 );
-	trap_WriteCoord( 1, self->s.v.origin[0] );
+	trap_WriteCoord( MSG_ONE, self->s.v.origin[0] );
 	p->has_disconnected = 1;
 	p->s.v.touch = ( func_t ) SUB_Null;
 	p->s.v.health = 0;

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: pyro.c,v 1.13 2005-05-28 18:33:52 AngelD Exp $
+ *  $Id: pyro.c,v 1.14 2005-11-29 14:22:43 AngelD Exp $
  */
 #include "g_local.h"
 #define FLAME_PLYRMAXTIME 45
@@ -176,11 +176,11 @@ void NapalmGrenadeNetThink(  )
 				stuffcmd( other, "bf\nbf\n" );
 		}
 	}
-	trap_WriteByte( 4, SVC_TEMPENTITY );
-	trap_WriteByte( 4, TE_EXPLOSION );
-	trap_WriteCoord( 4, self->s.v.origin[0] );
-	trap_WriteCoord( 4, self->s.v.origin[1] );
-	trap_WriteCoord( 4, self->s.v.origin[2] );
+	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+	trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
 	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
 	self->heat = self->heat + 1;
 	if ( self->heat > 7 )
@@ -223,11 +223,11 @@ void NapalmGrenadeExplode(  )
         				stuffcmd( other, "bf\nbf\n" );
         		}
         	}
-        	trap_WriteByte( 4, SVC_TEMPENTITY );
-        	trap_WriteByte( 4, TE_EXPLOSION );
-        	trap_WriteCoord( 4, self->s.v.origin[0] );
-        	trap_WriteCoord( 4, self->s.v.origin[1] );
-        	trap_WriteCoord( 4, self->s.v.origin[2] );
+        	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+        	trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
+        	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+        	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+        	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
         	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
         	head = spawn(  );
         	head->s.v.think = ( func_t ) NapalmGrenadeNetThink;
@@ -812,11 +812,11 @@ void T_IncendiaryTouch(  )
 	normalize( self->s.v.velocity, vtemp );
 	VectorScale( vtemp, 8, vtemp );
 	VectorSubtract( self->s.v.origin, vtemp, self->s.v.origin );
-	trap_WriteByte( 4, SVC_TEMPENTITY );
-	trap_WriteByte( 4, TE_EXPLOSION );
-	trap_WriteCoord( 4, self->s.v.origin[0] );
-	trap_WriteCoord( 4, self->s.v.origin[1] );
-	trap_WriteCoord( 4, self->s.v.origin[2] );
+	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+	trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
 	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
 	dremove( self );
 }

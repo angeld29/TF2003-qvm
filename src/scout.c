@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: scout.c,v 1.21 2005-11-28 17:37:32 AngelD Exp $
+ *  $Id: scout.c,v 1.22 2005-11-29 14:22:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -178,11 +178,11 @@ void FlashGrenadeExplode(  )
 
 	owner = PROG_TO_EDICT( self->s.v.owner );
 	self->s.v.effects = ( int ) self->s.v.effects | 4;
-	trap_WriteByte( 4, SVC_TEMPENTITY );
-	trap_WriteByte( 4, TE_TAREXPLOSION );
-	trap_WriteCoord( 4, self->s.v.origin[0] );
-	trap_WriteCoord( 4, self->s.v.origin[1] );
-	trap_WriteCoord( 4, self->s.v.origin[2] );
+	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+	trap_WriteByte( MSG_MULTICAST, TE_TAREXPLOSION );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
 	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
 	for ( te = world; ( te = findradius( te, self->s.v.origin, 300 ) ); )
 	{
@@ -310,11 +310,11 @@ void ConcussionGrenadeTouch(  )
 void ConcussionGrenadeExplode(  )
 {
 	T_RadiusBounce( self, PROG_TO_EDICT( self->s.v.owner ), 240, world );
-	trap_WriteByte( 4, SVC_TEMPENTITY );
-	trap_WriteByte( 4, TE_EXPLOSION );
-	trap_WriteCoord( 4, self->s.v.origin[0] );
-	trap_WriteCoord( 4, self->s.v.origin[1] );
-	trap_WriteCoord( 4, self->s.v.origin[2] );
+	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+	trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
 	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
 	dremove( self );
 }

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.30 2005-11-28 18:30:57 AngelD Exp $
+ *  $Id: weapons.c,v 1.31 2005-11-29 14:22:43 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -3651,7 +3651,6 @@ void W_WeaponFrame(  )
 				{
 					//G_sprint( self, 1,
 					//	  "You cannot fire the assault cannon without\nyour feet on the ground...\n" );
-					//self->fire_held_down = 1;
 				}
 				break;
 			default:

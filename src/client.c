@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.47 2005-11-28 18:30:57 AngelD Exp $
+ *  $Id: client.c,v 1.48 2005-11-29 14:22:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -802,18 +802,18 @@ void ExitIntermission()
 	{
 		if ( !strcmp( world->s.v.model, "maps/e1m7.bsp" ) )
 		{
-			trap_WriteByte( 2, 32 );
-			trap_WriteByte( 2, 2 );
-			trap_WriteByte( 2, 3 );
+			trap_WriteByte( MSG_ALL, SVC_CDTRACK );
+			trap_WriteByte( MSG_ALL, 2 );
+			trap_WriteByte( MSG_ALL, 3 );
 			if ( !trap_cvar( "registered" ) )
 			{
-				trap_WriteByte( 2, 31 );
-				trap_WriteString( 2,
+				trap_WriteByte( MSG_ALL, SVC_FINALE );
+				trap_WriteString( MSG_ALL,
 						  "As the corpse of the monstrous entity\nChthon sinks back into the lava whence\nit rose, you grip the Rune of Earth\nMagic tightly. Now that you have\nconquered the Dimension of the Doomed,\nrealm of Earth Magic, you are ready to\ncomplete your task in the other three\nhaunted lands of Quake. Or are you? If\nyou don't register Quake, you'll never\nknow what awaits you in the Realm of\nBlack Magic, the Netherworld, and the\nElder World!" );
 			} else
 			{
-				trap_WriteByte( 2, 31 );
-				trap_WriteString( 2,
+				trap_WriteByte( MSG_ALL, SVC_FINALE );
+				trap_WriteString( MSG_ALL,
 						  "As the corpse of the monstrous entity\nChthon sinks back into the lava whence\nit rose, you grip the Rune of Earth\nMagic tightly. Now that you have\nconquered the Dimension of the Doomed,\nrealm of Earth Magic, you are ready to\ncomplete your task. A Rune of magic\npower lies at the end of each haunted\nland of Quake. Go forth, seek the\ntotality of the four Runes!" );
 			}
 			return;
@@ -821,33 +821,33 @@ void ExitIntermission()
 		{
 			if ( !strcmp( world->s.v.model, "maps/e2m6.bsp" ) )
 			{
-				trap_WriteByte( 2, 32 );
-				trap_WriteByte( 2, 2 );
-				trap_WriteByte( 2, 3 );
-				trap_WriteByte( 2, 31 );
-				trap_WriteString( 2,
+				trap_WriteByte( MSG_ALL, SVC_CDTRACK );
+				trap_WriteByte( MSG_ALL, 2 );
+				trap_WriteByte( MSG_ALL, 3 );
+				trap_WriteByte( MSG_ALL, SVC_FINALE );
+				trap_WriteString( MSG_ALL,
 						  "The Rune of Black Magic throbs evilly in\nyour hand and whispers dark thoughts\ninto your brain. You learn the inmost\nlore of the Hell-Mother; Shub-Niggurath!\nYou now know that she is behind all the\nterrible plotting which has led to so\nmuch death and horror. But she is not\ninviolate! Armed with this Rune, you\nrealize that once all four Runes are\ncombined, the gate to Shub-Niggurath's\nPit will open, and you can face the\nWitch-Goddess herself in her frightful\notherworld cathedral." );
 				return;
 			} else
 			{
 				if ( !strcmp( world->s.v.model, "maps/e3m6.bsp" ) )
 				{
-					trap_WriteByte( 2, 32 );
-					trap_WriteByte( 2, 2 );
-					trap_WriteByte( 2, 3 );
-					trap_WriteByte( 2, 31 );
-					trap_WriteString( 2,
+					trap_WriteByte( MSG_ALL, SVC_CDTRACK );
+					trap_WriteByte( MSG_ALL, 2 );
+					trap_WriteByte( MSG_ALL, 3 );
+					trap_WriteByte( MSG_ALL, SVC_FINALE );
+					trap_WriteString( MSG_ALL,
 							  "The charred viscera of diabolic horrors\nbubble viscously as you seize the Rune\nof Hell Magic. Its heat scorches your\nhand, and its terrible secrets blight\nyour mind. Gathering the shreds of your\ncourage, you shake the devil's shackles\nfrom your soul, and become ever more\nhard and determined to destroy the\nhideous creatures whose mere existence\nthreatens the souls and psyches of all\nthe population of Earth." );
 					return;
 				} else
 				{
 					if ( !strcmp( world->s.v.model, "maps/e4m7.bsp" ) )
 					{
-						trap_WriteByte( 2, 32 );
-						trap_WriteByte( 2, 2 );
-						trap_WriteByte( 2, 3 );
-						trap_WriteByte( 2, 31 );
-						trap_WriteString( 2,
+						trap_WriteByte( MSG_ALL, SVC_CDTRACK );
+						trap_WriteByte( MSG_ALL, 2 );
+						trap_WriteByte( MSG_ALL, 3 );
+						trap_WriteByte( MSG_ALL, SVC_FINALE );
+						trap_WriteString( MSG_ALL,
 								  "Despite the awful might of the Elder\nWorld, you have achieved the Rune of\nElder Magic, capstone of all types of\narcane wisdom. Beyond good and evil,\nbeyond life and death, the Rune\npulsates, heavy with import. Patient and\npotent, the Elder Being Shub-Niggurath\nweaves her dire plans to clear off all\nlife from the Earth, and bring her own\nfoul offspring to our world! For all the\ndwellers in these nightmare dimensions\nare her descendants! Once all Runes of\nmagic power are united, the energy\nbehind them will blast open the Gateway\nto Shub-Niggurath, and you can travel\nthere to foil the Hell-Mother's plots\nin person." );
 						return;
 					}
@@ -860,13 +860,13 @@ void ExitIntermission()
 	{
 		if ( !trap_cvar( "registered" ) )
 		{
-			trap_WriteByte( 2, 33 );
+			trap_WriteByte( MSG_ALL, SVC_SELLSCREEN );
 			return;
 		}
 		if ( ( ( int ) ( g_globalvars.serverflags ) & 15 ) == 15 )
 		{
-			trap_WriteByte( 2, 31 );
-			trap_WriteString( 2,
+			trap_WriteByte( MSG_ALL, SVC_FINALE );
+			trap_WriteString( MSG_ALL,
 					  "Now, you have all four Runes. You sense\ntremendous invisible forces moving to\nunseal ancient barriers. Shub-Niggurath\nhad hoped to use the Runes Herself to\nclear off the Earth, but now instead,\nyou will use them to enter her home and\nconfront her as an avatar of avenging\nEarth-life. If you defeat her, you will\nbe remembered forever as the savior of\nthe planet. If she conquers, it will be\nas if you had never been born." );
 			return;
 		}

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: actions.c,v 1.20 2005-11-28 17:37:32 AngelD Exp $
+ *  $Id: actions.c,v 1.21 2005-11-29 14:22:43 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -303,15 +303,15 @@ void TeamFortress_SaveMe(  )
 					tl = spawn(  );
 					VectorCopy( self->s.v.origin, tl->s.v.origin );
 					tl->s.v.origin[2] += 32;
-					trap_WriteByte( 1, SVC_TEMPENTITY );
-					trap_WriteByte( 1, TE_LIGHTNING3 );
-					WriteEntity( 1, tl );
-					trap_WriteCoord( 1, tl->s.v.origin[0] );
-					trap_WriteCoord( 1, tl->s.v.origin[1] );
-					trap_WriteCoord( 1, tl->s.v.origin[2] + 24 );
-					trap_WriteCoord( 1, self->s.v.origin[0] );
-					trap_WriteCoord( 1, self->s.v.origin[1] );
-					trap_WriteCoord( 1, self->s.v.origin[2] );
+					trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
+					trap_WriteByte( MSG_ONE, TE_LIGHTNING3 );
+					WriteEntity( MSG_ONE, tl );
+					trap_WriteCoord( MSG_ONE, tl->s.v.origin[0] );
+					trap_WriteCoord( MSG_ONE, tl->s.v.origin[1] );
+					trap_WriteCoord( MSG_ONE, tl->s.v.origin[2] + 24 );
+					trap_WriteCoord( MSG_ONE, self->s.v.origin[0] );
+					trap_WriteCoord( MSG_ONE, self->s.v.origin[1] );
+					trap_WriteCoord( MSG_ONE, self->s.v.origin[2] );
 					dremove( tl );
 				}
 			}

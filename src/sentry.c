@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: sentry.c,v 1.25 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: sentry.c,v 1.26 2005-11-29 14:22:43 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -423,11 +423,11 @@ void Sentry_Explode(  )
 			dremove( self->oldenemy );
 	} else
 		dremove( self->trigger_field );
-	trap_WriteByte( 4, SVC_TEMPENTITY );
-	trap_WriteByte( 4, TE_EXPLOSION );
-	trap_WriteCoord( 4, self->s.v.origin[0] );
-	trap_WriteCoord( 4, self->s.v.origin[1] );
-	trap_WriteCoord( 4, self->s.v.origin[2] );
+	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+	trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
 	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
 	BecomeExplosion(  );
 }
@@ -466,11 +466,11 @@ void Sentry_Die(  )
 		ThrowGib( "progs/tgib3.mdl", -70 );
 		tf_data.deathmsg = DMSG_SG_EXPLODION;
 		T_RadiusDamage( self, self->real_owner, 75 + self->s.v.ammo_rockets * 8, self );
-		trap_WriteByte( 4, SVC_TEMPENTITY );
-		trap_WriteByte( 4, TE_EXPLOSION );
-		trap_WriteCoord( 4, self->s.v.origin[0] );
-		trap_WriteCoord( 4, self->s.v.origin[1] );
-		trap_WriteCoord( 4, self->s.v.origin[2] );
+		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+		trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
+		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
 		trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
 	} else
 	{
@@ -637,15 +637,15 @@ void    FireSentryLighting( gedict_t * targ )
 	traceline( PASSVEC3( src ), PASSVEC3( end ), 0, self );
 	
 
-	trap_WriteByte( 4, SVC_TEMPENTITY );
-	trap_WriteByte( 4, TE_LIGHTNING1 );
-	WriteEntity( 4, self );
-	trap_WriteCoord( 4, src[0] );
-	trap_WriteCoord( 4, src[1] );
-	trap_WriteCoord( 4, src[2] );
-	trap_WriteCoord( 4, g_globalvars.trace_endpos[0] );
-	trap_WriteCoord( 4, g_globalvars.trace_endpos[1] );
-	trap_WriteCoord( 4, g_globalvars.trace_endpos[2] );
+	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+	trap_WriteByte( MSG_MULTICAST, TE_LIGHTNING1 );
+	WriteEntity( MSG_MULTICAST, self );
+	trap_WriteCoord( MSG_MULTICAST, src[0] );
+	trap_WriteCoord( MSG_MULTICAST, src[1] );
+	trap_WriteCoord( MSG_MULTICAST, src[2] );
+	trap_WriteCoord( MSG_MULTICAST, g_globalvars.trace_endpos[0] );
+	trap_WriteCoord( MSG_MULTICAST, g_globalvars.trace_endpos[1] );
+	trap_WriteCoord( MSG_MULTICAST, g_globalvars.trace_endpos[2] );
 	trap_multicast( PASSVEC3( src ), 1 );
 	if ( g_globalvars.trace_ent )
 	{

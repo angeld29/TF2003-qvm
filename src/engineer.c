@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: engineer.c,v 1.26 2005-11-28 18:30:57 AngelD Exp $
+ *  $Id: engineer.c,v 1.27 2005-11-29 14:22:43 AngelD Exp $
  */
 /*========================================================
 Weapons and functions for the ENGINEER class and associated weaponry                          
@@ -91,11 +91,11 @@ void LaserBolt_Touch(  )
 	return;
     } else
     {
-	trap_WriteByte( 4, SVC_TEMPENTITY );
-	trap_WriteByte( 4, TE_SPIKE );
-	trap_WriteCoord( 4, self->s.v.origin[0] );
-	trap_WriteCoord( 4, self->s.v.origin[1] );
-	trap_WriteCoord( 4, self->s.v.origin[2] );
+	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+	trap_WriteByte( MSG_MULTICAST, TE_SPIKE );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
 	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
     }
     dremove( self );
@@ -179,11 +179,11 @@ void EMPExplode(  )
     }
     tf_data.deathmsg = DMSG_GREN_EMP_AMMO;
     T_RadiusDamage( self, PROG_TO_EDICT( self->s.v.enemy ), expsize, world );
-    trap_WriteByte( 4, SVC_TEMPENTITY );
-    trap_WriteByte( 4, TE_EXPLOSION );
-    trap_WriteCoord( 4, self->s.v.origin[0] );
-    trap_WriteCoord( 4, self->s.v.origin[1] );
-    trap_WriteCoord( 4, self->s.v.origin[2] );
+    trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+    trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
+    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
     trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
 
     // Respawn
@@ -261,11 +261,11 @@ void EMPGrenadeExplode(  )
 		T_RadiusDamage( te, PROG_TO_EDICT( self->s.v.owner ), expsize, te );
 		te->s.v.think = ( func_t ) TeamFortress_AmmoboxRemove;//SUB_Remove;
 		te->s.v.nextthink = g_globalvars.time + 0.1;
-		trap_WriteByte( 4, SVC_TEMPENTITY );
-		trap_WriteByte( 4, TE_EXPLOSION );
-		trap_WriteCoord( 4, te->s.v.origin[0] );
-		trap_WriteCoord( 4, te->s.v.origin[1] );
-		trap_WriteCoord( 4, te->s.v.origin[2] );
+		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+		trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
+		trap_WriteCoord( MSG_MULTICAST, te->s.v.origin[0] );
+		trap_WriteCoord( MSG_MULTICAST, te->s.v.origin[1] );
+		trap_WriteCoord( MSG_MULTICAST, te->s.v.origin[2] );
 		trap_multicast( PASSVEC3( te->s.v.origin ), 1 );
 	    }
 	    continue;
@@ -299,11 +299,11 @@ void EMPGrenadeExplode(  )
 			te->s.v.think = ( func_t ) SUB_Remove;
 			te->s.v.nextthink = g_globalvars.time + 0.1;
 		    }
-		    trap_WriteByte( 4, SVC_TEMPENTITY );
-		    trap_WriteByte( 4, TE_EXPLOSION );
-		    trap_WriteCoord( 4, te->s.v.origin[0] );
-		    trap_WriteCoord( 4, te->s.v.origin[1] );
-		    trap_WriteCoord( 4, te->s.v.origin[2] );
+		    trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+		    trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
+		    trap_WriteCoord( MSG_MULTICAST, te->s.v.origin[0] );
+		    trap_WriteCoord( MSG_MULTICAST, te->s.v.origin[1] );
+		    trap_WriteCoord( MSG_MULTICAST, te->s.v.origin[2] );
 		    trap_multicast( PASSVEC3( te->s.v.origin ), 1 );
 		}
 	    }
@@ -784,11 +784,11 @@ void Dispenser_Explode(  )
     ThrowGib( "progs/dgib1.mdl", -30 );
     ThrowGib( "progs/dgib2.mdl", -50 );
     ThrowGib( "progs/dgib3.mdl", -50 );
-    trap_WriteByte( 4, SVC_TEMPENTITY );
-    trap_WriteByte( 4, TE_EXPLOSION );
-    trap_WriteCoord( 4, self->s.v.origin[0] );
-    trap_WriteCoord( 4, self->s.v.origin[1] );
-    trap_WriteCoord( 4, self->s.v.origin[2] );
+    trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+    trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
+    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
+    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
+    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
     trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
     BecomeExplosion(  );
 }
