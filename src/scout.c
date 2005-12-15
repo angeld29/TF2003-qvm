@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: scout.c,v 1.23 2005-12-15 14:38:00 AngelD Exp $
+ *  $Id: scout.c,v 1.24 2005-12-15 18:48:08 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -803,23 +803,20 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 
 	if ( ( multiscan == 0 ) && saveent )
 	{
-		if ( saveent )
-		{
-			VectorSubtract( saveent->s.v.origin, self->s.v.origin, tmp );
-			normalize( tmp, lightningvec );
-			VectorScale( lightningvec, vlen( tmp ) / 5, lightningvec );
-			VectorAdd( lightningvec, self->s.v.origin, lightningvec );
-			g_globalvars.msg_entity = EDICT_TO_PROG( self );
-			trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
-			trap_WriteByte( MSG_ONE, TE_LIGHTNING1 );
-			WriteEntity( MSG_ONE, saveent );
-			trap_WriteCoord( MSG_ONE, self->s.v.origin[0] );
-			trap_WriteCoord( MSG_ONE, self->s.v.origin[1] );
-			trap_WriteCoord( MSG_ONE, self->s.v.origin[2] + 8 );
-			trap_WriteCoord( MSG_ONE, lightningvec[0] );
-			trap_WriteCoord( MSG_ONE, lightningvec[1] );
-			trap_WriteCoord( MSG_ONE, lightningvec[2] + 8 );
-		}
+      		VectorSubtract( saveent->s.v.origin, self->s.v.origin, tmp );
+      		normalize( tmp, lightningvec );
+      		VectorScale( lightningvec, vlen( tmp ) / 5, lightningvec );
+      		VectorAdd( lightningvec, self->s.v.origin, lightningvec );
+      		g_globalvars.msg_entity = EDICT_TO_PROG( self );
+      		trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
+      		trap_WriteByte( MSG_ONE, TE_LIGHTNING1 );
+      		WriteEntity( MSG_ONE, saveent );
+      		trap_WriteCoord( MSG_ONE, self->s.v.origin[0] );
+      		trap_WriteCoord( MSG_ONE, self->s.v.origin[1] );
+      		trap_WriteCoord( MSG_ONE, self->s.v.origin[2] + 8 );
+      		trap_WriteCoord( MSG_ONE, lightningvec[0] );
+      		trap_WriteCoord( MSG_ONE, lightningvec[1] );
+      		trap_WriteCoord( MSG_ONE, lightningvec[2] + 8 );
 	}
 
 	if ( typescan == 0 && any_detected2 == 0 )
