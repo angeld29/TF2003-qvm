@@ -8,7 +8,7 @@ suicide body
 scanner на sentry, флаги
 sound on grens
 new menu system
-setting через cmd
++setting через cmd
 flare dmg
 auto flaginfo/flaginfo in sbar
 

@@ -61,7 +61,7 @@ by [sd] angel for MTFL
 Внесенные изменения (на 10.03.2004 r1):
 
 Общее:
-[+] Теперь topcolor chacking показывается в showtf.
+[+] Теперь topcolor checking показывается в showtf.
 
 Тренировочная версия:
 [+] Убран full_flash.

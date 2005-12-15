@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: scout.c,v 1.22 2005-11-29 14:22:43 AngelD Exp $
+ *  $Id: scout.c,v 1.23 2005-12-15 14:38:00 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -722,7 +722,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 		G_sprint( self, PRINT_HIGH, "All scanner functions are disabled.\n" );
 		return;
 	}
-	multiscan = ( self->settings_bits & TF_MULTISCAN_MASK)? 1: 0;
+	multiscan = ( self->settings_bits & TF_MULTISCAN_MASK) ? 0: 1;
 //REMOVE!!!!	
 /*	multiscan = 1;
 	GetInfokeyString( self, "ms", "multiscan", st, sizeof( st ), "on" );
@@ -801,7 +801,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 		}
 	}
 
-	if ( multiscan == 0 && saveent )
+	if ( ( multiscan == 0 ) && saveent )
 	{
 		if ( saveent )
 		{
@@ -812,7 +812,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 			g_globalvars.msg_entity = EDICT_TO_PROG( self );
 			trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
 			trap_WriteByte( MSG_ONE, TE_LIGHTNING1 );
-			WriteEntity( MSG_ONE, list );
+			WriteEntity( MSG_ONE, saveent );
 			trap_WriteCoord( MSG_ONE, self->s.v.origin[0] );
 			trap_WriteCoord( MSG_ONE, self->s.v.origin[1] );
 			trap_WriteCoord( MSG_ONE, self->s.v.origin[2] + 8 );

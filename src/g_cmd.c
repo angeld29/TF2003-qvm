@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.21 2005-11-29 14:22:43 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.22 2005-12-15 14:38:00 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -29,6 +29,7 @@
 #define CMD_NOT_TEAM		8
 #define CMD_NOT_CLASS		16
 #define CMD_SPECTATOR_ALLOWED	32
+#define CMD_NOT_BUILD	        64
 
 
 typedef struct {
@@ -57,9 +58,9 @@ const static cmd_t   cmds[] = {
 	{"vote", Vote_Cmd, CMD_NOT_PREMATCH},
         {"set", Client_Set_Cmd},
 	{"admin", Admin_Cmd, CMD_SPECTATOR_ALLOWED},
-	{"discard", TeamFortress_Cmd_Discard, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
-	{"sg_rotate", Engineer_RotateSG, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
-	{"detpack", TeamFortress_Cmd_Detpack, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS},
+	{"discard", TeamFortress_Cmd_Discard, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS | CMD_NOT_BUILD},
+	{"sg_rotate", Engineer_RotateSG, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS | CMD_NOT_BUILD},
+	{"detpack", TeamFortress_Cmd_Detpack, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS },
 	{NULL, NULL, 0}
 };
 extern void trap_CmdArgv( int arg, char *valbuff, int sizebuff );
@@ -99,6 +100,8 @@ qboolean ClientCommand(  )
 			return true;
 
 		if ( ( ucmd->allowed & CMD_NOT_CLASS ) && ( !self->playerclass ) )
+			return true;
+		if ( ( ucmd->allowed & CMD_NOT_BUILD ) && ( self->is_building || self->is_detpacking || self->is_feigning ) )
 			return true;
 
 

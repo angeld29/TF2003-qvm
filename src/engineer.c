@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: engineer.c,v 1.27 2005-11-29 14:22:43 AngelD Exp $
+ *  $Id: engineer.c,v 1.28 2005-12-15 14:38:00 AngelD Exp $
  */
 /*========================================================
 Weapons and functions for the ENGINEER class and associated weaponry                          
@@ -560,11 +560,11 @@ void DispenserThink(  )
     if ( self->hook_out > 3 ) 
     {
         // dispenser refilling itself 5%
-	self->s.v.ammo_shells = self->s.v.ammo_shells + ( int ) ( 400 / 20 );
-	self->s.v.ammo_cells = self->s.v.ammo_cells + ( int ) ( 400 / 20 );
-	self->s.v.ammo_nails = self->s.v.ammo_nails + ( int ) ( 600 / 20 );
-	self->s.v.ammo_rockets = self->s.v.ammo_rockets + ( int ) ( 300 / 20 );
-	self->s.v.armorvalue = self->s.v.armorvalue + ( int ) ( 500 / 20 );
+	self->s.v.ammo_shells = self->s.v.ammo_shells + ( int ) ( BUILD_DISPENSER_MAX_SHELLS / 20 );
+	self->s.v.ammo_cells = self->s.v.ammo_cells + ( int ) ( BUILD_DISPENSER_MAX_CELLS / 20 );
+	self->s.v.ammo_nails = self->s.v.ammo_nails + ( int ) ( BUILD_DISPENSER_MAX_NAILS / 20 );
+	self->s.v.ammo_rockets = self->s.v.ammo_rockets + ( int ) ( BUILD_DISPENSER_MAX_ROCKETS / 20 );
+	self->s.v.armorvalue = self->s.v.armorvalue + ( int ) ( BUILD_DISPENSER_MAX_ARMOR / 20 );
 	if ( self->s.v.ammo_shells > BUILD_DISPENSER_MAX_SHELLS )
 	    self->s.v.ammo_shells = BUILD_DISPENSER_MAX_SHELLS;
 	if ( self->s.v.ammo_nails > BUILD_DISPENSER_MAX_NAILS )

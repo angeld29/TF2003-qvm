@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.48 2005-11-29 14:22:43 AngelD Exp $
+ *  $Id: client.c,v 1.49 2005-12-15 14:38:00 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -2331,7 +2331,7 @@ qboolean SetClientSetting( gedict_t*p , const char*key, const char* value )
 
 				case 0x58862793://ms
 				case 0x02E5FD61://multiscan
-					if( strcmp(value,"off") )
+					if( !strcmp(value,"off") )
 						p->settings_bits |= TF_MULTISCAN_MASK;
 					else
 						p->settings_bits -= p->settings_bits & TF_MULTISCAN_MASK;
@@ -2415,7 +2415,7 @@ qboolean PrintClientSetting( gedict_t*p , const char*key )
 
 				case 0x58862793://ms
 				case 0x02E5FD61://multiscan
-					if( p->settings_bits & TF_MULTISCAN_MASK) 
+					if( !(p->settings_bits & TF_MULTISCAN_MASK) ) 
 						G_sprint( p, 2, "Multiscan is ÏÎ\n");
 					else
 						G_sprint( p, 2, "Multiscan is ÏÆÆ\n");
@@ -2477,7 +2477,7 @@ void ParseUserInfo()
 	self->discard_nails = -1;
 	self->discard_rockets = -1;
 	self->discard_cells = -1;
-	self->settings_bits = TF_CLASS_HELP_MASK | TF_MULTISCAN_MASK;
+	self->settings_bits = TF_CLASS_HELP_MASK;
 	self->take_sshot = 0;
 	if( GetInfokeyString( self, "sbr", "sbar_res" , value, sizeof( value ), NULL))
 		SetClientSetting( self, "sbr", value);
