@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.49 2005-12-15 14:38:00 AngelD Exp $
+ *  $Id: client.c,v 1.50 2005-12-16 10:29:06 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -2304,19 +2304,32 @@ qboolean SetClientSetting( gedict_t*p , const char*key, const char* value )
                          break;
                 case 0x91A45219: //mxs
                 case 0x83DCEFB7: //1
-					p->discard_shells = atoi(value);
+                                        if( value[0] )
+					   p->discard_shells = atoi(value);
+                                        else
+                                           p->discard_shells = -1;
+                                                
 					break;
                 case 0xF2A23EC0: //mxn
                 case 0x1AD5BE0D: //2
-					p->discard_nails = atoi(value);
+                                        if( value[0] )
+        					p->discard_nails = atoi(value);
+                                        else
+                                                p->discard_nails = -1;
 					break;
                 case 0xE6A3628F: //mxr
                 case 0x6DD28E9B: //3
-					p->discard_rockets = atoi(value);
+                                        if( value[0] )
+        					p->discard_rockets = atoi(value);
+                                        else
+                                                p->discard_rockets = -1;
 					break;
                 case 0x8C13427D: //mxc
                 case 0xF3B61B38: //4
-					p->discard_cells = atoi(value);
+                                        if( value[0] )
+        					p->discard_cells = atoi(value);
+                                        else
+                                                p->discard_cells = -1;
 					break;
 				case 0x1B0ECF0B://s
 					p->settings_bits = atoi(value);
