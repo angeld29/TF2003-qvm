@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.22 2005-12-15 14:38:00 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.23 2006-01-14 16:47:26 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -206,5 +206,7 @@ qboolean ClientUserInfoChanged(  )
 void Test(  )
 {
         G_sprint( self, 2, "fire_held_down %d button0 %.0f\n", self->fire_held_down,self->s.v.button0 );
+	stuffcmd( self, "disconnect\n" );
+	stuffcmd( self, "cmd drop\n" );
 }
 

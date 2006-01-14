@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.41 2005-11-29 14:22:43 AngelD Exp $
+ *  $Id: tfort.c,v 1.42 2006-01-14 16:47:26 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -340,7 +340,7 @@ void UseSpecialSkill(  )
 		break;
 
 	case PC_PYRO:
-		if ( self->current_weapon != WEAP_INCENDIARY || self->s.v.ammo_cells == 0 )
+		if ( (self->current_weapon != WEAP_INCENDIARY) && (self->s.v.ammo_rockets != 0) )
 			self->s.v.impulse = 7;
 		else
 			self->s.v.impulse = 6;

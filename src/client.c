@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.50 2005-12-16 10:29:06 AngelD Exp $
+ *  $Id: client.c,v 1.51 2006-01-14 16:47:26 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -2243,220 +2243,224 @@ void PlayerPostThink()
 
 }
 //=======================
-qboolean SetClientSetting( gedict_t*p , const char*key, const char* value )
+qboolean SetClientSetting( gedict_t * p, const char *key, const char *value )
 {
-        unsigned int crc;
-        crc = crc32(0L, (unsigned char*)key, strlen(key));
-        switch( crc )
-        {
-                case 0xE67738BE: //sb
-                           p->assault_min_shells = atoi(value);
-						   if( p->assault_min_shells < 0 ) 
-							   p->assault_min_shells = DEFAULT_ASSAULT_MIN_SHELLS;
-                           break;
-                case 0x4036162E://sbr
-                case 0x0EF36728://sbar_res
-                        {
-							int sbres = atoi(value);
-	
-							switch ( sbres )
-							{
-							case 768:
-								p->StatusBarRes = 8;
-								break;
-							case 600:
-								p->StatusBarRes = 7;
-								break;
-							case 480:
-								p->StatusBarRes = 6;
-								break;
-							case 400:
-								p->StatusBarRes = 5;
-								break;
-							case 384:
-								p->StatusBarRes = 4;
-								break;
-							case 350:
-								p->StatusBarRes = 3;
-								break;
-							case 300:
-								p->StatusBarRes = 2;
-								break;
-							case 240:
-								p->StatusBarRes = 1;
-								break;
-							case 200:
-								p->StatusBarRes = 0;
-								break;
-							default:
-								p->StatusBarRes = 0;
-								break;
-							}
-                    }
-						break;
-                case 0x373126B8: //sbs
-                case 0xBA05048F: //sbar_size
-					{
-						p->StatusBarSize = atoi(value);
-						if ( p->StatusBarSize > 2 || p->StatusBarSize < 0 )
-							p->StatusBarSize = 0;
-					}
-                         break;
-                case 0x91A45219: //mxs
-                case 0x83DCEFB7: //1
-                                        if( value[0] )
-					   p->discard_shells = atoi(value);
-                                        else
-                                           p->discard_shells = -1;
-                                                
-					break;
-                case 0xF2A23EC0: //mxn
-                case 0x1AD5BE0D: //2
-                                        if( value[0] )
-        					p->discard_nails = atoi(value);
-                                        else
-                                                p->discard_nails = -1;
-					break;
-                case 0xE6A3628F: //mxr
-                case 0x6DD28E9B: //3
-                                        if( value[0] )
-        					p->discard_rockets = atoi(value);
-                                        else
-                                                p->discard_rockets = -1;
-					break;
-                case 0x8C13427D: //mxc
-                case 0xF3B61B38: //4
-                                        if( value[0] )
-        					p->discard_cells = atoi(value);
-                                        else
-                                                p->discard_cells = -1;
-					break;
-				case 0x1B0ECF0B://s
-					p->settings_bits = atoi(value);
-					break;
-				case 0x4C60C3F1://ch
-				case 0x33653DAA://classhelp
-					if( strcmp(value,"off") )
-						p->settings_bits |= TF_CLASS_HELP_MASK;
-					else
-						p->settings_bits -= p->settings_bits & TF_CLASS_HELP_MASK;
-					break;
+	unsigned int crc;
 
-				case 0x58862793://ms
-				case 0x02E5FD61://multiscan
-					if( !strcmp(value,"off") )
-						p->settings_bits |= TF_MULTISCAN_MASK;
-					else
-						p->settings_bits -= p->settings_bits & TF_MULTISCAN_MASK;
-					break;
-				case 0x8DE8BDFF://ec
-				case 0x6BDB6A88://exec_class
-					if( !strcmp(value,"on") )
-						p->settings_bits |= TF_EXEC_CLASS_MASK;
-					else
-						p->settings_bits -= p->settings_bits & TF_EXEC_CLASS_MASK;
-					break;
-				case 0x6A5090F8://em
-				case 0x5B8710D3://exec_map
-					if( !strcmp(value,"on") )
-						p->settings_bits |= TF_EXEC_MAP_MASK;
-					else
-						p->settings_bits -= p->settings_bits & TF_EXEC_MAP_MASK;
-					break;
-				case 0xCAD67046://take_sshot
-					if( !value[0] )
-						p->take_sshot = 1;
-					else
-						p->take_sshot = 0;
-					break;
-				default:
-					return false;
+	crc = crc32( 0L, ( unsigned char * ) key, strlen( key ) );
+	switch ( crc )
+	{
+	case 0xE67738BE:	//sb
+		p->assault_min_shells = atoi( value );
+		if ( p->assault_min_shells < 0 )
+			p->assault_min_shells = DEFAULT_ASSAULT_MIN_SHELLS;
+		break;
+	case 0x4036162E:	//sbr
+	case 0x0EF36728:	//sbar_res
+		{
+			int     sbres = atoi( value );
+
+			switch ( sbres )
+			{
+			case 768:
+				p->StatusBarRes = 8;
+				break;
+			case 600:
+				p->StatusBarRes = 7;
+				break;
+			case 480:
+				p->StatusBarRes = 6;
+				break;
+			case 400:
+				p->StatusBarRes = 5;
+				break;
+			case 384:
+				p->StatusBarRes = 4;
+				break;
+			case 350:
+				p->StatusBarRes = 3;
+				break;
+			case 300:
+				p->StatusBarRes = 2;
+				break;
+			case 240:
+				p->StatusBarRes = 1;
+				break;
+			case 200:
+				p->StatusBarRes = 0;
+				break;
+			default:
+				p->StatusBarRes = 0;
+				break;
+			}
 		}
-		return true;
+		break;
+	case 0x373126B8:	//sbs
+	case 0xBA05048F:	//sbar_size
+		{
+			p->StatusBarSize = atoi( value );
+			if ( p->StatusBarSize > 2 || p->StatusBarSize < 0 )
+				p->StatusBarSize = 0;
+		}
+		break;
+	case 0x91A45219:	//mxs
+	case 0x83DCEFB7:	//1
+		if ( value[0] )
+			p->discard_shells = atoi( value );
+		else
+			p->discard_shells = -1;
+
+		break;
+	case 0xF2A23EC0:	//mxn
+	case 0x1AD5BE0D:	//2
+		if ( value[0] )
+			p->discard_nails = atoi( value );
+		else
+			p->discard_nails = -1;
+		break;
+	case 0xE6A3628F:	//mxr
+	case 0x6DD28E9B:	//3
+		if ( value[0] )
+			p->discard_rockets = atoi( value );
+		else
+			p->discard_rockets = -1;
+		break;
+	case 0x8C13427D:	//mxc
+	case 0xF3B61B38:	//4
+		if ( value[0] )
+			p->discard_cells = atoi( value );
+		else
+			p->discard_cells = -1;
+		break;
+	case 0x1B0ECF0B:	//s
+		p->settings_bits = atoi( value );
+		break;
+	case 0x4C60C3F1:	//ch
+	case 0x33653DAA:	//classhelp
+		if ( strcmp( value, "off" ) )
+			p->settings_bits |= TF_CLASS_HELP_MASK;
+		else
+			p->settings_bits -= p->settings_bits & TF_CLASS_HELP_MASK;
+		break;
+
+	case 0x58862793:	//ms
+	case 0x02E5FD61:	//multiscan
+		if ( !strcmp( value, "off" ) )
+			p->settings_bits |= TF_MULTISCAN_MASK;
+		else
+			p->settings_bits -= p->settings_bits & TF_MULTISCAN_MASK;
+		break;
+	case 0x8DE8BDFF:	//ec
+	case 0x6BDB6A88:	//exec_class
+		if ( !strcmp( value, "on" ) )
+			p->settings_bits |= TF_EXEC_CLASS_MASK;
+		else
+			p->settings_bits -= p->settings_bits & TF_EXEC_CLASS_MASK;
+		break;
+	case 0x6A5090F8:	//em
+	case 0x5B8710D3:	//exec_map
+		if ( !strcmp( value, "on" ) )
+			p->settings_bits |= TF_EXEC_MAP_MASK;
+		else
+			p->settings_bits -= p->settings_bits & TF_EXEC_MAP_MASK;
+		break;
+	case 0xCAD67046:	//take_sshot
+		if ( !value[0] )
+			p->take_sshot = 1;
+		else
+			p->take_sshot = 0;
+		break;
+	default:
+		return false;
+	}
+	return true;
 }
-qboolean PrintClientSetting( gedict_t*p , const char*key )
-{
-        unsigned int crc;
-        crc = crc32(0L, (unsigned char*)key, strlen(key));
-        switch( crc )
-        {
-                case 0xE67738BE: //sb
-						   G_sprint( p, 2, "%s %3d\n", key, p->assault_min_shells );
-                           break;
-                case 0x4036162E://sbr
-                case 0x0EF36728://sbar_res
-                        {
-							static const int sbres_tbl[] = {200,240,300,350,384,400,480,600,768};
-							int index = p->StatusBarRes;
-							if( index > 8 || index <0 )
-								index = 0;
-							G_sprint( p, 2, "%s %3d\n", key, sbres_tbl[index]);
-                       }
-						break;
-                case 0x373126B8: //sbs
-                case 0xBA05048F: //sbar_size
-					{
-						G_sprint( p, 2, "%s %3d\n", key, p->StatusBarSize );
-					}
-                         break;
-                case 0x91A45219: //mxs
-                case 0x83DCEFB7: //1
-					G_sprint( p, 2, "Discard shells %3d\n", p->discard_shells );
-					break;
-                case 0xF2A23EC0: //mxn
-                case 0x1AD5BE0D: //2
-					G_sprint( p, 2, "Discard nails %3d\n", p->discard_nails );
-					break;
-                case 0xE6A3628F: //mxr
-                case 0x6DD28E9B: //3
-					G_sprint( p, 2, "Discard rockets %3d\n", p->discard_rockets );
-					break;
-                case 0x8C13427D: //mxc
-                case 0xF3B61B38: //4
-					G_sprint( p, 2, "Discard cells %3d\n", p->discard_cells );
-					break;
-				case 0x1B0ECF0B://s
-					G_sprint( p, 2, "TF setings bits %4d\n", p->settings_bits );
-					break;
-				case 0x4C60C3F1://ch
-				case 0x33653DAA://classhelp
-					if( p->settings_bits & TF_CLASS_HELP_MASK ) 
-						G_sprint( p, 2, "Classhelp is ÏÎ\n");
-					else
-						G_sprint( p, 2, "Classhelp is ÏÆÆ\n");
-					break;
 
-				case 0x58862793://ms
-				case 0x02E5FD61://multiscan
-					if( !(p->settings_bits & TF_MULTISCAN_MASK) ) 
-						G_sprint( p, 2, "Multiscan is ÏÎ\n");
-					else
-						G_sprint( p, 2, "Multiscan is ÏÆÆ\n");
-					break;
-				case 0x8DE8BDFF://ec
-				case 0x6BDB6A88://exec_class
-					if( p->settings_bits & TF_EXEC_CLASS_MASK) 
-						G_sprint( p, 2, "Exec class is ÏÎ\n");
-					else
-						G_sprint( p, 2, "Exec class is ÏÆÆ\n");
-					break;
-				case 0x6A5090F8://em
-				case 0x5B8710D3://exec_map
-					if( p->settings_bits & TF_EXEC_MAP_MASK) 
-						G_sprint( p, 2, "Exec map is ÏÎ\n");
-					else
-						G_sprint( p, 2, "Exec map is ÏÆÆ\n");
-					break;
-				case 0xCAD67046://take_sshot
-					if( p->settings_bits & TF_EXEC_MAP_MASK) 
-						G_sprint( p, 2, "Take screenshot is ÏÎ\n");
-					else
-						G_sprint( p, 2, "Take screenshot is ÏÆÆ\n");
-					break;
-				default:
-					return false;
+qboolean PrintClientSetting( gedict_t * p, const char *key )
+{
+	unsigned int crc;
+
+	crc = crc32( 0L, ( unsigned char * ) key, strlen( key ) );
+	switch ( crc )
+	{
+	case 0xE67738BE:	//sb
+		G_sprint( p, 2, "%s %3d\n", key, p->assault_min_shells );
+		break;
+	case 0x4036162E:	//sbr
+	case 0x0EF36728:	//sbar_res
+		{
+			static const int sbres_tbl[] = { 200, 240, 300, 350, 384, 400, 480, 600, 768 };
+			int     index = p->StatusBarRes;
+
+			if ( index > 8 || index < 0 )
+				index = 0;
+			G_sprint( p, 2, "%s %3d\n", key, sbres_tbl[index] );
 		}
-		return true;
+		break;
+	case 0x373126B8:	//sbs
+	case 0xBA05048F:	//sbar_size
+		{
+			G_sprint( p, 2, "%s %3d\n", key, p->StatusBarSize );
+		}
+		break;
+	case 0x91A45219:	//mxs
+	case 0x83DCEFB7:	//1
+		G_sprint( p, 2, "Discard shells %3d\n", p->discard_shells );
+		break;
+	case 0xF2A23EC0:	//mxn
+	case 0x1AD5BE0D:	//2
+		G_sprint( p, 2, "Discard nails %3d\n", p->discard_nails );
+		break;
+	case 0xE6A3628F:	//mxr
+	case 0x6DD28E9B:	//3
+		G_sprint( p, 2, "Discard rockets %3d\n", p->discard_rockets );
+		break;
+	case 0x8C13427D:	//mxc
+	case 0xF3B61B38:	//4
+		G_sprint( p, 2, "Discard cells %3d\n", p->discard_cells );
+		break;
+	case 0x1B0ECF0B:	//s
+		G_sprint( p, 2, "TF setings bits %4d\n", p->settings_bits );
+		break;
+	case 0x4C60C3F1:	//ch
+	case 0x33653DAA:	//classhelp
+		if ( p->settings_bits & TF_CLASS_HELP_MASK )
+			G_sprint( p, 2, "Classhelp is ÏÎ\n" );
+		else
+			G_sprint( p, 2, "Classhelp is ÏÆÆ\n" );
+		break;
+
+	case 0x58862793:	//ms
+	case 0x02E5FD61:	//multiscan
+		if ( !( p->settings_bits & TF_MULTISCAN_MASK ) )
+			G_sprint( p, 2, "Multiscan is ÏÎ\n" );
+		else
+			G_sprint( p, 2, "Multiscan is ÏÆÆ\n" );
+		break;
+	case 0x8DE8BDFF:	//ec
+	case 0x6BDB6A88:	//exec_class
+		if ( p->settings_bits & TF_EXEC_CLASS_MASK )
+			G_sprint( p, 2, "Exec class is ÏÎ\n" );
+		else
+			G_sprint( p, 2, "Exec class is ÏÆÆ\n" );
+		break;
+	case 0x6A5090F8:	//em
+	case 0x5B8710D3:	//exec_map
+		if ( p->settings_bits & TF_EXEC_MAP_MASK )
+			G_sprint( p, 2, "Exec map is ÏÎ\n" );
+		else
+			G_sprint( p, 2, "Exec map is ÏÆÆ\n" );
+		break;
+	case 0xCAD67046:	//take_sshot
+		if ( p->settings_bits & TF_EXEC_MAP_MASK )
+			G_sprint( p, 2, "Take screenshot is ÏÎ\n" );
+		else
+			G_sprint( p, 2, "Take screenshot is ÏÆÆ\n" );
+		break;
+	default:
+		return false;
+	}
+	return true;
 }
 
 void   Client_Set_Cmd(  )
