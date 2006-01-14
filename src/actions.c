@@ -1,3 +1,4 @@
+sda
 /*
  *  QWProgs-TF2003
  *  Copyright (C) 2004  [sd] angel
@@ -18,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: actions.c,v 1.23 2006-01-14 16:49:34 AngelD Exp $
+ *  $Id: actions.c,v 1.24 2006-01-14 16:49:48 AngelD Exp $
  */
 #include "g_local.h"
 
