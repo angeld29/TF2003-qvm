@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: world.c,v 1.11 2005-11-14 15:36:21 AngelD Exp $
+ *  $Id: world.c,v 1.12 2006-01-18 14:05:26 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -83,7 +83,7 @@ World Types:
 //=======================
 
 extern gedict_t *lastspawn;
-int     number_of_teams;
+int     number_of_teams = 0;
 
 void SP_worldspawn(  )
 {
@@ -359,6 +359,7 @@ void SP_worldspawn(  )
 int     timelimit, fraglimit, teamplay, deathmatch, framecount, coop;
 static  float old_time = 0;
 
+void MatchTimer( qboolean );
 void StartFrame( int time )
 {
 	timelimit = trap_cvar( "timelimit" ) * 60;
@@ -370,4 +371,5 @@ void StartFrame( int time )
 	bot_frametime = g_globalvars.time - old_time;
 	old_time = g_globalvars.time;
 	BotFrame();
+	MatchTimer( false );
 }

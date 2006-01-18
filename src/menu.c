@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: menu.c,v 1.22 2005-11-28 18:30:57 AngelD Exp $
+ *  $Id: menu.c,v 1.23 2006-01-18 14:05:26 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -207,7 +207,7 @@ const char   *team_menu_strings[] = {
 
 void Menu_Team( menunum_t menu )
 {
-	if ( ( tf_data.toggleflags & 64 ) && teamplay )
+	if ( ( tf_data.toggleflags & TFLAG_AUTOTEAM ) && teamplay )
 	{
 		if ( TeamFortress_TeamPutPlayerInTeam(  ) )
 			return;

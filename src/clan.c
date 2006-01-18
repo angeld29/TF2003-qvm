@@ -18,11 +18,12 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: clan.c,v 1.10 2005-11-28 17:37:32 AngelD Exp $
+ *  $Id: clan.c,v 1.11 2006-01-18 14:05:26 AngelD Exp $
  */
 #include "g_local.h"
 
 extern int last_id;
+void MatchTimer( qboolean force );
 void PreMatch_Think(  )
 {
 	int     time_left;
@@ -65,6 +66,7 @@ void PreMatch_Think(  )
 		return;
 	}
 	G_bprint( 2, "MATCH BEGINS NOW\n" );
+	MatchTimer( true );
 	if ( tf_data.game_locked )
 		G_bprint( 2, "GAME IS NOW LOCKED\n" );
 	teamscores[0] = teamscores[1] = teamscores[2] = teamscores[3] = teamscores[4] = 0;
@@ -277,4 +279,65 @@ void DumpClanScores(  )
 			stuffcmd( te, "screenshot\n" );
 		}
 	}
+	MatchTimer( true );
+}
+
+void MatchTimer( qboolean force )
+{
+        static float lasttime = 0;
+        int     time_left;
+
+        if ( !( tf_data.toggleflags & TFLAG_FIRSTENTRY ) )
+                return;
+
+        if( !force && lasttime && ( ( g_globalvars.time - lasttime ) < 60 ))
+        {
+                return;
+        }
+        lasttime = g_globalvars.time;
+	if ( tf_data.cb_prematch_time > g_globalvars.time )
+	{//prematch
+	        localcmd("serverinfo status Countdown\n" );
+/*	        time_left = ceil(tf_data.cb_prematch_time - g_globalvars.time+0.5);
+	        if( time_left > 60 )
+	                localcmd("serverinfo status \"PM %d min left\"\n", time_left / 60);
+	        else
+	                localcmd("serverinfo status \"PM %d sec left\"\n", time_left );
+*/	        
+		return;
+	}
+	if( !timelimit )
+	{
+	        localcmd("serverinfo status \"no timelimit\"\n");
+	        return;
+	}
+	if( g_globalvars.time < timelimit )
+	{
+	        time_left = ceil( timelimit - g_globalvars.time +0.5);
+	        if( time_left > 60 )
+	                localcmd("serverinfo status \"%d min left\"\n", time_left / 60);
+	        else
+	                localcmd("serverinfo status \"%d sec left\"\n", time_left );
+	        return;
+	}
+	localcmd("serverinfo status Standby\n");
+}
+
+void UpdateServerinfoScores()
+{
+        switch(number_of_teams)
+        {
+                case 2:
+                        localcmd("serverinfo score \"%d:%d\"\n", teamscores[1],teamscores[2]);
+                        break;
+                case 3:
+                        localcmd("serverinfo score \"%d:%d:%d\"\n", teamscores[1],teamscores[2],teamscores[3]);
+                        break;
+                case 4:
+                        localcmd("serverinfo score \"%d:%d:%d:%d\"\n", teamscores[1],teamscores[2],teamscores[3],teamscores[4]);
+                        break;
+                default:
+                        return;
+        }
+
 }

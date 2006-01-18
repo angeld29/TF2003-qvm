@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.51 2006-01-14 16:47:26 AngelD Exp $
+ *  $Id: client.c,v 1.52 2006-01-18 14:05:26 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -138,6 +138,7 @@ void autokick_think()
 }
 //-----------------------------------------------------------------------------------------------------
 extern int     team_top_colors[5];
+void UpdateServerinfoScores();
 void DecodeLevelParms()
 {
 	char    st[10];
@@ -174,7 +175,7 @@ void DecodeLevelParms()
 		tf_data.invis_only = 0;
 		if ( coop || !deathmatch )
 			tf_data.toggleflags |= TFLAG_CLASS_PERSIST;
-		strncpy( nextmap, g_globalvars.mapname, 64 );
+		strncpy( nextmap, g_globalvars.mapname, sizeof(nextmap) );
 		tf_data.allow_hook = 1;
 
 		ent = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
@@ -232,7 +233,7 @@ void DecodeLevelParms()
 		teamscores[2] = 0;
 		teamscores[3] = 0;
 		teamscores[4] = 0;
-
+		UpdateServerinfoScores();
 		tf_data.autokick_kills = 0;
 		tf_data.autokick_time = 0;
 		tf_data.cease_fire = 0;
@@ -2630,7 +2631,7 @@ sbres = GetInfokeyInt( self, "sbr", "sbar_res", 200 );
 					TeamFortress_TeamSet( te->team_no );
 					self->s.v.frags = te->s.v.frags;
 					self->real_frags = te->real_frags;
-					if ( !( tf_data.toggleflags & 128 ) && !( tf_data.toggleflags & 2048 ) )
+					if ( !( tf_data.toggleflags & TFLAG_TEAMFRAGS ) && !( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
 						self->s.v.frags = self->real_frags;
 					self->playerclass = te->playerclass;
 					self->tfstate = te->tfstate;

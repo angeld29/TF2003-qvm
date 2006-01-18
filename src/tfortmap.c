@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfortmap.c,v 1.20 2005-11-28 18:30:57 AngelD Exp $
+ *  $Id: tfortmap.c,v 1.21 2006-01-18 14:05:26 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -786,7 +786,7 @@ void RemoveResults( gedict_t * Goal, gedict_t * Player )
 	Player->armorclass = Player->armorclass - ( Player->armorclass & Goal->armorclass );
 	if ( Goal->s.v.frags )
 	{
-		if ( Goal->goal_effects == TFGE_AP || !( tf_data.toggleflags & 2048 ) )
+		if ( Goal->goal_effects == TFGE_AP || !( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
 			TF_AddFrags( Player, Goal->s.v.frags );
 	}
 	Player->s.v.ammo_shells = Player->s.v.ammo_shells - Goal->s.v.ammo_shells;
@@ -2311,7 +2311,7 @@ void SP_item_flag_team2(  )
 	self->broadcast = " гот the enemy team's flag!\n";
 	self->deathtype = "You've got the enemy flag!\n";
 	self->s.v.noise = "ogre/ogwake.wav";
-	if ( tf_data.toggleflags & 8192 )
+	if ( tf_data.toggleflags & TFLAG_USE_WAR_STD )
 		self->mdl = "progs/tf_stan.mdl";
 	else
 		self->mdl = "progs/tf_flag.mdl";
@@ -2382,7 +2382,7 @@ void SP_item_flag_team1(  )
 	self->broadcast = " гот the enemy team's flag!\n";
 	self->deathtype = "You've got the enemy flag!\n";
 	self->s.v.noise = "ogre/ogwake.wav";
-	if ( tf_data.toggleflags & 8192 )
+	if ( tf_data.toggleflags & TFLAG_USE_WAR_STD )
 		self->mdl = "progs/tf_stan.mdl";
 	else
 		self->mdl = "progs/tf_flag.mdl";

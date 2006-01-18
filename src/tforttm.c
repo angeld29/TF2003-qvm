@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tforttm.c,v 1.20 2005-11-28 17:37:32 AngelD Exp $
+ *  $Id: tforttm.c,v 1.21 2006-01-18 14:05:26 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -144,7 +144,7 @@ int TeamFortress_TeamSet( int tno )
 		G_bprint( 2, "%s has started Team No %d.\n", self->s.v.netname, tno );
 
 		self->immune_to_check = g_globalvars.time + 10;
-		if ( ( tf_data.toggleflags & 128 ) || ( tf_data.toggleflags & 2048 ) )
+		if ( ( tf_data.toggleflags & TFLAG_TEAMFRAGS ) || ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
 			self->s.v.frags = TeamFortress_TeamGetScore( tno );
 		TeamFortress_SetColor( self, TeamFortress_TeamGetTopColor( tno ), 
 		                      TeamFortress_TeamGetColor( tno ) - 1 );
@@ -169,7 +169,7 @@ int TeamFortress_TeamSet( int tno )
 	self->team_no = tno;
 	self->immune_to_check = g_globalvars.time + 10;
 	self->lives = TeamFortress_TeamGetLives( tno );
-	if ( ( tf_data.toggleflags & 128 ) || ( tf_data.toggleflags & 2048 ) )
+	if ( ( tf_data.toggleflags & TFLAG_TEAMFRAGS ) || ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
 		self->s.v.frags = TeamFortress_TeamGetScore( tno );
 
 	TeamFortress_TeamShowMemberClasses( self );
@@ -306,6 +306,7 @@ int TeamFortress_TeamGetScore( int tno )
 	return teamscores[tno];
 }
 
+void UpdateServerinfoScores();
 void TeamFortress_TeamIncreaseScore( int tno, int scoretoadd )
 {
 	gedict_t *e;
@@ -323,6 +324,7 @@ void TeamFortress_TeamIncreaseScore( int tno, int scoretoadd )
 				e->s.v.frags = TeamFortress_TeamGetScore( tno );
 		}
 	}
+	UpdateServerinfoScores();
 }
 
 
