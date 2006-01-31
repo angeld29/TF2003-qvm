@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: admin_cmd.c,v 1.8 2006-01-14 16:47:26 AngelD Exp $
+ *  $Id: admin_cmd.c,v 1.9 2006-01-31 13:39:00 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -36,7 +36,6 @@ static void Admin_Ban(int argc);
 static void Admin_UnBan(int argc);
 static void Admin_BanList(int argc);
 static void Admin_Console(int argc);
-static void Admin_CVar(int argc);
 static void Admin_Map(int argc);
 
 static const int max_adminlevel = 100;
@@ -51,7 +50,6 @@ static const admin_cmd_t admin_cmds[] =
 	{"banlist", Admin_BanList, 3},
 	{"unban", Admin_UnBan, 3},
 	{"console", Admin_Console, 999},
-	{"cvar", Admin_CVar, 999},
 	{NULL,NULL,0}
 };
 
@@ -320,16 +318,4 @@ static void Admin_Console(int argc)
 
         localcmd("%s\n",value);
         trap_executecmd();
-}
-static void Admin_CVar(int argc)
-{
-        char    value[1024],value2[1024];
-
-	if( argc != 3)
-	{
-		return;
-	}
-	trap_CmdArgv( 2, value, sizeof( value ) );
-	trap_cvar_string(value, value2,sizeof(value2));
-	G_sprint( self, 2, "\"%s\" is \"%s\"\n",value,value2);
 }

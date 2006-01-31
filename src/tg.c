@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tg.c,v 1.13 2005-05-16 09:35:46 AngelD Exp $
+ *  $Id: tg.c,v 1.14 2006-01-31 13:39:00 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -237,8 +237,13 @@ void TG_Cmd()
                 trap_CmdArgv( 2, st, sizeof( st ) );
           	if ( !strcmp( st, "off" ) )
           		tg_data.sg_disable_fire = 1;
-          	else
+          	else if( !strcmp( st, "toggle" ) )
+          	{
+          	        tg_data.sg_disable_fire = (tg_data.sg_disable_fire)?0:1;
+          	}else
+          	{
           		tg_data.sg_disable_fire = 0;
+          	}
                 return;
         }
         if(!strcmp(cmd_command,"sg_find"))

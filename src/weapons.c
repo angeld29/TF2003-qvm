@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.31 2005-11-29 14:22:43 AngelD Exp $
+ *  $Id: weapons.c,v 1.32 2006-01-31 13:39:00 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -3434,12 +3434,21 @@ void DeadImpulses(  )
 	case 81:
 		StatusRes( self->s.v.impulse - 71 );
 		break;
+	case 23:
+		if ( CTF_Map == 1 )
+			TeamFortress_CTF_FlagInfo(  );
+		else
+			TeamFortress_DisplayDetectionItems(  );
+		break;
 	case 13:
 		G_sprint( self, 2, "Aliases checked.\n" );
 		self->got_aliases = 1;
 		self->s.v.impulse = 0;
 		break;
+	default:
+	        return;
 	}
+	self->s.v.impulse = 0;
 }
 #define SI_DETPIPE 1
 #define SI_THROWGREN 2
@@ -3575,6 +3584,7 @@ void W_WeaponFrame(  )
 	}
 	if ( g_globalvars.time < self->attack_finished )
 	{
+	        DeadImpulses();
 		if ( self->s.v.impulse )
 			Angel_SaveImpulse( self->s.v.impulse );
 		return;

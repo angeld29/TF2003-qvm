@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.52 2006-01-18 14:05:26 AngelD Exp $
+ *  $Id: client.c,v 1.53 2006-01-31 13:39:00 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -145,6 +145,7 @@ void DecodeLevelParms()
 	gedict_t *ent;
 	gedict_t *te;
 	float fvar;
+	static int first_decode = 1;
 
 	// local "21?TeamFortress"
 	// local "info_player_team1"
@@ -167,8 +168,30 @@ void DecodeLevelParms()
 	self->current_weapon = g_globalvars.parm8;
 	self->s.v.armortype = g_globalvars.parm9 * 0.01;
 
+	if ( g_globalvars.parm11 )
+		self->tfstate = g_globalvars.parm11;
+	if ( !self->playerclass )
+		self->playerclass = g_globalvars.parm12;
+/* if (parm13) 
+  self.StatusBarRes = parm13;
+ if (parm14) 
+  self.StatusBarSize = parm14;*/
+/*	if ( g_globalvars.parm15 )
+	{
+		self->is_admin = g_globalvars.parm15;
+	}*/
+
 	if ( !( tf_data.toggleflags & TFLAG_FIRSTENTRY ) )
 	{
+
+	        if( !first_decode )
+	        {
+	                G_bprint(2,"!!!BUG BUG BUG!!!\nfirst_decode != 0 %d %s\n!!!BUG BUG BUG!!!\n", tf_data.toggleflags, self->s.v.netname);
+	                tf_data.toggleflags |= TFLAG_FIRSTENTRY;
+	                G_bprint(2,"toggleflags %d\n", tf_data.toggleflags );
+	                return;
+	        }
+	        first_decode = 0;
 		tf_data.toggleflags = g_globalvars.parm10;
 		tf_data.flagem_checked = 0;
 		tf_data.allow_hook = 0;
@@ -242,7 +265,8 @@ void DecodeLevelParms()
 
 		tf_data.toggleflags -= ( tf_data.toggleflags & TFLAG_CHEATCHECK );
 
-		tf_data.toggleflags |= TFLAG_FIRSTENTRY | GetSVInfokeyInt( "temp1", NULL, 0 );
+		tf_data.toggleflags |= GetSVInfokeyInt( "temp1", NULL, 0 );
+		tf_data.toggleflags |= TFLAG_FIRSTENTRY;
 
 		autoteam_time = 30;
 
@@ -641,18 +665,6 @@ void DecodeLevelParms()
 		if( tf_data.enable_bot )
 		        localcmd( "exec maps/%s.wps\n", g_globalvars.mapname );
 	}
-	if ( g_globalvars.parm11 )
-		self->tfstate = g_globalvars.parm11;
-	if ( !self->playerclass )
-		self->playerclass = g_globalvars.parm12;
-/* if (parm13) 
-  self.StatusBarRes = parm13;
- if (parm14) 
-  self.StatusBarSize = parm14;*/
-/*	if ( g_globalvars.parm15 )
-	{
-		self->is_admin = g_globalvars.parm15;
-	}*/
 }
 
 /*
