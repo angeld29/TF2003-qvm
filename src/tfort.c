@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.42 2006-01-14 16:47:26 AngelD Exp $
+ *  $Id: tfort.c,v 1.43 2006-02-07 19:43:02 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -460,12 +460,12 @@ void TeamFortress_ChangeClass(  )
 	self->playerclass = ( self->s.v.impulse != 1 ) ? ( self->s.v.impulse - TF_CHANGEPC ) : PC_CIVILIAN;
 
 	self->nextpc = 0;
-	self->s.v.takedamage = 2;
-	self->s.v.movetype = 3;
-	self->s.v.flags = 8 | 512;
+	self->s.v.takedamage = DAMAGE_AIM;
+	self->s.v.movetype = MOVETYPE_WALK;
+	self->s.v.flags = FL_CLIENT | FL_ONGROUND;
 	self->s.v.waterlevel = 0;
 	self->air_finished = g_globalvars.time + 12;
-	self->s.v.solid = 3;
+	self->s.v.solid = SOLID_SLIDEBOX;
 	self->pausetime = 0;
 	spot = SelectSpawnPoint(  );
 	VectorCopy( spot->s.v.origin, self->s.v.origin );
@@ -1025,8 +1025,8 @@ void TeamFortress_PrimeGrenade(  )
 				newmis = spawn(  );
 				g_globalvars.newmis = EDICT_TO_PROG( newmis );
 				newmis->s.v.owner = EDICT_TO_PROG( self );
-				newmis->s.v.movetype = 6;
-				newmis->s.v.solid = 2;
+				newmis->s.v.movetype = MOVETYPE_TOSS;
+				newmis->s.v.solid = SOLID_BBOX;
 				newmis->s.v.classname = "grenade";
 				makevectors( self->s.v.v_angle );
 				newmis->s.v.velocity[0] =
@@ -1081,8 +1081,8 @@ void TeamFortress_PrimeGrenade(  )
 			case GR_TYPE_FLARE:
 				newmis = spawn(  );
 				newmis->s.v.owner = EDICT_TO_PROG( self );
-				newmis->s.v.movetype = 6;
-				newmis->s.v.solid = 2;
+				newmis->s.v.movetype = MOVETYPE_TOSS;
+				newmis->s.v.solid = SOLID_BBOX;
 				newmis->s.v.classname = "grenade";
 				makevectors( self->s.v.v_angle );
 				if ( self->s.v.v_angle[0] )
@@ -1167,8 +1167,8 @@ void TeamFortress_GrenadePrimed(  )
 	newmis = spawn(  );
 	g_globalvars.newmis = EDICT_TO_PROG( newmis );
 	newmis->s.v.owner = EDICT_TO_PROG( user );
-	newmis->s.v.movetype = 10;
-	newmis->s.v.solid = 2;
+	newmis->s.v.movetype = MOVETYPE_BOUNCE;
+	newmis->s.v.solid = SOLID_BBOX;
 	newmis->s.v.classname = "grenade";
 	makevectors( user->s.v.v_angle );
 	if ( user->s.v.deadflag )
@@ -1646,7 +1646,7 @@ void TeamFortress_SetEquipment(  )
 		self->s.v.waterlevel = 3;
 		self->s.v.takedamage = 0;
 		self->s.v.solid = SOLID_NOT;
-		self->s.v.movetype = MOVETYPE_NOCLIP;
+		self->s.v.movetype = MOVETYPE_NONE;//!!!REMOVE ME MOVETYPE_NOCLIP;
 		self->s.v.model = "";
 		self->mdl = "";
 		self->s.v.modelindex = 0;
@@ -1868,9 +1868,9 @@ void TeamFortress_SetupRespawn( int Suicided )
 			{
 				G_sprint( self, 2, "NO lives left, returning to Observer mode.\n" );
 				self->playerclass = 0;
-				self->tfstate -= ( self->tfstate & 8 );
-				self->s.v.movetype = 8;
-				self->s.v.solid = 0;
+				self->tfstate -= ( self->tfstate & TFSTATE_RANDOMPC );
+				self->s.v.movetype = MOVETYPE_NONE;//!!!REMOVE ME MOVETYPE_NOCLIP;
+				self->s.v.solid = SOLID_NOT;
 				self->s.v.model = "";
 				self->mdl = "";
 				SetVector( self->s.v.velocity, 0, 0, 0 );
@@ -2714,7 +2714,7 @@ void PlayerObserverMode(  )
 	self->s.v.waterlevel = 3;
 	self->s.v.takedamage = 0;
 	self->s.v.solid = SOLID_NOT;
-	self->s.v.movetype = MOVETYPE_NOCLIP;
+	self->s.v.movetype = MOVETYPE_NONE;//!!!REMOVE ME MOVETYPE_NOCLIP;
 	G_sprint( self, 2, "Observer mode\n" );
 	CenterPrint( self, "\n" );
 	stuffcmd( self, "cl_rollangle 0\n" );
