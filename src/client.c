@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.53 2006-01-31 13:39:00 AngelD Exp $
+ *  $Id: client.c,v 1.54 2006-02-28 12:50:07 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -662,6 +662,26 @@ void DecodeLevelParms()
 		}
                 if( tg_data.tg_enabled )
 			TG_LoadSettings();
+                else
+                {
+                        tg_data.godmode = 0;
+                        tg_data.unlimit_ammo = 0;
+                        tg_data.unlimit_grens = 0;
+                        tg_data.disable_reload = 0;
+                        tg_data.detpack_clip = TG_DETPACK_CLIP_OWNER;
+                        tg_data.detpack_drop = 0;   // 1 can drop, 0 - cannot
+                        tg_data.disable_disarm = 0; // 0 normal, 1 - disable
+                        tg_data.gren_effect = 0;    //0 -default, 1 - off for all, 2 off for self
+                        tg_data.gren_time = 0;      //0 -full time , 10 ,5 in sek
+
+                        tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
+                        tg_data.sg_disable_fire = 0;
+                        tg_data.sg_fire_bullets = true;
+                        tg_data.sg_fire_rockets = true;
+                        tg_data.sg_fire_lighting = false;
+                        tg_data.sg_unlimit_ammo = false;
+                        tg_data.tg_sbar = 0;
+                }
 		if( tf_data.enable_bot )
 		        localcmd( "exec maps/%s.wps\n", g_globalvars.mapname );
 	}

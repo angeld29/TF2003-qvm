@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: menu.c,v 1.23 2006-01-18 14:05:26 AngelD Exp $
+ *  $Id: menu.c,v 1.24 2006-02-28 12:50:07 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -51,27 +51,29 @@ void    Menu_EngineerFix_SentryGun( menunum_t );
 void    Menu_EngineerFix_SentryGun_Input( int inp );
 void    Menu_Dispenser( menunum_t );
 void    Menu_Dispenser_Input( int inp );
-void	Menu_Spy( menunum_t menu );
-void 	Menu_Spy_Input( int inp );
-void 	Menu_Spy_Skin( menunum_t menu );
-void 	Menu_Spy_Skin_Input( int inp );
-void 	Menu_Spy_Color( menunum_t menu );
-void 	Menu_Spy_Color_Input( int inp );
-void 	Menu_BirthDay( menunum_t menu );
-void 	Menu_BirthDay_Input( int inp );
+void    Menu_Spy( menunum_t menu );
+void    Menu_Spy_Input( int inp );
+void    Menu_Spy_Skin( menunum_t menu );
+void    Menu_Spy_Skin_Input( int inp );
+void    Menu_Spy_Color( menunum_t menu );
+void    Menu_Spy_Color_Input( int inp );
+void    Menu_BirthDay( menunum_t menu );
+void    Menu_BirthDay_Input( int inp );
 
-void 	TG_Main_Menu(menunum_t menu);
-void 	TG_Main_Menu_Input( int inp );
-void 	TG_SGOptions_Menu_Input( int inp );
-void 	TG_SGOptions_Menu(menunum_t menu);
-void 	TG_Detpack_Menu(menunum_t menu);
-void 	TG_Detpack_Menu_Input( int inp );
-void 	TG_Cheats_Menu(menunum_t menu);
-void 	TG_Cheats_Menu_Input( int inp );
-void 	TG_SavePosition_Menu(menunum_t menu);
-void 	TG_SavePosition_Menu_Input( int inp );
+void    TG_Main_Menu( menunum_t menu );
+void    TG_Main_Menu_Input( int inp );
+void    TG_SGOptions_Menu_Input( int inp );
+void    TG_SGOptions_Menu( menunum_t menu );
+void    TG_Detpack_Menu( menunum_t menu );
+void    TG_Detpack_Menu_Input( int inp );
+void    TG_Cheats_Menu( menunum_t menu );
+void    TG_Cheats_Menu_Input( int inp );
+void    TG_SavePosition_Menu( menunum_t menu );
+void    TG_SavePosition_Menu_Input( int inp );
+void    TG_SG_Fire_Menu_Input( int inp );
+void    TG_SG_Fire_Menu( menunum_t menu );
 
-const static menu_t  menus[] = {
+const static menu_t menus[] = {
 	{0, 0, 0, NULL, NULL},	//MENU_NULL,                      
 	{0, 0, 0, NULL, NULL},	//MENU_DEFAULT,                 
 	{31, 0, 0, Menu_Team, Menu_Team_Input},	//MENU_TEAM,                    
@@ -89,9 +91,9 @@ const static menu_t  menus[] = {
 	{-1, 0, 0, Menu_Spy_Color, Menu_Spy_Color_Input},	//MENU_SPY_COLOR,                       
 	{-1, 0, 0, Menu_Engineer, Menu_Engineer_Input},	//MENU_ENGINEER,                        
 	{-1, 0, 0, Menu_EngineerFix_Dispenser,
-			   Menu_EngineerFix_Dispenser_Input},	//MENU_ENGINEER_FIX_DISPENSER,  
+	 Menu_EngineerFix_Dispenser_Input},	//MENU_ENGINEER_FIX_DISPENSER,  
 	{-1, 0, 0, Menu_EngineerFix_SentryGun,
-	           Menu_EngineerFix_SentryGun_Input},	//MENU_ENGINEER_FIX_SENTRYGUN,
+	 Menu_EngineerFix_SentryGun_Input},	//MENU_ENGINEER_FIX_SENTRYGUN,
 	{0, 0, 0, Menu_NULL, NULL},	//MENU_ENGINEER_FIX_MORTAR,     
 	{-1, 0, 0, Menu_Dispenser, Menu_Dispenser_Input},	//MENU_DISPENSER,                       
 	{-1, 0, 0, Menu_Class, Menu_Class_Input},	//MENU_CHANGECLASS              
@@ -101,11 +103,12 @@ const static menu_t  menus[] = {
 	{-1, 0, 0, Menu_BirthDay, Menu_BirthDay_Input},	//MENU_BIRTHDAY2
 	{-1, 0, 0, Menu_BirthDay, Menu_BirthDay_Input},	//MENU_BIRTHDAY3
 
-	{-1, 0,	0, TG_Main_Menu, TG_Main_Menu_Input},
-	{-1, 0,	0, TG_SGOptions_Menu, TG_SGOptions_Menu_Input},
-	{-1, 0,	0, TG_Detpack_Menu, TG_Detpack_Menu_Input},
-	{-1, 0,	0, TG_Cheats_Menu, TG_Cheats_Menu_Input},
-	{-1, 0,	0, TG_SavePosition_Menu, TG_SavePosition_Menu_Input},
+	{-1, 0, 0, TG_Main_Menu, TG_Main_Menu_Input},
+	{-1, 0, 0, TG_SGOptions_Menu, TG_SGOptions_Menu_Input},
+	{-1, 0, 0, TG_Detpack_Menu, TG_Detpack_Menu_Input},
+	{-1, 0, 0, TG_Cheats_Menu, TG_Cheats_Menu_Input},
+	{-1, 0, 0, TG_SavePosition_Menu, TG_SavePosition_Menu_Input},
+	{-1, 0, 0, TG_SG_Fire_Menu, TG_SG_Fire_Menu_Input},
 
 	{0, 0, 0, NULL, NULL}
 };
@@ -123,7 +126,7 @@ void Player_Menu(  )
 		return;
 	}
 
-	if ( self->current_menu <= MENU_CLASS/*MENU_DEFAULT*/ )
+	if ( self->current_menu <= MENU_CLASS /*MENU_DEFAULT */  )
 	{
 		if ( !self->team_no && teamplay && self->lives )
 		{
@@ -196,7 +199,7 @@ void Menu_Input( int impulse )
 }
 
 extern char *team_menu_string;
-const char   *team_menu_strings[] = {
+const char *team_menu_strings[] = {
 	"              ",
 	"“‘ Team One  ",
 	"”‘ Team Two  ",
@@ -224,17 +227,20 @@ void Menu_Team( menunum_t menu )
 			     "“‘ Blue Team           \n"
 			     "”‘ Red Team            \n\n\n\n"
 			     "™‘ Bind my keys for me!\n\n"
-			     "For full details on this patch:\n" "http://www.telefragged.com/teamfortress/\n" );
+			     "For full details on this patch:\n"
+			     "http://www.telefragged.com/teamfortress/\n" );
 	else
 	{
 		if ( number_of_teams == 1 )
-			CenterPrint( self, "=== Choose Your Team ===\n\n%s\n", team_menu_strings[1] );
+			CenterPrint( self, "=== Choose Your Team ===\n\n%s\n",
+				     team_menu_strings[1] );
 		else
-			CenterPrint( self, "=== Choose Your Team ===\n\n%s\n%s\n%s\n%s\n%s\n",
-				     team_menu_strings[1],
-				     team_menu_strings[2],
+			CenterPrint( self,
+				     "=== Choose Your Team ===\n\n%s\n%s\n%s\n%s\n%s\n",
+				     team_menu_strings[1], team_menu_strings[2],
 				     team_menu_strings[( number_of_teams > 2 ) ? 3 : 0],
-				     team_menu_strings[( number_of_teams > 3 ) ? 4 : 0], team_menu_strings[5] );
+				     team_menu_strings[( number_of_teams > 3 ) ? 4 : 0],
+				     team_menu_strings[5] );
 	}
 
 }
@@ -258,13 +264,14 @@ void Menu_Team_Input( int inp )
 	self->s.v.impulse = 0;
 }
 
-const char   *class_hdr = "=== Choose Your Class ===";
-const char   *class_str = "“‘ Scout   \n"
-    "”‘ Sniper  \n" "•‘ Soldier \n" "–‘ Demoman \n" "—‘ Medic   \n" "˜‘ HWGuy   \n" "™‘ Pyro    \n";
-const char   *class_spy = "š‘ Spy     \n";
-const char   *class_eng = "›‘ Engineer\n";
-const char   *class_rpc = "’‘ RandomPC\n";
-const char   *class_bd = "’‘ The Birthday Boy\n";
+const char *class_hdr = "=== Choose Your Class ===";
+const char *class_str = "“‘ Scout   \n"
+    "”‘ Sniper  \n" "•‘ Soldier \n" "–‘ Demoman \n" "—‘ Medic   \n" "˜‘ HWGuy   \n"
+    "™‘ Pyro    \n";
+const char *class_spy = "š‘ Spy     \n";
+const char *class_eng = "›‘ Engineer\n";
+const char *class_rpc = "’‘ RandomPC\n";
+const char *class_bd = "’‘ The Birthday Boy\n";
 
 void Menu_Class( menunum_t menu )
 {
@@ -313,20 +320,24 @@ void Menu_Class( menunum_t menu )
 	}
 	if ( tf_data.spy_off == 1 )
 	{
-		CenterPrint( self, "%s\n\n%s%s%s", class_hdr, class_str, class_eng, class_rpc );
+		CenterPrint( self, "%s\n\n%s%s%s", class_hdr, class_str, class_eng,
+			     class_rpc );
 		return;
 	}
 	if ( tf_data.birthday == 1 )
 	{
-		CenterPrint( self, "%s\n\n%s%s%s%s", class_hdr, class_str, class_spy, class_eng, class_bd );
+		CenterPrint( self, "%s\n\n%s%s%s%s", class_hdr, class_str, class_spy,
+			     class_eng, class_bd );
 		return;
 	}
-	CenterPrint( self, "%s\n\n%s%s%s%s", class_hdr, class_str, class_spy, class_eng, class_rpc );
+	CenterPrint( self, "%s\n\n%s%s%s%s", class_hdr, class_str, class_spy, class_eng,
+		     class_rpc );
 }
 
 void Menu_Class_Input( int imp )
 {
-	int     new_class = 0;//, opt;
+	int     new_class = 0;	//, opt;
+
 	//char    st[10];
 
 	if ( imp > 10 && imp < 1 )
@@ -339,9 +350,9 @@ void Menu_Class_Input( int imp )
 	if ( self->playerclass && new_class != 1 )
 	{
 
-	        if( self->settings_bits &TF_CLASS_HELP_MASK )
-	                self->current_menu = MENU_CLASSHELP;
-//REMOVE!!!!	                
+		if ( self->settings_bits & TF_CLASS_HELP_MASK )
+			self->current_menu = MENU_CLASSHELP;
+//REMOVE!!!!                    
 /*		if( GetInfokeyString( self, "ch", "classhelp", st, sizeof( st ), "" ) )
 		{
 			if( strcmp(st,"off") )
@@ -368,13 +379,15 @@ void Menu_Drop( menunum_t menu )
 			     "“‘ Shells                      \n"
 			     "”‘ Nails                       \n"
 			     "•‘ Rockets                     \n"
-			     "–‘ Cells                       \n" "—‘ Nothing                     \n\n" );
+			     "–‘ Cells                       \n"
+			     "—‘ Nothing                     \n\n" );
 	else
 		CenterPrint( self, "Drop:                           \n"
 			     "“‘ Shells                      \n"
 			     "”‘ Nails                       \n"
 			     "•‘ Rockets                     \n"
-			     "–‘ Cells                       \n" "—‘ Nothing                     \n\n" );
+			     "–‘ Cells                       \n"
+			     "—‘ Nothing                     \n\n" );
 
 }
 
@@ -399,59 +412,69 @@ void Menu_Intro( menunum_t menu )
 	} else
 		CenterPrint( self, "Welcome to ÔåáíÆïòôòåóó ”’’•\n"
 			     "by sd‘ angel for ÍÔÆÌ\n"
-			     "======================================\n" "http://mtfl.sd.ru\n" );
+			     "======================================\n"
+			     "http://mtfl.sd.ru\n" );
 }
 
-const char   *classhelp1[] = {
+const char *classhelp1[] = {
 	"",
 	"ÓÃÏÕÔ Details:               \n\n"
 	    "×ÅÁÐÏÎÓ:                     \n"
-	    "”‘ Shotgun                  \n" "–‘ Nailgun                  \n\n" "Press š for alias help\n",
+	    "”‘ Shotgun                  \n" "–‘ Nailgun                  \n\n"
+	    "Press š for alias help\n",
 
 	"ÓÎÉÐÅÒ Details:              \n\n"
 	    "×ÅÁÐÏÎÓ:                     \n"
 	    "”‘ Sniper Rifle             \n"
-	    "•‘ Auto Rifle               \n" "–‘ Nailgun                  \n\n" "Press š for alias help\n",
+	    "•‘ Auto Rifle               \n" "–‘ Nailgun                  \n\n"
+	    "Press š for alias help\n",
 
 	"ÓÏÌÄÉÅÒ Details:             \n\n"
 	    "×ÅÁÐÏÎÓ:                     \n"
 	    "”‘ Shotgun                  \n"
-	    "•‘ Super Shotgun            \n" "™‘ Rocket Launcher          \n\n" "Press š for alias help\n",
+	    "•‘ Super Shotgun            \n" "™‘ Rocket Launcher          \n\n"
+	    "Press š for alias help\n",
 
 	"ÄÅÍÏÌÉÔÉÏÎÓ ÍÁÎ Details:     \n\n"
 	    "×ÅÁÐÏÎÓ:                     \n"
 	    "”‘ Shotgun                  \n"
 	    "˜‘ Grenade Launcher         \n"
-	    "™‘ Pipebomb Launcher        \n" "                             \n\n" "Press š for alias help\n",
+	    "™‘ Pipebomb Launcher        \n" "                             \n\n"
+	    "Press š for alias help\n",
 
 	"ÍÅÄÉÃ Details:               \n\n"
 	    "×ÅÁÐÏÎÓ:                     \n"
 	    "“‘ Medikit/BioWeapon        \n"
 	    "”‘ Shotgun                  \n"
-	    "•‘ Super Shotgun            \n" "—‘ Super Nailgun            \n\n" "Press š for alias help\n",
+	    "•‘ Super Shotgun            \n" "—‘ Super Nailgun            \n\n"
+	    "Press š for alias help\n",
 
 	"ÈÅÁÖÙ ×ÅÁÐÏÎÓ ÇÕÙ Details:   \n\n"
 	    "×ÅÁÐÏÎÓ:                     \n"
 	    "”‘ Shotgun                  \n"
-	    "•‘ Super Shotgun            \n" "™‘ Assault Cannon           \n\n" "Press š for alias help\n",
+	    "•‘ Super Shotgun            \n" "™‘ Assault Cannon           \n\n"
+	    "Press š for alias help\n",
 
 	"ÐÙÒÏ Details:                \n\n"
 	    "×ÅÁÐÏÎÓ:                     \n"
 	    "”‘ Shotgun                  \n"
-	    "˜‘ Flamethrower             \n" "™‘ Incendiary Cannon        \n\n" "Press š for alias help\n",
+	    "˜‘ Flamethrower             \n" "™‘ Incendiary Cannon        \n\n"
+	    "Press š for alias help\n",
 
 	"ÓÐÙ Details:                 \n\n"
 	    "×ÅÁÐÏÎÓ:                     \n"
 	    "“‘ Knife                    \n"
 	    "”‘ Tranquiliser Gun         \n"
-	    "•‘ Super Shotgun            \n" "–‘ Nailgun                  \n\n" "Press š for alias help\n",
+	    "•‘ Super Shotgun            \n" "–‘ Nailgun                  \n\n"
+	    "Press š for alias help\n",
 
 	"ÅÎÇÉÎÅÅÒ Details:            \n\n"
 	    "×ÅÁÐÏÎÓ:                     \n"
 	    "“‘ Spanner                  \n"
-	    "”‘ RailGun                  \n" "•‘ Super Shotgun            \n\n" "Press š for alias help\n"
+	    "”‘ RailGun                  \n" "•‘ Super Shotgun            \n\n"
+	    "Press š for alias help\n"
 };
-const char   *classhelp2[] = {
+const char *classhelp2[] = {
 	"",
 	"ÇÒÅÎÁÄÅÓ:            \nFlash Grenade       \nConcussion Grenade  \n\nÓÐÅÃÉÁÌ ÃÏÍÍÁÎÄÓ:   \nScanner : scan10,scan30,scan50,autoscan\nScanner mode : scane,scanf    \n\nPress š for alias help\n",
 	"ÇÒÅÎÁÄÅÓ:            \nHand Grenade        \nFlare               \n\nÓÐÅÃÉÁÌ ÃÏÍÍÁÎÄÓ:   \nautozoom : Toggle Rifle Autozooming\n\n\nPress š for alias help\n",
@@ -474,7 +497,8 @@ char   *class_stuffcmd[] = {
 	    "  autozoom : Toggle Rifle Autozooming\n\n\n",
 
 	"ÓÏÌÄÉÅÒ Details:\n\n×ÅÁÐÏÎÓ:\n   ”‘ Shotgun\n   •‘ Super Shotgun\n"
-	    "   ™‘ Rocket Launcher\nÇÒÅÎÁÄÅÓ:\n   Hand Grenade\n   Nail Grenade\n" "ÓÐÅÃÉÁÌ ÃÏÍÍÁÎÄÓ:\n   None\n\n\n",
+	    "   ™‘ Rocket Launcher\nÇÒÅÎÁÄÅÓ:\n   Hand Grenade\n   Nail Grenade\n"
+	    "ÓÐÅÃÉÁÌ ÃÏÍÍÁÎÄÓ:\n   None\n\n\n",
 
 	"ÄÅÍÏÌÉÔÉÏÎÓ ÍÁÎ Details:\n\n×ÅÁÐÏÎÓ:\n   ”‘ Shotgun\n   ˜‘ Grenade Launcher         \n   ™‘ Pipebomb Launcher        \n"
 	    "ÇÒÅÎÁÄÅÓ:\n   Hand Grenade\n   Mirv Grenade\n"
@@ -485,10 +509,12 @@ char   *class_stuffcmd[] = {
 	    "ÓÐÅÃÉÁÌ ÃÏÍÍÁÎÄÓ:\n   None\n\n\n",
 
 	"ÈÅÁÖÙ ×ÅÁÐÏÎÓ ÇÕÙ Details:\n\n×ÅÁÐÏÎÓ:\n   ”‘ Shotgun\n   •‘ Super Shotgun\n"
-	    "   ™‘ Assault Cannon\nÇÒÅÎÁÄÅÓ:\n   Hand Grenade\n" "   Mirv Grenade\nÓÐÅÃÉÁÌ ÃÏÍÍÁÎÄÓ:\n   None\n\n\n",
+	    "   ™‘ Assault Cannon\nÇÒÅÎÁÄÅÓ:\n   Hand Grenade\n"
+	    "   Mirv Grenade\nÓÐÅÃÉÁÌ ÃÏÍÍÁÎÄÓ:\n   None\n\n\n",
 
 	"ÐÙÒÏ Details:\n\n×ÅÁÐÏÎÓ:\n   ”‘ Shotgun\n   ˜‘ Flamethrower\n   ™‘ Incendiary Cannon\n"
-	    "ÇÒÅÎÁÄÅÓ:\n   Hand Grenade\n   Napalm Grenade\n" "ÓÐÅÃÉÁÌ ÃÏÍÍÁÎÄÓ:\n   None\n\n\n",
+	    "ÇÒÅÎÁÄÅÓ:\n   Hand Grenade\n   Napalm Grenade\n"
+	    "ÓÐÅÃÉÁÌ ÃÏÍÍÁÎÄÓ:\n   None\n\n\n",
 
 	"ÓÐÙ Details:\n\n×ÅÁÐÏÎÓ:\n   “‘ Knife           \n   ”‘ Tranquiliser Gun\n   •‘ Super Shotgun\n   –‘ Nailgun\n"
 	    "ÇÒÅÎÁÄÅÓ:\n   Hand Grenade\n   Hallucinogenic Grenade\n"
@@ -540,29 +566,30 @@ void Menu_RepeatHelp( menunum_t menu )
 	self->current_menu = MENU_DEFAULT;
 }
 
-const char   *menu_eng_header = "Action:                           \n";
-const char   *menu_eng_builddisp = "“‘ Build Ammo&Armor Dispenser   \n";
-const char   *menu_eng_buildsentry = "”‘ Build Sentry Gun             \n";
-const char   *menu_eng_exit = "—‘ Nothing                      \n\n";
-const char   *menu_eng_detdisp = "™‘ Remotely Detonate Dispenser  \n";
-const char   *menu_eng_detsentry = "š‘ Remotely Detonate Sentry Gun \n";
+const char *menu_eng_header = "Action:                           \n";
+const char *menu_eng_builddisp = "“‘ Build Ammo&Armor Dispenser   \n";
+const char *menu_eng_buildsentry = "”‘ Build Sentry Gun             \n";
+const char *menu_eng_exit = "—‘ Nothing                      \n\n";
+const char *menu_eng_detdisp = "™‘ Remotely Detonate Dispenser  \n";
+const char *menu_eng_detsentry = "š‘ Remotely Detonate Sentry Gun \n";
 
 
 void Menu_Engineer( menunum_t menu )
 {
-	const char   *s_bdisp = "", *s_detdisp = "", *s_bsentry = "", *s_detsentry = "";
+	const char *s_bdisp = "", *s_detdisp = "", *s_bsentry = "", *s_detsentry = "";
 
 	if ( self->has_dispenser )
 	{
 		s_detdisp = menu_eng_detdisp;
-                if( tg_data.tg_enabled )
+		if ( tg_data.tg_enabled )
 			s_bdisp = menu_eng_builddisp;
-                else 
-                	s_bdisp = "";
+		else
+			s_bdisp = "";
 	} else
 	{
 
-		if ( (self->s.v.ammo_cells < BUILD_COST_DISPENSER) && !tg_data.tg_enabled)
+		if ( ( self->s.v.ammo_cells < BUILD_COST_DISPENSER )
+		     && !tg_data.tg_enabled )
 			s_bdisp = "\n";
 		else
 			s_bdisp = menu_eng_builddisp;
@@ -573,13 +600,14 @@ void Menu_Engineer( menunum_t menu )
 	if ( self->has_sentry )
 	{
 		s_detsentry = menu_eng_detsentry;
-                if( tg_data.tg_enabled )
+		if ( tg_data.tg_enabled )
 			s_bsentry = menu_eng_buildsentry;
-                else
-                	s_bsentry = "";
+		else
+			s_bsentry = "";
 	} else
 	{
-		if ( (self->s.v.ammo_cells < BUILD_COST_SENTRYGUN) && !tg_data.tg_enabled)
+		if ( ( self->s.v.ammo_cells < BUILD_COST_SENTRYGUN )
+		     && !tg_data.tg_enabled )
 			s_bsentry = "\n";
 		else
 			s_bsentry = menu_eng_buildsentry;
@@ -587,7 +615,8 @@ void Menu_Engineer( menunum_t menu )
 		s_detsentry = "";
 	}
 
-	CenterPrint( self, "%s%s%s%s%s%s", menu_eng_header, s_bdisp, s_detdisp, s_bsentry, s_detsentry, menu_eng_exit );
+	CenterPrint( self, "%s%s%s%s%s%s", menu_eng_header, s_bdisp, s_detdisp, s_bsentry,
+		     s_detsentry, menu_eng_exit );
 }
 
 void Menu_Engineer_Input( int inp )
@@ -595,14 +624,15 @@ void Menu_Engineer_Input( int inp )
 	switch ( inp )
 	{
 	case 1:
-                if ( !( ( int ) self->s.v.flags & FL_ONGROUND ) )
-                {
-            		CenterPrint( self, "You can't build in the air!\n\n" );
-                        ResetMenu(  );
-            		self->s.v.impulse = 0;
-            		return;
-                }
-		if ( (self->s.v.ammo_cells >= BUILD_COST_DISPENSER && self->has_dispenser == 0) || tg_data.tg_enabled )
+		if ( !( ( int ) self->s.v.flags & FL_ONGROUND ) )
+		{
+			CenterPrint( self, "You can't build in the air!\n\n" );
+			ResetMenu(  );
+			self->s.v.impulse = 0;
+			return;
+		}
+		if ( ( self->s.v.ammo_cells >= BUILD_COST_DISPENSER
+		       && self->has_dispenser == 0 ) || tg_data.tg_enabled )
 		{
 			TeamFortress_Build( 1 );
 			ResetMenu(  );
@@ -610,14 +640,15 @@ void Menu_Engineer_Input( int inp )
 		}
 		break;
 	case 2:
-                if ( !( ( int ) self->s.v.flags & FL_ONGROUND ) )
-                {
-            		CenterPrint( self, "You can't build in the air!\n\n" );
-            		ResetMenu(  );
-            		self->s.v.impulse = 0;
-            		return;
-                }
-		if ( (self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN && self->has_sentry == 0) || tg_data.tg_enabled )
+		if ( !( ( int ) self->s.v.flags & FL_ONGROUND ) )
+		{
+			CenterPrint( self, "You can't build in the air!\n\n" );
+			ResetMenu(  );
+			self->s.v.impulse = 0;
+			return;
+		}
+		if ( ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN
+		       && self->has_sentry == 0 ) || tg_data.tg_enabled )
 		{
 			TeamFortress_Build( 2 );
 			ResetMenu(  );
@@ -653,7 +684,8 @@ void Menu_EngineerFix_Dispenser( menunum_t menu )
 		     "“‘ Put Ammo into Dispenser     \n"
 		     "”‘ Put Armor into Dispenser    \n"
 		     "•‘ Repair Dispenser            \n"
-		     "–‘ Dismantle Dispenser         \n" "—‘ Nothing                     \n\n" );
+		     "–‘ Dismantle Dispenser         \n"
+		     "—‘ Nothing                     \n\n" );
 }
 
 void Menu_EngineerFix_Dispenser_Input( int inp )
@@ -661,7 +693,8 @@ void Menu_EngineerFix_Dispenser_Input( int inp )
 	float   metalcost;
 	float   am;
 
-	if ( strneq( self->s.v.classname, "player" ) || !self->building || self->building == world )
+	if ( strneq( self->s.v.classname, "player" ) || !self->building
+	     || self->building == world )
 		return;
 
 	switch ( inp )
@@ -706,7 +739,8 @@ void Menu_EngineerFix_Dispenser_Input( int inp )
 		self->building->s.v.armorvalue = self->building->s.v.armorvalue + am;
 		break;
 	case 3:
-		metalcost = ( self->building->s.v.max_health - self->building->s.v.health ) / 5;
+		metalcost =
+		    ( self->building->s.v.max_health - self->building->s.v.health ) / 5;
 		if ( metalcost > self->s.v.ammo_cells )
 			metalcost = self->s.v.ammo_cells;
 		self->s.v.ammo_cells = self->s.v.ammo_cells - metalcost;
@@ -717,14 +751,18 @@ void Menu_EngineerFix_Dispenser_Input( int inp )
 		self->s.v.ammo_cells = self->s.v.ammo_cells + BUILD_COST_DISPENSER / 2;
 		if ( self->building->real_owner != self )
 		{
-			G_sprint( self->building->real_owner, 2, "%s dismantled your Dispenser.\n", self->s.v.netname );
-			teamsprint( self->building->real_owner->team_no, self->building->real_owner,
+			G_sprint( self->building->real_owner, 2,
+				  "%s dismantled your Dispenser.\n", self->s.v.netname );
+			teamsprint( self->building->real_owner->team_no,
+				    self->building->real_owner,
 				    ( char * ) self->s.v.netname );
-			teamsprint( self->building->real_owner->team_no, self->building->real_owner, " dismantled " );
-			teamsprint( self->building->real_owner->team_no, self->building->real_owner,
+			teamsprint( self->building->real_owner->team_no,
+				    self->building->real_owner, " dismantled " );
+			teamsprint( self->building->real_owner->team_no,
+				    self->building->real_owner,
 				    ( char * ) self->building->real_owner->s.v.netname );
-			teamsprint( self->building->real_owner->team_no, self->building->real_owner,
-				    "'s Dispenser.\n" );
+			teamsprint( self->building->real_owner->team_no,
+				    self->building->real_owner, "'s Dispenser.\n" );
 		}
 		dremove( self->building );
 		self->building->real_owner->has_dispenser -= 1;
@@ -744,30 +782,32 @@ void Menu_EngineerFix_Dispenser_Input( int inp )
 		self->s.v.armortype = 0;
 		self->armorclass = 0;
 		self->s.v.items =
-		    ( int ) self->s.v.items - ( ( int ) self->s.v.items & ( IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3 ) );
+		    ( int ) self->s.v.items -
+		    ( ( int ) self->s.v.items & ( IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3 ) );
 	}
 	W_SetCurrentAmmo(  );
 
 }
 
 
-const char   *menu_eng_fixsg_upgrade = "”‘ Upgrade Sentry Gun          \n";
-const char   *menu_eng_fixsg_static = "™‘ Make static                 \n";
-const char   *menu_eng_fixsg_nostatic = "™‘ Make no static              \n";
+const char *menu_eng_fixsg_upgrade = "”‘ Upgrade Sentry Gun          \n";
+const char *menu_eng_fixsg_static = "™‘ Make static                 \n";
+const char *menu_eng_fixsg_nostatic = "™‘ Make no static              \n";
 void Menu_EngineerFix_SentryGun( menunum_t menu )
 {
-	const char   *s_upgrade = "\n", *s_static = "";
+	const char *s_upgrade = "\n", *s_static = "";
 
-	if ( self->building->s.v.weapon < 3 && (self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.tg_enabled ) )
+	if ( self->building->s.v.weapon < 3
+	     && ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.tg_enabled ) )
 		s_upgrade = menu_eng_fixsg_upgrade;
 
-        if( tg_data.tg_enabled )
-        {
-	 	if ( self->building->has_sentry )
- 			s_static = menu_eng_fixsg_nostatic;
- 		else
+	if ( tg_data.tg_enabled )
+	{
+		if ( self->building->has_sentry )
+			s_static = menu_eng_fixsg_nostatic;
+		else
 			s_static = menu_eng_fixsg_static;
-        }
+	}
 	CenterPrint( self, "Action:                            \n"
 		     "“‘ Put Ammo into Sentry Gun    \n"
 		     "%s"
@@ -786,7 +826,8 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 	if ( !self->building->real_owner->has_sentry )
 		return;
 
-	if ( strneq( self->s.v.classname, "player" ) || self->building == world || !self->building )
+	if ( strneq( self->s.v.classname, "player" ) || self->building == world
+	     || !self->building )
 		return;
 
 	switch ( inp )
@@ -795,8 +836,10 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 		am = 20 * 2;
 		if ( am > self->s.v.ammo_shells )
 			am = self->s.v.ammo_shells;
-		if ( am > self->building->maxammo_shells - self->building->s.v.ammo_shells )
-			am = self->building->maxammo_shells - self->building->s.v.ammo_shells;
+		if ( am >
+		     self->building->maxammo_shells - self->building->s.v.ammo_shells )
+			am = self->building->maxammo_shells -
+			    self->building->s.v.ammo_shells;
 		if ( !tg_data.unlimit_ammo )
 			self->s.v.ammo_shells = self->s.v.ammo_shells - am;
 		self->building->s.v.ammo_shells = self->building->s.v.ammo_shells + am;
@@ -805,40 +848,56 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 			am = 10 * 2;
 			if ( am > self->s.v.ammo_rockets )
 				am = self->s.v.ammo_rockets;
-			if ( am > self->building->maxammo_rockets - self->building->s.v.ammo_rockets )
-				am = self->building->maxammo_rockets - self->building->s.v.ammo_rockets;
+			if ( am >
+			     self->building->maxammo_rockets -
+			     self->building->s.v.ammo_rockets )
+				am = self->building->maxammo_rockets -
+				    self->building->s.v.ammo_rockets;
 			if ( !tg_data.unlimit_ammo )
 				self->s.v.ammo_rockets = self->s.v.ammo_rockets - am;
-			self->building->s.v.ammo_rockets = self->building->s.v.ammo_rockets + am;
+			self->building->s.v.ammo_rockets =
+			    self->building->s.v.ammo_rockets + am;
 			break;
 	case 2:
 			if ( self->building->s.v.weapon < 3
-			     && (self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.tg_enabled )
-			     )
+			     && ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN
+				  || tg_data.tg_enabled ) )
 			{
-				if( !tg_data.tg_enabled )
+				if ( !tg_data.tg_enabled )
 					self->s.v.ammo_cells = self->s.v.ammo_cells - 130;
 
-				self->building->s.v.weapon = self->building->s.v.weapon + 1;
-				self->building->s.v.max_health = self->building->s.v.max_health * 1.2;
-				self->building->s.v.health = self->building->s.v.max_health;
-				self->building->maxammo_shells = self->building->maxammo_shells * 1.2;
+				self->building->s.v.weapon =
+				    self->building->s.v.weapon + 1;
+				self->building->s.v.max_health =
+				    self->building->s.v.max_health * 1.2;
+				self->building->s.v.health =
+				    self->building->s.v.max_health;
+				self->building->maxammo_shells =
+				    self->building->maxammo_shells * 1.2;
 				if ( self->building->s.v.weapon == 2 )
 				{
-					sound( self->building, 3, "weapons/turrset.wav", 1, 1 );
-					self->building->s.v.think = ( func_t ) lvl2_sentry_stand;
+					sound( self->building, 3, "weapons/turrset.wav",
+					       1, 1 );
+					self->building->s.v.think =
+					    ( func_t ) lvl2_sentry_stand;
 					self->building->s.v.skin = 1;
 				} else
 				{
-					sound( self->building, 3, "weapons/turrset.wav", 1, 1 );
-					self->building->s.v.think = ( func_t ) lvl3_sentry_stand;
+					sound( self->building, 3, "weapons/turrset.wav",
+					       1, 1 );
+					self->building->s.v.think =
+					    ( func_t ) lvl3_sentry_stand;
 					self->building->s.v.skin = 2;
 				}
-				G_sprint( self, 2, "You upgrade the Sentry Gun to level %.0f\n", self->building->s.v.weapon);
+				G_sprint( self, 2,
+					  "You upgrade the Sentry Gun to level %.0f\n",
+					  self->building->s.v.weapon );
 			}
 			break;
 	case 3:
-			metalcost = ( self->building->s.v.max_health - self->building->s.v.health ) / 5;
+			metalcost =
+			    ( self->building->s.v.max_health -
+			      self->building->s.v.health ) / 5;
 
 			if ( !tg_data.unlimit_ammo )
 			{
@@ -847,7 +906,8 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 
 				self->s.v.ammo_cells = self->s.v.ammo_cells - metalcost;
 			}
-			self->building->s.v.health = self->building->s.v.health + metalcost * 5;
+			self->building->s.v.health =
+			    self->building->s.v.health + metalcost * 5;
 
 			break;
 	case 4:
@@ -855,15 +915,19 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 			self->s.v.ammo_cells = self->s.v.ammo_cells + 130 / 2;
 			if ( self->building->real_owner != self )
 			{
-				G_sprint( self->building->real_owner, 2, "%s dismantled your Sentry Gun.\n",
-					   self->s.v.netname );
-				teamsprint( self->building->real_owner->team_no, self->building->real_owner,
+				G_sprint( self->building->real_owner, 2,
+					  "%s dismantled your Sentry Gun.\n",
+					  self->s.v.netname );
+				teamsprint( self->building->real_owner->team_no,
+					    self->building->real_owner,
 					    ( char * ) self->s.v.netname );
-				teamsprint( self->building->real_owner->team_no, self->building->real_owner,
-					    " dismantled " );
-				teamsprint( self->building->real_owner->team_no, self->building->real_owner,
+				teamsprint( self->building->real_owner->team_no,
+					    self->building->real_owner, " dismantled " );
+				teamsprint( self->building->real_owner->team_no,
+					    self->building->real_owner,
 					    self->building->real_owner->s.v.netname );
-				teamsprint( self->building->real_owner->team_no, self->building->real_owner,
+				teamsprint( self->building->real_owner->team_no,
+					    self->building->real_owner,
 					    "'s Sentry Gun.\n" );
 			}
 			dremove( self->building->trigger_field );
@@ -878,8 +942,8 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 		self->building->waitmax = anglemod( self->building->waitmax + 45 );
 		break;
 	case 7:
-	        if( !tg_data.tg_enabled )
-	        	return;
+		if ( !tg_data.tg_enabled )
+			return;
 		self->s.v.impulse = 0;
 		if ( self->building->has_sentry )
 			self->building->has_sentry = 0;
@@ -899,17 +963,19 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 		self->s.v.armortype = 0;
 		self->armorclass = 0;
 		self->s.v.items =
-		    ( int ) self->s.v.items - ( ( int ) self->s.v.items & ( IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3 ) );
+		    ( int ) self->s.v.items -
+		    ( ( int ) self->s.v.items & ( IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3 ) );
 	}
 	W_SetCurrentAmmo(  );
 
 }
+
 void Menu_Dispenser( menunum_t menu )
 {
-	 CenterPrint(self, "Use Dispenser:                     \n"
-	                   "“‘ Withdraw some ammo          \n"
-	                   "”‘ Withdraw some Armor         \n"
-	                   "•‘ Nothing                     \n\n");
+	CenterPrint( self, "Use Dispenser:                     \n"
+		     "“‘ Withdraw some ammo          \n"
+		     "”‘ Withdraw some Armor         \n"
+		     "•‘ Nothing                     \n\n" );
 }
 
 void Menu_Dispenser_Input( int inp )
@@ -921,7 +987,8 @@ void Menu_Dispenser_Input( int inp )
 	case 1:
 		if ( !self->building->s.v.ammo_shells
 		     && !self->building->s.v.ammo_nails
-		     && !self->building->s.v.ammo_rockets && !self->building->s.v.ammo_cells )
+		     && !self->building->s.v.ammo_rockets
+		     && !self->building->s.v.ammo_cells )
 		{
 			empty = 1;
 			break;
@@ -985,53 +1052,56 @@ void Menu_Dispenser_Input( int inp )
 	{
 		self->s.v.armortype = 0;
 		self->armorclass = 0;
-		self->s.v.items = ( int ) self->s.v.items - ( ( int ) self->s.v.items & ( IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3 ) );
+		self->s.v.items =
+		    ( int ) self->s.v.items -
+		    ( ( int ) self->s.v.items & ( IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3 ) );
 	}
 	W_SetCurrentAmmo(  );
 
 }
 
-const char *spy_menu_feign             = "•‘ Start Feigning              \n"
-                                         "–‘ Silent Feign                \n";
-const char *spy_menu_stop_feign        = "•‘ Stop Feigning               \n";
-const char *spy_menu_undecover         = "“‘ Change Skin                 \n"
-	                 	         "”‘ Change Color                \n";
+const char *spy_menu_feign = "•‘ Start Feigning              \n"
+    "–‘ Silent Feign                \n";
+const char *spy_menu_stop_feign = "•‘ Stop Feigning               \n";
+const char *spy_menu_undecover = "“‘ Change Skin                 \n"
+    "”‘ Change Color                \n";
 
-const char *spy_menu_reset_skin        = "—‘ Reset Skin                  \n";
-const char *spy_menu_reset_color       = "—‘ Reset Color                 \n";
-const char *spy_menu_reset_skin_color  = "—‘ Reset Skin and Color        \n";
+const char *spy_menu_reset_skin = "—‘ Reset Skin                  \n";
+const char *spy_menu_reset_color = "—‘ Reset Color                 \n";
+const char *spy_menu_reset_skin_color = "—‘ Reset Skin and Color        \n";
 void Menu_Spy( menunum_t menu )
 {
-	const char *s_undercover = spy_menu_undecover,*s_feign=	"",*s_reset ="";
+	const char *s_undercover = spy_menu_undecover, *s_feign = "", *s_reset = "";
 
-	if(self->is_feigning)
+	if ( self->is_feigning )
 		s_feign = spy_menu_stop_feign;
 	else
 		s_feign = spy_menu_feign;
 
-	if( self->undercover_team && self->undercover_skin )	
+	if ( self->undercover_team && self->undercover_skin )
 	{
 		s_reset = spy_menu_reset_skin_color;
-	}else
+	} else
 	{
-	  if( self->undercover_skin )	
-	  	s_reset = spy_menu_reset_skin;
-	  	
-	  if( self->undercover_team )	
-	  	s_reset = spy_menu_reset_color;
+		if ( self->undercover_skin )
+			s_reset = spy_menu_reset_skin;
+
+		if ( self->undercover_team )
+			s_reset = spy_menu_reset_color;
 	}
-		
-		
-	if (((int)self->s.v.effects & (8 | 4)) || self->is_unabletospy == 1) {
+
+
+	if ( ( ( int ) self->s.v.effects & ( 8 | 4 ) ) || self->is_unabletospy == 1 )
+	{
 		s_undercover = "";
 	}
 
-        CenterPrint( self, "Action:                           \n"
-                           "%s%s%s"                                  
-                           "˜‘ Nothing                     \n\n", 
-                           s_undercover, s_feign, s_reset);
+	CenterPrint( self, "Action:                           \n"
+		     "%s%s%s"
+		     "˜‘ Nothing                     \n\n",
+		     s_undercover, s_feign, s_reset );
 }
-	
+
 void Menu_Spy_Input( int inp )
 {
 	if ( inp == 1 || inp == 2 )
@@ -1120,7 +1190,8 @@ void Menu_Spy_Color( menunum_t menu )
 		self->s.v.impulse = 0;
 		return;
 	}
-	CenterPrint( self, "=== Change Color to the Same Color as  ===\n\n%s\n%s\n%s\n%s\n\n",
+	CenterPrint( self,
+		     "=== Change Color to the Same Color as  ===\n\n%s\n%s\n%s\n%s\n\n",
 		     team_menu_strings[1],
 		     team_menu_strings[( number_of_teams > 1 ) ? 2 : 0],
 		     team_menu_strings[( number_of_teams > 2 ) ? 3 : 0],
@@ -1144,289 +1215,281 @@ void Menu_NULL( menunum_t menu )
 }
 
 
-const char *birthday_msgs[]={
-"\n\n\n\nHAPPY BIRTHDAY TEAMFORTRESS!\n",
-"\n\n\n\nCurrent number of Snipers on\nthe Battlements:\n%4d",
-"\n\n\n\nYeeha!\nThe 505,672nd detpack was\njust laid on the bridge!\n",
-"\n\n\n\nIs that an assault cannon in your\n pocket, or are you just playing TF?\n(Blame Ian)\n",
-"\n\n\n\n25,000 downloads\n50 donations\nDamn, but we rock!\n",
-"\n\n\n\nTeamFortress is one year old today!\n",
-"\n\n\n\nTF II available 2nd quarter 98\n",
-"\n\n\n\nhmm.... I wonder what the next\nmessage will be...\n",
-"\n\n\n\nKill your friends! Kill your family!\nSnipe your pets! Detpack your house!\nGet TF Now!\n",
-"\n\n\n\nDeath to Potatoes!\n",
-"\n\n\n\n\"You guys have really fucked up\n urinals, you know that?\"\n   - TyR in Australia\n",
-"\n\n\n\nMany potatoes were harmed in the\nmaking of this product.\n",
-"\n\n\n\nBAH! I shoulda put the Demoman\nblast armor back while I was at it!\n   - Gudlyf\n",
-"\n\n\n\nTwin Peaks will be out... uhh...\nerr... soon.\n",
-"\n\n\n\n\"Twin Peaks will be finished tomorrow.\"\n   - TyR, 16th July, 25th July, 2nd August...",
-"\n\n\n\n\"After all, TF is an INSULT to the\npurity of CTF!\"\n   - Mjollnir, who was joking... really!",
-"\n\n\n\n\"I force them to work.\nElse I cut back their supplies\"\n   - Vomitgod, on TFS\n",
-"\n\n\n\nI remember the good ol' days...\nwhen you had to use imin1 & imin2\nto join a team.\n",
-"\n\n\n\nI remember the good ol' days...\nwhen there were 2 TF servers...\nand they were always down.",
-"\n\n\n\nI remember the good ol' days...\nwhen no-one knew how to use\nhand grenades...\n",
-"\n\n\n\nI remember the good ol' days...\nwhen 2fort was the only TF map.\nWe sure have come a long\nway since then... sigh",
-"\n\n\n\nI remember the good ol' days...\nwhen the sniper rifle just\nkilled in one hit... everytime\n",
-"\n\n\n\nI remember the good ol' days...\nwhen I could download TF in\n1 minute 20 seconds\n",
-"\n\n\n\nI remember the good ol' days...\nwhen I didn't have to download\nANYTHING to play TF\n",
-"\n\n\n\nI remember the good ol' days...\nwhen players used to say\n\"What's that bubble?\"\n",
-"\n\n\n\nI remember the good ol' days...\nwhen The Well actually had a well...\n",
-"\n\n\n\nI remember the good ol' days...\nwhen the motion detector was officially\nthe Scout's best friend, at least\naccording to the readme.txt\n",
-"\n\n\n\nI remember the good ol' days...\nwhen  Ian went to jail for punching\nRobin out\n",
-"\n\n\n\nTF Newbie Quote #1:\nUmm... How do I set a detpack?\n",
-"\n\n\n\nTF Newbie Quote #2:\nUmm... How do I throw a grenade?\n",
-"\n\n\n\nTF Newbie Quote #3:\nHey, he is cheating, that soldier just jumped up to the roof!!\n",
-"\n\n\n\nTF Newbie Quote #4:\nHow do I throw the pins?\n",
-"\n\n\n\nTF Newbie Quote #5:\nWhere do I take the flag!?!?!\n",
-"\n\n\n\nTF Newbie Quote #6:\nWhere's the control room?\n",
-"\n\n\n\nTF Newbie Quote #7:\nWhy the hell are these backpacks\nexploding?\n",
-"\n\n\n\nTF Newbie Quote #8:\nWho's the maniac with the axe?\n",
-"\n\n\n\nTF Newbie Quote #9:\nStop shooting me!\nI'm on your team!\nYou tried to attack my with the axe!\n",
-"\n\n\n\nTF Newbie Quote #10:\nWhat's this key? I thought this\nwas a CTF style map, guys?\n",
-"\n\n\n\nTF Veteran Quote #1:\nUm, Red Medics, please don't\nheal the President.\n",
-"\n\n\n\nTF Veteran Quote #2:\nGuys could you NOT set up\nsentries in hunted?\n",
-"\n\n\n\nTF Veteran Quote #3:\nWho the hell is on\nthe lift?\n",
-"\n\n\n\nTF Veteran Quote #4:\nDISCARD!!\n",
-"\n\n\n\nTF Veteran Quote #5:\nDamn Snipers!\n",
-"\n\n\n\nTF Veteran Quote #6:\nDamn Snipers!\n",
-"\n\n\n\nTF Veteran Quote #7:\nGet a mask or\nget in the WATER!!\n",
-"\n\n\n\nTF Veteran Quote #8:\nSpy's, please change colors\noutside our base.\n",
-"\n\n\n\nTF Veteran Quote #9:\nI was typing!!\n",
-"\n\n\n\nTF Veteran Quote #10:\nWhy is that guy running\nout of our yard with\nthe flag???\n",
-"\n\n\n\nTF's original design docs!\nCheck it out!\nwww.teamfortress.com/files/teamfortress/tfdes_1.gif",
-"\n\n\n\nTF's original design docs!\nCheck it out!\nwww.teamfortress.com/files/teamfortress/tfdes_2.gif",
-"\n\n\n\n\"MJ: Did you hear John Cash wrote TF?\"\n   - VomitGod"
+const char *birthday_msgs[] = {
+	"\n\n\n\nHAPPY BIRTHDAY TEAMFORTRESS!\n",
+	"\n\n\n\nCurrent number of Snipers on\nthe Battlements:\n%4d",
+	"\n\n\n\nYeeha!\nThe 505,672nd detpack was\njust laid on the bridge!\n",
+	"\n\n\n\nIs that an assault cannon in your\n pocket, or are you just playing TF?\n(Blame Ian)\n",
+	"\n\n\n\n25,000 downloads\n50 donations\nDamn, but we rock!\n",
+	"\n\n\n\nTeamFortress is one year old today!\n",
+	"\n\n\n\nTF II available 2nd quarter 98\n",
+	"\n\n\n\nhmm.... I wonder what the next\nmessage will be...\n",
+	"\n\n\n\nKill your friends! Kill your family!\nSnipe your pets! Detpack your house!\nGet TF Now!\n",
+	"\n\n\n\nDeath to Potatoes!\n",
+	"\n\n\n\n\"You guys have really fucked up\n urinals, you know that?\"\n   - TyR in Australia\n",
+	"\n\n\n\nMany potatoes were harmed in the\nmaking of this product.\n",
+	"\n\n\n\nBAH! I shoulda put the Demoman\nblast armor back while I was at it!\n   - Gudlyf\n",
+	"\n\n\n\nTwin Peaks will be out... uhh...\nerr... soon.\n",
+	"\n\n\n\n\"Twin Peaks will be finished tomorrow.\"\n   - TyR, 16th July, 25th July, 2nd August...",
+	"\n\n\n\n\"After all, TF is an INSULT to the\npurity of CTF!\"\n   - Mjollnir, who was joking... really!",
+	"\n\n\n\n\"I force them to work.\nElse I cut back their supplies\"\n   - Vomitgod, on TFS\n",
+	"\n\n\n\nI remember the good ol' days...\nwhen you had to use imin1 & imin2\nto join a team.\n",
+	"\n\n\n\nI remember the good ol' days...\nwhen there were 2 TF servers...\nand they were always down.",
+	"\n\n\n\nI remember the good ol' days...\nwhen no-one knew how to use\nhand grenades...\n",
+	"\n\n\n\nI remember the good ol' days...\nwhen 2fort was the only TF map.\nWe sure have come a long\nway since then... sigh",
+	"\n\n\n\nI remember the good ol' days...\nwhen the sniper rifle just\nkilled in one hit... everytime\n",
+	"\n\n\n\nI remember the good ol' days...\nwhen I could download TF in\n1 minute 20 seconds\n",
+	"\n\n\n\nI remember the good ol' days...\nwhen I didn't have to download\nANYTHING to play TF\n",
+	"\n\n\n\nI remember the good ol' days...\nwhen players used to say\n\"What's that bubble?\"\n",
+	"\n\n\n\nI remember the good ol' days...\nwhen The Well actually had a well...\n",
+	"\n\n\n\nI remember the good ol' days...\nwhen the motion detector was officially\nthe Scout's best friend, at least\naccording to the readme.txt\n",
+	"\n\n\n\nI remember the good ol' days...\nwhen  Ian went to jail for punching\nRobin out\n",
+	"\n\n\n\nTF Newbie Quote #1:\nUmm... How do I set a detpack?\n",
+	"\n\n\n\nTF Newbie Quote #2:\nUmm... How do I throw a grenade?\n",
+	"\n\n\n\nTF Newbie Quote #3:\nHey, he is cheating, that soldier just jumped up to the roof!!\n",
+	"\n\n\n\nTF Newbie Quote #4:\nHow do I throw the pins?\n",
+	"\n\n\n\nTF Newbie Quote #5:\nWhere do I take the flag!?!?!\n",
+	"\n\n\n\nTF Newbie Quote #6:\nWhere's the control room?\n",
+	"\n\n\n\nTF Newbie Quote #7:\nWhy the hell are these backpacks\nexploding?\n",
+	"\n\n\n\nTF Newbie Quote #8:\nWho's the maniac with the axe?\n",
+	"\n\n\n\nTF Newbie Quote #9:\nStop shooting me!\nI'm on your team!\nYou tried to attack my with the axe!\n",
+	"\n\n\n\nTF Newbie Quote #10:\nWhat's this key? I thought this\nwas a CTF style map, guys?\n",
+	"\n\n\n\nTF Veteran Quote #1:\nUm, Red Medics, please don't\nheal the President.\n",
+	"\n\n\n\nTF Veteran Quote #2:\nGuys could you NOT set up\nsentries in hunted?\n",
+	"\n\n\n\nTF Veteran Quote #3:\nWho the hell is on\nthe lift?\n",
+	"\n\n\n\nTF Veteran Quote #4:\nDISCARD!!\n",
+	"\n\n\n\nTF Veteran Quote #5:\nDamn Snipers!\n",
+	"\n\n\n\nTF Veteran Quote #6:\nDamn Snipers!\n",
+	"\n\n\n\nTF Veteran Quote #7:\nGet a mask or\nget in the WATER!!\n",
+	"\n\n\n\nTF Veteran Quote #8:\nSpy's, please change colors\noutside our base.\n",
+	"\n\n\n\nTF Veteran Quote #9:\nI was typing!!\n",
+	"\n\n\n\nTF Veteran Quote #10:\nWhy is that guy running\nout of our yard with\nthe flag???\n",
+	"\n\n\n\nTF's original design docs!\nCheck it out!\nwww.teamfortress.com/files/teamfortress/tfdes_1.gif",
+	"\n\n\n\nTF's original design docs!\nCheck it out!\nwww.teamfortress.com/files/teamfortress/tfdes_2.gif",
+	"\n\n\n\n\"MJ: Did you hear John Cash wrote TF?\"\n   - VomitGod"
 };
-int num_birthday_msgs = sizeof( birthday_msgs ) / sizeof( birthday_msgs[0] ) ;
-int snipers_num;
+int     num_birthday_msgs = sizeof( birthday_msgs ) / sizeof( birthday_msgs[0] );
+int     snipers_num;
 void BirthdayTimer(  )
 {
-        int rnum;
-        gedict_t*te;
-        if(self->s.v.weapon >5)
-        {
-  		self->s.v.weapon =  0;
-  		self->s.v.nextthink = g_globalvars.time + 180 + g_random() * 60;
-  		rnum = (int)(g_random() * num_birthday_msgs);
-  		self->team_str_home = NULL;
-  		if(rnum == 1)
-  		{
-  			snipers_num = TeamFortress_GetNoPlayers() / 2;
-			snipers_num = snipers_num * (g_random()+1);
-  		}
-  		self->team_str_moved  = (char*)birthday_msgs[rnum];
-        }else
-        {
-  		self->s.v.nextthink = g_globalvars.time + 1.5;
-  		self->s.v.weapon +=  1;
-        }
-        for( te = world; (te= trap_find(te, FOFS(s.v.classname) ,"player"));)
-        {
-          G_centerprint(te, self->team_str_moved, snipers_num);
-          if(self->s.v.weapon == 1)
-          	sound(te, 3, "misc/b1.wav", 1, 1);
-          else
-          {
-           if(self->s.v.weapon <= 4)
-           {
-             switch((int)(g_random() *3))
-             {
-             	case 0:
-             		sound(te, 3, "misc/b2.wav", 1, 1);
-             		break;
-             	case 1:
-             		sound(te, 3, "misc/b3.wav", 1, 1);
-             		break;
-             	default:
-             		sound(te, 3, "misc/b4.wav", 1, 1);
-             		break;
-             }
-           }
-          }
-          	
-        }
+	int     rnum;
+	gedict_t *te;
+
+	if ( self->s.v.weapon > 5 )
+	{
+		self->s.v.weapon = 0;
+		self->s.v.nextthink = g_globalvars.time + 180 + g_random(  ) * 60;
+		rnum = ( int ) ( g_random(  ) * num_birthday_msgs );
+		self->team_str_home = NULL;
+		if ( rnum == 1 )
+		{
+			snipers_num = TeamFortress_GetNoPlayers(  ) / 2;
+			snipers_num = snipers_num * ( g_random(  ) + 1 );
+		}
+		self->team_str_moved = ( char * ) birthday_msgs[rnum];
+	} else
+	{
+		self->s.v.nextthink = g_globalvars.time + 1.5;
+		self->s.v.weapon += 1;
+	}
+	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "player" ) ); )
+	{
+		G_centerprint( te, self->team_str_moved, snipers_num );
+		if ( self->s.v.weapon == 1 )
+			sound( te, 3, "misc/b1.wav", 1, 1 );
+		else
+		{
+			if ( self->s.v.weapon <= 4 )
+			{
+				switch ( ( int ) ( g_random(  ) * 3 ) )
+				{
+				case 0:
+					sound( te, 3, "misc/b2.wav", 1, 1 );
+					break;
+				case 1:
+					sound( te, 3, "misc/b3.wav", 1, 1 );
+					break;
+				default:
+					sound( te, 3, "misc/b4.wav", 1, 1 );
+					break;
+				}
+			}
+		}
+
+	}
 }
 
-void 	Menu_BirthDay( menunum_t menu )
+void Menu_BirthDay( menunum_t menu )
 {
- if (self->current_menu == MENU_BIRTHDAY2) 
-  CenterPrint(self, "3rd Impulse\n");
- else {
-  if (self->current_menu == MENU_BIRTHDAY3) 
-   CenterPrint(self, "4th Impulse\n");
- }
+	if ( self->current_menu == MENU_BIRTHDAY2 )
+		CenterPrint( self, "3rd Impulse\n" );
+	else
+	{
+		if ( self->current_menu == MENU_BIRTHDAY3 )
+			CenterPrint( self, "4th Impulse\n" );
+	}
 
 }
 
-void 	Menu_BirthDay_Input( int inp )
+void Menu_BirthDay_Input( int inp )
 {
-  gedict_t *te;
-  switch(self->current_menu)
-  {
-  	case MENU_BIRTHDAY1:
-  		  ResetMenu();
-                  self->s.v.impulse = 0;
-                  if(inp == 98)
-                  	self->current_menu = MENU_BIRTHDAY2;
-                  break;	
-  	case MENU_BIRTHDAY2:
-  		  ResetMenu();
-                  self->s.v.impulse = 0;
-                  if(inp == 156)
-                  	self->current_menu = MENU_BIRTHDAY3;
-                  break;	
+	gedict_t *te;
 
-  	case MENU_BIRTHDAY3:
-  		  ResetMenu();
-                  self->s.v.impulse = 0;
-                  if(inp != 96)
-                  	break;
-                  tf_data.birthday = 1;
-                  localcmd("localinfo birthday on\n");
-                  G_bprint(2, "IT'S PARTY TIME\n");
-                  for(te = world; (te = trap_find( te, FOFS(s.v.classname), "player"));)
-                  	CenterPrint(te, "\n\nHAPPY BIRTHDAY TEAMFORTRESS!\n");
-                  te = spawn();
-                  te->s.v.weapon = 10;
-                  te->s.v.nextthink = g_globalvars.time + 60;
-                  te->s.v.think = (func_t)BirthdayTimer;
-                  break;	
-  }
+	switch ( self->current_menu )
+	{
+	case MENU_BIRTHDAY1:
+		ResetMenu(  );
+		self->s.v.impulse = 0;
+		if ( inp == 98 )
+			self->current_menu = MENU_BIRTHDAY2;
+		break;
+	case MENU_BIRTHDAY2:
+		ResetMenu(  );
+		self->s.v.impulse = 0;
+		if ( inp == 156 )
+			self->current_menu = MENU_BIRTHDAY3;
+		break;
+
+	case MENU_BIRTHDAY3:
+		ResetMenu(  );
+		self->s.v.impulse = 0;
+		if ( inp != 96 )
+			break;
+		tf_data.birthday = 1;
+		localcmd( "localinfo birthday on\n" );
+		G_bprint( 2, "IT'S PARTY TIME\n" );
+		for ( te = world;
+		      ( te = trap_find( te, FOFS( s.v.classname ), "player" ) ); )
+			CenterPrint( te, "\n\nHAPPY BIRTHDAY TEAMFORTRESS!\n" );
+		te = spawn(  );
+		te->s.v.weapon = 10;
+		te->s.v.nextthink = g_globalvars.time + 60;
+		te->s.v.think = ( func_t ) BirthdayTimer;
+		break;
+	}
 }
 
 void TG_Main_Menu( menunum_t menu )
 {
- CenterPrint(self, "Options:\n"
- 		   "1) SG options                 \n"
- 		   "2) Detpack option             \n"
- 		   "3) Cheats                     \n"
- 		   "4) Load defaults              \n"
- 		   "5) Saved position             \n"
- 		   "7) Nothing                    \n");
+	CenterPrint( self, "Options:\n"
+		     "1) SG options                 \n"
+		     "2) Detpack option             \n"
+		     "3) Cheats                     \n"
+		     "4) Load defaults              \n"
+		     "5) Saved position             \n"
+		     "7) Nothing                    \n" );
 }
 
-void 	TG_Main_Menu_Input( int inp )
+void TG_Main_Menu_Input( int inp )
 {
-  switch( inp )
-  {
-  	case 1:
-  		self->current_menu = TG_MENU_SG;
-  		break;
-  	case 2:
-  		self->current_menu = TG_MENU_DETPACK;
-  		break;
-  	case 3:
-  		self->current_menu = TG_MENU_CHEATS;
-  		break;
-  	case 4: 
-  		TG_LoadSettings();
-  		break;
-  	case 5:
-  		self->current_menu = TG_MENU_POSITION;
-  		break;
+	switch ( inp )
+	{
+	case 1:
+		self->current_menu = TG_MENU_SG;
+		break;
+	case 2:
+		self->current_menu = TG_MENU_DETPACK;
+		break;
+	case 3:
+		self->current_menu = TG_MENU_CHEATS;
+		break;
+	case 4:
+		TG_LoadSettings(  );
+		break;
+	case 5:
+		self->current_menu = TG_MENU_POSITION;
+		break;
 	case 7:
 		ResetMenu(  );
 		self->s.v.impulse = 0;
 		break;
 	default:
 		return;
-  }
+	}
 
-  self->s.v.impulse = 0;
-  self->menu_count = 23;
+	self->s.v.impulse = 0;
+	self->menu_count = 23;
 
 }
-/*REMOVE!!!
-const char* sentry_type_names[]=
-{
- "Sentry: 2.8.1",
- "Sentry: 2.8.1 fixed(mtfl)",
- "Sentry: 2.8.1 fixed new",
- "Sentry: NEW, SGPPL = ",
- "Sentry: MTFL new find,SGPPL = ",
- "Sentry: 2.8.1 new find,SGPPL = ",
- "Unknown Sentry type"
-}; */
 
-const char* sentry_sfire_names[]=
-{
-"4) Sentry Shells Fire: NEW    \n",
-"4) Sentry Shells Fire: 2.8.1  \n",
-"4) Sentry Shells Fire: MTFL1  \n",
-"4) Sentry Shells Fire: MTFL2  \n"
-}; 
-
-const char* sentry_find_names[]=
-{
-  "6)†ignore teammates           \n",
-  "6)ˆignore owner               \n",
-  "6)‰ignore OFF                 \n",
-  "6)‡ignore all targets         \n",
+const char *sentry_sfire_names[] = {
+	"4) Sentry Shells Fire: NEW    \n",
+	"4) Sentry Shells Fire: 2.8.1  \n",
+	"4) Sentry Shells Fire: MTFL1  \n",
+	"4) Sentry Shells Fire: MTFL2  \n"
 };
 
-const char* sentry_firetype_names[]=
-{
- "7) Fire bullets & rockets     \n",
- "7) Fire bullets               \n",
- "7) Fire lightning (no damage) \n"
+const char *sentry_find_names[] = {
+	"6)†ignore teammates           \n",
+	"6)ˆignore owner               \n",
+	"6)‰ignore OFF                 \n",
+	"6)‡ignore all targets         \n",
 };
-void 	TG_SGOptions_Menu(menunum_t menu)
+
+/*const char *sentry_firetype_names[] = {
+	"7) Fire bullets & rockets     \n",
+	"7) Fire bullets               \n",
+	"7) Fire lightning (no damage) \n"
+};*/
+void TG_SGOptions_Menu( menunum_t menu )
 {
-  const char *s_sg_newfind,*s_sg_sfire, *s_sg_fire,*s_sg_find,*s_sgfiretype,*s_sbar;
-  char  s_sgppl[80];
-  const char *s_sg_rfire;
-  
-  if( tf_data.sg_newfind )
-  {
-  		s_sg_newfind =  "1)‰Sentry New Find Target ON  \n";
-//        sprintf(s_sgppl,"2)-    %3d ppl emulation   3)+\n",tf_data.sgppl);
-        _snprintf(s_sgppl ,sizeof(s_sgppl) ,"       %3d ppl emulation      \n",tf_data.sgppl);
-  }else
-  {
-  	s_sg_newfind = "1)‡Sentry New Find Target OFF \n";
-  	_snprintf(s_sgppl, sizeof(s_sgppl) ,"\n");
-  }
-  if ( tf_data.sg_rfire)
-  	s_sg_rfire = "3)‰Sentry Rocket Fire: NEW    \n";
-  else
-  	s_sg_rfire = "3)‡Sentry Rocket Fire: OLD    \n";
+	const char *s_sg_newfind, *s_sg_sfire, *s_sg_find, *s_sgfiretype, *s_sbar,*s_sg_unlimit_ammo;
+	char    s_sgppl[80];
+	const char *s_sg_rfire;
 
-
-  if(tf_data.sg_sfire >= SG_SFIRE_NUM)
-  	tf_data.sg_sfire = 0;
-  s_sg_sfire = sentry_sfire_names[tf_data.sg_sfire];
-  	
-  if ( !tg_data.sg_disable_fire)
-  	s_sg_fire = "5)‰fire ON                    \n";
-  else
-  	s_sg_fire = "5)‡fire OFF                   \n";
-  if(tg_data.sg_allow_find >= TG_SG_FIND_IGNORE_NUM)
-  	tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
-  
-  s_sg_find = sentry_find_names[tg_data.sg_allow_find];
-
-  if(tg_data.sg_fire_type >= TG_SG_FIRE_NUM)
-  	tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;
-  s_sgfiretype = sentry_firetype_names[tg_data.sg_fire_type];
-  if( tg_data.tg_sbar )
-  	s_sbar = "8)‰Eng Sbar for All           \n";
-  else
-  	s_sbar = "8)‡Limited Eng Sbar           \n";
-
-  CenterPrint(self,"Sentry Gun Options:\n"
-  		   "%s%s%s%s"
-  		   "%s%s%s%s"
-  		   "9) Nothing                    \n",
-  		   s_sg_newfind, s_sgppl, s_sg_rfire,s_sg_sfire,
-  		   s_sg_fire, s_sg_find, s_sgfiretype, s_sbar );
-}
-void 	TG_SGOptions_Menu_Input( int inp )
-{
-	switch(inp)
+	if ( tf_data.sg_newfind )
 	{
-		case 1:
-		        tf_data.sg_newfind = (tf_data.sg_newfind)?0:1;
-		       break;
+		s_sg_newfind = "1)‰Sentry New Find Target ON  \n";
+		_snprintf( s_sgppl, sizeof( s_sgppl ), "       %3d ppl emulation      \n",
+			   tf_data.sgppl );
+	} else
+	{
+		s_sg_newfind = "1)‡Sentry New Find Target OFF \n";
+		_snprintf( s_sgppl, sizeof( s_sgppl ), "\n" );
+	}
+	if ( tf_data.sg_rfire )
+		s_sg_rfire = "3)‰Sentry Rocket Fire: NEW    \n";
+	else
+		s_sg_rfire = "3)‡Sentry Rocket Fire: OLD    \n";
+
+	if ( tg_data.sg_unlimit_ammo )
+		s_sg_unlimit_ammo = "5)‰Unlimited ammo ON          \n";
+	else
+		s_sg_unlimit_ammo = "5)‡Unlimited ammo OFF         \n";
+
+
+	if ( tf_data.sg_sfire >= SG_SFIRE_NUM )
+		tf_data.sg_sfire = 0;
+	s_sg_sfire = sentry_sfire_names[tf_data.sg_sfire];
+
+	if ( tg_data.sg_allow_find >= TG_SG_FIND_IGNORE_NUM )
+		tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
+
+	s_sg_find = sentry_find_names[tg_data.sg_allow_find];
+
+/*  if(tg_data.sg_fire_type >= TG_SG_FIRE_NUM)
+  	tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;
+  s_sgfiretype = sentry_firetype_names[tg_data.sg_fire_type];*/
+	s_sgfiretype = "7) Fire type                  \n";
+	if ( tg_data.tg_sbar )
+		s_sbar = "8)‰Eng Sbar for All           \n";
+	else
+		s_sbar = "8)‡Limited Eng Sbar           \n";
+
+	CenterPrint( self, "Sentry Gun Options:\n"
+		     "%s%s%s%s"
+		     "%s%s%s%s"
+		     "9) Nothing                    \n",
+		     s_sg_newfind, s_sgppl, s_sg_rfire, s_sg_sfire,
+		     s_sg_unlimit_ammo, s_sg_find, s_sgfiretype, s_sbar );
+}
+void TG_SGOptions_Menu_Input( int inp )
+{
+	switch ( inp )
+	{
+	case 1:
+		tf_data.sg_newfind = ( tf_data.sg_newfind ) ? 0 : 1;
+		break;
 /*REMOVE!!!
 		case 3:
 			if( tf_data.sg_newfind )
@@ -1439,262 +1502,324 @@ void 	TG_SGOptions_Menu_Input( int inp )
 				 	tf_data.sgppl--;
 			}
 			break;	*/
-		case 3:
-			tf_data.sg_rfire = (tf_data.sg_rfire)?0:1;
-			break;
-		case 4:
-			if( ++(tf_data.sg_sfire) >= SG_SFIRE_NUM)
-				tf_data.sg_sfire = 0;
-		       break;
-		case 5:
-			tg_data.sg_disable_fire = (tg_data.sg_disable_fire)?0:1;
-			break;
-		case 6:
-			if( ++(tg_data.sg_allow_find) >= TG_SG_FIND_IGNORE_NUM)
-				tg_data.sg_allow_find = 0;
-		       break;
-		case 7:
-			if( ++(tg_data.sg_fire_type) >= TG_SG_FIRE_NUM)
-				tg_data.sg_fire_type = 0;
-		       break;
-		case 8:
-			tg_data.tg_sbar = (tg_data.tg_sbar)?0:1;
-			break;
-		case 9:
-			ResetMenu(  );
-			self->s.v.impulse = 0;
-			break;
-		default:
-			return;
+	case 3:
+		tf_data.sg_rfire = ( tf_data.sg_rfire ) ? 0 : 1;
+		break;
+	case 4:
+		if ( ++( tf_data.sg_sfire ) >= SG_SFIRE_NUM )
+			tf_data.sg_sfire = 0;
+		break;
+	case 5:
+	        tg_data.sg_unlimit_ammo = ( tg_data.sg_unlimit_ammo ) ? false : true;
+		break;
+	case 6:
+		if ( ++( tg_data.sg_allow_find ) >= TG_SG_FIND_IGNORE_NUM )
+			tg_data.sg_allow_find = 0;
+		break;
+	case 7:
+		self->current_menu = TG_MENU_SG_FIRE;
+/*			if( ++(tg_data.sg_fire_type) >= TG_SG_FIRE_NUM)
+				tg_data.sg_fire_type = 0;*/
+
+		break;
+	case 8:
+		tg_data.tg_sbar = ( tg_data.tg_sbar ) ? 0 : 1;
+		break;
+	case 9:
+		ResetMenu(  );
+		self->s.v.impulse = 0;
+		break;
+	default:
+		return;
 	}
 
-  self->s.v.impulse = 0;
-  self->menu_count = 23;
+	self->s.v.impulse = 0;
+	self->menu_count = 23;
 }
-void 	TG_Detpack_Menu(menunum_t menu)
+
+void TG_SG_Fire_Menu( menunum_t menu )
 {
-	char* s_clip,*s_disarm,*s_drop,*s_block;
-	
-        switch(tg_data.detpack_clip)
-        {
-        	case TG_DETPACK_SOLID_ALL:
-        		s_clip = "1)‰detpack clip is ALL        \n";
-        		break;
+	const char *s_sg_firebullets, *s_sg_firerockets, *s_sg_firelighting, *s_sg_fire;
 
-        	case TG_DETPACK_CLIP_ALL:
-        		s_clip = "1)‡detpack clip is OFF        \n";
-        		break;
+	s_sg_firebullets = ( tg_data.sg_fire_bullets ) ?
+	    "2)‰Fire bullets ON            \n" : "2)‡Fire bullets OFF           \n";
+	s_sg_firerockets = ( tg_data.sg_fire_rockets ) ?
+	    "3)‰Fire rockets ON            \n" : "3)‡Fire rockets OFF           \n";
+	s_sg_firelighting = ( tg_data.sg_fire_lighting ) ?
+	    "4)‰Fire lighting ON           \n" : "4)‡Fire lighting OFF          \n";
 
-        	case TG_DETPACK_CLIP_OWNER:
-        	default:
-        		s_clip = "1)ˆdetpack clip is ON         \n";	
-			break;
-        }
-        if( tg_data.disable_disarm)
-        	s_disarm = "2)‡don't disarm detpacks      \n";
-        else
-        	s_disarm = "2)‰disarm detpacks            \n";
+	if ( !tg_data.sg_disable_fire )
+		s_sg_fire = "1)‰fire ON                    \n";
+	else
+		s_sg_fire = "1)‡fire OFF                   \n";
 
-        if( tg_data.detpack_drop )
-        	s_drop = "3)‰drop detpacks              \n";
-        else
-        	s_drop = "3)‡don't drop detpacks        \n";
+	CenterPrint( self, "Sentry Gun Fire type:\n"
+		           "%s%s%s%s" 
+		           "5) Nothing                    \n", 
+		           s_sg_fire,s_sg_firebullets, s_sg_firerockets, s_sg_firelighting);
 
-	if( tf_data.detpack_block )
+}
+void TG_SG_Fire_Menu_Input( int inp )
+{
+	switch ( inp )
+	{
+	case 1:
+		tg_data.sg_disable_fire = ( tg_data.sg_disable_fire ) ? 0 : 1;
+		break;
+	case 2:
+		tg_data.sg_fire_bullets = ( tg_data.sg_fire_bullets ) ? false : true;
+		break;
+	case 3:
+		tg_data.sg_fire_rockets = ( tg_data.sg_fire_rockets ) ? false : true;
+		break;
+	case 4:
+		tg_data.sg_fire_lighting = ( tg_data.sg_fire_lighting ) ? false : true;
+		break;
+	case 5:
+		ResetMenu(  );
+		self->s.v.impulse = 0;
+		break;
+	default:
+		return;
+	}
+
+	self->s.v.impulse = 0;
+	self->menu_count = 23;
+}
+
+void TG_Detpack_Menu( menunum_t menu )
+{
+	char   *s_clip, *s_disarm, *s_drop, *s_block;
+
+	switch ( tg_data.detpack_clip )
+	{
+	case TG_DETPACK_SOLID_ALL:
+		s_clip = "1)‰detpack clip is ALL        \n";
+		break;
+
+	case TG_DETPACK_CLIP_ALL:
+		s_clip = "1)‡detpack clip is OFF        \n";
+		break;
+
+	case TG_DETPACK_CLIP_OWNER:
+	default:
+		s_clip = "1)ˆdetpack clip is ON         \n";
+		break;
+	}
+	if ( tg_data.disable_disarm )
+		s_disarm = "2)‡don't disarm detpacks      \n";
+	else
+		s_disarm = "2)‰disarm detpacks            \n";
+
+	if ( tg_data.detpack_drop )
+		s_drop = "3)‰drop detpacks              \n";
+	else
+		s_drop = "3)‡don't drop detpacks        \n";
+
+	if ( tf_data.detpack_block )
 		s_block = "4)‡Stack detpacks: TF2003     \n";
 	else
 		s_block = "4)‰Stack detpacks: TF 2.8.1   \n";
 
-       CenterPrint(self, "Detpack options:\n"
-       			 "%s%s%s%s"
-       			 "5) Nothing                    \n",
-       			 s_clip,s_disarm,s_drop,s_block);
+	CenterPrint( self, "Detpack options:\n"
+		     "%s%s%s%s"
+		     "5) Nothing                    \n",
+		     s_clip, s_disarm, s_drop, s_block );
 }
 
-void Detpack_SetClip(  );
-void 	TG_Detpack_Menu_Input( int inp )
+void    Detpack_SetClip(  );
+void TG_Detpack_Menu_Input( int inp )
 {
-	switch(inp)
+	switch ( inp )
 	{
-		case 1:
-			if( ++(tg_data.detpack_clip) >= TG_DETPACK_CLIP_NUM )
-				tg_data.detpack_clip = 0;
-			Detpack_SetClip();
-		       break;
-		case 2:
-		        tg_data.disable_disarm = (tg_data.disable_disarm)?0:1;
-			break;	
-		case 3:
-			tg_data.detpack_drop = (tg_data.detpack_drop)?0:1;
-			break;	
-		case 4:
-			tf_data.detpack_block = (tf_data.detpack_block)?0:1;
-			break;
-		case 5:
-			ResetMenu(  );
-			self->s.v.impulse = 0;
-			break;
-		default:
-			return;
+	case 1:
+		if ( ++( tg_data.detpack_clip ) >= TG_DETPACK_CLIP_NUM )
+			tg_data.detpack_clip = 0;
+		Detpack_SetClip(  );
+		break;
+	case 2:
+		tg_data.disable_disarm = ( tg_data.disable_disarm ) ? 0 : 1;
+		break;
+	case 3:
+		tg_data.detpack_drop = ( tg_data.detpack_drop ) ? 0 : 1;
+		break;
+	case 4:
+		tf_data.detpack_block = ( tf_data.detpack_block ) ? 0 : 1;
+		break;
+	case 5:
+		ResetMenu(  );
+		self->s.v.impulse = 0;
+		break;
+	default:
+		return;
 	}
 
-  self->s.v.impulse = 0;
-  self->menu_count = 23;
+	self->s.v.impulse = 0;
+	self->menu_count = 23;
 }
 
-void 	TG_Cheats_Menu(menunum_t menu)
+void TG_Cheats_Menu( menunum_t menu )
 {
-	char *s_gren_effect, *s_gren_time;
+	char   *s_gren_effect, *s_gren_time;
 
-	switch( tg_data.gren_effect )
+	switch ( tg_data.gren_effect )
 	{
-		case TG_GREN_EFFECT_OFF:
-		        s_gren_effect = "3)‡Grenade effect OFF         \n";
-			break;
-			
-		case TG_GREN_EFFECT_OFF_FORSELF:
-			s_gren_effect = "3)ˆGrenade effect OFF for self\n";
-			break;
-		
-		case TG_GREN_EFFECT_ON:
-		default:
-			s_gren_effect = "3)‰Grenade effect ON          \n";
-			break;
-	
+	case TG_GREN_EFFECT_OFF:
+		s_gren_effect = "3)‡Grenade effect OFF         \n";
+		break;
+
+	case TG_GREN_EFFECT_OFF_FORSELF:
+		s_gren_effect = "3)ˆGrenade effect OFF for self\n";
+		break;
+
+	case TG_GREN_EFFECT_ON:
+	default:
+		s_gren_effect = "3)‰Grenade effect ON          \n";
+		break;
+
 	}
-	switch( tg_data.gren_time )
+	switch ( tg_data.gren_time )
 	{
-	   
-		case 0:
-		default:	
-			s_gren_time = "4)‰Grenade effect time: full  \n";
-			break;
-		case 5:
-			s_gren_time = "4)‡Grenade effect time: 5 sec \n";
-			break;
-		case 10:
-			s_gren_time = "4)ˆGrenade effect time: 10 sec\n";
-			break;
-	
+
+	case 0:
+	default:
+		s_gren_time = "4)‰Grenade effect time: full  \n";
+		break;
+	case 5:
+		s_gren_time = "4)‡Grenade effect time: 5 sec \n";
+		break;
+	case 10:
+		s_gren_time = "4)ˆGrenade effect time: 10 sec\n";
+		break;
+
 	}
 	CenterPrint( self, "Cheats menu:\n"
-			   "%s%s%s%s%s%s"
-			   "7) Nothing                    \n",
-    (tg_data.unlimit_ammo )?"1)‰Unlimited ammo ON          \n":"1)‡Unlimited ammo OFF         \n",
-    (tg_data.unlimit_grens)?"2)‰Unlimited grenades ON      \n":"2)‡Unlimited grenades OFF     \n",
-                             s_gren_effect,
-                             s_gren_time,
-    (tg_data.godmode )?     "5)‰God Mode ON                \n":"5)‡God Mode OFF               \n",
-    (tg_data.disable_reload )?"6)‰Reload Disabled            \n":"6)‡Reload Enabled             \n");
+		     "%s%s%s%s%s%s"
+		     "7) Nothing                    \n",
+		     ( tg_data.
+		       unlimit_ammo ) ? "1)‰Unlimited ammo ON          \n" :
+		     "1)‡Unlimited ammo OFF         \n",
+		     ( tg_data.
+		       unlimit_grens ) ? "2)‰Unlimited grenades ON      \n" :
+		     "2)‡Unlimited grenades OFF     \n", s_gren_effect, s_gren_time,
+		     ( tg_data.
+		       godmode ) ? "5)‰God Mode ON                \n" :
+		     "5)‡God Mode OFF               \n",
+		     ( tg_data.
+		       disable_reload ) ? "6)‰Reload Disabled            \n" :
+		     "6)‡Reload Enabled             \n" );
 }
 
-void 	TG_Cheats_Menu_Input( int inp )
+void TG_Cheats_Menu_Input( int inp )
 {
-	switch(inp)
+	switch ( inp )
 	{
-		case 1:
-		        tg_data.unlimit_ammo = (tg_data.unlimit_ammo)?0:1;
-		       break;
-		case 2:
-		        tg_data.unlimit_grens = (tg_data.unlimit_grens)?0:1;
-			break;	
-		case 3:
-			if( ++(tg_data.gren_effect) >= TG_GREN_EFFECT_NUM )
-				tg_data.gren_effect = 0;
-			break;	
-		case 4:
-		        tg_data.gren_time += 5;
-		        if( tg_data.gren_time > 10) 
-		        	tg_data.gren_time = 0;
-			break;
-		case 5:
-		        tg_data.godmode = (tg_data.godmode)?0:1;
-			break;	
-		case 6:
-		        tg_data.disable_reload = (tg_data.disable_reload)?0:1;
-			break;	
-		case 7:
-			ResetMenu(  );
-			self->s.v.impulse = 0;
-			break;
-		default:
-			return;
+	case 1:
+		tg_data.unlimit_ammo = ( tg_data.unlimit_ammo ) ? 0 : 1;
+		break;
+	case 2:
+		tg_data.unlimit_grens = ( tg_data.unlimit_grens ) ? 0 : 1;
+		break;
+	case 3:
+		if ( ++( tg_data.gren_effect ) >= TG_GREN_EFFECT_NUM )
+			tg_data.gren_effect = 0;
+		break;
+	case 4:
+		tg_data.gren_time += 5;
+		if ( tg_data.gren_time > 10 )
+			tg_data.gren_time = 0;
+		break;
+	case 5:
+		tg_data.godmode = ( tg_data.godmode ) ? 0 : 1;
+		break;
+	case 6:
+		tg_data.disable_reload = ( tg_data.disable_reload ) ? 0 : 1;
+		break;
+	case 7:
+		ResetMenu(  );
+		self->s.v.impulse = 0;
+		break;
+	default:
+		return;
 	}
 
-  self->s.v.impulse = 0;
-  self->menu_count = 23;
+	self->s.v.impulse = 0;
+	self->menu_count = 23;
 
 }
 
-vec3_t savepos={0,0,0},saveangle,savevel;
-void 	TG_SavePosition_Menu(menunum_t menu)
+vec3_t  savepos = { 0, 0, 0 }
+,       saveangle, savevel;
+void TG_SavePosition_Menu( menunum_t menu )
 {
 	if ( VectorCompareF( savepos, 0, 0, 0 ) )
-		CenterPrint(self,"\n1) Save Position              \n"
-				   "                              \n"
-				   "                              \n"
-				   "                              \n"
-				   "5) Nothing                    ");
+		CenterPrint( self, "\n1) Save Position              \n"
+			     "                              \n"
+			     "                              \n"
+			     "                              \n"
+			     "5) Nothing                    " );
 	else
-		CenterPrint(self,"\n1) Save Position              \n"
-				   "2) Show Position              \n"
-				   "3) Restore Position           \n"
-				   "4) Delete saved position      \n"
-				   "5) Nothing                    ");
+		CenterPrint( self, "\n1) Save Position              \n"
+			     "2) Show Position              \n"
+			     "3) Restore Position           \n"
+			     "4) Delete saved position      \n"
+			     "5) Nothing                    " );
 }
 
 
-void 	TG_SavePosition_Menu_Input( int inp )
+void TG_SavePosition_Menu_Input( int inp )
 {
-	switch(inp)
+	switch ( inp )
 	{
-		case 1:
-		        VectorCopy( self->s.v.origin, savepos);
-		        VectorCopy( self->s.v.angles, saveangle);
-		        VectorCopy( self->s.v.velocity, savevel);
-			trap_WriteByte(MULTICAST_PHS_R, SVC_TEMPENTITY);
-			trap_WriteByte(MULTICAST_PHS_R, TE_TAREXPLOSION);
-			trap_WriteCoord(MULTICAST_PHS_R, savepos[0]);
-			trap_WriteCoord(MULTICAST_PHS_R, savepos[1]);
-			trap_WriteCoord(MULTICAST_PHS_R, savepos[2]);
-			trap_multicast( PASSVEC3(savepos), 1);
-			ResetMenu(  );
-		        break;
-		case 2:
-			if ( VectorCompareF( savepos, 0, 0, 0 ) )
-				break;
-			trap_WriteByte(MULTICAST_PHS_R, SVC_TEMPENTITY);
-			trap_WriteByte(MULTICAST_PHS_R, TE_TAREXPLOSION);
-			trap_WriteCoord(MULTICAST_PHS_R, savepos[0]);
-			trap_WriteCoord(MULTICAST_PHS_R, savepos[1]);
-			trap_WriteCoord(MULTICAST_PHS_R, savepos[2]);
-			trap_multicast(PASSVEC3(savepos), 1);
-			G_sprint( self, 2, "Saved position: '%.0f %.0f %.0f'\n",savepos[0],savepos[1],savepos[2]);
-			G_sprint( self, 2, "angle: '%.0f %.0f %.0f'\n",saveangle[0],saveangle[1],saveangle[2]);
-			G_sprint( self, 2, "speed: '%.0f %.0f %.0f'\n",savevel[0],savevel[1],savevel[2]);
-			break;	
-		case 3:
-		        VectorCopy( savepos  , self->s.v.origin  );
-		        VectorCopy( saveangle, self->s.v.angles   );
-		        VectorCopy( savevel  , self->s.v.velocity);
-		        setorigin(self, PASSVEC3(savepos));
-		        self->s.v.fixangle=1;
-		        ResetMenu(  );
-			break;	
-		case 4:
-		        SetVector( savepos, 0, 0, 0 );
-		        ResetMenu(  );
+	case 1:
+		VectorCopy( self->s.v.origin, savepos );
+		VectorCopy( self->s.v.angles, saveangle );
+		VectorCopy( self->s.v.velocity, savevel );
+		trap_WriteByte( MULTICAST_PHS_R, SVC_TEMPENTITY );
+		trap_WriteByte( MULTICAST_PHS_R, TE_TAREXPLOSION );
+		trap_WriteCoord( MULTICAST_PHS_R, savepos[0] );
+		trap_WriteCoord( MULTICAST_PHS_R, savepos[1] );
+		trap_WriteCoord( MULTICAST_PHS_R, savepos[2] );
+		trap_multicast( PASSVEC3( savepos ), 1 );
+		ResetMenu(  );
+		break;
+	case 2:
+		if ( VectorCompareF( savepos, 0, 0, 0 ) )
 			break;
-		case 5:
-			ResetMenu(  );
-			self->s.v.impulse = 0;
-			break;
-		default:
-			return;
+		trap_WriteByte( MULTICAST_PHS_R, SVC_TEMPENTITY );
+		trap_WriteByte( MULTICAST_PHS_R, TE_TAREXPLOSION );
+		trap_WriteCoord( MULTICAST_PHS_R, savepos[0] );
+		trap_WriteCoord( MULTICAST_PHS_R, savepos[1] );
+		trap_WriteCoord( MULTICAST_PHS_R, savepos[2] );
+		trap_multicast( PASSVEC3( savepos ), 1 );
+		G_sprint( self, 2, "Saved position: '%.0f %.0f %.0f'\n", savepos[0],
+			  savepos[1], savepos[2] );
+		G_sprint( self, 2, "angle: '%.0f %.0f %.0f'\n", saveangle[0],
+			  saveangle[1], saveangle[2] );
+		G_sprint( self, 2, "speed: '%.0f %.0f %.0f'\n", savevel[0], savevel[1],
+			  savevel[2] );
+		break;
+	case 3:
+		VectorCopy( savepos, self->s.v.origin );
+		VectorCopy( saveangle, self->s.v.angles );
+		VectorCopy( savevel, self->s.v.velocity );
+		setorigin( self, PASSVEC3( savepos ) );
+		self->s.v.fixangle = 1;
+		ResetMenu(  );
+		break;
+	case 4:
+		SetVector( savepos, 0, 0, 0 );
+		ResetMenu(  );
+		break;
+	case 5:
+		ResetMenu(  );
+		self->s.v.impulse = 0;
+		break;
+	default:
+		return;
 	}
 
-  self->s.v.impulse = 0;
-  self->menu_count = 23;
+	self->s.v.impulse = 0;
+	self->menu_count = 23;
 
 }
-

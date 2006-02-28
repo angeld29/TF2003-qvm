@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfortmap.c,v 1.21 2006-01-18 14:05:26 AngelD Exp $
+ *  $Id: tfortmap.c,v 1.22 2006-02-28 12:50:07 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1383,7 +1383,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 {
 	gedict_t *te;
 	float   winners;
-	float   gotone;
+//	float   gotone;
 
 	if ( tf_data.cb_prematch_time > g_globalvars.time )
 		return;
@@ -1598,7 +1598,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 			}
 		}
 	}
-	gotone = 0;
+//	gotone = 0;
 	te = trap_find( world, FOFS( s.v.classname ), "player" );
 	while ( te )
 	{
@@ -1664,12 +1664,12 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 				if ( APMeetsCriteria( Goal, te ) )
 				{
 					Apply_Results( Goal, te, AP, addb );
-					gotone = 1;
+//					gotone = 1;
 				}
 			} else
 			{
 				Apply_Results( Goal, te, AP, addb );
-				gotone = 1;
+//				gotone = 1;
 			}
 		}
 		te = trap_find( te, FOFS( s.v.classname ), "player" );

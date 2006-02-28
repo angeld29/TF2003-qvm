@@ -1,6 +1,9 @@
-+пофиксить разную вероятность точек спавна
-после взрыва грены в себе скин грен глючит
-vote quad
+TG
++независимое отключение стрельбы ракетами, шеллами и молнией
+
+
+?????после взрыва грены в себе скин грен глючит
+vote quad(a/d)
 botonly,playeronly  teams
 autochangemap он ласт дроп
 fix подвисание карты при долгом висении в инетмиссион
@@ -15,7 +18,6 @@ fix TCL - for Yes
 
 camera
 suicide body
-+fix TeamFortress_TeamGetColor чтобы возвращал реальный цвет а не цвет+1
 
 scanner на sentry, флаги
 sound on grens

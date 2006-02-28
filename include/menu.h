@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: menu.h,v 1.5 2004-12-23 03:16:14 AngelD Exp $
+ *  $Id: menu.h,v 1.6 2006-02-28 12:50:07 AngelD Exp $
  */
 #define MENU_REFRESH_RATE 			25
 typedef enum {
@@ -50,6 +50,7 @@ typedef enum {
 	TG_MENU_SG,
 	TG_MENU_DETPACK,
 	TG_MENU_CHEATS,
-	TG_MENU_POSITION
+	TG_MENU_POSITION,
+	TG_MENU_SG_FIRE
 } menunum_t;
 

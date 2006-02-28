@@ -87,7 +87,7 @@ gren_eff	off/self/
 gren_time	10/5/
 god		on/
 unl_ammo	on/
-unl_grens	on/
+unl_gren	on/
 dp_da		off/
 dp_drop		on/
 disable_reload	on/
@@ -128,7 +128,7 @@ dp_drop on	allow detpack kicking
 
 unl_ammo on	unlimited ammo
 
-unl_grens on	unlimited grenades
+unl_gren on	unlimited grenades
 
 gren_eff off	disable flash/conc effects
  	 self	disable flash/conc for oneself

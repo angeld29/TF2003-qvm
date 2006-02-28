@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tg.c,v 1.14 2006-01-31 13:39:00 AngelD Exp $
+ *  $Id: tg.c,v 1.15 2006-02-28 12:50:07 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -46,13 +46,34 @@ void TG_LoadSettings()
        			else
        				tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
        				
-       	GetSVInfokeyString( "sg_fire_type", NULL, st, sizeof( st ), "" );
+/*       	GetSVInfokeyString( "sg_fire_type", NULL, st, sizeof( st ), "" );
        	if ( !strcmp( st, "nodmg" ) )
        		tg_data.sg_fire_type = TG_SG_FIRE_LIGHTING;
        	else if( !strcmp( st, "bullets" ) )
        			tg_data.sg_fire_type = TG_SG_FIRE_BULLETS;
       		else
-       			tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;
+       			tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;*/
+       	GetSVInfokeyString( "sg_fire_bullets", NULL, st, sizeof( st ), "on" );
+       	if( !strcmp(st,"off") )
+       	        tg_data.sg_fire_bullets = false;
+       	else
+       	        tg_data.sg_fire_bullets = true;
+       	GetSVInfokeyString( "sg_fire_rockets", NULL, st, sizeof( st ), "on" );
+       	if( !strcmp(st,"off") )
+       	        tg_data.sg_fire_rockets = false;
+       	else
+       	        tg_data.sg_fire_rockets = true;
+       	GetSVInfokeyString( "sg_fire_lighting", NULL, st, sizeof( st ), "off" );
+       	if( !strcmp(st,"off") )
+       	        tg_data.sg_fire_lighting = false;
+       	else
+       	        tg_data.sg_fire_lighting = true;
+       	GetSVInfokeyString( "sg_unlimit_ammo", NULL, st, sizeof( st ), "off" );
+       	if( !strcmp(st,"on") )
+       	        tg_data.sg_unlimit_ammo = true;
+       	else
+       	        tg_data.sg_unlimit_ammo = false;
+       	        
       			
        	GetSVInfokeyString( "gren_eff", NULL, st, sizeof( st ), "" );
        	if ( !strcmp( st, "off" ) )
@@ -266,7 +287,50 @@ void TG_Cmd()
                 return;
         }
 
-        if(!strcmp(cmd_command,"sg_fire_type"))
+        if(!strcmp(cmd_command,"sg_fire_bullets"))
+        {
+                if(argc<3)
+                {
+                	G_sprint(self, 2, "sg_fire_bullets is %s\n", tg_data.sg_fire_bullets?"on":"off");
+                	return;
+                }
+                trap_CmdArgv( 2, st, sizeof( st ) );
+         	if( !strcmp(st,"off") )
+         	        tg_data.sg_fire_bullets = false;
+         	else
+         	        tg_data.sg_fire_bullets = true;
+         	return;
+        }
+        if(!strcmp(cmd_command,"sg_fire_rockets"))
+        {
+                if(argc<3)
+                {
+                	G_sprint(self, 2, "sg_fire_rockets is %s\n", tg_data.sg_fire_rockets?"on":"off");
+                	return;
+                }
+                trap_CmdArgv( 2, st, sizeof( st ) );
+         	if( !strcmp(st,"off") )
+         	        tg_data.sg_fire_rockets = false;
+         	else
+         	        tg_data.sg_fire_rockets = true;
+         	return;
+        }
+        if(!strcmp(cmd_command,"sg_fire_lighting"))
+        {
+                if(argc<3)
+                {
+                	G_sprint(self, 2, "sg_fire_lighting is %s\n", tg_data.sg_fire_lighting?"on":"off");
+                	return;
+                }
+                trap_CmdArgv( 2, st, sizeof( st ) );
+         	if( strcmp(st,"on") )
+         	        tg_data.sg_fire_lighting = false;
+         	else
+         	        tg_data.sg_fire_lighting = true;
+         	return;
+        }
+
+/*        if(!strcmp(cmd_command,"sg_fire_type"))
         {
                 if(argc<3)
                 {
@@ -282,7 +346,7 @@ void TG_Cmd()
        		else
         			tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;
                 return;
-        }
+        }*/
 	if ( !strcmp( cmd_command, "eff_conc" ) )
 	{
 	     TG_Eff_Conc(self);

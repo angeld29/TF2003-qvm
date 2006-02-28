@@ -2,7 +2,7 @@ QuakeWorld TeamFortress 2003 (QVM/DDL/SO Versions)
 by [sd] angel for MTFL
 
 ////////////////////////////////////////////////////
-Внесенные изменения (на xx.xx.200x r1):
+Внесенные изменения (на 28.02.2006 r1):
 Пиро:
 [+] Пофикшена ошибка (портирования) c работой special.
 
@@ -12,6 +12,23 @@ by [sd] angel for MTFL
 [+] все импульсы разрешенные для трупов работают в любое время.
 [+] защита от бага с прематч.
 [+] запрещен полет обсервером на сервере с новым pmove.
+
+Тренировочная версия:
+[+] Удалена команда /cmd tg sg_fire_type и ключ localinfo sg_fire_type.
+[+] Добавлены команды:
+    /cmd tg sg_fire_bullets [on/off]
+    /cmd tg sg_fire_rockets [on/off]
+    /cmd tg sg_fire_lighting [on/off]
+    /cmd tg sg_unlimit_ammo [on/off]
+
+[+] Добавлены ключи для localinfo:
+       sg_fire_bullets [on/off]  
+       sg_fire_rockets [on/off]  
+       sg_fire_lighting [on/off] 
+       sg_unlimit_ammo [on/off]  
+[+] Изменено меню настроек SG.
+[+] Молния пушки заменена более тонкую.
+
 
 ////////////////////////////////////////////////////
 Внесенные изменения (на 15.12.2005 r1):

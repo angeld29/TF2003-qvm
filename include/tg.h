@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tg.h,v 1.8 2004-12-23 03:16:14 AngelD Exp $
+ *  $Id: tg.h,v 1.9 2006-02-28 12:50:07 AngelD Exp $
  */
 
 #define TG_CONC_IMPULSE 205
@@ -82,18 +82,23 @@ typedef enum
 
 
 typedef struct{
- int tg_enabled;
- int godmode;
- int unlimit_ammo,unlimit_grens;
- int disable_reload;
- int detpack_clip;
- int detpack_drop; // 1 can drop, 0 - cannot
- int disable_disarm; // 0 normal, 1 - disable
- tg_gren_effect_t gren_effect; //0 -default, 1 - off for all, 2 off for self
- int gren_time;   //0 -full time , 10 ,5 in sek
- tg_sg_find_t sg_allow_find;
- int sg_disable_fire;
- tg_sg_fire_t sg_fire_type;
+ int                    tg_enabled;
+ int                    godmode;
+ int                    unlimit_ammo,unlimit_grens;
+ int                    disable_reload;
+ int                    detpack_clip;
+ int                    detpack_drop;   // 1 can drop, 0 - cannot
+ int                    disable_disarm; // 0 normal, 1 - disable
+ tg_gren_effect_t       gren_effect;    //0 -default, 1 - off for all, 2 off for self
+ int                    gren_time;      //0 -full time , 10 ,5 in sek
+
+ tg_sg_find_t   sg_allow_find;
+ int            sg_disable_fire;
+ qboolean       sg_fire_bullets,
+                sg_fire_rockets,
+                sg_fire_lighting;
+ qboolean       sg_unlimit_ammo;
+// tg_sg_fire_t sg_fire_type;
  int tg_sbar;
 }tf_tg_server_data_t;
 

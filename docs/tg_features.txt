@@ -81,7 +81,7 @@ gren_eff	off/self/
 gren_time	10/5/
 god		on/
 unl_ammo	on/
-unl_grens	on/
+unl_gren	on/
 dp_da		off/
 dp_drop		on/
 disable_reload	on/
@@ -122,7 +122,7 @@ dp_drop on разрешить сбрасывать детпаки
 
 unl_ammo on бесконечные патроны 
 
-unl_grens on бескончные грены 
+unl_gren on бескончные грены 
 
 gren_eff off выключен эффект конки и флеша 
  	 self не действует на себе 

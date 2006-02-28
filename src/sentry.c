@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: sentry.c,v 1.26 2005-11-29 14:22:43 AngelD Exp $
+ *  $Id: sentry.c,v 1.27 2006-02-28 12:50:07 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -62,7 +62,7 @@ void lvl1_sentry_atk1(  )
 		lvl1_sentry_stand(  );
 	else
 	{
-		if ( self->s.v.ammo_shells <= 0 )
+		if ( self->s.v.ammo_shells <= 0 && !tg_data.sg_unlimit_ammo )
 			lvl1_sentry_stand(  );
 		else
 		{
@@ -117,7 +117,7 @@ void lvl2_sentry_atk1(  )
 		lvl2_sentry_stand(  );
 	else
 	{
-		if ( self->s.v.ammo_shells <= 0 )
+		if ( self->s.v.ammo_shells <= 0 && !tg_data.sg_unlimit_ammo )
 			lvl2_sentry_stand(  );
 		else
 		{
@@ -173,7 +173,7 @@ void lvl3_sentry_atk1(  )
 		lvl3_sentry_stand(  );
 	else
 	{
-		if ( self->s.v.ammo_shells <= 0 && self->s.v.ammo_rockets <= 0 )
+		if ( self->s.v.ammo_shells <= 0 && self->s.v.ammo_rockets <= 0 && !tg_data.sg_unlimit_ammo )
 			lvl3_sentry_stand(  );
 		else
 		{
@@ -373,7 +373,7 @@ int Sentry_FindTarget(  )
 
 void Sentry_FoundTarget(  )
 {
-	if ( self->s.v.ammo_shells > 0 || ( self->s.v.ammo_rockets > 0 && self->s.v.weapon == 3 ) )
+	if ( self->s.v.ammo_shells > 0 || ( self->s.v.ammo_rockets > 0 && self->s.v.weapon == 3 ) || tg_data.sg_unlimit_ammo )
 		sound( self, 2, "weapons/turrspot.wav", 1, 1 );
 	Sentry_HuntTarget(  );
 	if ( self->super_damage_finished < g_globalvars.time )
@@ -638,7 +638,7 @@ void    FireSentryLighting( gedict_t * targ )
 	
 
 	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-	trap_WriteByte( MSG_MULTICAST, TE_LIGHTNING1 );
+	trap_WriteByte( MSG_MULTICAST, TE_LIGHTNING2 );
 	WriteEntity( MSG_MULTICAST, self );
 	trap_WriteCoord( MSG_MULTICAST, src[0] );
 	trap_WriteCoord( MSG_MULTICAST, src[1] );
@@ -852,10 +852,11 @@ int Sentry_Fire(  )
 
 	gedict_t *enemy = PROG_TO_EDICT( self->s.v.enemy );
 
+	self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & EF_DIMLIGHT );
+
 	if ( tg_data.sg_disable_fire )
 		return 0;
 
-	self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & 8 );
 	VectorSubtract( enemy->s.v.origin, self->s.v.origin, dir );
 	if ( self->s.v.ideal_yaw - anglemod( self->s.v.angles[1] ) < -10
 	     || self->s.v.ideal_yaw - anglemod( self->s.v.angles[1] ) > 10 )
@@ -864,72 +865,81 @@ int Sentry_Fire(  )
 		return 0;
 	
 	// Level 3 Turrets fire rockets every 3 seconds
-	if ( self->s.v.weapon == 3 && self->s.v.ammo_rockets > 0 
-		&& self->super_damage_finished < g_globalvars.time
-	     	&& ( tg_data.sg_fire_type == TG_SG_FIRE_NORMAL )  )
+	if (  tg_data.sg_fire_rockets && self->s.v.weapon == 3 && 
+	       ( (self->s.v.ammo_rockets > 0 ) || ( tg_data.sg_unlimit_ammo) )
+		&& self->super_damage_finished < g_globalvars.time )
 	{
 		Sentry_MuzzleFlash(  );
 		sound( self, 1, "weapons/rocket1i.wav", 1, 1 );
 
-	        if(tf_data.sg_rfire)
+	        if( tf_data.sg_rfire )
 	        	LaunchSGRocketNEW(enemy);
 	        else
 	        	LaunchSGRocketOLD(enemy); 
 
 		self->super_damage_finished = g_globalvars.time + 3;
-#ifndef DEBUG_SG
-		self->s.v.ammo_rockets = self->s.v.ammo_rockets - 1;
-#endif		
+                if( !tg_data.sg_unlimit_ammo ) 
+		      self->s.v.ammo_rockets = self->s.v.ammo_rockets - 1;
+
 		if ( self->s.v.ammo_rockets == 10 )
 			G_sprint( self->real_owner, 2, "Sentry Gun is low on rockets.\n" );
 	}
-	if ( tg_data.sg_fire_type == TG_SG_FIRE_LIGHTING )
+	if ( tg_data.sg_fire_lighting )
 	{
 		FireSentryLighting( PROG_TO_EDICT(self->s.v.enemy) );
-		return 1;
+		//return 1;
 	}
-	tf_data.deathmsg = DMSG_SENTRYGUN_BULLET;
-
-	self->s.v.ammo_shells -= 1;
-	if ( self->s.v.ammo_shells < 0 )
+	if ( tg_data.sg_fire_bullets )
 	{
-		self->s.v.ammo_shells = 0;
-		return 0;
+        	tf_data.deathmsg = DMSG_SENTRYGUN_BULLET;
+
+        	if( !tg_data.sg_unlimit_ammo ) 
+        	{
+        	       self->s.v.ammo_shells = self->s.v.ammo_shells - 1;
+        	       if ( self->s.v.ammo_shells < 0 )
+                       {
+                		self->s.v.ammo_shells = 0;
+                		return 0;
+                       }
+        	}
+        	Sentry_MuzzleFlash(  );
+        	sound( self, 1, "weapons/sniper.wav", 1, 1 );
+
+                switch(tf_data.sg_sfire)
+                {
+                	
+                	case SG_SFIRE_MTFL1:
+        			VectorCopy( self->s.v.angles, self->s.v.v_angle );
+        		case SG_SFIRE_281:
+        			FireBullets( 4, dir, 0.1, 0.1, 0 );
+                		break;
+                	case SG_SFIRE_MTFL2:
+        			VectorCopy( self->s.v.angles, self->s.v.v_angle );
+        			FireSentryBulletsMTFL2( 4, enemy, 0.1, 0.1, 0 );
+        			break;
+                	case SG_SFIRE_NEW:
+        			VectorCopy( self->s.v.angles, self->s.v.v_angle );
+        			FireSentryBulletsNEW( 4, enemy, 0.1, 0.1, 0 );
+        			break;
+                	default:
+                		G_Error("Unknown SG TYPE %d\n",tf_data.sg_sfire);
+                
+                }
 	}
-	Sentry_MuzzleFlash(  );
-	sound( self, 1, "weapons/sniper.wav", 1, 1 );
-
-        switch(tf_data.sg_sfire)
-        {
-        	
-        	case SG_SFIRE_MTFL1:
-			VectorCopy( self->s.v.angles, self->s.v.v_angle );
-		case SG_SFIRE_281:
-			FireBullets( 4, dir, 0.1, 0.1, 0 );
-        		break;
-        	case SG_SFIRE_MTFL2:
-			VectorCopy( self->s.v.angles, self->s.v.v_angle );
-			FireSentryBulletsMTFL2( 4, enemy, 0.1, 0.1, 0 );
-			break;
-        	case SG_SFIRE_NEW:
-			VectorCopy( self->s.v.angles, self->s.v.v_angle );
-			FireSentryBulletsNEW( 4, enemy, 0.1, 0.1, 0 );
-			break;
-        	default:
-        		G_Error("Unknown SG TYPE %d\n",tf_data.sg_sfire);
-        
-        }
-
         // Warn owner that it's low on ammo
-	if ( !self->s.v.ammo_shells && g_random(  ) < 0.1 )
-		G_sprint( self->real_owner, 2, "Sentry Gun is out of shells.\n" );
-	else
-	{
-		if ( self->s.v.ammo_shells == 20 )
-			G_sprint( self->real_owner, 2, "Sentry Gun is low on shells.\n" );
-	}
-	if ( !self->s.v.ammo_rockets && self->s.v.weapon == 3 && g_random(  ) < 0.1 )
-		G_sprint( self->real_owner, 2, "Sentry Gun is out of rockets.\n" );
+        if( !tg_data.sg_unlimit_ammo && tg_data.sg_fire_bullets )
+        {
+              	if ( self->s.v.ammo_shells <=0 && g_random(  ) < 0.1 )
+              		G_sprint( self->real_owner, 2, "Sentry Gun is out of shells.\n" );
+              	else
+              	{
+              		if ( self->s.v.ammo_shells == 20 )
+              			G_sprint( self->real_owner, 2, "Sentry Gun is low on shells.\n" );
+              	}
+        }
+        if( !tg_data.sg_unlimit_ammo && tg_data.sg_fire_rockets )
+	       if ( self->s.v.ammo_rockets <= 0 && self->s.v.weapon == 3 && g_random(  ) < 0.1 )
+        		G_sprint( self->real_owner, 2, "Sentry Gun is out of rockets.\n" );
 	return 1;
 }
 
