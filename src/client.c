@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.54 2006-02-28 12:50:07 AngelD Exp $
+ *  $Id: client.c,v 1.55 2006-02-28 21:29:52 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -2403,6 +2403,12 @@ qboolean SetClientSetting( gedict_t * p, const char *key, const char *value )
 		else
 			p->take_sshot = 0;
 		break;
+	case 0xE5A257DF:	//grensound
+	        if ( !strcmp( value, "on" ) )
+	                p->internal_settings_bits |= TF_INTERNAL_GRENSOUND;
+	        else
+	                p->internal_settings_bits -= p->settings_bits & TF_INTERNAL_GRENSOUND;
+		break;
 	default:
 		return false;
 	}
@@ -2490,6 +2496,12 @@ qboolean PrintClientSetting( gedict_t * p, const char *key )
 		else
 			G_sprint( p, 2, "Take screenshot is ÏÆÆ\n" );
 		break;
+	case 0xE5A257DF:	//grensound
+		if ( p->internal_settings_bits & TF_INTERNAL_GRENSOUND )
+			G_sprint( p, 2, "Grenade sound is ÏÎ\n" );
+		else
+			G_sprint( p, 2, "Grenade sound is ÏÆÆ\n" );
+		break;
 	default:
 		return false;
 	}
@@ -2498,22 +2510,22 @@ qboolean PrintClientSetting( gedict_t * p, const char *key )
 
 void   Client_Set_Cmd(  )
 {
-    char    key[20];
-    char    value[20];
-    int argc;
+        char    key[20];
+        char    value[20];
+        int argc;
 
 
 	argc = trap_CmdArgc();
 	if(argc < 2)
 		return;
-    trap_CmdArgv( 1, key, sizeof( key ) );
+        trap_CmdArgv( 1, key, sizeof( key ) );
 	Q_strlwr( key );
 	if(argc < 3)
 	{
 		PrintClientSetting( self, key);
 		return;
 	}
-    trap_CmdArgv( 2, value, sizeof( value ) );
+        trap_CmdArgv( 2, value, sizeof( value ) );
 	if( SetClientSetting( self, key, value) )
 		PrintClientSetting( self, key);
 }
@@ -2528,6 +2540,7 @@ void ParseUserInfo()
 	self->discard_rockets = -1;
 	self->discard_cells = -1;
 	self->settings_bits = TF_CLASS_HELP_MASK;
+	self->internal_settings_bits = 0;
 	self->take_sshot = 0;
 	if( GetInfokeyString( self, "sbr", "sbar_res" , value, sizeof( value ), NULL))
 		SetClientSetting( self, "sbr", value);
@@ -2589,62 +2602,12 @@ void ClientConnect()
 		KickCheater( self );
 	ParseUserInfo();
 	stuffcmd( self, "tf_onconnect\n");
-/*//REMOVE!!!!
-sbres = GetInfokeyInt( self, "sbr", "sbar_res", 200 );
-	switch ( sbres )
-	{
-	case 768:
-		self->StatusBarRes = 8;
-		break;
-	case 600:
-		self->StatusBarRes = 7;
-		break;
-	case 480:
-		self->StatusBarRes = 6;
-		break;
-	case 400:
-		self->StatusBarRes = 5;
-		break;
-	case 384:
-		self->StatusBarRes = 4;
-		break;
-	case 350:
-		self->StatusBarRes = 3;
-		break;
-	case 300:
-		self->StatusBarRes = 2;
-		break;
-	case 240:
-		self->StatusBarRes = 1;
-		break;
-	case 200:
-		self->StatusBarRes = 0;
-		break;
-	}
-	self->StatusBarSize = GetInfokeyInt( self, "sbs", "sbar_size", 0 );
-	if ( self->StatusBarSize > 2 || self->StatusBarSize < 0 )
-		self->StatusBarSize = 0;
-	*/
 	TeamFortress_ExecMapScript( self );
 	self->has_disconnected = 0;
 
 	if ( intermission_running )
 		GotoNextMap();
 
-/*	GetSVInfokeyString( "apw", "adminpwn", st2, sizeof( st2 ), "" );
-	GetInfokeyString( self, "apw", "adminpwn", st, sizeof( st ), "" );
-
-	if ( st2[0] && st[0] && !strcmp( st, st2 ) )
-	{
-		self->is_admin = 1;
-		stuffcmd( self, "setinfo apw \"" );
-		stuffcmd( self, "\"\n" );
-		TeamFortress_Alias( "countplayers", 192, 0 );
-		TeamFortress_Alias( "kick", 190, 0 );
-		TeamFortress_Alias( "yes", 191, 0 );
-		TeamFortress_Alias( "no", 195, 0 );
-		TeamFortress_Alias( "ceasefire", 193, 0 );
-	} else*/
 	self->is_admin = 0;
 	if ( tf_data.clanbattle && self->has_disconnected != 1 )
 	{

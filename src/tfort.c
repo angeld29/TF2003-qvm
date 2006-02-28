@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.43 2006-02-07 19:43:02 AngelD Exp $
+ *  $Id: tfort.c,v 1.44 2006-02-28 21:29:52 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1052,6 +1052,8 @@ void TeamFortress_PrimeGrenade(  )
 				break;
 			default:
 				G_sprint( self, 2, "%s primed, 3 seconds...\n", GrenadePrimeName[gtype] );
+				if ( self->internal_settings_bits & TF_INTERNAL_GRENSOUND )
+				        stuffcmd( self, "play count.wav\n" );
 				break;
 			}
 
@@ -1116,6 +1118,8 @@ void TeamFortress_PrimeGrenade(  )
 				break;
 			default:
 				G_sprint( self, 2, "%s primed, 3 seconds...\n", GrenadePrimeName[gtype] );
+				if ( self->internal_settings_bits & TF_INTERNAL_GRENSOUND )
+				        stuffcmd( self, "play count.wav\n" );
 				break;
 			}
 
@@ -1146,6 +1150,7 @@ void TeamFortress_PrimeGrenade(  )
 void TeamFortress_GrenadePrimed(  )
 {
 	gedict_t *user;
+	qboolean printthrowmsg = true;
 
 	user = PROG_TO_EDICT( self->s.v.owner );
 	if ( !( user->tfstate & TFSTATE_GRENTHROWING ) && !user->s.v.deadflag )
@@ -1264,6 +1269,7 @@ void TeamFortress_GrenadePrimed(  )
 		else
 			newmis->mdl = "flare";
 		setmodel( newmis, "progs/flare.mdl" );
+		printthrowmsg = false;
 		break;
 
 	case GR_TYPE_GAS:
@@ -1304,12 +1310,13 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) ScatterCaltrops;
 		newmis->s.v.skin = 0;
 		SetVector( newmis->s.v.avelocity, 0, 0, 0 );
+		printthrowmsg = false;
 		break;
-
-
 	}
+	if( printthrowmsg )
+	        G_sprint( user, 2, "%s throwed.\n", GrenadePrimeName[(int)self->s.v.weapon] );
+	        
 	setsize( newmis, 0, 0, 0, 0, 0, 0 );
-// 	setsize(newmis ,0, 0, 0 ,1, 1, 1);
 	setorigin( newmis, PASSVEC3( user->s.v.origin ) );
 	dremove( self );
 }

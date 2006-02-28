@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_mod_command.c,v 1.5 2005-06-10 00:43:39 AngelD Exp $
+ *  $Id: g_mod_command.c,v 1.6 2006-02-28 21:29:52 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -26,9 +26,11 @@ typedef struct {
 	void    ( *Action ) ( int );
 } mod_t;
 void WP_command( int argc );
+void AGR_command( int argc );
 
 const static mod_t   mod_cmds[] = {
 	{"wp", WP_command},
+	{"agr", AGR_command},
 	{NULL, NULL}
 };
 
@@ -200,4 +202,84 @@ void WP_command( int argc )
                 ClearWaypoints();
                 return;
         }
+}
+void AGR_command( int argc )
+{
+        char    cmd_command[1024];
+        static  qboolean agr_mode =  false;
+	gedict_t *Goal,*saveself;
+	gedict_t *te,*owner;
+
+
+        if( argc < 3)
+        {
+                if( self == world )
+                        return;
+                if( agr_mode )
+                        G_sprint(self, 2, "AGR mode is ON\n");
+                else
+                        G_sprint(self, 2, "AGR mode is OFF\n");
+                return;
+        }
+        saveself = self;
+        trap_CmdArgv( 2, cmd_command, sizeof( cmd_command ) );
+        if( !strcmp(cmd_command,"on") )
+        {
+                if( agr_mode )
+                {
+        	        if( self != world )
+                                G_sprint(self, 2, "AGR mode already activated\n");
+                        return;
+                }
+
+	        Goal = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
+
+                if ( !Goal )
+	       	       return;
+	        if ( !Goal->display_item_status2 )
+	                return;
+       	        te = Finditem( Goal->display_item_status2 );
+                if ( te == world )
+        	{
+        	        if( self != world )
+             		         G_sprint(self,2,"Item is missing.\n" );
+        		return;
+        	}
+        	owner = PROG_TO_EDICT(te->s.v.owner);
+        	if( owner != world )
+        	{
+        	        tfgoalitem_RemoveFromPlayer( te, owner, 1 );
+        	}
+        	te->take_sshot = 1;
+                agr_mode = true;
+                G_bprint(2,"AGR mode activated\n");
+                return;
+        }
+        if( !strcmp(cmd_command,"off") )
+        {
+                if( !agr_mode )
+                {
+        	        if( self != world )
+                                G_sprint(self,2,"AGR mode not activated\n");
+                        return;
+                }
+	        Goal = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
+
+                if ( !Goal )
+	       	       return;
+	        if ( !Goal->display_item_status2 )
+	                return;
+       	        te = Finditem( Goal->display_item_status2 );
+                if ( te == world )
+        	{
+        	        if( self != world )
+        		      G_sprint(self,2, "Item is missing.\n" );
+        		return;
+        	}
+        	te->take_sshot = 0;
+                agr_mode = false;
+                G_bprint(2,"AGR mode deactivated\n");
+                return;
+        }
+
 }

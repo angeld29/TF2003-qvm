@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: progs.h,v 1.25 2005-11-28 17:37:32 AngelD Exp $
+ *  $Id: progs.h,v 1.26 2006-02-28 21:29:52 AngelD Exp $
  */
 #include "progdefs.h"
 
@@ -292,6 +292,7 @@ typedef struct gedict_s {
 	int             discard_rockets;
 	int             discard_cells;
 	int             settings_bits;
+	int             internal_settings_bits;
 	int             take_sshot;
 //player settings end
 	int             tf_id;

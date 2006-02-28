@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.32 2006-01-31 13:39:00 AngelD Exp $
+ *  $Id: weapons.c,v 1.33 2006-02-28 21:29:52 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -64,6 +64,7 @@ void W_Precache(  )
 	trap_precache_sound( "weapons/asscan4.wav" );            
 	trap_precache_sound( "weapons/railgun.wav" );            // Railgun                          
 	trap_precache_sound( "weapons/dartgun.wav" );            // Spy's dart gun                   
+	trap_precache_sound( "count.wav" );                      // grenade prime sound
 
 	trap_precache_model( "progs/v_flame.mdl" );              
 	trap_precache_model( "progs/v_tgun.mdl" );

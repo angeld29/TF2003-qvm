@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_tf_consts.h,v 1.11 2005-05-17 03:56:00 AngelD Exp $
+ *  $Id: g_tf_consts.h,v 1.12 2006-02-28 21:29:52 AngelD Exp $
  */
 // TeamFortress State Flags
 #define TFSTATE_GRENPRIMED  1  // Whether the player has a primed grenade
@@ -629,6 +629,8 @@
 #define TF_STATUS_SPY_MASK  128
 #define TF_STATUS_DETPACK_MASK  256
 #define TF_STATUS_SENTRY_MASK  512
+
+#define TF_INTERNAL_GRENSOUND  1
 
 
 #define DG_TYPE_NORMAL  2 

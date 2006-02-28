@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfortmap.c,v 1.22 2006-02-28 12:50:07 AngelD Exp $
+ *  $Id: tfortmap.c,v 1.23 2006-02-28 21:29:52 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -908,19 +908,19 @@ int APMeetsCriteria( gedict_t * Goal, gedict_t * AP )
 	if ( Goal->if_goal_is_active )
 	{
 		te = Findgoal( Goal->if_goal_is_active );
-		if ( te && te->goal_state != 1 )
+		if ( te && te->goal_state != TFGS_ACTIVE )
 			return 0;
 	}
 	if ( Goal->if_goal_is_inactive )
 	{
 		te = Findgoal( Goal->if_goal_is_inactive );
-		if ( te && te->goal_state != 2 )
+		if ( te && te->goal_state != TFGS_INACTIVE )
 			return 0;
 	}
 	if ( Goal->if_goal_is_removed )
 	{
 		te = Findgoal( Goal->if_goal_is_removed );
-		if ( te && te->goal_state != 3 )
+		if ( te && te->goal_state != TFGS_REMOVED )
 			return 0;
 	}
 	if ( Goal->if_group_is_active )
@@ -930,7 +930,7 @@ int APMeetsCriteria( gedict_t * Goal, gedict_t * AP )
 		{
 			if ( te->group_no == Goal->if_group_is_active )
 			{
-				if ( te->goal_state != 1 )
+				if ( te->goal_state != TFGS_ACTIVE )
 					return 0;
 			}
 			te = trap_find( te, FOFS( s.v.classname ), "info_tfgoal" );
@@ -943,7 +943,7 @@ int APMeetsCriteria( gedict_t * Goal, gedict_t * AP )
 		{
 			if ( te->group_no == Goal->if_group_is_inactive )
 			{
-				if ( te->goal_state != 2 )
+				if ( te->goal_state != TFGS_INACTIVE )
 					return 0;
 			}
 			te = trap_find( te, FOFS( s.v.classname ), "info_tfgoal" );
@@ -956,7 +956,7 @@ int APMeetsCriteria( gedict_t * Goal, gedict_t * AP )
 		{
 			if ( te->group_no == Goal->if_group_is_removed )
 			{
-				if ( te->goal_state != 3 )
+				if ( te->goal_state != TFGS_REMOVED )
 					return 0;
 			}
 			te = trap_find( te, FOFS( s.v.classname ), "info_tfgoal" );
@@ -967,7 +967,7 @@ int APMeetsCriteria( gedict_t * Goal, gedict_t * AP )
 		te = Finditem( Goal->if_item_has_moved );
 		if ( te != world )
 		{
-			if ( te->goal_state != 1 && VectorCompare( te->s.v.origin, te->s.v.oldorigin ) )
+			if ( te->goal_state != TFGS_ACTIVE && VectorCompare( te->s.v.origin, te->s.v.oldorigin ) )
 				return 0;
 		}
 	}
@@ -976,7 +976,7 @@ int APMeetsCriteria( gedict_t * Goal, gedict_t * AP )
 		te = Finditem( Goal->if_item_hasnt_moved );
 		if ( te != world )
 		{
-			if ( te->goal_state == 1 || !VectorCompare( te->s.v.origin, te->s.v.oldorigin ) )
+			if ( te->goal_state == TFGS_ACTIVE || !VectorCompare( te->s.v.origin, te->s.v.oldorigin ) )
 				return 0;
 		}
 	}
@@ -1049,11 +1049,11 @@ int Activated( gedict_t * Goal, gedict_t * AP )
 	float   RevAct;
 	float   Act;
 
-	if ( Goal->goal_state == 1 )
+	if ( Goal->goal_state == TFGS_ACTIVE )
 		return 0;
-	if ( Goal->goal_state == 3 )
+	if ( Goal->goal_state == TFGS_REMOVED )
 		return 0;
-	if ( Goal->goal_state == 4 )
+	if ( Goal->goal_state == TFGS_DELAYED )
 		return 0;
 	APMet = APMeetsCriteria( Goal, AP );
 	if ( streq( Goal->s.v.classname, "item_tfgoal" ) )
@@ -1135,7 +1135,7 @@ void DoGoalWork( gedict_t * Goal, gedict_t * AP )
 		te = Finditem( Goal->return_item_no );
 		if ( te != world )
 		{
-			if ( te->goal_state == 1 )
+			if ( te->goal_state == TFGS_ACTIVE )
 				tfgoalitem_RemoveFromPlayer( te, PROG_TO_EDICT( te->s.v.owner ), 1 );
 			RI = spawn(  );
 			RI->s.v.enemy = EDICT_TO_PROG( te );
@@ -1150,7 +1150,7 @@ void DoGoalWork( gedict_t * Goal, gedict_t * AP )
 		te = Findteamspawn( Goal->remove_spawnpoint );
 		if ( te )
 		{
-			te->goal_state = 3;
+			te->goal_state = TFGS_REMOVED;
 			te->team_str_home = "";
 		}
 	}
@@ -1159,9 +1159,9 @@ void DoGoalWork( gedict_t * Goal, gedict_t * AP )
 		te = Findteamspawn( Goal->restore_spawnpoint );
 		if ( te )
 		{
-			if ( te->goal_state == 3 )
+			if ( te->goal_state == TFGS_REMOVED )
 			{
-				te->goal_state = 2;
+				te->goal_state = TFGS_INACTIVE;
 				te->team_str_home = (char*)team_spawn_str[te->team_no];
 			}
 		}
@@ -1186,7 +1186,7 @@ void DoGroupWork( gedict_t * Goal, gedict_t * AP )
 			{
 				if ( tg->group_no == Goal->all_active )
 				{
-					if ( tg->goal_state != 1 )
+					if ( tg->goal_state != TFGS_ACTIVE )
 						allset = 0;
 				}
 				tg = trap_find( tg, FOFS( s.v.classname ), "info_tfgoal" );
@@ -1285,7 +1285,7 @@ void DoItemGroupWork( gedict_t * Item, gedict_t * AP )
 		{
 			if ( tg->group_no == Item->distance )
 			{
-				if ( tg->goal_state != 1 )
+				if ( tg->goal_state != TFGS_ACTIVE )
 					allcarried = 0;
 			}
 			tg = trap_find( tg, FOFS( s.v.classname ), "item_tfgoal" );
@@ -1310,7 +1310,7 @@ void DoItemGroupWork( gedict_t * Item, gedict_t * AP )
 		{
 			if ( tg->group_no == Item->speed )
 			{
-				if ( tg->goal_state != 1 )
+				if ( tg->goal_state != TFGS_ACTIVE )
 					allcarried = 0;
 				else
 				{
@@ -1374,7 +1374,7 @@ void DoTriggerWork( gedict_t * Goal, gedict_t * AP )
 
 void DelayedResult(  )
 {
-	if ( PROG_TO_EDICT( self->s.v.enemy )->goal_state == 4 )
+	if ( PROG_TO_EDICT( self->s.v.enemy )->goal_state == TFGS_DELAYED )
 		DoResults( PROG_TO_EDICT( self->s.v.enemy ), PROG_TO_EDICT( self->s.v.owner ), self->s.v.weapon );
 	dremove( self );
 }
@@ -1387,9 +1387,9 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 
 	if ( tf_data.cb_prematch_time > g_globalvars.time )
 		return;
-	if ( Goal->goal_state == 1 )
+	if ( Goal->goal_state == TFGS_ACTIVE )
 		return;
-	if ( Goal->delay_time > 0 && Goal->goal_state != 4 )
+	if ( Goal->delay_time > 0 && Goal->goal_state != TFGS_DELAYED )
 	{
 		Goal->goal_state = 4;
 		te = spawn(  );
@@ -1715,20 +1715,20 @@ void tfgoal_touch(  )
 		return;
 	if ( tf_data.cb_prematch_time > g_globalvars.time )
 		return;
-	if ( self->goal_state == 1 )
+	if ( self->goal_state == TFGS_ACTIVE )
 		return;
 	if ( CTF_Map == 1 )
 	{
 		if ( self->goal_no == 3 && other->team_no == 1 )
 		{
 			te = Finditem( 1 );
-			if ( te->goal_state == 1 || !VectorCompare( te->s.v.origin, te->s.v.oldorigin ) )
+			if ( te->goal_state == TFGS_ACTIVE || !VectorCompare( te->s.v.origin, te->s.v.oldorigin ) )
 				return;
 		}
 		if ( self->goal_no == 4 && other->team_no == 2 )
 		{
 			te = Finditem( 2 );
-			if ( te->goal_state == 1 || !VectorCompare( te->s.v.origin, te->s.v.oldorigin ) )
+			if ( te->goal_state == TFGS_ACTIVE || !VectorCompare( te->s.v.origin, te->s.v.oldorigin ) )
 				return;
 		}
 	}
@@ -1742,7 +1742,7 @@ void info_tfgoal_use(  )
 
 void tfgoal_timer_tick(  )
 {
-	if ( self->goal_state != 3 )
+	if ( self->goal_state != TFGS_REMOVED )
 	{
 		if ( APMeetsCriteria( self, world ) )
 			DoResults( self, world, 1 );
@@ -1772,6 +1772,11 @@ void item_tfgoal_touch(  )
 		return;
 	if ( other->is_feigning )
 		return;
+
+	if ( self->take_sshot )
+	{
+	        return;
+	}
 
 	if ( CTF_Map == 1 )
 	{
@@ -1893,7 +1898,7 @@ void ReturnItem(  )
 	gedict_t *te;
 	gedict_t *enemy = PROG_TO_EDICT( self->s.v.enemy );
 
-	enemy->goal_state = 2;
+	enemy->goal_state = TFGS_INACTIVE;
 	if ( ( enemy->goal_activation & TFGI_SOLID ) && streq( enemy->s.v.classname, "item_tfgoal" ) )
 		enemy->s.v.solid = SOLID_BBOX;
 	else
@@ -2144,7 +2149,7 @@ void tfgoalitem_drop( gedict_t * Item, float PAlive, gedict_t * P )
 	Item->s.v.velocity[2] = 400;
 	Item->s.v.velocity[0] = -50 + g_random(  ) * 100;
 	Item->s.v.velocity[1] = -50 + g_random(  ) * 100;
-	Item->goal_state = 2;
+	Item->goal_state = TFGS_INACTIVE;
 	Item->s.v.movetype = MOVETYPE_TOSS;
 	if ( Item->goal_activation & TFGI_SOLID )
 		Item->s.v.solid = SOLID_BBOX;
@@ -2184,7 +2189,7 @@ void tfgoalitem_remove(  )
 	gedict_t *te;
 	gedict_t *oldself;
 
-	if ( self->goal_state == 1 )
+	if ( self->goal_state == TFGS_ACTIVE )
 		return;
 	if ( self->goal_activation & TFGI_RETURN_REMOVE )
 	{
@@ -2220,7 +2225,7 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 {
 	int     flag_time = 0;
 
-	if ( Item->goal_state == 1 )
+	if ( Item->goal_state == TFGS_ACTIVE )
 	{
 		if ( Goal->team_str_carried || Goal->non_team_str_carried )
 		{
@@ -2545,7 +2550,7 @@ void DropGoalItems(  )
 {
 	gedict_t *te;
 
-	newmis = spawn(); //FIX ME??? no need this?
+	newmis = spawn(); 
 	g_globalvars.newmis = EDICT_TO_PROG( newmis );
 	makevectors( self->s.v.v_angle );
 	VectorNormalize( g_globalvars.v_forward );

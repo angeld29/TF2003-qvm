@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.24 2006-01-18 14:05:26 AngelD Exp $
+ *  $Id: g_main.c,v 1.25 2006-02-28 21:29:52 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -172,6 +172,7 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 		//SV_CMD_RCON			1  
 		//SV_CMD_MASTER		2          
 		//SV_CMD_BOT			3  
+		self = PROG_TO_EDICT( g_globalvars.self );
 		ModCommand();
 		return 0;
 	}
