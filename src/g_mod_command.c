@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_mod_command.c,v 1.6 2006-02-28 21:29:52 AngelD Exp $
+ *  $Id: g_mod_command.c,v 1.7 2006-03-02 12:08:56 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -26,11 +26,11 @@ typedef struct {
 	void    ( *Action ) ( int );
 } mod_t;
 void WP_command( int argc );
-void AGR_command( int argc );
+void Red_Def_command( int argc );
 
 const static mod_t   mod_cmds[] = {
 	{"wp", WP_command},
-	{"agr", AGR_command},
+	{"red_def", Red_Def_command},
 	{NULL, NULL}
 };
 
@@ -203,32 +203,37 @@ void WP_command( int argc )
                 return;
         }
 }
-void AGR_command( int argc )
+void Red_Def_command( int argc )
 {
         char    cmd_command[1024];
-        static  qboolean agr_mode =  false;
+        static  qboolean red_def_mode =  false;
 	gedict_t *Goal,*saveself;
 	gedict_t *te,*owner;
 
-
+	if( tf_data.mtfl )
+	{
+       	        if( self != world )
+      		         G_sprint(self,2,"Not allowed for mtfl.\n" );
+      		return;
+	}
         if( argc < 3)
         {
                 if( self == world )
                         return;
-                if( agr_mode )
-                        G_sprint(self, 2, "AGR mode is ON\n");
+                if( red_def_mode )
+                        G_sprint(self, 2, "Red-Def mode is ON\n");
                 else
-                        G_sprint(self, 2, "AGR mode is OFF\n");
+                        G_sprint(self, 2, "Red-Def mode is OFF\n");
                 return;
         }
         saveself = self;
         trap_CmdArgv( 2, cmd_command, sizeof( cmd_command ) );
         if( !strcmp(cmd_command,"on") )
         {
-                if( agr_mode )
+                if( red_def_mode )
                 {
         	        if( self != world )
-                                G_sprint(self, 2, "AGR mode already activated\n");
+                                G_sprint(self, 2, "Red-Def mode already activated\n");
                         return;
                 }
 
@@ -236,9 +241,9 @@ void AGR_command( int argc )
 
                 if ( !Goal )
 	       	       return;
-	        if ( !Goal->display_item_status2 )
+	        if ( !Goal->display_item_status1 )
 	                return;
-       	        te = Finditem( Goal->display_item_status2 );
+       	        te = Finditem( Goal->display_item_status1 );
                 if ( te == world )
         	{
         	        if( self != world )
@@ -251,25 +256,25 @@ void AGR_command( int argc )
         	        tfgoalitem_RemoveFromPlayer( te, owner, 1 );
         	}
         	te->take_sshot = 1;
-                agr_mode = true;
-                G_bprint(2,"AGR mode activated\n");
+                red_def_mode = true;
+                G_bprint(2,"Òεδ-ΔΕζ νοδε αγτιφατεδ\n");
                 return;
         }
         if( !strcmp(cmd_command,"off") )
         {
-                if( !agr_mode )
+                if( !red_def_mode )
                 {
         	        if( self != world )
-                                G_sprint(self,2,"AGR mode not activated\n");
+                                G_sprint(self,2,"Red-Def mode not active\n");
                         return;
                 }
 	        Goal = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
 
                 if ( !Goal )
 	       	       return;
-	        if ( !Goal->display_item_status2 )
+	        if ( !Goal->display_item_status1 )
 	                return;
-       	        te = Finditem( Goal->display_item_status2 );
+       	        te = Finditem( Goal->display_item_status1 );
                 if ( te == world )
         	{
         	        if( self != world )
@@ -277,8 +282,8 @@ void AGR_command( int argc )
         		return;
         	}
         	te->take_sshot = 0;
-                agr_mode = false;
-                G_bprint(2,"AGR mode deactivated\n");
+                red_def_mode = false;
+                G_bprint(2,"Òεδ-ΔΕζ νοδε δεαγτιφατεδ\n");
                 return;
         }
 

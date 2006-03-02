@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: admin_cmd.c,v 1.10 2006-02-28 21:29:52 AngelD Exp $
+ *  $Id: admin_cmd.c,v 1.11 2006-03-02 12:08:56 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -37,7 +37,7 @@ static void Admin_UnBan(int argc);
 static void Admin_BanList(int argc);
 static void Admin_Console(int argc);
 static void Admin_Map(int argc);
-void AGR_command( int argc );
+void Red_Def_command( int argc );
 
 static const int max_adminlevel = 100;
 static const admin_cmd_t admin_cmds[] = 
@@ -51,7 +51,7 @@ static const admin_cmd_t admin_cmds[] =
 	{"banlist", Admin_BanList, 3},
 	{"unban", Admin_UnBan, 3},
 	{"console", Admin_Console, 999},
-	{"agr", AGR_command, 1},
+	{"red_def", Red_Def_command, 1},
 	{NULL,NULL,0}
 };
 
