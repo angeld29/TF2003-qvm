@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.55 2006-02-28 21:29:52 AngelD Exp $
+ *  $Id: client.c,v 1.56 2006-03-04 11:42:14 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -2292,7 +2292,7 @@ qboolean SetClientSetting( gedict_t * p, const char *key, const char *value )
 	case 0x0EF36728:	//sbar_res
 		{
 			int     sbres = atoi( value );
-
+			
 			switch ( sbres )
 			{
 			case 768:
@@ -2326,14 +2326,20 @@ qboolean SetClientSetting( gedict_t * p, const char *key, const char *value )
 				p->StatusBarRes = 0;
 				break;
 			}
+			p->StatusRefreshTime = g_globalvars.time + 0.2;
 		}
 		break;
 	case 0x373126B8:	//sbs
 	case 0xBA05048F:	//sbar_size
 		{
+		        p->StatusRefreshTime = g_globalvars.time + 0.2;
 			p->StatusBarSize = atoi( value );
 			if ( p->StatusBarSize > 2 || p->StatusBarSize < 0 )
 				p->StatusBarSize = 0;
+			if( p->StatusBarSize )
+			        p->StatusRefreshTime = g_globalvars.time + 0.2;
+			else
+			        p->StatusRefreshTime = g_globalvars.time + 60;
 		}
 		break;
 	case 0x91A45219:	//mxs
