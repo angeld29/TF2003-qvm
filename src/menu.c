@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: menu.c,v 1.24 2006-02-28 12:50:07 AngelD Exp $
+ *  $Id: menu.c,v 1.25 2006-03-04 13:09:25 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -352,21 +352,6 @@ void Menu_Class_Input( int imp )
 
 		if ( self->settings_bits & TF_CLASS_HELP_MASK )
 			self->current_menu = MENU_CLASSHELP;
-//REMOVE!!!!                    
-/*		if( GetInfokeyString( self, "ch", "classhelp", st, sizeof( st ), "" ) )
-		{
-			if( strcmp(st,"off") )
-			{
-				self->current_menu = MENU_CLASSHELP;
-			}
-		}else
-		{
-			opt = GetInfokeyInt( self, "s", NULL, TF_CLASS_HELP_MASK );
-		        if( ( opt & TF_CLASS_HELP_MASK ) != 0 )
-		        {
-		        	self->current_menu = MENU_CLASSHELP;
-		        }
-		}*/
 	}
 	self->menu_displaytime = 0;
 	self->s.v.impulse = 0;
@@ -1467,7 +1452,8 @@ void TG_SGOptions_Menu( menunum_t menu )
 
 	s_sg_find = sentry_find_names[tg_data.sg_allow_find];
 
-/*  if(tg_data.sg_fire_type >= TG_SG_FIRE_NUM)
+/*REMOVE!!!
+  if(tg_data.sg_fire_type >= TG_SG_FIRE_NUM)
   	tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;
   s_sgfiretype = sentry_firetype_names[tg_data.sg_fire_type];*/
 	s_sgfiretype = "7) Fire type                  \n";

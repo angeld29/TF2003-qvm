@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.33 2006-02-28 21:29:52 AngelD Exp $
+ *  $Id: weapons.c,v 1.34 2006-03-04 13:09:25 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -755,24 +755,8 @@ TraceAttack
 // dir must be normalized
 void TraceAttack( float damage, vec3_t dir )
 {
-
-	//vec3_t  vel;
 	vec3_t  	org, tmp;
 
-	//REMOVE!!! not used vel var
-	/*vel = normalize(dir + v_up*crandom() + v_right*crandom());
-	   vel = vel + 2*trace_plane_normal;
-	   vel = vel * 200; */
-
-/*	VectorScale( g_globalvars.v_up, crandom(  ), tmp ); 
-	VectorAdd( dir, tmp, vel );
-	VectorScale( g_globalvars.v_right, crandom(  ), tmp );
-	VectorAdd( vel, tmp, vel );
-	VectorNormalize( vel );
-	VectorScale( g_globalvars.trace_plane_normal, 2, tmp );
-	VectorAdd( vel, tmp, vel );
-	VectorScale( vel, 200, vel );*/
-	
 	// org = trace_endpos - dir*4;
 	VectorScale( dir, 4, tmp );
 	VectorSubtract( g_globalvars.trace_endpos, tmp, org );

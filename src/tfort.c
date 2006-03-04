@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.44 2006-02-28 21:29:52 AngelD Exp $
+ *  $Id: tfort.c,v 1.45 2006-03-04 13:09:25 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1556,13 +1556,7 @@ void TeamFortress_SetEquipment(  )
 	self->s.v.items = ( int ) self->s.v.items | kept_items;
     
 	self->assault_min_shells = GetInfokeyInt( self, "sb", NULL, DEFAULT_ASSAULT_MIN_SHELLS );
-//REMOVE!!!!	        
-/*	if( self->assault_min_shells < 0)
-		self->assault_min_shells = DEFAULT_ASSAULT_MIN_SHELLS;
 
-	GetInfokeyString( self, "s", NULL, st, sizeof(st), "off" );
-	opt = GetInfokeyInt( self, "s", NULL, 0 );
-	if(!strcmp(st, "on") || (opt &TF_AUTOID_MASK))*/
 	if( self->settings_bits & TF_AUTOID_MASK)
 	{
          te = spawn();
@@ -2660,56 +2654,6 @@ void TeamFortress_AutoID(  )
 }
 
 
-
-/*
-//REMOVE!!!
-void () TeamFortress_CheckforCheats =
-{
- float tf;
- float pf;
- string st;
- vec3_t vplf;
- vec3_t vf;
-
- self->s.v.nextthink = g_globalvars.time + 2;
- if (self->s.v.owner.immune_to_check > g_globalvars.time) 
-  return;
- if (self->s.v.owner.deadflag) 
-  return;
- if (!(self->s.v.owner.flags & 512) || self->s.v.velocity[2]) 
-  return;
- vplf = self->s.v.owner->s.v.velocity;
- makevectors(self->s.v.owner.angles);
- vf = v_forward;
- vf[2] = 0;
- vf = normalize(vf);
- tf = vplf[0] * vf[0] + vplf[1] * vf[1];
- pf = self->s.v.owner.maxfbspeed + 100;
- if ((self->s.v.owner->tfstate & 65536) && tf > 20) {
-  self->s.v.nextthink = g_globalvars.time + 0.5;
-  self->s.v.owner.cheat_level = self->s.v.owner.cheat_level + 600;
- }
- if (tf > pf) {
-  pf = pf + 100;
-  if (tf > pf) {
-   self->s.v.nextthink = g_globalvars.time + 2;
-   self->s.v.owner.cheat_level = self->s.v.owner.cheat_level + 300;
-  }
-  else {
-   self->s.v.nextthink = g_globalvars.time + 3;
-   self->s.v.owner.cheat_level = self->s.v.owner.cheat_level + 150;
-  }
-  TeamFortress_SetSpeed(self->s.v.owner);
- }
- if (self->s.v.owner.cheat_level > 1200) {
-  self->s.v.owner.cheat_level = 0;
-  bprint2(1, self->s.v.owner.netname, " has been kicked for cheating.\n");
-  G_sprint(self->s.v.owner, 2, "You have been kicked for cheating, because of your speed.\n");
-  KickCheater(self->s.v.owner);
- }
-};*/
-
-
 void PlayerObserverMode(  )
 {
 	self->current_menu = MENU_DEFAULT;
@@ -2784,22 +2728,9 @@ const char   *ec_strings[] = {
 
 void TeamFortress_ExecClassScript( gedict_t * p )
 {
-//	char    st[10];
-//	int     pl_set;
 
 	if( ! (self->settings_bits  & TF_EXEC_CLASS_MASK) )
 	        return;
-//REMOVE!!!!	
-/*	if ( GetInfokeyString( p, "ec", "exec_class", st, sizeof( st ), "" ) )
-	{
-		if ( Q_stricmp( st, "on" ) )
-			return;
-	} else
-	{
-		pl_set = GetInfokeyInt( p, "s", NULL, 0 );
-		if ( !( pl_set & TF_EXEC_CLASS_MASK ) )
-			return;
-	}*/
 	if ( !p->playerclass || p->playerclass > 9 )
 		return;
 	stuffcmd( p, ec_strings[p->playerclass] );
@@ -2807,22 +2738,9 @@ void TeamFortress_ExecClassScript( gedict_t * p )
 
 void TeamFortress_ExecMapScript( gedict_t * p )
 {
-//	char    st[10];
-//	int     pl_set;
 
 	if( ! (self->settings_bits  & TF_EXEC_MAP_MASK) )
 	        return;
-//REMOVE!!!!	
-/*	if ( GetInfokeyString( p, "em", "exec_map", st, sizeof( st ), "" ) )
-	{
-		if ( Q_stricmp( st, "on" ) )
-			return;
-	} else
-	{
-		pl_set = GetInfokeyInt( p, "s", NULL, 0 );
-		if ( !( pl_set & TF_EXEC_MAP_MASK ) )
-			return;
-	}*/
 
 	stuffcmd( p, "exec mapdefault.cfg\n" );
 	stuffcmd( p, "exec %s.cfg", g_globalvars.mapname );

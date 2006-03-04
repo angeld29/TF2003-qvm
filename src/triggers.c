@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: triggers.c,v 1.8 2005-05-11 11:29:20 AngelD Exp $
+ *  $Id: triggers.c,v 1.9 2006-03-04 13:09:25 AngelD Exp $
  */
 #include "g_local.h"
 gedict_t *stemp, *otemp, *s, *old;
@@ -591,25 +591,6 @@ void SP_trigger_setskill(  )
 	dremove( self );
 	return;
 }
-
-/*
-//REMOVE!!!
-void trigger_skill_touch()
-{
- gedict_t* te;
-
- if (strneq(other->s.v.classname, "player")) 
-  return;
- if (!Activated(self, other)) {
-  if (self.else_goal) {
-   te = Findgoal(self.else_goal);
-   if (te) 
-    AttemptToActivate(te, other, self);
-  }
-  return;
- }
- cvar_set("skill", self.message);
-};*/
 
 /*
 ==============================================================================
