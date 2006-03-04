@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.56 2006-03-04 11:42:14 AngelD Exp $
+ *  $Id: client.c,v 1.57 2006-03-04 15:10:06 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1317,11 +1317,11 @@ gedict_t *FindDeathmatchSpawnPoint()
 }
 
 
-void ValidateUser( gedict_t * e )
+/*void ValidateUser( gedict_t * e )
 {
 
 }
-
+*/
 
 gedict_t *SelectSpawnPoint()
 {

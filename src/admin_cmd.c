@@ -18,11 +18,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: admin_cmd.c,v 1.11 2006-03-02 12:08:56 AngelD Exp $
+ *  $Id: admin_cmd.c,v 1.12 2006-03-04 15:10:06 AngelD Exp $
  */
 #include "g_local.h"
 
-typedef struct {
+typedef struct admin_cmd_s{
 	char		*command;
 	void		(*Action) (int);
 	int		level;

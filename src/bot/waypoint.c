@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: waypoint.c,v 1.7 2005-06-10 00:43:39 AngelD Exp $
+ *  $Id: waypoint.c,v 1.8 2006-03-04 15:10:06 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -254,7 +254,7 @@ qboolean AddLink( int src_index, int dest_index, wp_link_t * newlink )
 
 
 #define MAX_PATH_LEN  100
-typedef struct {
+typedef struct tmp_path_s{
 	waypoint_t *wp;
 	int     link_index;
 } tmp_path_t;

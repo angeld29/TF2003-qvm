@@ -18,11 +18,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: ui.c,v 1.7 2005-06-05 05:10:41 AngelD Exp $
+ *  $Id: ui.c,v 1.8 2006-03-04 15:10:06 AngelD Exp $
  */
 #include "g_local.h"
 
-typedef struct {
+typedef struct bot_cmd_s{
 	char		*command;
 	void		(*func) ();
 }bot_cmd_t;

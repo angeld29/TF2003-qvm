@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.45 2006-03-04 13:09:25 AngelD Exp $
+ *  $Id: tfort.c,v 1.46 2006-03-04 15:10:06 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -28,7 +28,7 @@ int FLAME_MAXWORLDNUM, MAX_WORLD_PIPEBOMBS, MAX_WORLD_AMMOBOXES, GR_TYPE_MIRV_NO
 
 static int     num_team_ammoboxes[5] = { 0, 0, 0, 0, 0 };
 
-typedef struct {
+typedef struct class_settings_s{
 	int     bitmask;
 	int     maxhealth, maxspeed, maxstrafespeed;
 	int     weapons_carried, current_weapon;
@@ -45,7 +45,7 @@ typedef struct {
 	const   char   *name;
 	const   char   *defaultskin;
 	const   char   *infokey4skin[4];
-} class_settings_t;
+}class_settings_t;
 
 
 const class_settings_t class_set[] = {

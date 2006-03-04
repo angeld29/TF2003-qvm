@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: progs.h,v 1.26 2006-02-28 21:29:52 AngelD Exp $
+ *  $Id: progs.h,v 1.27 2006-03-04 15:10:06 AngelD Exp $
  */
 #include "progdefs.h"
 
@@ -356,7 +356,7 @@ extern char           *team_menu_string;
 
 extern int FLAME_MAXWORLDNUM, MAX_WORLD_PIPEBOMBS, MAX_WORLD_AMMOBOXES, GR_TYPE_MIRV_NO, GR_TYPE_NAPALM_NO;
 
-typedef enum
+typedef enum sg_sfire_e
 {
 	SG_SFIRE_NEW,
 	SG_SFIRE_281,
@@ -365,7 +365,7 @@ typedef enum
 	SG_SFIRE_NUM
 }sg_sfire_t;
 
-typedef enum
+typedef enum arena_modes_e
 {
 	ARENA_MODE_NONE = 0,
 	ARENA_MODE_FFA,
@@ -373,7 +373,7 @@ typedef enum
 }arena_modes_t;
 
 
-typedef struct {
+typedef struct tf_server_data_s{
 	int             toggleflags;
 	float           respawn_delay_time;
 	int             live_camera;

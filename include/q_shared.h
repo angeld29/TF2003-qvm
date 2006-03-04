@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: q_shared.h,v 1.3 2005-05-28 15:18:32 AngelD Exp $
+ *  $Id: q_shared.h,v 1.4 2006-03-04 15:10:06 AngelD Exp $
  */
 
 #ifndef __Q_SHARED_H
@@ -94,7 +94,7 @@
 
 typedef unsigned char 		byte;
 //typedef enum {qfalse, qtrue}	qboolean;
-typedef enum {false, true}	qboolean;
+typedef enum qboolean_e {false, true}	qboolean;
 
 
 
@@ -118,7 +118,7 @@ typedef struct link_s
 
 // entity_state_t is the information conveyed from the server
 // in an update message
-typedef struct
+typedef struct	entity_state_s
 {
 	int		number;			// edict index
 
@@ -141,7 +141,7 @@ float	FloatSwap (const float *f);
 
 // 64-bit integers for global rankings interface
 // implemented as a struct for qvm compatibility
-typedef struct
+typedef struct qint64_s
 {
 	byte	b0;
 	byte	b1;
@@ -194,7 +194,7 @@ char *Q_CleanStr( char *string );
 
 
 // parameters to the main Error routine
-typedef enum {
+typedef enum errorParm_e{
 	ERR_FATAL,					// exit the entire game with a popup window
 	ERR_DROP,					// print to console and disconnect from game
 	ERR_SERVERDISCONNECT,		// don't kill server

@@ -18,12 +18,12 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: menu.c,v 1.25 2006-03-04 13:09:25 AngelD Exp $
+ *  $Id: menu.c,v 1.26 2006-03-04 15:10:06 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
 
-typedef struct {
+typedef struct menu_s{
 	int     allowed_impulses;
 	int     reset_impulse;
 	int     display_time;

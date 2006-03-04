@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.24 2006-01-18 14:05:26 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.25 2006-03-04 15:10:06 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -32,7 +32,7 @@
 #define CMD_NOT_BUILD	        64
 
 
-typedef struct {
+typedef struct cmd_s{
 	char   *command;
 	void    ( *Action ) (  );
 	int     allowed;

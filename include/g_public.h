@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_public.h,v 1.8 2005-11-14 15:36:21 AngelD Exp $
+ *  $Id: g_public.h,v 1.9 2006-03-04 15:10:06 AngelD Exp $
  */
 
 #ifndef __G_PUBLIC_H__
@@ -39,7 +39,7 @@
 //
 // system traps provided by the main engine
 //
-typedef enum
+typedef enum  gameImport_e
 {
 	//============== general Quake services ==================
 
@@ -136,7 +136,7 @@ typedef enum
 //
 // functions exported by the game subsystem
 //
-typedef enum
+typedef enum gameExport_e
 {
 	GAME_INIT,	// ( int levelTime, int randomSeed, int restart );
 	// init and shutdown will be called every single level
@@ -177,7 +177,7 @@ typedef enum
 } gameExport_t;
 
 
-typedef enum
+typedef enum fieldtype_e
 {
 	F_INT, 
 	F_FLOAT,
@@ -191,7 +191,7 @@ typedef enum
 	F_IGNORE
 } fieldtype_t;
 
-typedef struct
+typedef struct field_s
 {
 	string_t	name;
 	int			ofs;
@@ -199,7 +199,7 @@ typedef struct
 //	int			flags;
 } field_t;
 
-typedef struct
+typedef struct gameData_s
 {
 	edict_t		*ents;
 	int		sizeofent;
@@ -210,7 +210,7 @@ typedef struct
 
 typedef int		fileHandle_t;
 
-typedef enum {
+typedef enum fsMode_e{
 	FS_READ_BIN,
 	FS_READ_TXT,
 	FS_WRITE_BIN,
@@ -219,7 +219,7 @@ typedef enum {
 	FS_APPEND_TXT
 } fsMode_t;
 
-typedef enum {
+typedef enum fsOrigin_e{
 	FS_SEEK_CUR,
 	FS_SEEK_END,
 	FS_SEEK_SET

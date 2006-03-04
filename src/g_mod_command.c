@@ -17,11 +17,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_mod_command.c,v 1.7 2006-03-02 12:08:56 AngelD Exp $
+ *  $Id: g_mod_command.c,v 1.8 2006-03-04 15:10:06 AngelD Exp $
  */
 
 #include "g_local.h"
-typedef struct {
+typedef struct mod_s{
 	char   *command;
 	void    ( *Action ) ( int );
 } mod_t;

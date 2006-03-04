@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfortmap.c,v 1.23 2006-02-28 21:29:52 AngelD Exp $
+ *  $Id: tfortmap.c,v 1.24 2006-03-04 15:10:06 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1384,6 +1384,24 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 	gedict_t *te;
 	float   winners;
 //	float   gotone;
+        static const char *ctf_msg_your_team_gotflag = "\n\n\nYour team гот the енемы flag!!";
+        static const char *ctf_msg_your_flag_taken   = "\n\n\nYour flag has been такен!!";
+        static const char *ctf_msgs_you_take_flag[] = {
+                 "\n\n\nYou got the enemy flag!\n\nFlee!" ,
+                 "\n\n\nYou got the enemy flag!\n\nHead for home!" ,
+                 "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
+                 "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
+                 "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
+                 "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
+                 "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
+                 "\n\n\nYou got the enemy flag!\n\n<Insert witty comment here>" ,
+                 "\n\n\nYou got the enemy flag!\n\n" ,
+                 "\n\n\nYou got the enemy flag!\n\n" ,
+                 "\n\n\nIs that a flag in your pocket\nor a you just happy to see me?" 
+        };
+        
+        static const int num_ctf_msgs = sizeof(ctf_msgs_you_take_flag)/sizeof(ctf_msgs_you_take_flag[0]);
+
 
 	if ( tf_data.cb_prematch_time > g_globalvars.time )
 		return;
@@ -1429,178 +1447,76 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 	}
 	if ( winners == 1 )
 		TeamFortress_TeamShowScores( 2 );
-	if ( CTF_Map == 1 )
+	if ( CTF_Map == 1 && AP && AP != world )
 	{
-		if ( AP && AP != world )
-		{
-			if ( Goal->goal_no == 1 )
-			{
-				te = trap_find( world, FOFS( s.v.classname ), "player" );
-				while ( te )
-				{
-					if ( te->team_no == 2 )
-					{
-						if ( te == AP )
-						{
-							winners = g_random(  );
-							if ( winners < 0.1 )
-								CenterPrint( te,
-									     "\n\n\nYou got the enemy flag!\n\nFlee!" );
-							else
-							{
-								if ( winners < 0.2 )
-									CenterPrint( te,
-										     "\n\n\nYou got the enemy flag!\n\nHead for home!" );
-								else
-								{
-									if ( winners < 0.6 )
-										CenterPrint( te,
-											     "\n\n\nYou got the enemy flag!\n\nReturn to base!" );
-									else
-									{
-										if ( winners < 0.7 )
-											CenterPrint( te,
-												     "\n\n\nYou got the enemy flag!\n\n<Insert witty comment here>" );
-										else
-										{
-											if ( winners < 0.8 )
-												CenterPrint( te,
-													     "\n\n\nYou got the enemy flag!\n\n" );
-											else
-											{
-												if ( winners < 0.95 )
-													CenterPrint( te,
-														     "\n\n\nYou got the enemy flag!\n\n" );
-												else
-													CenterPrint( te,
-														     "\n\n\nIs that a flag in your pocket\nor a you just happy to see me?" );
-											}
-										}
-									}
-								}
-							}
-						} else
-							CenterPrint( te, "\n\n\nYour team гот the енемы flag!!" );
-					} else
-						CenterPrint( te, "\n\n\nYour flag has been такен!!" );
-					te = trap_find( te, FOFS( s.v.classname ), "player" );
-				}
-				G_bprint( 2, "%s гот the блуе flag!\n", AP->s.v.netname );
-				AP->s.v.items = ( int ) AP->s.v.items | 131072;
-			} else
-			{
-				if ( Goal->goal_no == 2 )
-				{
-					te = trap_find( world, FOFS( s.v.classname ), "player" );
-					while ( te )
-					{
-						if ( te->team_no == 1 )
-						{
-							if ( te == AP )
-							{
-								winners = g_random(  );
-								if ( winners < 0.1 )
-									CenterPrint( te,
-										     "\n\n\nYou got the enemy flag!\n\nFlee!" );
-								else
-								{
-									if ( winners < 0.2 )
-										CenterPrint( te,
-											     "\n\n\nYou got the enemy flag!\n\nHead for home!" );
-									else
-									{
-										if ( winners < 0.6 )
-											CenterPrint( te,
-												     "\n\n\nYou got the enemy flag!\n\nReturn to base!" );
-										else
-										{
-											if ( winners < 0.7 )
-												CenterPrint( te,
-													     "\n\n\nYou got the enemy flag!\n\n<Insert witty comment here>" );
-											else
-											{
-												if ( winners < 0.8 )
-													CenterPrint( te,
-														     "\n\n\nYou got the enemy flag!\n\nRed's dead baby, Red's dead..." );
-												else
-												{
-													if ( winners <
-													     0.95 )
-														CenterPrint
-														    ( te,
-														      "\n\n\nYou got the enemy flag!\n\n" );
-													else
-														CenterPrint
-														    ( te,
-														      "\n\n\nIs that a flag in your pocket\nor a you just happy to see me?" );
-												}
-											}
-										}
-									}
-								}
-							} else
-								CenterPrint( te,
-									     "\n\n\nYour team гот the енемы flag!!" );
-						} else
-							CenterPrint( te, "\n\n\nYour flag has been такен!!" );
-						te = trap_find( te, FOFS( s.v.classname ), "player" );
-					}
-					G_bprint( 2, "%s гот the ред flag!\n", AP->s.v.netname );
-					AP->s.v.items = ( int ) AP->s.v.items | 262144;
-				} else
-				{
-					if ( Goal->goal_no == 3 )
-					{
-						te = trap_find( world, FOFS( s.v.classname ), "player" );
-						while ( te )
-						{
-							if ( te->team_no == 2 )
-							{
-								if ( te == AP )
-									CenterPrint( te,
-										     "\n\n\nYou цаптуред the flag!!" );
-								else
-									CenterPrint( te,
-										     "\n\n\nYour flag was цаптуред!!" );
-							} else
-								CenterPrint( te,
-									     "\n\n\nYour team цаптуред the flag!!" );
-							te = trap_find( te, FOFS( s.v.classname ), "player" );
-						}
-						G_bprint( 2, "%s цаптуред the ред flag!\n", AP->s.v.netname );
-						AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & 262144 );
-					} else
-					{
-						if ( Goal->goal_no == 4 )
-						{
-							te = trap_find( world, FOFS( s.v.classname ), "player" );
-							while ( te )
-							{
-								if ( te->team_no == 1 )
-								{
-									if ( te == AP )
-										CenterPrint( te,
-											     "\n\n\nYou цаптуред the flag!!" );
-									else
-										CenterPrint( te,
-											     "\n\n\nYour flag was цаптуред!!" );
-								} else
-									CenterPrint( te,
-										     "\n\n\nYour team цаптуред the flag!!" );
-								te = trap_find( te, FOFS( s.v.classname ), "player" );
-							}
-							G_bprint( 2, "%s цаптуред the блуе flag!\n", AP->s.v.netname );
-							AP->s.v.items =
-							    AP->s.v.items - ( ( int ) AP->s.v.items & 131072 );
-						}
-					}
-				}
-			}
-		}
+                switch( Goal->goal_no ) 
+                {
+                      case 1:
+  			for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
+  			{
+  				if ( te->team_no == 2 )
+  				{
+  					if ( te == AP )
+  					{
+  					        CenterPrint( te, ctf_msgs_you_take_flag[(int)g_random()*num_ctf_msgs]);
+  					} else
+  						CenterPrint( te, ctf_msg_your_team_gotflag );
+  				} else
+  					CenterPrint( te, ctf_msg_your_flag_taken );
+  			}
+  			G_bprint( 2, "%s гот the блуе flag!\n", AP->s.v.netname );
+  			AP->s.v.items = ( int ) AP->s.v.items | IT_KEY1;
+                        break;
+                      case 2:
+  			for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
+  			{
+  				if ( te->team_no == 1 )
+  				{
+  					if ( te == AP )
+  					{
+  					        CenterPrint( te, ctf_msgs_you_take_flag[(int)g_random()*num_ctf_msgs]);
+  					} else
+  						CenterPrint( te, ctf_msg_your_team_gotflag );
+  				} else
+  					CenterPrint( te, ctf_msg_your_flag_taken );
+  			}
+  			G_bprint( 2, "%s гот the ред flag!\n", AP->s.v.netname );
+  			AP->s.v.items = ( int ) AP->s.v.items | IT_KEY2;
+                        break;
+                      case 3:
+  			for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
+  			{
+       				if ( te->team_no == 2 )
+       				{
+       					if ( te == AP )
+       						CenterPrint( te,"\n\n\nYou цаптуред the flag!!" );
+       					else
+       						CenterPrint( te,"\n\n\nYour flag was цаптуред!!" );
+       				} else
+       					CenterPrint( te, "\n\n\nYour team цаптуред the flag!!" );
+       			}
+       			G_bprint( 2, "%s цаптуред the ред flag!\n", AP->s.v.netname );
+       			AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY2 );
+                        break;
+                      case 4:
+  			for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
+  			{
+       				if ( te->team_no == 1 )
+       				{
+       					if ( te == AP )
+       						CenterPrint( te,"\n\n\nYou цаптуред the flag!!" );
+       					else
+       						CenterPrint( te,"\n\n\nYour flag was цаптуред!!" );
+       				} else
+       					CenterPrint( te, "\n\n\nYour team цаптуред the flag!!" );
+       			}
+       			G_bprint( 2, "%s цаптуред the блуе flag!\n", AP->s.v.netname );
+       			AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY1 );
+                        break;
+                }
 	}
 //	gotone = 0;
-	te = trap_find( world, FOFS( s.v.classname ), "player" );
-	while ( te )
+	for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )        
 	{
 		if ( Goal->broadcast && !CTF_Map )
 			CenterPrint( te, "\n\n\n%s", Goal->broadcast );
@@ -1672,7 +1588,6 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 //				gotone = 1;
 			}
 		}
-		te = trap_find( te, FOFS( s.v.classname ), "player" );
 	}
 	if ( strneq( Goal->s.v.classname, "item_tfgoal" ) )
 		Goal->goal_state = 1;

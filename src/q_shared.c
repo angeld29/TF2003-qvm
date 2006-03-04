@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: q_shared.c,v 1.3 2005-06-05 05:10:41 AngelD Exp $
+ *  $Id: q_shared.c,v 1.4 2006-03-04 15:10:06 AngelD Exp $
  */
 
 // q_shared.c -- stateless support routines that are included in each code dll
@@ -108,7 +108,7 @@ qint64 Long64NoSwap (qint64 ll)
 	return ll;
 }
 
-typedef union {
+typedef union _FloatByteUnion_u{
     float	f;
     unsigned int i;
 } _FloatByteUnion;

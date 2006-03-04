@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_spawn.c,v 1.8 2005-05-28 22:35:46 AngelD Exp $
+ *  $Id: g_spawn.c,v 1.9 2006-03-04 15:10:06 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -376,7 +376,7 @@ static const field_t         fields[] = {
         {"hook_out",			FOFS( hook_out ),			F_INT},
         {NULL}
 };
-typedef struct {
+typedef struct spawn_s{
 	char           *name;
 	void            ( *spawn ) ();
 } spawn_t;

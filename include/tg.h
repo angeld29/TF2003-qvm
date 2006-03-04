@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tg.h,v 1.9 2006-02-28 12:50:07 AngelD Exp $
+ *  $Id: tg.h,v 1.10 2006-03-04 15:10:06 AngelD Exp $
  */
 
 #define TG_CONC_IMPULSE 205
@@ -32,20 +32,7 @@
 #define TG_DISP_LOAD_IMPULSE 224
 #define TG_DISP_UNLOAD_IMPULSE 225
 
-/*
-#define TG_MENU_MAIN 200
-#define TG_MENU_SG 201
-#define TG_MENU_DETPACK 202
-#define TG_MENU_CHEATS 203
-#define TG_MENU_POSITION 204
-////////TG SG Options
-
-#define TG_SG_FIND_IGNORE_OFF 3
-#define TG_SG_FIND_IGNORE_TEAM 1
-#define TG_SG_FIND_IGNORE_OWNER 2
-#define TG_SG_FIND_IGNORE_ALL 0
-*/
-typedef enum
+typedef enum tg_sg_find_e
 {
  TG_SG_FIND_IGNORE_TEAM,
  TG_SG_FIND_IGNORE_OWNER,
@@ -54,17 +41,15 @@ typedef enum
  TG_SG_FIND_IGNORE_NUM
 }tg_sg_find_t;
 
-typedef enum
+typedef enum tg_sg_fire_e
 {
  TG_SG_FIRE_NORMAL,
  TG_SG_FIRE_BULLETS,
  TG_SG_FIRE_LIGHTING,
  TG_SG_FIRE_NUM
 }tg_sg_fire_t;
-/*#define TG_SG_FIRE_NORMAL 0
-#define TG_SG_FIRE_BULLETS 1
-#define TG_SG_FIRE_LIGHTING 2*/
-typedef enum
+
+typedef enum tg_detpack_clip_e
 {
 	TG_DETPACK_CLIP_OWNER,
 	TG_DETPACK_CLIP_ALL,
@@ -72,7 +57,7 @@ typedef enum
 	TG_DETPACK_CLIP_NUM
 }tg_detpack_clip_t;
 
-typedef enum
+typedef enum tg_gren_effect_e
 {
 	TG_GREN_EFFECT_ON,
 	TG_GREN_EFFECT_OFF,
@@ -81,7 +66,7 @@ typedef enum
 }tg_gren_effect_t;
 
 
-typedef struct{
+typedef struct tf_tg_server_data_s{
  int                    tg_enabled;
  int                    godmode;
  int                    unlimit_ammo,unlimit_grens;
