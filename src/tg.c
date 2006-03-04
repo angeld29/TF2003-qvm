@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tg.c,v 1.15 2006-02-28 12:50:07 AngelD Exp $
+ *  $Id: tg.c,v 1.16 2006-03-04 13:01:15 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -369,3 +369,127 @@ void TG_Cmd()
 	}
 }
 
+
+
+void FlashPlayer( gedict_t*p, gedict_t*attacker );
+void ConcPlayer( gedict_t*p, gedict_t*attacker );
+void ConcussionGrenadeTimer(  );
+void OldConcussionGrenadeTimer(  );
+void TG_Eff_Flash( gedict_t * te )
+{
+	if ( strneq( te->s.v.classname, "player" ) )
+		return;
+	if ( te->s.v.health <= 0 )
+		return;
+
+	FlashPlayer( te, NULL );
+}
+
+void TG_Eff_Conc( gedict_t * head )
+{
+	if ( strneq( head->s.v.classname, "player" ) )
+		return;
+	if ( head->s.v.health <= 0 )
+		return;
+
+	ConcPlayer( head, NULL);
+}
+
+void    HallucinationTimer(  );
+void    TranquiliserTimer(  );
+
+void TG_Eff_Remove( gedict_t * pl )
+{
+	gedict_t *te;
+	float   healam;
+
+	if ( strneq( pl->s.v.classname, "player" ) )
+		return;
+	if ( pl->s.v.health <= 0 )
+		return;
+
+	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "timer" ) ); )
+	{
+		if ( te->s.v.owner != EDICT_TO_PROG( pl ) )
+			continue;
+		if ( te->s.v.think != ( func_t ) ConcussionGrenadeTimer &&
+		     te->s.v.think != ( func_t ) OldConcussionGrenadeTimer )
+			continue;
+		if ( tf_data.old_grens == 1 )
+			stuffcmd( pl, "v_idlescale 0\nfov 90\n" );
+		dremove( te );
+		break;
+	}
+	if ( pl->tfstate & TFSTATE_HALLUCINATING )
+	{
+		for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "timer" ) ); )
+		{
+			if ( te->s.v.owner != EDICT_TO_PROG( pl ) )
+				continue;
+			if ( te->s.v.think != ( func_t ) HallucinationTimer )
+				continue;
+
+			pl->tfstate -= ( pl->tfstate & TFSTATE_HALLUCINATING );
+
+			ResetGasSkins( pl );
+
+			if ( tf_data.new_gas & GAS_MASK_PALETTE )
+				stuffcmd( pl, "v_cshift; wait; bf\n" );
+			dremove( te );
+			break;
+		}
+		if ( !te )
+			G_conprintf( "Warning: Error in Hallucination Timer logic.\n" );
+	}
+	if ( pl->tfstate & TFSTATE_TRANQUILISED )
+	{
+		for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "timer" ) ); )
+		{
+			if ( te->s.v.owner != EDICT_TO_PROG( pl ) )
+				continue;
+			if ( te->s.v.think != ( func_t ) TranquiliserTimer )
+				continue;
+
+			pl->tfstate -= ( pl->tfstate & TFSTATE_TRANQUILISED );
+			TeamFortress_SetSpeed( pl );
+			dremove( te );
+			break;
+		}
+		if ( !te )
+			G_conprintf( "Warning: Error in Tranquilisation Timer logic.\n" );
+	}
+	if ( pl->FlashTime > 0 )
+	{
+		for ( te = world; ( te = trap_find( te, FOFS( s.v.netname ), "flashtimer" ) ); )
+		{
+			if ( te->s.v.owner != EDICT_TO_PROG( pl ) )
+				continue;
+			if ( strneq( te->s.v.classname, "timer" ) )
+				continue;
+
+			pl->FlashTime = 0;
+			if ( tf_data.new_flash )
+				disableupdates( pl, -1 );	/* server-side flash */
+			break;
+		}
+		if ( !te )
+		{
+			G_conprintf( "Warning: Error in Flash Timer logic.\n" );
+			pl->FlashTime = 0;
+		}
+	}
+	if ( pl->tfstate & TFSTATE_INFECTED )
+	{
+		healam = rint( pl->s.v.health / 2 );
+		pl->tfstate -= ( pl->tfstate & TFSTATE_INFECTED );
+		tf_data.deathmsg = DMSG_MEDIKIT;
+		T_Damage( pl, self, self, healam );
+		return;
+	}
+	if ( pl->numflames > 0 )
+	{
+		sound( pl, 1, "items/r_item1.wav", 1, 1 );
+		pl->numflames = 0;
+		return;
+	}
+}

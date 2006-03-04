@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: scout.c,v 1.24 2005-12-15 18:48:08 AngelD Exp $
+ *  $Id: scout.c,v 1.25 2006-03-04 13:01:15 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -162,17 +162,78 @@ void FlashTimerNew(  )
 		ent_remove( self );
 		return;
 	}
-//      if ( te->FlashTime < ( 24 - NEW_FLASH_START_TIME ) )
-//      {
 	stuffcmd( te, "v_cshift %.0f %.0f %.0f %.0f\n", te->FlashTime * 10,
 		  te->FlashTime * 10, te->FlashTime * 10, te->FlashTime * 10 );
-//      }
+
 	self->s.v.nextthink = g_globalvars.time + 0.6;
+}
+
+void FlashPlayer( gedict_t*p, gedict_t*attacker )
+{
+        gedict_t* te;
+        
+        if ( !p->FlashTime )
+        {
+       		te = spawn(  );
+       		te->s.v.classname = "timer";
+       		te->s.v.netname = "flashtimer";
+       		te->s.v.owner = EDICT_TO_PROG( p );
+        }else
+        {
+       		for ( te = world; ( te = trap_find( te, FOFS( s.v.netname ), "flashtimer" ) ); )
+       		{
+       			if ( te->s.v.owner != EDICT_TO_PROG( p ) )
+       				continue;
+
+       			break;
+       		}
+       		if ( !te )
+       		{
+       			G_conprintf( "Warning: Error in Flash Timer logic.\n" );
+       			return;
+       		}
+        }
+        G_sprint( p, 2, "You are flashed\n" );
+       	
+       	te->team_no = (attacker)?attacker->team_no:p->team_no;
+       	if ( attacker && tg_data.gren_time )
+       		te->gren_eff_time = g_globalvars.time + tg_data.gren_time;
+
+       	
+       	if ( tf_data.new_flash )
+       	{
+       	        te->s.v.think = ( func_t ) FlashTimerNew;
+       	        te->s.v.nextthink = g_globalvars.time + NEW_FLASH_START_TIME;
+       	        if( p == attacker )
+       	        {
+       	                p->FlashTime = 16;
+       	                stuffcmd( p, "v_cshift 160 160 160 160\n" );
+       	                disableupdates( p, -1 );	/* server-side flash */
+       	        }else
+       	        {
+       	                p->FlashTime = 24;
+			stuffcmd( p, "v_cshift 255 255 255 255\n" );
+			disableupdates( p, NEW_FLASH_START_TIME );	/* server-side flash */
+       	        }
+       	}else
+       	{
+       	        te->s.v.think = ( func_t ) FlashTimer;
+       	        te->s.v.nextthink = g_globalvars.time + 1;
+       	        if( p == attacker )
+       	        {
+       	                p->FlashTime = 16;
+       	                stuffcmd( p, "v_cshift 160 160 160 160\n" );
+       	        }else
+       	        {
+       	                p->FlashTime = 24;
+       	                stuffcmd( p, "v_cshift 240 240 240 240\n" );
+       	        }
+       	}
 }
 
 void FlashGrenadeExplode(  )
 {
-	gedict_t *te, *tmpte;
+	gedict_t *te;
 	gedict_t *owner;
 	vec3_t  tmp;
 
@@ -208,94 +269,8 @@ void FlashGrenadeExplode(  )
 
 		if ( te == owner && tg_data.gren_effect == TG_GREN_EFFECT_OFF_FORSELF )
 			continue;
+		FlashPlayer( te, owner );
 
-		G_sprint( te, 2, "You are flashed\n" );
-		if ( tf_data.new_flash )
-		{
-			if ( !te->FlashTime )
-			{
-				newmis = spawn(  );
-				newmis->s.v.classname = "timer";
-				newmis->s.v.netname = "flashtimer";
-				newmis->team_no = owner->team_no;
-				newmis->s.v.owner = EDICT_TO_PROG( te );
-				newmis->s.v.think = ( func_t ) FlashTimerNew;
-				newmis->s.v.nextthink = g_globalvars.time + NEW_FLASH_START_TIME;
-				if ( tg_data.gren_time )
-					newmis->gren_eff_time = g_globalvars.time + tg_data.gren_time;
-			} else
-			{
-				for ( tmpte = world; ( tmpte = trap_find( tmpte, FOFS( s.v.netname ), "flashtimer" ) ); )
-				{
-					if ( tmpte->s.v.owner != EDICT_TO_PROG( te ) )
-						continue;
-
-					tmpte->s.v.nextthink = g_globalvars.time + NEW_FLASH_START_TIME;
-					if ( tg_data.gren_time )
-						tmpte->gren_eff_time = g_globalvars.time + tg_data.gren_time;
-
-					break;
-				}
-				if ( !tmpte )
-				{
-					G_conprintf( "Warning: Error in Flash Timer logic.\n" );
-				}
-
-			}
-			if ( te == owner )
-			{
-				te->FlashTime = 16;
-				stuffcmd( te, "v_cshift 160 160 160 160\n" );
-				disableupdates( te, -1 );	/* server-side flash */
-			} else
-			{
-				te->FlashTime = 24;
-				stuffcmd( te, "v_cshift 255 255 255 255\n" );
-				disableupdates( te, NEW_FLASH_START_TIME );	/* server-side flash */
-			}
-		} else
-		{
-			//old flash
-			if ( !te->FlashTime )
-			{
-				newmis = spawn(  );
-				newmis->s.v.classname = "timer";
-				newmis->s.v.netname = "flashtimer";
-				newmis->team_no = owner->team_no;
-				newmis->s.v.owner = EDICT_TO_PROG( te );
-				newmis->s.v.think = ( func_t ) FlashTimer;
-				newmis->s.v.nextthink = g_globalvars.time + 1;
-				if ( tg_data.gren_time )
-					newmis->gren_eff_time = g_globalvars.time + tg_data.gren_time;
-			} else
-			{
-				for ( tmpte = world;( tmpte = trap_find( tmpte, FOFS( s.v.netname ), "flashtimer" ) ); )
-				{
-					if ( tmpte->s.v.owner != EDICT_TO_PROG( te ) )
-						continue;
-
-					tmpte->s.v.nextthink = g_globalvars.time + 1;
-					if ( tg_data.gren_time )
-						tmpte->gren_eff_time = g_globalvars.time + tg_data.gren_time;
-
-					break;
-				}
-				if ( !tmpte )
-				{
-					G_conprintf( "Warning: Error in Flash Timer logic.\n" );
-				}
-
-			}
-			if ( te == owner )
-			{
-				te->FlashTime = 16;
-			} else
-			{
-				te->FlashTime = 24;
-			}
-			stuffcmd( te, "v_cshift %.0f %.0f %.0f %.0f\n",
-				  te->FlashTime * 10, te->FlashTime * 10, te->FlashTime * 10, te->FlashTime * 10 );
-		}
 	}
 	dremove( self );
 }
@@ -477,7 +452,49 @@ void ScannerSwitch(  )
 	self->StatusRefreshTime = g_globalvars.time + 0.1;
 }
 
+void ConcPlayer( gedict_t*p, gedict_t*attacker )
+{
+        gedict_t* te;
+       	// Concuss 'em!!
+       	// If they are already concussed, set the concussion back up
+       	// Try to find a concusstimer entity for this player
 
+       	G_sprint( p, 2, "You are conced\n" );
+       	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "timer" ) ); )
+       	{
+       		if ( te->s.v.owner != EDICT_TO_PROG( p ) )
+       			continue;
+       		if ( te->s.v.think == ( func_t ) ConcussionGrenadeTimer )
+       			break;
+       		if ( te->s.v.think == ( func_t ) OldConcussionGrenadeTimer )
+       			break;
+       	}
+       	if( !te )
+       	{
+       	        te = spawn(  );
+       	        te->s.v.classname = "timer";
+       	        te->s.v.owner = EDICT_TO_PROG( p );
+       	        te->team_no = (attacker)?attacker->team_no:p->team_no;
+       	        if ( tf_data.old_grens == 1 )
+               	        stuffcmd( p, "bf\n" );
+       	}
+       	if ( tf_data.old_grens == 1 )
+       	{
+     		stuffcmd( p, "v_idlescale 100\n" );
+     		stuffcmd( p, "fov 130\n" );
+     		te->s.v.think = ( func_t ) OldConcussionGrenadeTimer;
+     		te->s.v.health = 100;
+     		te->s.v.nextthink = g_globalvars.time + 5;
+     	} else
+     	{
+     	        te->s.v.think = ( func_t ) ConcussionGrenadeTimer;
+     		te->s.v.health = 800;
+     		te->s.v.nextthink = g_globalvars.time + 0.25;
+       	}
+
+       	if ( tg_data.gren_time )
+       		te->gren_eff_time = g_globalvars.time + tg_data.gren_time;
+}
 //=========================================================================
 // Acts just like T_RadiusDamage, but doesn't damage things, just pushes them away
 // from the explosion at a speed relative to the distance from the explosion's origin.
@@ -485,7 +502,6 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 {
 	float   points;
 	gedict_t *head;
-	gedict_t *te;
 	vec3_t  org, dist;
 
 	for ( head = world; ( head = findradius( head, inflictor->s.v.origin, bounce + 40 ) ); )
@@ -528,59 +544,7 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 				continue;
 
 			// Concuss 'em!!
-			// If they are already concussed, set the concussion back up
-			// Try to find a concusstimer entity for this player
-
-			G_sprint( head, 2, "You are conced\n" );
-			for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "timer" ) ); )
-			{
-				if ( te->s.v.owner != EDICT_TO_PROG( head ) )
-					continue;
-				if ( te->s.v.think == ( func_t ) ConcussionGrenadeTimer )
-					break;
-				if ( te->s.v.think == ( func_t ) OldConcussionGrenadeTimer )
-					break;
-			}
-			if ( te )
-			{
-				if ( tf_data.old_grens == 1 )
-				{
-					stuffcmd( head, "v_idlescale 100\n" );
-					stuffcmd( head, "fov 130\n" );
-					te->s.v.health = 100;
-					te->s.v.nextthink = g_globalvars.time + 5;
-				} else
-				{
-					te->s.v.health = 800;
-					te->s.v.nextthink = g_globalvars.time + 0.25;
-				}
-			} else
-			{
-				if ( tf_data.old_grens == 1 )
-				{
-					stuffcmd( head, "v_idlescale 100\n" );
-					stuffcmd( head, "fov 130\n" );
-					stuffcmd( head, "bf\n" );
-					te = spawn(  );
-					te->s.v.nextthink = g_globalvars.time + 5;
-					te->s.v.think = ( func_t ) OldConcussionGrenadeTimer;
-					te->team_no = attacker->team_no;
-					te->s.v.classname = "timer";
-					te->s.v.owner = EDICT_TO_PROG( head );
-					te->s.v.health = 100;
-				} else
-				{
-					te = spawn(  );
-					te->s.v.nextthink = g_globalvars.time + 0.25;
-					te->s.v.think = ( func_t ) ConcussionGrenadeTimer;
-					te->team_no = attacker->team_no;
-					te->s.v.classname = "timer";
-					te->s.v.owner = EDICT_TO_PROG( head );
-					te->s.v.health = 800;
-				}
-			}
-			if ( tg_data.gren_time )
-				te->gren_eff_time = g_globalvars.time + tg_data.gren_time;
+			ConcPlayer( head, attacker );
 		}
 	}
 }
@@ -723,14 +687,6 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 		return;
 	}
 	multiscan = ( self->settings_bits & TF_MULTISCAN_MASK) ? 0: 1;
-//REMOVE!!!!	
-/*	multiscan = 1;
-	GetInfokeyString( self, "ms", "multiscan", st, sizeof( st ), "on" );
-	opt = GetInfokeyInt( self, "s", NULL, 0 );
-
-	if ( !strcmp( st, "off" ) || ( opt & TF_MULTISCAN_MASK ) )
-		multiscan = 0;*/
-
 
 	if ( typescan == 0 )
 		G_sprint( self, PRINT_HIGH, "Scanning...\n" );
@@ -826,238 +782,3 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 	return;
 }
 
-void TG_Eff_Flash( gedict_t * te )
-{
-	gedict_t *tmp;
-
-	if ( strneq( te->s.v.classname, "player" ) )
-		return;
-	if ( te->s.v.health <= 0 )
-		return;
-
-	G_sprint( te, 2, "You are flashed\n" );
-	if ( tf_data.new_flash )
-	{
-
-		if ( !te->FlashTime )
-		{
-			newmis = spawn(  );
-			newmis->s.v.classname = "timer";
-			newmis->s.v.netname = "flashtimer";
-			newmis->team_no = te->team_no;
-			newmis->s.v.owner = EDICT_TO_PROG( te );
-			newmis->s.v.think = ( func_t ) FlashTimerNew;
-			newmis->s.v.nextthink = g_globalvars.time + NEW_FLASH_START_TIME;
-		} else
-		{
-			for ( tmp = world; ( tmp = trap_find( tmp, FOFS( s.v.netname ), "flashtimer" ) ); )
-			{
-				if ( tmp->s.v.owner != EDICT_TO_PROG( te ) )
-					continue;
-
-				tmp->s.v.nextthink = g_globalvars.time + NEW_FLASH_START_TIME;
-				break;
-			}
-			if ( !tmp )
-			{
-				G_conprintf( "Warning: Error in Flash Timer logic.\n" );
-			}
-
-		}
-		te->FlashTime = 24;
-		stuffcmd( te, "v_cshift 255 255 255 255\n" );
-		disableupdates( te, NEW_FLASH_START_TIME );	/* server-side flash */
-
-	} else
-	{
-		if ( !te->FlashTime )
-		{
-			newmis = spawn(  );
-			newmis->s.v.classname = "timer";
-			newmis->s.v.netname = "flashtimer";
-			newmis->team_no = te->team_no;
-			newmis->s.v.owner = EDICT_TO_PROG( te );
-			newmis->s.v.think = ( func_t ) FlashTimer;
-			newmis->s.v.nextthink = g_globalvars.time + 1;
-		} else
-		{
-			for ( tmp = world; ( tmp = trap_find( tmp, FOFS( s.v.netname ), "flashtimer" ) ); )
-			{
-				if ( tmp->s.v.owner != EDICT_TO_PROG( te ) )
-					continue;
-
-				tmp->s.v.nextthink = g_globalvars.time + 1;
-				break;
-			}
-			if ( !tmp )
-			{
-				G_conprintf( "Warning: Error in Flash Timer logic.\n" );
-			}
-
-		}
-		te->FlashTime = 24;
-		stuffcmd( te, "v_cshift %.0f %.0f %.0f %.0f\n", te->FlashTime * 10,
-			  te->FlashTime * 10, te->FlashTime * 10, te->FlashTime * 10 );
-	}
-
-}
-
-void TG_Eff_Conc( gedict_t * head )
-{
-	gedict_t *te;
-
-	if ( strneq( head->s.v.classname, "player" ) )
-		return;
-	if ( head->s.v.health <= 0 )
-		return;
-
-	G_sprint( head, 2, "You are conced\n" );
-	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "timer" ) ); )
-	{
-		if ( te->s.v.owner != EDICT_TO_PROG( head ) )
-			continue;
-		if ( te->s.v.think == ( func_t ) ConcussionGrenadeTimer )
-			break;
-		if ( te->s.v.think == ( func_t ) OldConcussionGrenadeTimer )
-			break;
-	}
-
-	if ( te )
-	{
-		if ( tf_data.old_grens == 1 )
-		{
-			stuffcmd( head, "v_idlescale 100\n" );
-			stuffcmd( head, "fov 130\n" );
-			te->s.v.health = 100;
-			te->s.v.nextthink = g_globalvars.time + 5;
-		} else
-		{
-			te->s.v.health = 800;
-			te->s.v.nextthink = g_globalvars.time + 0.25;
-		}
-	} else
-	{
-		if ( tf_data.old_grens == 1 )
-		{
-			stuffcmd( head, "v_idlescale 100\n" );
-			stuffcmd( head, "fov 130\n" );
-			stuffcmd( head, "bf\n" );
-			te = spawn(  );
-			te->s.v.nextthink = g_globalvars.time + 5;
-			te->s.v.think = ( func_t ) OldConcussionGrenadeTimer;
-			te->team_no = head->team_no;
-			te->s.v.classname = "timer";
-			te->s.v.owner = EDICT_TO_PROG( head );
-			te->s.v.health = 100;
-		} else
-		{
-			te = spawn(  );
-			te->s.v.nextthink = g_globalvars.time + 0.25;
-			te->s.v.think = ( func_t ) ConcussionGrenadeTimer;
-			te->team_no = head->team_no;
-			te->s.v.classname = "timer";
-			te->s.v.owner = EDICT_TO_PROG( head );
-			te->s.v.health = 800;
-		}
-	}
-
-}
-
-void    HallucinationTimer(  );
-void    TranquiliserTimer(  );
-
-void TG_Eff_Remove( gedict_t * pl )
-{
-	gedict_t *te;
-	float   healam;
-
-	if ( strneq( pl->s.v.classname, "player" ) )
-		return;
-	if ( pl->s.v.health <= 0 )
-		return;
-
-	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "timer" ) ); )
-	{
-		if ( te->s.v.owner != EDICT_TO_PROG( pl ) )
-			continue;
-		if ( te->s.v.think != ( func_t ) ConcussionGrenadeTimer &&
-		     te->s.v.think != ( func_t ) OldConcussionGrenadeTimer )
-			continue;
-		if ( tf_data.old_grens == 1 )
-			stuffcmd( pl, "v_idlescale 0\nfov 90\n" );
-		dremove( te );
-		break;
-	}
-	if ( pl->tfstate & TFSTATE_HALLUCINATING )
-	{
-		for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "timer" ) ); )
-		{
-			if ( te->s.v.owner != EDICT_TO_PROG( pl ) )
-				continue;
-			if ( te->s.v.think != ( func_t ) HallucinationTimer )
-				continue;
-
-			pl->tfstate -= ( pl->tfstate & TFSTATE_HALLUCINATING );
-
-			ResetGasSkins( pl );
-
-			if ( tf_data.new_gas & GAS_MASK_PALETTE )
-				stuffcmd( pl, "v_cshift; wait; bf\n" );
-			dremove( te );
-			break;
-		}
-		if ( !te )
-			G_conprintf( "Warning: Error in Hallucination Timer logic.\n" );
-	}
-	if ( pl->tfstate & TFSTATE_TRANQUILISED )
-	{
-		for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "timer" ) ); )
-		{
-			if ( te->s.v.owner != EDICT_TO_PROG( pl ) )
-				continue;
-			if ( te->s.v.think != ( func_t ) TranquiliserTimer )
-				continue;
-
-			pl->tfstate -= ( pl->tfstate & TFSTATE_TRANQUILISED );
-			TeamFortress_SetSpeed( pl );
-			dremove( te );
-			break;
-		}
-		if ( !te )
-			G_conprintf( "Warning: Error in Tranquilisation Timer logic.\n" );
-	}
-	if ( pl->FlashTime > 0 )
-	{
-		for ( te = world; ( te = trap_find( te, FOFS( s.v.netname ), "flashtimer" ) ); )
-		{
-			if ( te->s.v.owner != EDICT_TO_PROG( pl ) )
-				continue;
-			if ( strneq( te->s.v.classname, "timer" ) )
-				continue;
-
-			pl->FlashTime = 0;
-			if ( tf_data.new_flash )
-				disableupdates( pl, -1 );	/* server-side flash */
-			break;
-		}
-		if ( !te )
-		{
-			G_conprintf( "Warning: Error in Flash Timer logic.\n" );
-			pl->FlashTime = 0;
-		}
-	}
-	if ( pl->tfstate & TFSTATE_INFECTED )
-	{
-		healam = rint( pl->s.v.health / 2 );
-		pl->tfstate -= ( pl->tfstate & TFSTATE_INFECTED );
-		tf_data.deathmsg = DMSG_MEDIKIT;
-		T_Damage( pl, self, self, healam );
-		return;
-	}
-	if ( pl->numflames > 0 )
-	{
-		sound( pl, 1, "items/r_item1.wav", 1, 1 );
-		pl->numflames = 0;
-		return;
-	}
-}
