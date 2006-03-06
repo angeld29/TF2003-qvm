@@ -7,7 +7,7 @@ by [sd] angel for MTFL
 [+] Добавлена возможность автопроигрыша звука на гранаты.
     Настраивается через /cmd set grensound [on/off].
     Проигрывается звук count.wav.
-[+] Добавлена мессага на выброс гранаты "%s throwed.\n" 
+[+] Добавлена мессага на выброс гранаты "%s throwed.\n" (msg level 0)
 [+] Добавлен режим Red-Def. В этом режиме берется только team 2 флаг.
     Вкл/выкл через rcon mod red_def [on/off] или через cmd admin red_def [on/off]( требуется adminlvl 1).
 
