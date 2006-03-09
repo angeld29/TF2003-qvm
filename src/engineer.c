@@ -18,10 +18,10 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: engineer.c,v 1.28 2005-12-15 14:38:00 AngelD Exp $
+ *  $Id: engineer.c,v 1.29 2006-03-09 20:54:16 AngelD Exp $
  */
 /*========================================================
-Weapons and functions for the ENGINEER class and associated weaponry                          
+Weapons and functions for the ENGINEER class and associated weaponry
 =======================================================*/
 
 #include "g_local.h"

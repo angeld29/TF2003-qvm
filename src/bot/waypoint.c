@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: waypoint.c,v 1.8 2006-03-04 15:10:06 AngelD Exp $
+ *  $Id: waypoint.c,v 1.9 2006-03-09 20:54:16 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -280,7 +280,7 @@ void PrintPath(wp_path_t * path)
         }
 }
 
-wp_path_t *WaypointFindPathOld( waypoint_t * wp_src, waypoint_t * wp_dst )
+/*wp_path_t *WaypointFindPathOld( waypoint_t * wp_src, waypoint_t * wp_dst )
 {
 	int     pathlen = 0, i;
 	tmp_path_t tmppath[MAX_PATH_LEN];
@@ -365,7 +365,7 @@ wp_path_t *WaypointFindPathOld( waypoint_t * wp_src, waypoint_t * wp_dst )
 	}
         G_dprintf("WP %2d %3d = %3f %3f %3f\n", i,tmpp->link->dest_wp->index, PASSVEC3( tmpp->link->dest_wp->origin));
 	return path;
-}
+}*/
 
 wp_path_t *WaypointFindPath( waypoint_t * wp_src, waypoint_t * wp_dst )
 {

