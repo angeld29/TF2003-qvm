@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.47 2006-03-06 20:12:21 AngelD Exp $
+ *  $Id: tfort.c,v 1.48 2006-11-21 16:41:57 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1314,7 +1314,7 @@ void TeamFortress_GrenadePrimed(  )
 		break;
 	}
 	if( printthrowmsg )
-	        G_sprint( user, 0, "%s throwed.\n", GrenadePrimeName[(int)self->s.v.weapon] );
+	        G_sprint( user, 0, "%s thrown.\n", GrenadePrimeName[(int)self->s.v.weapon] );
 	        
 	setsize( newmis, 0, 0, 0, 0, 0, 0 );
 	setorigin( newmis, PASSVEC3( user->s.v.origin ) );

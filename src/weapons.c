@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.34 2006-03-04 13:09:25 AngelD Exp $
+ *  $Id: weapons.c,v 1.35 2006-11-21 16:41:57 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -1497,7 +1497,7 @@ void W_FireGrenade(  )
 	newmis->s.v.owner = EDICT_TO_PROG( self );
 	newmis->s.v.movetype = MOVETYPE_BOUNCE;
 	newmis->s.v.solid = SOLID_BBOX;
-	if ( !self->weaponmode || tf_data.cb_prematch_time > g_globalvars.time )
+	if ( !self->weaponmode || ( tf_data.cb_prematch_time > g_globalvars.time ) )
 	{
 		newmis->s.v.weapon = 5;
 		newmis->s.v.classname = "grenade";
@@ -3091,7 +3091,7 @@ void ImpulseCommands(  )
 			return;
 		}
 	}
-	if ( tf_data.cb_prematch_time > g_globalvars.time || tf_data.cease_fire )
+	if ( ( tf_data.cb_prematch_time > g_globalvars.time ) || tf_data.cease_fire )
 	{
 		PreMatchImpulses(  );
 		DeadImpulses(  );
@@ -3366,7 +3366,7 @@ void DeadImpulses(  )
 		TeamFortress_ChangeClass(  );
 		break;
 	case 99:
-		if ( self->playerclass && deathmatch == 3 && tf_data.cb_prematch_time < g_globalvars.time )
+		if ( self->playerclass && deathmatch == 3 && ( tf_data.cb_prematch_time < g_globalvars.time ) )
 		{
 			self->current_menu = MENU_CHANGECLASS;
 			self->menu_count = MENU_REFRESH_RATE;

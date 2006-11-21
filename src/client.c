@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.57 2006-03-04 15:10:06 AngelD Exp $
+ *  $Id: client.c,v 1.58 2006-11-21 16:41:57 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -2243,9 +2243,9 @@ void PlayerPostThink()
 						fdmg = fdmg * 1.5;
 				}
 				fdmg = rint( fdmg );
+				self->deathtype = "falling";
 				TF_T_Damage( self, world, world, fdmg, 1, 0 );
 				sound( self, 2, "player/land2.wav", 1, 1 );
-				self->deathtype = "falling";
 			} else
 				sound( self, 2, "player/land.wav", 1, 1 );
 		}

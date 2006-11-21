@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: vote.c,v 1.7 2006-03-02 12:08:56 AngelD Exp $
+ *  $Id: vote.c,v 1.8 2006-11-21 16:41:57 AngelD Exp $
  */
 
 // vote.q: mapchange voting functions
@@ -213,7 +213,7 @@ void Vote_Elect_Init()
 	if(  elect_percentage * f1 < 100 ) 
 	{
 		G_bprint(2,  "%s ηαιξσ αδνιξ στατυσ!\n", elect_player->s.v.netname);
-		G_sprint(elect_player, 2, "Type γνδ φοτε αδνιξ for admin commands.\n");
+		G_sprint(elect_player, 2, "Type γνδ αδνιξ for admin commands.\n");
 		current_vote = -1;
 		elect_player->is_admin = elect_level;
 		return;	

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: clan.c,v 1.11 2006-01-18 14:05:26 AngelD Exp $
+ *  $Id: clan.c,v 1.12 2006-11-21 16:41:57 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -31,7 +31,7 @@ void PreMatch_Think(  )
 	gedict_t *oldself;
 	gedict_t *gren;
 
-	time_left = ceil(tf_data.cb_prematch_time - g_globalvars.time+0.5);
+	time_left = ceil( tf_data.cb_prematch_time - g_globalvars.time );
 	if ( time_left > 60 )
 	{
 		G_bprint( 2, "%d minutes left till Match begins.\n", time_left / 60 );
@@ -59,12 +59,18 @@ void PreMatch_Think(  )
 		self->s.v.nextthink = g_globalvars.time + 1.0;
 		return;
 	}
-	if ( time_left > 0 )
+	//if ( time_left > 0 )
+	if( tf_data.cb_prematch_time > g_globalvars.time )
 	{
 		G_bprint( 2, "1 second.\n" );
 		self->s.v.nextthink = g_globalvars.time + 1.0;
 		return;
 	}
+/*	if( tf_data.cb_prematch_time > g_globalvars.time )
+	{
+	        self->s.v.nextthink = g_globalvars.time + 0.5;
+	        return;
+	}*/
 	G_bprint( 2, "MATCH BEGINS NOW\n" );
 	MatchTimer( true );
 	if ( tf_data.game_locked )

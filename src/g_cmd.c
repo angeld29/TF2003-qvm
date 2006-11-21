@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_cmd.c,v 1.25 2006-03-04 15:10:06 AngelD Exp $
+ *  $Id: g_cmd.c,v 1.26 2006-11-21 16:41:57 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -206,5 +206,7 @@ qboolean ClientUserInfoChanged(  )
 void Test(  )
 {
         G_sprint( self, 2, "fire_held_down %d button0 %.0f\n", self->fire_held_down,self->s.v.button0 );
+        G_sprint( self, 2, "movetype  %.0f solid %.0f\n", self->s.v.movetype,self->s.v.solid );
+        G_sprint( self, 2, "toggleflags %d\n", tf_data.toggleflags );
 }
 
