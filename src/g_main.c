@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.25 2006-02-28 21:29:52 AngelD Exp $
+ *  $Id: g_main.c,v 1.26 2006-11-21 21:47:50 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -39,8 +39,8 @@ static char     worldmodel[64] = "worldmodel";
 static char     netnames[MAX_CLIENTS][32];
 int             api_ver;
 
-//#define MIN_API_VERSION 6
-#define MIN_API_VERSION GAME_API_VERSION
+#define MIN_API_VERSION 8
+//#define MIN_API_VERSION GAME_API_VERSION
 
 static gameData_t      gamedata =
     { ( edict_t * ) g_edicts, sizeof( gedict_t ), &g_globalvars, expfields , MIN_API_VERSION};
@@ -76,7 +76,10 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 			G_conprintf("Mod requried API_VERSION %d or higher, server have %d\n", MIN_API_VERSION, api_ver);
 			return 0;
 		}
-
+		if( api_ver >= MIN_API_VERSION && api_ver <= GAME_API_VERSION )
+		{
+		        gamedata.APIversion = api_ver;
+		}
 		G_InitGame( arg0, arg1 );
 		return ( int ) ( &gamedata );
 

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tforttm.c,v 1.22 2006-03-04 13:09:25 AngelD Exp $
+ *  $Id: tforttm.c,v 1.23 2006-11-21 21:47:50 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -853,7 +853,7 @@ void teamsprint( int tno, gedict_t * ignore, char *st )
 	for ( te = world;( te = trap_find( te, FOFS( s.v.classname ), "player" ) ) ; )
 	{
 		if ( te->team_no == tno && te != ignore )
-			G_sprint( te, 2, st );
+			G_sprint( te, 2, "%s", st );
 	}
 }
 

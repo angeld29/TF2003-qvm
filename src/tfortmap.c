@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfortmap.c,v 1.24 2006-03-04 15:10:06 AngelD Exp $
+ *  $Id: tfortmap.c,v 1.25 2006-11-21 21:47:50 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1522,8 +1522,8 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 			CenterPrint( te, "\n\n\n%s", Goal->broadcast );
 		if ( Goal->netname_broadcast && !CTF_Map )
 		{
-			G_sprint( te, 2, AP->s.v.netname );
-			G_sprint( te, 2, Goal->netname_broadcast );
+			G_sprint( te, 2, "%s", AP->s.v.netname );
+			G_sprint( te, 2, "%s", Goal->netname_broadcast );
 		}
 		if ( AP == te )
 		{
@@ -2168,9 +2168,9 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 			{
 
 				if ( Player->team_no == Item->owned_by )
-					G_sprint( Player, 2, Goal->team_str_moved );
+					G_sprint( Player, 2, "%s", Goal->team_str_moved );
 				else
-					G_sprint( Player, 2, Goal->non_team_str_moved );
+					G_sprint( Player, 2, "%s", Goal->non_team_str_moved );
 
 				if ( tf_data.flag_timer )
 				{
@@ -2430,7 +2430,7 @@ void ForceRespawn( gedict_t * P )
 		}
 		if ( spot->s.v.message )
 		{
-			CenterPrint( self, spot->s.v.message );
+			CenterPrint( self, "%s", spot->s.v.message );
 			if ( !( spot->goal_activation & TFSP_MULTIPLEMSGS ) )
 				spot->s.v.message = NULL;
 		}

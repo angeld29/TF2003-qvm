@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: triggers.c,v 1.9 2006-03-04 13:09:25 AngelD Exp $
+ *  $Id: triggers.c,v 1.10 2006-11-21 21:47:50 AngelD Exp $
  */
 #include "g_local.h"
 gedict_t *stemp, *otemp, *s, *old;
@@ -630,7 +630,7 @@ void trigger_onlyregistered_touch(  )
 	{
 		if ( self->s.v.message && strneq( self->s.v.message, "" ) )
 		{
-			G_centerprint( other, self->s.v.message );
+			G_centerprint( other, "%s", self->s.v.message );
 			sound( other, CHAN_BODY, "misc/talk.wav", 1, ATTN_NORM );
 		}
 	}

@@ -91,3 +91,9 @@ equ	trap_AddBot		 -79
 equ	trap_RemoveBot		 -80
 equ	trap_SetBotUserInfo	 -81
 equ	trap_SetBotCMD		 -82
+
+equ		QVMstrftime		 -83
+equ		trap_CmdArgs     -84
+equ		trap_CmdTokenize -85
+equ		strlcpy			 -86
+equ		strlcat			 -87

@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.h,v 1.12 2005-11-14 15:36:21 AngelD Exp $
+ *  $Id: g_syscalls.h,v 1.13 2006-11-21 21:47:50 AngelD Exp $
  */
 
 int     trap_GetApiVersion(  );
@@ -111,4 +111,7 @@ int 	trap_SetBotUserInfo( int edn, const char* varname, const char* value );
 int 	trap_SetBotCMD( int edn,int msec, float angles_x, float angles_y, float angles_z, 
                                 int forwardmove, int sidemove, int upmove, 
                                 int buttons, int impulse);
+
+void    trap_precache_vwep_model( int pos, char *name );
+int QVMstrftime( char *valbuff, int sizebuff, const char *fmt, int offset );
 

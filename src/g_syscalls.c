@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.c,v 1.12 2005-11-28 17:37:32 AngelD Exp $
+ *  $Id: g_syscalls.c,v 1.13 2006-11-21 21:47:50 AngelD Exp $
  */
 
 // this file is only included when building a dll
@@ -111,6 +111,11 @@ void trap_precache_sound( char *name )
 void trap_precache_model( char *name )
 {
 	syscall( G_PRECACHE_MODEL, (int) name );
+}
+
+void trap_precache_vwep_model( int pos, char *name )
+{
+	syscall( G_PRECACHE_VWEP_MODEL, pos, (int) name );
 }
 
 void trap_setorigin( int edn, float origin_x, float origin_y, float origin_z )
@@ -338,6 +343,16 @@ void trap_CmdArgv( int arg, char *valbuff, int sizebuff )
 	syscall( G_CMD_ARGV, arg, (int)valbuff, sizebuff );
 }
 
+void trap_CmdArgs( char *valbuff, int sizebuff )
+{
+	syscall( G_CMD_ARGS, (int)valbuff, sizebuff );
+}
+
+void trap_CmdTokenize( char *str )
+{
+	syscall( G_CMD_TOKENIZE, (int)str );
+}
+
 void    trap_TraceCapsule( float v1_x, float v1_y, float v1_z, 
 			float v2_x, float v2_y, float v2_z, 
 			int nomonst, int edn ,
@@ -411,3 +426,7 @@ int 	trap_SetBotCMD( int edn,int msec, float angles_x, float angles_y, float ang
                                 forwardmove, sidemove, upmove, buttons, impulse );
 }
 
+int QVMstrftime( char *valbuff, int sizebuff, const char *fmt, int offset )
+{
+	return syscall( G_QVMstrftime, (int)valbuff, sizebuff, (int)fmt, offset );
+}

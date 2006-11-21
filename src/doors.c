@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: doors.c,v 1.6 2005-05-23 18:54:02 AngelD Exp $
+ *  $Id: doors.c,v 1.7 2006-11-21 21:47:50 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -282,7 +282,7 @@ void door_touch(  )
 
 	if ( msg && msg[0] )
 	{
-		G_centerprint( other, PROG_TO_EDICT( self->s.v.owner )->s.v.message );
+		G_centerprint( other, "%s", PROG_TO_EDICT( self->s.v.owner )->s.v.message );
 		sound( other, CHAN_VOICE, "misc/talk.wav", 1, ATTN_NORM );
 	}
 // key door stuff
@@ -846,7 +846,7 @@ void secret_touch(  )
 
 	if ( self->s.v.message )
 	{
-		G_centerprint( other, self->s.v.message );
+		G_centerprint( other, "%s", self->s.v.message );
 		sound( other, CHAN_BODY, "misc/talk.wav", 1, ATTN_NORM );
 	}
 }

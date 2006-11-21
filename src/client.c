@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.58 2006-11-21 16:41:57 AngelD Exp $
+ *  $Id: client.c,v 1.59 2006-11-21 21:47:50 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1537,7 +1537,7 @@ void PutClientInServer()
 		}
 		if ( spot->s.v.message )
 		{
-			CenterPrint( self, spot->s.v.message );
+			CenterPrint( self, "%s", spot->s.v.message );
 			if ( !( spot->goal_activation & TFSP_MULTIPLEMSGS ) )
 				spot->s.v.message = NULL;
 		}

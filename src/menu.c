@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: menu.c,v 1.26 2006-03-04 15:10:06 AngelD Exp $
+ *  $Id: menu.c,v 1.27 2006-11-21 21:47:50 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -218,7 +218,7 @@ void Menu_Team( menunum_t menu )
 
 	if ( team_menu_string )
 	{
-		CenterPrint( self, team_menu_string );
+		CenterPrint( self, "%s", team_menu_string );
 		return;
 	}
 	if ( CTF_Map == 1 )
@@ -285,28 +285,28 @@ void Menu_Class( menunum_t menu )
 		case 1:
 			if ( AD->s.v.noise1 )
 			{
-				CenterPrint( self, AD->s.v.noise1 );
+				CenterPrint( self, "%s", AD->s.v.noise1 );
 				return;
 			}
 			break;
 		case 2:
 			if ( AD->s.v.noise2 )
 			{
-				CenterPrint( self, AD->s.v.noise2 );
+				CenterPrint( self, "%s", AD->s.v.noise2 );
 				return;
 			}
 			break;
 		case 3:
 			if ( AD->s.v.noise3 )
 			{
-				CenterPrint( self, AD->s.v.noise3 );
+				CenterPrint( self, "%s", AD->s.v.noise3 );
 				return;
 			}
 			break;
 		case 4:
 			if ( AD->noise4 )
 			{
-				CenterPrint( self, AD->noise4 );
+				CenterPrint( self, "%s", AD->noise4 );
 				return;
 			}
 			break;

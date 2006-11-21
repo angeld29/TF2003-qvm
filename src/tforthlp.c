@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tforthlp.c,v 1.9 2005-05-05 14:51:43 AngelD Exp $
+ *  $Id: tforthlp.c,v 1.10 2006-11-21 21:47:50 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -198,7 +198,7 @@ void TeamFortress_HelpMap(  )
 	{
 		if ( te->non_team_broadcast )
 		{
-			G_sprint( self, 2, te->non_team_broadcast );
+			G_sprint( self, 2, "%s", te->non_team_broadcast );
 			return;
 		}
 	}

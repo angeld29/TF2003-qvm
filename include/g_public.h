@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_public.h,v 1.9 2006-03-04 15:10:06 AngelD Exp $
+ *  $Id: g_public.h,v 1.10 2006-11-21 21:47:50 AngelD Exp $
  */
 
 #ifndef __G_PUBLIC_H__
@@ -31,15 +31,17 @@
 //
 // g_public.h -- game module information visible to server
 
-#define	GAME_API_VERSION	8
+#define	GAME_API_VERSION	11
 
 
 //===============================================================
 
+// !!! new traps comes to end of list !!!
+
 //
 // system traps provided by the main engine
 //
-typedef enum  gameImport_e
+typedef enum
 {
 	//============== general Quake services ==================
 
@@ -129,14 +131,21 @@ typedef enum  gameImport_e
 	G_Add_Bot,
 	G_Remove_Bot,
 	G_SetBotUserInfo,
-	G_SetBotCMD
+	G_SetBotCMD,
+	G_QVMstrftime,
+	G_CMD_ARGS,
+	G_CMD_TOKENIZE,
+	g_strlcpy,
+	g_strlcat
+//	, G_PRECACHE_VWEP_MODEL
 } gameImport_t;
 
+// !!! new things comes to end of list !!!
 
 //
 // functions exported by the game subsystem
 //
-typedef enum gameExport_e
+typedef enum
 {
 	GAME_INIT,	// ( int levelTime, int randomSeed, int restart );
 	// init and shutdown will be called every single level
@@ -146,7 +155,7 @@ typedef enum gameExport_e
 	GAME_SHUTDOWN,	// (void);
 
 	GAME_CLIENT_CONNECT,	 	// ( int clientNum ,int isSpectator);
-	// ( int clientNum, qboolean firstTime, qboolean isBot );
+	// ( int clientNum, qbool firstTime, qbool isBot );
 	// return NULL if the client is allowed to connect, otherwise return
 	// a text string with the reason for denial
 	GAME_PUT_CLIENT_IN_SERVER,
@@ -173,11 +182,12 @@ typedef enum gameExport_e
 	// that is not recognized as a builtin function.
 	// The game can issue trap_argc() / trap_argv() commands to get the command
 	// and parameters.  Return qfalse if the game doesn't recognize it as a command.
+	GAME_CLIENT_SAY,			// ( int isTeamSay );
 
 } gameExport_t;
 
 
-typedef enum fieldtype_e
+typedef enum
 {
 	F_INT, 
 	F_FLOAT,
@@ -191,7 +201,7 @@ typedef enum fieldtype_e
 	F_IGNORE
 } fieldtype_t;
 
-typedef struct field_s
+typedef struct
 {
 	string_t	name;
 	int			ofs;
@@ -199,7 +209,7 @@ typedef struct field_s
 //	int			flags;
 } field_t;
 
-typedef struct gameData_s
+typedef struct
 {
 	edict_t		*ents;
 	int		sizeofent;
@@ -210,7 +220,7 @@ typedef struct gameData_s
 
 typedef int		fileHandle_t;
 
-typedef enum fsMode_e{
+typedef enum {
 	FS_READ_BIN,
 	FS_READ_TXT,
 	FS_WRITE_BIN,
@@ -219,7 +229,7 @@ typedef enum fsMode_e{
 	FS_APPEND_TXT
 } fsMode_t;
 
-typedef enum fsOrigin_e{
+typedef enum {
 	FS_SEEK_CUR,
 	FS_SEEK_END,
 	FS_SEEK_SET

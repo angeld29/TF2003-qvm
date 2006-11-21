@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: subs.c,v 1.7 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: subs.c,v 1.8 2006-11-21 21:47:50 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -248,7 +248,7 @@ void SUB_UseTargets(  )
 	if ( streq( activator->s.v.classname, "player" ) && self->s.v.message )
 		if ( strneq( self->s.v.message, "" ) )
 		{
-			G_centerprint( activator, self->s.v.message );
+			G_centerprint( activator, "%s", self->s.v.message );
 			if ( !self->s.v.noise )
 				sound( activator, CHAN_VOICE, "misc/talk.wav", 1, ATTN_NORM );
 		}
