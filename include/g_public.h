@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_public.h,v 1.10 2006-11-21 21:47:50 AngelD Exp $
+ *  $Id: g_public.h,v 1.11 2006-11-25 18:54:32 AngelD Exp $
  */
 
 #ifndef __G_PUBLIC_H__
@@ -137,7 +137,7 @@ typedef enum
 	G_CMD_TOKENIZE,
 	g_strlcpy,
 	g_strlcat
-//	, G_PRECACHE_VWEP_MODEL
+	, G_PRECACHE_VWEP_MODEL
 } gameImport_t;
 
 // !!! new things comes to end of list !!!

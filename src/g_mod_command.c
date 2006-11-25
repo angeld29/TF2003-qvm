@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_mod_command.c,v 1.8 2006-03-04 15:10:06 AngelD Exp $
+ *  $Id: g_mod_command.c,v 1.9 2006-11-25 18:54:32 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -244,7 +244,21 @@ void Red_Def_command( int argc )
 	        if ( !Goal->display_item_status1 )
 	                return;
        	        te = Finditem( Goal->display_item_status1 );
-                if ( te == world )
+
+       	        if( !te || te == world || te->team_no != 2 )
+       	        {
+       	                te = Finditem( Goal->display_item_status2 );
+       	        }
+       	        if( !te || te == world || te->team_no != 2 )
+       	        {
+       	                te = Finditem( Goal->display_item_status3 );
+       	        }
+       	        if( !te || te == world || te->team_no != 2 )
+       	        {
+       	                te = Finditem( Goal->display_item_status4 );
+       	        }
+
+                if ( te == world || te->team_no != 2 )
         	{
         	        if( self != world )
              		         G_sprint(self,2,"Item is missing.\n" );
@@ -275,10 +289,23 @@ void Red_Def_command( int argc )
 	        if ( !Goal->display_item_status1 )
 	                return;
        	        te = Finditem( Goal->display_item_status1 );
-                if ( te == world )
+       	        if( !te || te == world || te->team_no != 2 )
+       	        {
+       	                te = Finditem( Goal->display_item_status2 );
+       	        }
+       	        if( !te || te == world || te->team_no != 2 )
+       	        {
+       	                te = Finditem( Goal->display_item_status3 );
+       	        }
+       	        if( !te || te == world || te->team_no != 2 )
+       	        {
+       	                te = Finditem( Goal->display_item_status4 );
+       	        }
+
+                if ( te == world || te->team_no != 2 )
         	{
         	        if( self != world )
-        		      G_sprint(self,2, "Item is missing.\n" );
+             		         G_sprint(self,2,"Item is missing.\n" );
         		return;
         	}
         	te->take_sshot = 0;
