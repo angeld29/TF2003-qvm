@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_main.c,v 1.26 2006-11-21 21:47:50 AngelD Exp $
+ *  $Id: g_main.c,v 1.27 2006-11-26 21:33:27 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -31,6 +31,10 @@ static field_t         expfields[] = {
 	{"maxspeed", FOFS( maxspeed ), F_FLOAT}	,
 	{"gravity", FOFS( gravity ), F_FLOAT},
 	{"isBot", FOFS( isBot ), F_INT},
+#ifdef VWEP_TEST
+	{"vw_index",    FOFS( vw_index ),    F_FLOAT},
+	{"vw_frame",    FOFS( vw_frame ),    F_FLOAT},
+#endif
 	{NULL}
 };
 
@@ -39,8 +43,8 @@ static char     worldmodel[64] = "worldmodel";
 static char     netnames[MAX_CLIENTS][32];
 int             api_ver;
 
-#define MIN_API_VERSION 8
-//#define MIN_API_VERSION GAME_API_VERSION
+//#define MIN_API_VERSION 12
+#define MIN_API_VERSION GAME_API_VERSION
 
 static gameData_t      gamedata =
     { ( edict_t * ) g_edicts, sizeof( gedict_t ), &g_globalvars, expfields , MIN_API_VERSION};

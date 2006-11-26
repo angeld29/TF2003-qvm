@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_utils.c,v 1.14 2005-11-28 18:30:57 AngelD Exp $
+ *  $Id: g_utils.c,v 1.15 2006-11-26 21:33:27 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -209,6 +209,10 @@ findradius (origin, radius)
 */
 gedict_t *findradius( gedict_t * start, vec3_t org, float rad )
 {
+        return trap_findradius( start, org, rad);
+}
+/*gedict_t *findradius( gedict_t * start, vec3_t org, float rad )
+{
 	gedict_t *ent;
 	vec3_t  eorg;
 	int     j;
@@ -226,7 +230,7 @@ gedict_t *findradius( gedict_t * start, vec3_t org, float rad )
 	}
 	return NULL;
 
-}
+}*/
 
 
 /*
@@ -278,9 +282,10 @@ makevectors(vector)
 ==============
 */
 
+//extern gameData_t      gamedata;
 void makevectors( vec3_t vector )
 {
-	AngleVectors( vector, g_globalvars.v_forward, g_globalvars.v_right, g_globalvars.v_up );
+         trap_makevectors(vector);
 }
 
 

@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.c,v 1.13 2006-11-21 21:47:50 AngelD Exp $
+ *  $Id: g_syscalls.c,v 1.14 2006-11-26 21:33:27 AngelD Exp $
  */
 
 // this file is only included when building a dll
@@ -113,10 +113,12 @@ void trap_precache_model( char *name )
 	syscall( G_PRECACHE_MODEL, (int) name );
 }
 
+#ifdef VWEP_TEST
 void trap_precache_vwep_model( int pos, char *name )
 {
 	syscall( G_PRECACHE_VWEP_MODEL, pos, (int) name );
 }
+#endif
 
 void trap_setorigin( int edn, float origin_x, float origin_y, float origin_z )
 {
@@ -241,15 +243,14 @@ int trap_nextent( int n )
 	return syscall( G_NEXTENT, n );
 }
 
-/*int trap_find( int n,int fofs, char*str )
-{
-	return syscall( G_Find, n, fofs, (int)str );
-}*/
 gedict_t* trap_find( gedict_t* ent,int fofs, const char*str )
 {
 	return (gedict_t*)syscall( G_Find, (int)ent, fofs, (int)str );
 }
-
+gedict_t*	trap_findradius( gedict_t* ent, float*org, float rad )
+{
+        return (gedict_t*)syscall( G_FINDRADIUS, (int)ent, (int)org, PASSFLOAT(rad) );
+}
 
 void trap_makestatic( int edn )
 {
@@ -430,3 +431,15 @@ int QVMstrftime( char *valbuff, int sizebuff, const char *fmt, int offset )
 {
 	return syscall( G_QVMstrftime, (int)valbuff, sizebuff, (int)fmt, offset );
 }
+
+
+void trap_makevectors( float *v )
+{
+	syscall( G_MAKEVECTORS, (int)v );
+}
+
+gedict_t* trap_nextclient( gedict_t *v )
+{
+	return (gedict_t*)syscall( G_NEXTCLIENT, (int)v );
+}
+

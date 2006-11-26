@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.59 2006-11-21 21:47:50 AngelD Exp $
+ *  $Id: client.c,v 1.60 2006-11-26 21:33:27 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -2211,9 +2211,9 @@ void PlayerPostThink()
 
 	dtime = g_globalvars.time - self->lasttime;
 
- 	VectorSubtract(self->s.v.velocity,self->lastvel,self->accel);
-	VectorScale(self->accel, 1/dtime , self->accel);
-	VectorCopy(self->s.v.velocity, self->lastvel);
+// 	VectorSubtract(self->s.v.velocity,self->lastvel,self->accel);
+//	VectorScale(self->accel, 1/dtime , self->accel);
+//	VectorCopy(self->s.v.velocity, self->lastvel);
 	self->lasttime = g_globalvars.time;
 	
 

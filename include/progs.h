@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: progs.h,v 1.27 2006-03-04 15:10:06 AngelD Exp $
+ *  $Id: progs.h,v 1.28 2006-11-26 21:33:24 AngelD Exp $
  */
 #include "progdefs.h"
 
@@ -336,6 +336,10 @@ typedef struct gedict_s {
         const struct wp_link_s*  wp_link;
         struct wp_path_s      *wp_path;
 ///
+#ifdef VWEP_TEST
+	float   vw_index;
+	float   vw_frame;
+#endif
 }gedict_t;
 
 extern  float           sv_gravity;

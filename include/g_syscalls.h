@@ -20,7 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_syscalls.h,v 1.13 2006-11-21 21:47:50 AngelD Exp $
+ *  $Id: g_syscalls.h,v 1.14 2006-11-26 21:33:24 AngelD Exp $
  */
 
 int     trap_GetApiVersion(  );
@@ -62,8 +62,10 @@ void    trap_lightstyle( int style, const char *val );
 int     trap_checkbottom( int edn );
 int     trap_pointcontents( float origin_x, float origin_y, float origin_z );
 int     trap_nextent( int n );
+gedict_t* trap_nextclient( gedict_t *v );
 //int 	trap_find( int n,int fofs, char*str );
 gedict_t*	trap_find( gedict_t* ent,int fofs, const char*str );
+gedict_t*	trap_findradius( gedict_t* ent, float*org, float rad );
 
 void    trap_makestatic( int edn );
 void    trap_setspawnparam( int edn );
@@ -112,6 +114,9 @@ int 	trap_SetBotCMD( int edn,int msec, float angles_x, float angles_y, float ang
                                 int forwardmove, int sidemove, int upmove, 
                                 int buttons, int impulse);
 
+#ifdef VWEP_TEST
 void    trap_precache_vwep_model( int pos, char *name );
+#endif
 int QVMstrftime( char *valbuff, int sizebuff, const char *fmt, int offset );
 
+void trap_makevectors( float *v );

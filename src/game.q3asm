@@ -1,4 +1,4 @@
--o qwprogs
+-o qwtest
 g_main
 g_syscalls
 actions
