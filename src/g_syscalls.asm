@@ -23,7 +23,7 @@ equ    trap_stuffcmd         -20
 equ    trap_localcmd         -21
 equ    trap_cvar             -22
 equ    trap_cvar_set         -23
-equ		trap_findradius			 -24
+equ    trap_findradius	     -24
                              
 equ    trap_walkmove         -25
 equ    trap_droptofloor      -26
