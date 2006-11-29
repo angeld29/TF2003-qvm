@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: pyro.c,v 1.14 2005-11-29 14:22:43 AngelD Exp $
+ *  $Id: pyro.c,v 1.15 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 #define FLAME_PLYRMAXTIME 45
@@ -164,7 +164,7 @@ void NapalmGrenadeNetThink(  )
 	gedict_t *head;
 
 	self->s.v.nextthink = g_globalvars.time + 1;
-	for ( head = world; (head = findradius( head, self->s.v.origin, 180 )); )
+	for ( head = world; (head = trap_findradius( head, self->s.v.origin, 180 )); )
 	{
 		if ( head->s.v.takedamage )
 		{
@@ -210,7 +210,7 @@ void NapalmGrenadeExplode(  )
         
         	// don't do radius damage to the other, because all the damage
         	// was done in the impact
-        	for ( head = world; (head = findradius( head, self->s.v.origin, 180 )); )
+        	for ( head = world; (head = trap_findradius( head, self->s.v.origin, 180 )); )
         	{
         		if ( head->s.v.takedamage )
         		{
@@ -717,7 +717,7 @@ void W_FireFlame(  )
 
 	if ( self->s.v.waterlevel > 2 )
 	{
-		makevectors( self->s.v.v_angle );
+		trap_makevectors( self->s.v.v_angle );
 		VectorScale( g_globalvars.v_forward, 64, vtemp );
 		VectorAdd( self->s.v.origin, vtemp, vtemp );
 		NewBubbles( 2, vtemp );
@@ -739,7 +739,7 @@ void W_FireFlame(  )
 	flame->s.v.solid = SOLID_BBOX;
 	flame->s.v.classname = "flamerflame";
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	aim( flame->s.v.velocity );
 	VectorScale( flame->s.v.velocity, 600, flame->s.v.velocity );
 
@@ -789,7 +789,7 @@ void T_IncendiaryTouch(  )
 
 	// don't do radius damage to the other, because all the damage
 	// was done in the impact
-	for ( head = world; (head = findradius( head, self->s.v.origin, 180 )); )
+	for ( head = world; (head = trap_findradius( head, self->s.v.origin, 180 )); )
 	{
 		if ( head->s.v.takedamage )
 		{
@@ -844,7 +844,7 @@ void W_FireIncendiaryCannon(  )
 	newmis->s.v.movetype = MOVETYPE_FLYMISSILE;
 	newmis->s.v.solid = SOLID_BBOX;
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	aim( newmis->s.v.velocity );
 	VectorScale( newmis->s.v.velocity, 600, newmis->s.v.velocity );
 

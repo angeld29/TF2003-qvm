@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.60 2006-11-26 21:33:27 AngelD Exp $
+ *  $Id: client.c,v 1.61 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -1136,7 +1136,7 @@ int CheckTelefragSpotOld( vec3_t v )
 {
 	gedict_t *at_spot;
 
-	for ( at_spot = findradius( world, v, 40 ); at_spot; at_spot = findradius( at_spot, v, 40 ) )
+	for ( at_spot = trap_findradius( world, v, 40 ); at_spot; at_spot = trap_findradius( at_spot, v, 40 ) )
 	{
 		if ( streq( at_spot->s.v.classname, "player" ) && !at_spot->s.v.deadflag
 		     && at_spot->team_no == self->team_no && at_spot != self )
@@ -1580,7 +1580,7 @@ void PutClientInServer()
 	player_stand1();
 	if ( deathmatch || coop )
 	{
-		makevectors( self->s.v.angles );
+		trap_makevectors( self->s.v.angles );
 		if ( self->playerclass )
 		{
 			VectorScale( g_globalvars.v_forward, 20, v );
@@ -1870,7 +1870,7 @@ void CheckWaterJump()
 	vec3_t  end;
 
 // check for a jump-out-of-water
-	makevectors( self->s.v.angles );
+	trap_makevectors( self->s.v.angles );
 
 	VectorCopy( self->s.v.origin, start );	//start = self->s.v.origin;
 	start[2] = start[2] + 8;
@@ -1937,7 +1937,7 @@ void PlayerPreThink()
 		return;		// the think tics
 	}
 
-	makevectors( self->s.v.v_angle );	// is this still used
+	trap_makevectors( self->s.v.v_angle );	// is this still used
 
 	if ( !self->playerclass )
 	{

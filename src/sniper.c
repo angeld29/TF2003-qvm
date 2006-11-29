@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: sniper.c,v 1.4 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: sniper.c,v 1.5 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -71,7 +71,7 @@ void SniperSight_Update(  )
 		dremove( self );
 		return;
 	}
-	makevectors( owner->s.v.v_angle );
+	trap_makevectors( owner->s.v.v_angle );
 	org[0] = owner->s.v.origin[0] + g_globalvars.v_forward[0] * 10;
 	org[1] = owner->s.v.origin[1] + g_globalvars.v_forward[1] * 10;
 	org[2] = owner->s.v.absmin[2] + owner->s.v.size[2] * 0.7;

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: g_tf_utils.c,v 1.7 2005-05-28 19:03:46 AngelD Exp $
+ *  $Id: g_tf_utils.c,v 1.8 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -177,7 +177,7 @@ int infront( gedict_t * targ )
 	vec3_t  vec;
 	float   dot;
 
-	makevectors( self->s.v.angles );
+	trap_makevectors( self->s.v.angles );
 	VectorSubtract( targ->s.v.origin, self->s.v.origin, vec );
 	VectorNormalize( vec );
 

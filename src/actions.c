@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: actions.c,v 1.25 2006-01-14 16:50:10 AngelD Exp $
+ *  $Id: actions.c,v 1.26 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -159,7 +159,7 @@ void TeamFortress_Cmd_Discard( void )
 	newmis->s.v.solid = SOLID_TRIGGER;
 	newmis->s.v.classname = "ammobox";
 	newmis->team_no = self->team_no;
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	if ( self->s.v.v_angle[0] )
 	{
 		VectorScale( g_globalvars.v_forward, 400, newmis->s.v.velocity );
@@ -256,7 +256,7 @@ void TeamFortress_Discard(  )
 	newmis->s.v.solid = SOLID_TRIGGER;
 	newmis->s.v.classname = "ammobox";
 	newmis->team_no = self->team_no;
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	if ( self->s.v.v_angle[0] )
 	{
 		VectorScale( g_globalvars.v_forward, 400, newmis->s.v.velocity );
@@ -614,7 +614,7 @@ void TeamFortress_ID(  )
 	if( self->current_menu > MENU_DEFAULT)
 		return;
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	VectorScale( g_globalvars.v_forward, 10, src );
 	VectorAdd( src, self->s.v.origin, src );
 	src[2] = self->s.v.absmin[2] + self->s.v.size[2] * 0.7;

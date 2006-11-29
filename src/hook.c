@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: hook.c,v 1.4 2005-05-16 06:31:38 AngelD Exp $
+ *  $Id: hook.c,v 1.5 2006-11-29 23:19:23 AngelD Exp $
  */
 /*
 ===========================================================================
@@ -187,7 +187,7 @@ int Check_Overhead(  )
 	vec3_t  tmp;
 	gedict_t *owner = PROG_TO_EDICT( self->s.v.owner );
 
-	makevectors( owner->s.v.angles );
+	trap_makevectors( owner->s.v.angles );
 
         // The following comparisons could be optimized by doing away with
         // SRC and END, and plugging the values directly into the traceline
@@ -354,7 +354,7 @@ void Throw_Grapple(  )
 	self->hook = newmis;// This is my newmis
 	newmis->s.v.classname = "hook";
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	VectorScale( g_globalvars.v_forward, 800, newmis->s.v.velocity );
 	// set the facing of the grapple
 	vectoangles( newmis->s.v.velocity, newmis->s.v.angles );

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: weapons.c,v 1.35 2006-11-21 16:41:57 AngelD Exp $
+ *  $Id: weapons.c,v 1.36 2006-11-29 23:19:23 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -93,7 +93,7 @@ void W_FireAxe(  )
 	vec3_t  source, dest;
 	vec3_t  org, def;
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 
 	VectorCopy( self->s.v.origin, source );
 	source[2] += 16;
@@ -120,10 +120,10 @@ void W_FireAxe(  )
 		{
 			self->weaponmode = 1;
 			self->s.v.weaponmodel = "progs/v_knife2.mdl";
-			makevectors( PROG_TO_EDICT( g_globalvars.trace_ent )->s.v.v_angle );
+			trap_makevectors( PROG_TO_EDICT( g_globalvars.trace_ent )->s.v.v_angle );
 			VectorCopy( g_globalvars.v_right, def );
 
-			makevectors( self->s.v.v_angle );
+			trap_makevectors( self->s.v.v_angle );
 			if ( crossproduct( def, g_globalvars.v_forward ) > 0 )
 			{
 				tf_data.deathmsg = DMSG_BACKSTAB;
@@ -156,7 +156,7 @@ void W_FireSpanner(  )
 	float   healam;
 	gedict_t *te, *trace_ent;
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	VectorCopy( self->s.v.origin, source );
 	source[2] += 16;
 	VectorScale( g_globalvars.v_forward, 64, dest );
@@ -288,7 +288,7 @@ void W_FireMedikit(  )
 	gedict_t *te;
 	gedict_t *BioInfection, *trace_ent;
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 
 	VectorCopy( self->s.v.origin, source );
 	source[2] += 16;
@@ -503,7 +503,7 @@ void W_FireBioweapon(  )
 	vec3_t  org;
 	gedict_t *BioInfection, *trace_ent;
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 
 	VectorCopy( self->s.v.origin, source );
 	source[2] += 16;
@@ -618,7 +618,7 @@ void SpawnMeatSpray( vec3_t org, vec3_t vel )
 	missile->s.v.movetype = MOVETYPE_BOUNCE;
 	missile->s.v.solid = SOLID_NOT;
 
-	makevectors( self->s.v.angles );
+	trap_makevectors( self->s.v.angles );
 
 	VectorCopy( vel, missile->s.v.velocity );
 	missile->s.v.velocity[2] = missile->s.v.velocity[2] + 250 + 50 * g_random(  );
@@ -785,7 +785,7 @@ void FireBullets( float shotcount, vec3_t dir, float spread_x, float spread_y, f
 	vec3_t  direction;
 	vec3_t  src, tmp,end;
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	VectorScale( g_globalvars.v_forward, 10, tmp );
 	VectorAdd( self->s.v.origin, tmp, src );
 	//src = self->s.v.origin + g_globalvars.v_forward*10;
@@ -898,7 +898,7 @@ void FireSniperBullet( vec3_t direction, float damage )
 {
 	vec3_t  src;
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 
 	src[0] = self->s.v.origin[0] + g_globalvars.v_forward[0] * 10;
 	src[1] = self->s.v.origin[1] + g_globalvars.v_forward[1] * 10;
@@ -945,7 +945,7 @@ void W_FireSniperRifle(  )
 	KickPlayer( -2, self );
 	if ( !tg_data.unlimit_ammo )
 		self->s.v.currentammo = ( self->s.v.ammo_shells -= tf_data.snip_ammo);
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	VectorCopy( g_globalvars.v_forward, dir );
 
 	src[0] = self->s.v.origin[0] + g_globalvars.v_forward[0] * 10;
@@ -1044,7 +1044,7 @@ void W_FireAutoRifle(  )
 	KickPlayer( -1, self );
 	if ( !tg_data.unlimit_ammo )
 		self->s.v.currentammo = --( self->s.v.ammo_shells );
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	VectorCopy( g_globalvars.v_forward, dir );
 	tf_data.deathmsg = DMSG_AUTORIFLE;
 	FireSniperBullet( dir, 8 );
@@ -1210,7 +1210,7 @@ void W_FireRocket(  )
 	newmis->s.v.solid = SOLID_BBOX;
 
 // set newmis speed     
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	VectorScale( g_globalvars.v_forward, 900, newmis->s.v.velocity );
 
 	vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
@@ -1541,7 +1541,7 @@ void W_FireGrenade(  )
 		newmis->s.v.weapon = 11;
 		newmis->team_no = self->team_no;
 	}
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	if ( self->s.v.v_angle[0] )
 	{
 		newmis->s.v.velocity[0] =
@@ -1628,7 +1628,7 @@ void W_FireSpikes( float ox )
 {
 	vec3_t  dir, tmp;
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	if ( self->s.v.ammo_nails >= 4 && self->current_weapon == WEAP_SUPER_NAILGUN )
 	{
 		W_FireSuperSpikes(  );
@@ -2244,7 +2244,7 @@ void W_Attack(  )
 		return;
 	if ( self->is_undercover || self->undercover_team || self->undercover_skin )
 		Spy_RemoveDisguise( self );
-	makevectors( self->s.v.v_angle );	// calculate forward angle for velocity
+	trap_makevectors( self->s.v.v_angle );	// calculate forward angle for velocity
 	self->show_hostile = g_globalvars.time + 1;	// wake monsters up
 
 	switch ( self->current_weapon )

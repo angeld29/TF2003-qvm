@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: spy.c,v 1.17 2005-11-29 14:22:43 AngelD Exp $
+ *  $Id: spy.c,v 1.18 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -856,7 +856,7 @@ void TeamFortress_SpyFeignDeath( int issilent )
 	if ( self->is_feigning )
 	{
 	        // Check to make sure there isn't anyone on top of us
-		at_spot = findradius( world, self->s.v.origin, 64 );
+		at_spot = trap_findradius( world, self->s.v.origin, 64 );
 		i = 1;
 		j = 0;
 		while ( at_spot )
@@ -882,7 +882,7 @@ void TeamFortress_SpyFeignDeath( int issilent )
 				G_sprint( self, 2, "You can't get up while someone\nis standing on you.\n" );
 				return;
 			}
-			at_spot = findradius( at_spot, self->s.v.origin, 64 );
+			at_spot = trap_findradius( at_spot, self->s.v.origin, 64 );
 		}
 		SetVector( self->s.v.velocity, 0, 0, 0 );
 		setsize( self, -16, -16, -24, 16, 16, 32 );
@@ -934,7 +934,7 @@ void TeamFortress_SpyFeignDeath( int issilent )
    return;
   }*/
 		
-		for ( at_spot = world; ( at_spot = findradius( at_spot, self->s.v.origin, 64 ) ) ; )
+		for ( at_spot = world; ( at_spot = trap_findradius( at_spot, self->s.v.origin, 64 ) ) ; )
 		{
 			if ( streq( at_spot->s.v.classname, "player" ) && self != at_spot && at_spot->is_feigning == 1 )
 			{
@@ -1276,7 +1276,7 @@ void GasGrenadeMakeGas(  )
 	gedict_t *timer;
 
 	self->s.v.nextthink = g_globalvars.time + 0.75;
-	for ( te = world; (te = findradius( te, self->s.v.origin, 200 )); )
+	for ( te = world; (te = trap_findradius( te, self->s.v.origin, 200 )); )
 	{
 		if ( streq( te->s.v.classname, "player" ) && !te->s.v.deadflag && te->has_disconnected != 1 )
 		{
@@ -1540,7 +1540,7 @@ void W_FireTranq(  )
 	newmis->s.v.owner = EDICT_TO_PROG( self );
 	newmis->s.v.movetype = MOVETYPE_FLYMISSILE;
 	newmis->s.v.solid = SOLID_BBOX;
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	VectorCopy( g_globalvars.v_forward, newmis->s.v.velocity );
 	VectorScale( g_globalvars.v_forward, 1500, newmis->s.v.velocity ); // Faster than a normal nail
 	vectoangles( newmis->s.v.velocity, newmis->s.v.angles );

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfortmap.c,v 1.25 2006-11-21 21:47:50 AngelD Exp $
+ *  $Id: tfortmap.c,v 1.26 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -2076,7 +2076,7 @@ void tfgoalitem_drop( gedict_t * Item, float PAlive, gedict_t * P )
 	Item->s.v.owner = EDICT_TO_PROG( P );
 	if ( PAlive == 1 )
 	{
-		makevectors( P->s.v.v_angle );
+		trap_makevectors( P->s.v.v_angle );
 		if ( P->s.v.v_angle[0] )
 		{
 			Item->s.v.velocity[0] = g_globalvars.v_forward[0] * 400 + g_globalvars.v_up[0] * 200;
@@ -2450,7 +2450,7 @@ void ForceRespawn( gedict_t * P )
 	}
 	if ( deathmatch || coop )
 	{
-		makevectors( self->s.v.angles );
+		trap_makevectors( self->s.v.angles );
 		if ( self->playerclass )
 		{
 			VectorScale( g_globalvars.v_forward, 20, tmp );
@@ -2467,7 +2467,7 @@ void DropGoalItems(  )
 
 	newmis = spawn(); 
 	g_globalvars.newmis = EDICT_TO_PROG( newmis );
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	VectorNormalize( g_globalvars.v_forward );
 	VectorScale( g_globalvars.v_forward, 64, g_globalvars.v_forward );
 

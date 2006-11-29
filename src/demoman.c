@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: demoman.c,v 1.17 2005-11-29 14:22:43 AngelD Exp $
+ *  $Id: demoman.c,v 1.18 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -200,7 +200,7 @@ void TeamFortress_SetDetpack( float timer )
 	if ( self->ammo_detpack <= 0 && !tg_data.tg_enabled )
 		return;
 
-	for ( at_spot = world; (at_spot = findradius( at_spot, self->s.v.origin, 65 )); )
+	for ( at_spot = world; (at_spot = trap_findradius( at_spot, self->s.v.origin, 65 )); )
 	{
 		if ( streq( at_spot->s.v.classname, "player" ) && self != at_spot )
 		{
@@ -230,7 +230,7 @@ void TeamFortress_SetDetpack( float timer )
 	}
 	if ( tf_data.detpack_block )
 	{
-		for ( at_spot = world; (at_spot = findradius( at_spot, self->s.v.origin, 100 )); )
+		for ( at_spot = world; (at_spot = trap_findradius( at_spot, self->s.v.origin, 100 )); )
 		{
 			if ( tf_data.birthday == 1 && streq( at_spot->mdl, "progs/detpack2.mdl" ) )
 			{
@@ -406,7 +406,7 @@ void TeamFortress_DetpackExplode(  )
 	if ( pos != CONTENT_SOLID && pos != CONTENT_SKY && self->real_owner->has_disconnected != 1 )
 	{
 		tf_data.deathmsg = DMSG_DETPACK;
-		for ( head = world; (head = findradius( head, self->s.v.origin, WEAP_DETPACK_SIZE )); )
+		for ( head = world; (head = trap_findradius( head, self->s.v.origin, WEAP_DETPACK_SIZE )); )
 		{
 			if ( streq( head->s.v.classname, "info_tfgoal" ) )
 			{
@@ -495,7 +495,7 @@ void TeamFortress_DetpackTouch(  )
 	if ( (owner->team_no && TeamFortress_isTeamsAllied (other->team_no , owner->team_no)) && !tg_data.tg_enabled )
 		return;
 
-	makevectors( other->s.v.v_angle );
+	trap_makevectors( other->s.v.v_angle );
 	VectorCopy( other->s.v.origin, source );
 	source[2] += 16;
 

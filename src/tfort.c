@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tfort.c,v 1.49 2006-11-21 21:47:50 AngelD Exp $
+ *  $Id: tfort.c,v 1.50 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -489,7 +489,7 @@ void TeamFortress_ChangeClass(  )
 	player_stand1(  );
 	if ( deathmatch || coop )
 	{
-		makevectors( self->s.v.angles );
+		trap_makevectors( self->s.v.angles );
 		SetVector( v, self->s.v.origin[0] + g_globalvars.v_forward[0] * 20,
 			   self->s.v.origin[1] + g_globalvars.v_forward[1] * 20,
 			   self->s.v.origin[2] + g_globalvars.v_forward[2] * 20 );
@@ -1028,7 +1028,7 @@ void TeamFortress_PrimeGrenade(  )
 				newmis->s.v.movetype = MOVETYPE_TOSS;
 				newmis->s.v.solid = SOLID_BBOX;
 				newmis->s.v.classname = "grenade";
-				makevectors( self->s.v.v_angle );
+				trap_makevectors( self->s.v.v_angle );
 				newmis->s.v.velocity[0] =
 				    ( g_globalvars.v_forward[0] * 600 + g_globalvars.v_up[0] * 25 ) * 700;
 				newmis->s.v.velocity[1] =
@@ -1086,7 +1086,7 @@ void TeamFortress_PrimeGrenade(  )
 				newmis->s.v.movetype = MOVETYPE_TOSS;
 				newmis->s.v.solid = SOLID_BBOX;
 				newmis->s.v.classname = "grenade";
-				makevectors( self->s.v.v_angle );
+				trap_makevectors( self->s.v.v_angle );
 				if ( self->s.v.v_angle[0] )
 				{
 					newmis->s.v.velocity[0] =
@@ -1175,7 +1175,7 @@ void TeamFortress_GrenadePrimed(  )
 	newmis->s.v.movetype = MOVETYPE_BOUNCE;
 	newmis->s.v.solid = SOLID_BBOX;
 	newmis->s.v.classname = "grenade";
-	makevectors( user->s.v.v_angle );
+	trap_makevectors( user->s.v.v_angle );
 	if ( user->s.v.deadflag )
 		SetVector( newmis->s.v.velocity, 0, 0, 200 );
 	else
@@ -2067,7 +2067,7 @@ void TeamFortress_DropAmmo( int type )
 	newmis->s.v.classname = "ammobox";
 	newmis->team_no = self->team_no;
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 	if ( self->s.v.v_angle[0] )
 	{
 		newmis->s.v.velocity[0] = g_globalvars.v_forward[0] * 400 + g_globalvars.v_up[0] * 200;
@@ -2525,7 +2525,7 @@ void BioInfection_Decay(  )
 		return;
 	}
 
-	for ( te = findradius( world, owner->s.v.origin, 80 ); te; te = findradius( te, owner->s.v.origin, 80 ) )
+	for ( te = trap_findradius( world, owner->s.v.origin, 80 ); te; te = trap_findradius( te, owner->s.v.origin, 80 ) )
 	{
 		if ( te == owner )
 			continue;

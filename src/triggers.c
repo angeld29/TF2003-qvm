@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: triggers.c,v 1.10 2006-11-21 21:47:50 AngelD Exp $
+ *  $Id: triggers.c,v 1.11 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 gedict_t *stemp, *otemp, *s, *old;
@@ -122,7 +122,7 @@ void multi_touch(  )
 
 	if ( !VectorCompareF( self->s.v.movedir, 0, 0, 0 ) )
 	{
-		makevectors( other->s.v.angles );
+		trap_makevectors( other->s.v.angles );
 		if ( DotProduct( g_globalvars.v_forward, self->s.v.movedir ) < 0 )
 			return;	// not facing the right way
 	}
@@ -467,7 +467,7 @@ void teleport_touch(  )
 		G_Error( "couldn't find target" );
 
 // spawn a tfog flash in front of the destination
-	makevectors( t->mangle );
+	trap_makevectors( t->mangle );
 	org[0] = t->s.v.origin[0] + 32 * g_globalvars.v_forward[0];
 	org[1] = t->s.v.origin[1] + 32 * g_globalvars.v_forward[1];
 	org[2] = t->s.v.origin[2] + 32 * g_globalvars.v_forward[2];

@@ -1,9 +1,6 @@
 +!!!!!!! check printf like g_bprint(2,self->s.v.netname);
 +!!!!!!!   replace  g_bprint(2,"%s",self->s.v.netname);
 
-заменить makevectors -> trap_makevectors
-findradius -> trap_findradius
-
 
 ?????после взрыва грены в себе скин грен глючит
 botonly,playeronly  teams

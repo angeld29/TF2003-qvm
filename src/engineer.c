@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: engineer.c,v 1.29 2006-03-09 20:54:16 AngelD Exp $
+ *  $Id: engineer.c,v 1.30 2006-11-29 23:19:23 AngelD Exp $
  */
 /*========================================================
 Weapons and functions for the ENGINEER class and associated weaponry
@@ -110,7 +110,7 @@ void W_FireLaser(  )
 
     self->s.v.currentammo = --( self->s.v.ammo_nails );
 
-    makevectors( self->s.v.v_angle );
+    trap_makevectors( self->s.v.v_angle );
     VectorScale( g_globalvars.v_forward, 8, org );
     VectorAdd( self->s.v.origin, org, org );
     aim( vec );
@@ -214,7 +214,7 @@ void EMPGrenadeExplode(  )
     trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[1] );
     trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[2] );
     trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
-    for ( te = world; (te = findradius( te, self->s.v.origin, 240 )); )
+    for ( te = world; (te = trap_findradius( te, self->s.v.origin, 240 )); )
     {
 	if ( te->s.v.touch == ( func_t ) ammo_touch || te->s.v.touch == ( func_t ) weapon_touch )
 	{
@@ -378,7 +378,7 @@ int CheckAreaNew( gedict_t * obj, gedict_t * builder )
 	    return 0;
     }
 
-    te = findradius( world, obj->s.v.origin, 64 );
+    te = trap_findradius( world, obj->s.v.origin, 64 );
     if ( te )
 	return 0;
     
@@ -433,7 +433,7 @@ int CheckArea( gedict_t * obj, gedict_t * builder )
     traceline( PASSVEC3( builder->s.v.origin ), PASSVEC3( obj->s.v.origin ), 1, builder );
     if ( g_globalvars.trace_fraction != 1 )
 	return 0;
-    te = findradius( world, obj->s.v.origin, 64 );
+    te = trap_findradius( world, obj->s.v.origin, 64 );
     if ( te )
 		return 0;
     return 1;
@@ -451,7 +451,7 @@ void TeamFortress_Build( int objtobuild )
     g_globalvars.newmis = EDICT_TO_PROG( newmis );
 
     // get an origin
-    makevectors( self->s.v.v_angle );
+    trap_makevectors( self->s.v.v_angle );
     g_globalvars.v_forward[2] = 0;
     VectorNormalize( g_globalvars.v_forward );
     VectorScale( g_globalvars.v_forward, 64, g_globalvars.v_forward );

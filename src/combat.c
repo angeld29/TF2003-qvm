@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: combat.c,v 1.9 2006-01-31 13:39:00 AngelD Exp $
+ *  $Id: combat.c,v 1.10 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 void    ClientObituary( gedict_t * e1, gedict_t * e2 );
@@ -658,7 +658,7 @@ void T_RadiusDamage( gedict_t * inflictor, gedict_t * attacker, float damage, ge
 //      gedict_t *te;
 	vec3_t  org;
 
-	head = findradius( world, inflictor->s.v.origin, damage + 40 );
+	head = trap_findradius( world, inflictor->s.v.origin, damage + 40 );
 	while ( head )
 	{
 		if ( head != ignore )
@@ -692,7 +692,7 @@ void T_RadiusDamage( gedict_t * inflictor, gedict_t * attacker, float damage, ge
 				}
 			}
 		}
-		head = findradius( head, inflictor->s.v.origin, damage + 40 );
+		head = trap_findradius( head, inflictor->s.v.origin, damage + 40 );
 	}
 }
 
@@ -707,7 +707,7 @@ void T_BeamDamage( gedict_t * attacker, float damage )
 	float   points;
 	gedict_t *head;
 
-	head = findradius( world, attacker->s.v.origin, damage + 40 );
+	head = trap_findradius( world, attacker->s.v.origin, damage + 40 );
 	while ( head )
 	{
 		if ( head->s.v.takedamage )
@@ -724,6 +724,6 @@ void T_BeamDamage( gedict_t * attacker, float damage )
 					T_Damage( head, attacker, attacker, points );
 			}
 		}
-		head = findradius( head, attacker->s.v.origin, damage + 40 );
+		head = trap_findradius( head, attacker->s.v.origin, damage + 40 );
 	}
 }

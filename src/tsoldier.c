@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: tsoldier.c,v 1.5 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: tsoldier.c,v 1.6 2006-11-29 23:19:23 AngelD Exp $
  */
 
 #include "g_local.h"
@@ -105,7 +105,7 @@ void NailGrenadeLaunchNail(  )
 		self->s.v.angles[1] = current_yaw;
 		self->s.v.angles[0] = 0;
 		self->s.v.angles[2] = 0;
-		makevectors( self->s.v.angles );
+		trap_makevectors( self->s.v.angles );
 		tf_data.deathmsg = DMSG_GREN_NAIL;
 		launch_spike( self->s.v.origin, g_globalvars.v_forward );
 		newmis->s.v.touch = ( func_t ) superspike_touch;

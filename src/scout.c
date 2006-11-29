@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: scout.c,v 1.25 2006-03-04 13:01:15 AngelD Exp $
+ *  $Id: scout.c,v 1.26 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 
@@ -245,7 +245,7 @@ void FlashGrenadeExplode(  )
 	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
 	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
 	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
-	for ( te = world; ( te = findradius( te, self->s.v.origin, 300 ) ); )
+	for ( te = world; ( te = trap_findradius( te, self->s.v.origin, 300 ) ); )
 	{
 		if ( strneq( te->s.v.classname, "player" ) )
 			continue;
@@ -387,7 +387,7 @@ void ConcussionGrenadeTimer(  )
 	{
 		if ( !owner->is_feigning )
 		{
-			makevectors( owner->s.v.v_angle );
+			trap_makevectors( owner->s.v.v_angle );
 			stumble[0] =
 			    crandom(  ) * g_globalvars.v_forward[0] * self->s.v.health +
 			    crandom(  ) * g_globalvars.v_right[0] * self->s.v.health;
@@ -504,7 +504,7 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 	gedict_t *head;
 	vec3_t  org, dist;
 
-	for ( head = world; ( head = findradius( head, inflictor->s.v.origin, bounce + 40 ) ); )
+	for ( head = world; ( head = trap_findradius( head, inflictor->s.v.origin, bounce + 40 ) ); )
 	{
 		if ( head == ignore )
 			continue;
@@ -693,7 +693,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 	any_detected2 = 0;
 	scanrange = scanrange * 25;
 	minlen = scanrange + 100;
-	for ( list = world; ( list = findradius( list, self->s.v.origin, scanrange + 40 ) ); )
+	for ( list = world; ( list = trap_findradius( list, self->s.v.origin, scanrange + 40 ) ); )
 	{
 		enemy_detected = 0;
 		friend_detected = 0;

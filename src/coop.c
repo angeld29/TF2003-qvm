@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: coop.c,v 1.7 2004-12-23 03:16:15 AngelD Exp $
+ *  $Id: coop.c,v 1.8 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 void    key_touch(  );
@@ -68,7 +68,7 @@ void DropKey(  )
 		newmis->s.v.owner = EDICT_TO_PROG( self );
 		newmis->s.v.touch = ( func_t ) SUB_Null;
 		setorigin( newmis, self->s.v.origin[0], self->s.v.origin[1], self->s.v.origin[2] + 16 );
-		makevectors( self->s.v.v_angle );
+		trap_makevectors( self->s.v.v_angle );
 
 		VectorNormalize( g_globalvars.v_forward );
 		VectorScale( g_globalvars.v_forward, 300, newmis->s.v.velocity );

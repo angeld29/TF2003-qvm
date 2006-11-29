@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: sentry.c,v 1.27 2006-02-28 12:50:07 AngelD Exp $
+ *  $Id: sentry.c,v 1.28 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 #include "sentry.h"
@@ -494,7 +494,7 @@ void FireSentryBulletsNEW( int shotcount, gedict_t * targ, float spread_x, float
 	vec3_t  dst;
 	vec3_t  dir,  tmp, norm_dir;
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 
 	VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
 	VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
@@ -542,7 +542,7 @@ void FireSentryBulletsMTFL2( int shotcount, gedict_t * targ, float spread_x, flo
 	vec3_t  dst;
 	vec3_t  dir, end, tmp;
 
-	makevectors( self->s.v.v_angle );
+	trap_makevectors( self->s.v.v_angle );
 
 	VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
 	VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
@@ -590,7 +590,7 @@ void    FireSentryLighting( gedict_t * targ )
 	{
 		case SG_SFIRE_NEW:
 			VectorCopy( self->s.v.angles, self->s.v.v_angle );
-			makevectors( self->s.v.v_angle );
+			trap_makevectors( self->s.v.v_angle );
 
                 	VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
                 	VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
@@ -608,7 +608,7 @@ void    FireSentryLighting( gedict_t * targ )
 			break;
 		case SG_SFIRE_MTFL2:
         		VectorCopy( self->s.v.angles, self->s.v.v_angle );
-        		makevectors( self->s.v.v_angle );
+        		trap_makevectors( self->s.v.v_angle );
         		VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
         		VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
 
@@ -621,7 +621,7 @@ void    FireSentryLighting( gedict_t * targ )
 		case SG_SFIRE_MTFL1:
 			VectorCopy( self->s.v.angles, self->s.v.v_angle );
 		case SG_SFIRE_281:
-        		makevectors( self->s.v.v_angle );
+        		trap_makevectors( self->s.v.v_angle );
         		VectorScale( g_globalvars.v_forward, 10, src );
         		VectorAdd( self->s.v.origin, src, src );
         		src[2] = self->s.v.absmin[2] + self->s.v.size[2] * 0.7;
@@ -706,7 +706,7 @@ void LaunchSGRocketOLD(gedict_t*targ)
        	
        	vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
 
-       	makevectors( self->s.v.angles);
+       	trap_makevectors( self->s.v.angles);
        	VectorScale( g_globalvars.v_forward, 8, vtemp );
        	VectorAdd( vtemp, self->s.v.origin, vtemp );
        	vtemp[2] += 16;
@@ -765,7 +765,7 @@ void LaunchSGRocketNEW(gedict_t*targ)
 
 //try fire to targ origin
 
-       	makevectors( self->s.v.angles);
+       	trap_makevectors( self->s.v.angles);
        	VectorScale( g_globalvars.v_forward, 8, vtemp );
        	VectorAdd( vtemp, self->s.v.origin, src );
        	src[2] += 16;
@@ -959,7 +959,7 @@ void Eng_StaticSG_Activate(  )
 		failed = 0;
 		if ( ent->has_sentry && !ent->s.v.takedamage )
 		{
-			for ( pl = world; (pl = findradius( pl, ent->s.v.origin, 64 )); )
+			for ( pl = world; (pl = trap_findradius( pl, ent->s.v.origin, 64 )); )
 			{
 				if ( streq( pl->s.v.classname, "player" ) )
 				{
