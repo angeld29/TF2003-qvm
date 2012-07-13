@@ -1,3 +1,5 @@
+this mod can be launched with qwsv262 or mvdsv (quakeworld servers)
+
 Do not use double in mods, qvm does not support it.
 
 Do not modify progdefs.h and g_public.h.
