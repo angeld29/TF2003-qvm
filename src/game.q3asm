@@ -1,4 +1,4 @@
--o qwprogs
+-o ../bin/qwprogs
 g_main
 g_syscalls
 actions

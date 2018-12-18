@@ -21,8 +21,7 @@ set LIBRARY=
 
 set INCLUDE=
 
-
-
+mkdir bin
 mkdir VM
 mkdir VM\bot
 cd VM

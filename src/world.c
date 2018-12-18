@@ -107,6 +107,7 @@ void SP_worldspawn(  )
 		trap_cvar_set( "sv_gravity", "800" );
 
 	infokey( world, "*sv_gamedir", gamedir, sizeof( gamedir ) );
+
 	if ( gamedir[0] != 0 && strcmp( gamedir, "fortress" ) )
 	{
 		G_Error( "QW TF must be run with a sv_gamedir of \"fortress\".\n" );
