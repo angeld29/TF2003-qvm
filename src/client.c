@@ -790,7 +790,7 @@ void GotoNextMap()
 {
 	int     nextlevel;
 	char    str[64];
-	static  int map_try_change = 0;
+	//static  int map_try_change = 0;
 
 //      gedict_t *te;
 
@@ -2242,7 +2242,7 @@ void PlayerPostThink()
 					if ( self->playerclass == 6 )
 						fdmg = fdmg * 1.5;
 				}
-				fdmg = rint( fdmg );
+				fdmg = Q_rint( fdmg );
 				self->deathtype = "falling";
 				TF_T_Damage( self, world, world, fdmg, 1, 0 );
 				sound( self, 2, "player/land2.wav", 1, 1 );

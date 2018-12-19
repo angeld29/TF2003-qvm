@@ -55,7 +55,7 @@ gedict_t *spawn(  )
 	return t;
 }
 
-int rint(float f)
+/*int rint(float f)
 {
 	if(f > 0)
 		return (int)( f + 0.5);
@@ -63,6 +63,7 @@ int rint(float f)
 		return (int)( f - 0.5);
 
 }
+*/
 void ent_remove( gedict_t * t )
 {
 	if ( !t || t == world )

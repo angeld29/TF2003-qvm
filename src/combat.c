@@ -575,7 +575,7 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 	// do the damage, min 1
 	if ( take < 1 )
 		take = 1;
-	take = rint( take );	//take = floor( take );
+	take = Q_rint( take );	//take = floor( take );
 
 	if ( !no_damage )
 	{

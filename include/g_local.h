@@ -83,7 +83,6 @@ unsigned int crc32(unsigned int crc, unsigned char* buf, int len);
 //g_utils.c
 float           g_random( void );
 float           crandom( void );
-int 		rint(float f);
 gedict_t       *spawn( void );
 void            ent_remove( gedict_t * t );
 

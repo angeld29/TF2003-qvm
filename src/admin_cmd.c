@@ -64,7 +64,7 @@ static const admin_cmd_t admin_cmds[] =
 static int CheckString(char *str)
 {
 	char *strp =str,ch;
-	while(ch = *strp++)
+	while((ch = *strp++))
 	{
 		switch(ch)
 		{

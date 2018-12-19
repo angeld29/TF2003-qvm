@@ -1431,7 +1431,7 @@ void GasEffect2( gedict_t * owner )	//sounds
 	stuffcmd( owner, gas_sounds[i] );
 }
 
-static const char   *gas_sounds2[] = {
+/*static const char   *gas_sounds2[] = {
 	"play weapons/detpack.wav\n",
 	"play weapons/turrset.wav\n",
 	"play weapons/turrspot.wav\n",
@@ -1442,7 +1442,7 @@ static const char   *gas_sounds2[] = {
 	"play misc/vapeur2.wav\n",
 	"play weapons/asscan1.wav\n",
 	"play weapons/asscan2.wav\n"
-};
+};*/
 void GasEffect3( gedict_t * owner )
 {
 	gedict_t *te;

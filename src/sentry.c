@@ -325,7 +325,7 @@ int Sentry_FindTarget_Angel(  )
 		{
 			self->s.v.enemy = EDICT_TO_PROG( client );
 			self->height = g_globalvars.time + 0.1 * ( int ) ( g_random(  ) * tf_data.sgppl );
-//     self.height = g_globalvars.time + 0.1 * rint(sgppl);
+//     self.height = g_globalvars.time + 0.1 * Q_rint(sgppl);
 			if ( self->height == g_globalvars.time )
 			{
 				Sentry_FoundTarget(  );

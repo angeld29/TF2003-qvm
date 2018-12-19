@@ -66,6 +66,15 @@
 #include <time.h>
 #include <ctype.h>
 #include <limits.h>
+	#if defined( _WIN32 )
+
+	#else
+
+	#define _vsnprintf vsnprintf
+	#define _snprintf snprintf
+
+	#endif // defined( _WIN32 )
+
 
 #endif
 

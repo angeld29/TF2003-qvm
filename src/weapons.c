@@ -399,7 +399,7 @@ void W_FireMedikit(  )
 				}
 				if ( trace_ent->tfstate & TFSTATE_INFECTED )
 				{
-					healam = rint( trace_ent->s.v.health / 2 );
+					healam = Q_rint( trace_ent->s.v.health / 2 );
 					trace_ent->tfstate -= ( trace_ent->tfstate & TFSTATE_INFECTED );
 					tf_data.deathmsg = DMSG_MEDIKIT;
 					T_Damage( trace_ent, self, self, healam );
@@ -2114,10 +2114,23 @@ void W_Reload_rocket_launcher(  )
 	owner->StatusRefreshTime = g_globalvars.time + 0.1;
 }
 
+int _weapon_reload( void (* f)(), int tm )
+{
+    gedict_t *tWeapon;
+    G_sprint( self, 2, "reloading...\n" );
+    self->tfstate = self->tfstate | TFSTATE_RELOADING;
+    tWeapon = spawn(  );
+    tWeapon->s.v.owner = EDICT_TO_PROG( self );
+    tWeapon->s.v.classname = "timer";
+    tWeapon->s.v.nextthink = g_globalvars.time + tm;
+    tWeapon->s.v.think = (func_t) f;
+    self->s.v.weaponmodel = "";
+    self->s.v.weaponframe = 0;
+    return 1;
+}
+
 float CheckForReload(  )
 {
-	gedict_t *tWeapon;
-
  	if( tg_data.disable_reload )
 	{
 		self->reload_shotgun = 0;
@@ -2135,16 +2148,7 @@ float CheckForReload(  )
 			self->reload_shotgun = 0;
 			if ( self->s.v.ammo_shells < 8 )
 				self->reload_shotgun = 8 - self->s.v.ammo_shells;
-			G_sprint( self, 2, "reloading...\n" );
-			self->tfstate = self->tfstate | TFSTATE_RELOADING;
-			tWeapon = spawn(  );
-			tWeapon->s.v.owner = EDICT_TO_PROG( self );
-			tWeapon->s.v.classname = "timer";
-			tWeapon->s.v.nextthink = g_globalvars.time + 2;
-			tWeapon->s.v.think = ( func_t ) W_Reload_shotgun;
-			self->s.v.weaponmodel = "";
-			self->s.v.weaponframe = 0;
-			return 1;
+            return _weapon_reload( W_Reload_shotgun, 2 );
 		}
 		break;
 	case WEAP_SUPER_SHOTGUN:
@@ -2155,15 +2159,7 @@ float CheckForReload(  )
 			self->reload_super_shotgun = 0;
 			if ( self->s.v.ammo_shells < 16 )
 				self->reload_super_shotgun = 16 - self->s.v.ammo_shells;
-			G_sprint( self, 2, "reloading...\n" );
-			self->tfstate = self->tfstate | TFSTATE_RELOADING;
-			tWeapon = spawn(  );
-			tWeapon->s.v.owner = EDICT_TO_PROG( self );
-			tWeapon->s.v.nextthink = g_globalvars.time + 3;
-			tWeapon->s.v.think = ( func_t ) W_Reload_super_shotgun;
-			self->s.v.weaponmodel = "";
-			self->s.v.weaponframe = 0;
-			return 1;
+            return _weapon_reload( W_Reload_super_shotgun, 2 );
 		}
 		break;
 	case WEAP_GRENADE_LAUNCHER:
@@ -2172,16 +2168,7 @@ float CheckForReload(  )
 			self->reload_grenade_launcher = 0;
 			if ( self->s.v.ammo_rockets < 6 )
 				self->reload_grenade_launcher = 6 - self->s.v.ammo_rockets;
-			G_sprint( self, 2, "reloading...\n" );
-			self->tfstate = self->tfstate | TFSTATE_RELOADING;
-			tWeapon = spawn(  );
-			tWeapon->s.v.owner = EDICT_TO_PROG( self );
-			tWeapon->s.v.classname = "timer";
-			tWeapon->s.v.nextthink = g_globalvars.time + 4;
-			tWeapon->s.v.think = ( func_t ) W_Reload_grenade_launcher;
-			self->s.v.weaponmodel = "";
-			self->s.v.weaponframe = 0;
-			return 1;
+            return _weapon_reload( W_Reload_grenade_launcher, 4 );
 		}
 		break;
 	case WEAP_ROCKET_LAUNCHER:
@@ -2190,16 +2177,7 @@ float CheckForReload(  )
 			self->reload_rocket_launcher = 0;
 			if ( self->s.v.ammo_rockets < 4 )
 				self->reload_rocket_launcher = 4 - self->s.v.ammo_rockets;
-			G_sprint( self, 2, "reloading...\n" );
-			self->tfstate = self->tfstate | TFSTATE_RELOADING;
-			tWeapon = spawn(  );
-			tWeapon->s.v.owner = EDICT_TO_PROG( self );
-			tWeapon->s.v.classname = "timer";
-			tWeapon->s.v.nextthink = g_globalvars.time + 5;
-			tWeapon->s.v.think = ( func_t ) W_Reload_rocket_launcher;
-			self->s.v.weaponmodel = "";
-			self->s.v.weaponframe = 0;
-			return 1;
+            return _weapon_reload( W_Reload_rocket_launcher, 5 );
 		}
 		break;
 	}
@@ -2236,191 +2214,191 @@ void    player_chain5(  );
 void W_Attack(  )
 {
 
-        if ( !W_CheckNoAmmo(  ) )
-		return;
-	if ( self->has_disconnected == 1 )
-		return;
-	if ( self->tfstate & TFSTATE_RELOADING )
-		return;
-	if ( self->is_undercover || self->undercover_team || self->undercover_skin )
-		Spy_RemoveDisguise( self );
-	trap_makevectors( self->s.v.v_angle );	// calculate forward angle for velocity
-	self->show_hostile = g_globalvars.time + 1;	// wake monsters up
+    if ( !W_CheckNoAmmo(  ) )
+        return;
+    if ( self->has_disconnected == 1 )
+        return;
+    if ( self->tfstate & TFSTATE_RELOADING )
+        return;
+    if ( self->is_undercover || self->undercover_team || self->undercover_skin )
+        Spy_RemoveDisguise( self );
+    trap_makevectors( self->s.v.v_angle );	// calculate forward angle for velocity
+    self->show_hostile = g_globalvars.time + 1;	// wake monsters up
 
-	switch ( self->current_weapon )
-	{
-	case WEAP_AXE:
-		Attack_Finished( 0.5 );
-		sound( self, 1, "weapons/ax1.wav", 1, 1 );
-		switch ( ( int ) ( g_random(  ) * 4 ) )
-		{
-		case 0:
-			player_axe1(  );
-			break;
-		case 1:
-			player_axeb1(  );
-			break;
-		case 2:
-			player_axec1(  );
-			break;
-		default:
-			player_axed1(  );
-			break;
-		}
-		break;
-	case WEAP_SPANNER:
-		Attack_Finished( 0.5 );
-		sound( self, 1, "weapons/ax1.wav", 1, 1 );
-		player_axe1(  );
-		break;
-	case WEAP_HOOK:
-		if ( !self->hook_out )
-			player_chain1(  );
-		Attack_Finished( 0.1 );
-		break;
-	case WEAP_SHOTGUN:
-		if ( CheckForReload(  ) == 1 )
-			return;
-		player_shot1(  );
-		W_FireShotgun(  );
-		self->reload_shotgun += 1;
-		self->StatusRefreshTime = g_globalvars.time + 0.1;
-		CheckForReload(  );
-		Attack_Finished( 0.5 );
-		break;
-	case WEAP_SUPER_SHOTGUN:
-		if ( CheckForReload(  ) == 1 )
-			return;
-		player_shot1(  );
-		W_FireSuperShotgun(  );
-		self->reload_super_shotgun += 2;
-		self->StatusRefreshTime = g_globalvars.time + 0.1;
-		CheckForReload(  );
-		Attack_Finished( 0.7 );
-		break;
-	case WEAP_NAILGUN:
-	case WEAP_SUPER_NAILGUN:
-		player_nail1(  );
-		break;
-	case WEAP_GRENADE_LAUNCHER:
-		if ( CheckForReload(  ) == 1 )
-			return;
-		player_rocket1(  );
-		W_FireGrenade(  );
-		self->reload_grenade_launcher += 1;
-		self->StatusRefreshTime = g_globalvars.time + 0.1;
-		CheckForReload(  );
-		Attack_Finished( 0.6 );
-		break;
-	case WEAP_ROCKET_LAUNCHER:
-		if ( CheckForReload(  ) == 1 )
-			return;
-		player_rocket1(  );
-		W_FireRocket(  );
-		self->reload_rocket_launcher += 1;
-		self->StatusRefreshTime = g_globalvars.time + 0.1;
-		CheckForReload(  );
-		Attack_Finished( 0.8 );
-		break;
-	case WEAP_LIGHTNING:
-		player_light1(  );
-		Attack_Finished( 0.1 );
-		sound( self, 0, "weapons/lstart.wav", 1, 1 );
-		break;
-	case WEAP_SNIPER_RIFLE:
-		if ( ( ( int ) self->s.v.flags & FL_ONGROUND ) || self->hook_out )
-		{
-			player_shot1(  );
-			W_FireSniperRifle(  );
-			self->allow_snip_time = g_globalvars.time + tf_data.snip_time;
-			Attack_Finished( 1.5 );
-		}
-		break;
-	case WEAP_AUTO_RIFLE:
-		player_autorifle1(  );
-		W_FireAutoRifle(  );
-		Attack_Finished( 0.1 );
-		break;
-	case WEAP_ASSAULT_CANNON:
-		if ( self->s.v.ammo_cells < 4 )
-			G_sprint( self, 1, "Insufficient cells to power up the Assault Cannon.\n" );
-		else
-		{
-                        if( !tg_data.unlimit_ammo )
-				self->s.v.ammo_cells -= 4;
+    switch ( self->current_weapon )
+    {
+        case WEAP_AXE:
+            Attack_Finished( 0.5 );
+            sound( self, 1, "weapons/ax1.wav", 1, 1 );
+            switch ( ( int ) ( g_random(  ) * 4 ) )
+            {
+                case 0:
+                    player_axe1(  );
+                    break;
+                case 1:
+                    player_axeb1(  );
+                    break;
+                case 2:
+                    player_axec1(  );
+                    break;
+                default:
+                    player_axed1(  );
+                    break;
+            }
+            break;
+        case WEAP_SPANNER:
+            Attack_Finished( 0.5 );
+            sound( self, 1, "weapons/ax1.wav", 1, 1 );
+            player_axe1(  );
+            break;
+        case WEAP_HOOK:
+            if ( !self->hook_out )
+                player_chain1(  );
+            Attack_Finished( 0.1 );
+            break;
+        case WEAP_SHOTGUN:
+            if ( CheckForReload(  ) == 1 )
+                return;
+            player_shot1(  );
+            W_FireShotgun(  );
+            self->reload_shotgun += 1;
+            self->StatusRefreshTime = g_globalvars.time + 0.1;
+            CheckForReload(  );
+            Attack_Finished( 0.5 );
+            break;
+        case WEAP_SUPER_SHOTGUN:
+            if ( CheckForReload(  ) == 1 )
+                return;
+            player_shot1(  );
+            W_FireSuperShotgun(  );
+            self->reload_super_shotgun += 2;
+            self->StatusRefreshTime = g_globalvars.time + 0.1;
+            CheckForReload(  );
+            Attack_Finished( 0.7 );
+            break;
+        case WEAP_NAILGUN:
+        case WEAP_SUPER_NAILGUN:
+            player_nail1(  );
+            break;
+        case WEAP_GRENADE_LAUNCHER:
+            if ( CheckForReload(  ) == 1 )
+                return;
+            player_rocket1(  );
+            W_FireGrenade(  );
+            self->reload_grenade_launcher += 1;
+            self->StatusRefreshTime = g_globalvars.time + 0.1;
+            CheckForReload(  );
+            Attack_Finished( 0.6 );
+            break;
+        case WEAP_ROCKET_LAUNCHER:
+            if ( CheckForReload(  ) == 1 )
+                return;
+            player_rocket1(  );
+            W_FireRocket(  );
+            self->reload_rocket_launcher += 1;
+            self->StatusRefreshTime = g_globalvars.time + 0.1;
+            CheckForReload(  );
+            Attack_Finished( 0.8 );
+            break;
+        case WEAP_LIGHTNING:
+            player_light1(  );
+            Attack_Finished( 0.1 );
+            sound( self, 0, "weapons/lstart.wav", 1, 1 );
+            break;
+        case WEAP_SNIPER_RIFLE:
+            if ( ( ( int ) self->s.v.flags & FL_ONGROUND ) || self->hook_out )
+            {
+                player_shot1(  );
+                W_FireSniperRifle(  );
+                self->allow_snip_time = g_globalvars.time + tf_data.snip_time;
+                Attack_Finished( 1.5 );
+            }
+            break;
+        case WEAP_AUTO_RIFLE:
+            player_autorifle1(  );
+            W_FireAutoRifle(  );
+            Attack_Finished( 0.1 );
+            break;
+        case WEAP_ASSAULT_CANNON:
+            if ( self->s.v.ammo_cells < 4 )
+                G_sprint( self, 1, "Insufficient cells to power up the Assault Cannon.\n" );
+            else
+            {
+                if( !tg_data.unlimit_ammo )
+                    self->s.v.ammo_cells -= 4;
 
-			self->heat = 1;
-			self->tfstate |= TFSTATE_AIMING;
-			TeamFortress_SetSpeed( self );
-			player_assaultcannonup1(  );
-		}
-		break;
-	case WEAP_FLAMETHROWER:
-		player_shot1(  );
-		W_FireFlame(  );
-		if ( self->s.v.waterlevel > 2 )
-			Attack_Finished( 1 );
-		else
-		{
-			Attack_Finished( 0.15 );
-		}
-		break;
-	case WEAP_INCENDIARY:
-		player_rocket1(  );
-		W_FireIncendiaryCannon(  );
-		Attack_Finished( 1.2 );
-		break;
-	case WEAP_MEDIKIT:
-		sound( self, 1, "weapons/ax1.wav", 1, 1 );
-		switch ( ( int ) ( g_random(  ) * 4 ) )
-		{
-		case 0:
-			player_medikit1(  );
-			break;
-		case 1:
-			player_medikitb1(  );
-			break;
-		case 2:
-			player_medikitc1(  );
-			break;
-		default:
-			player_medikitd1(  );
-			break;
-		}
-		Attack_Finished( 0.5 );
-		break;
-	case WEAP_BIOWEAPON:
-		sound( self, 1, "weapons/ax1.wav", 1, 1 );
-		switch ( ( int ) ( g_random(  ) * 4 ) )
-		{
-		case 0:
-			player_bioweapon1(  );
-			break;
-		case 1:
-			player_bioweaponb1(  );
-			break;
-		case 2:
-			player_bioweaponc1(  );
-			break;
-		default:
-			player_bioweapond1(  );
-			break;
-		}
-		Attack_Finished( 0.5 );
-		break;
-	case WEAP_TRANQ:
-		sound( self, 1, "weapons/dartgun.wav", 1, 1 );
-		player_shot1(  );
-		W_FireTranq(  );
-		Attack_Finished( 1.5 );
-		break;
-	case WEAP_LASER:
-		sound( self, 1, "weapons/railgun.wav", 1, 1 );
-		player_shot1(  );
-		W_FireLaser(  );
-		Attack_Finished( 0.4 );
-		break;
-	}
+                self->heat = 1;
+                self->tfstate |= TFSTATE_AIMING;
+                TeamFortress_SetSpeed( self );
+                player_assaultcannonup1(  );
+            }
+            break;
+        case WEAP_FLAMETHROWER:
+            player_shot1(  );
+            W_FireFlame(  );
+            if ( self->s.v.waterlevel > 2 )
+                Attack_Finished( 1 );
+            else
+            {
+                Attack_Finished( 0.15 );
+            }
+            break;
+        case WEAP_INCENDIARY:
+            player_rocket1(  );
+            W_FireIncendiaryCannon(  );
+            Attack_Finished( 1.2 );
+            break;
+        case WEAP_MEDIKIT:
+            sound( self, 1, "weapons/ax1.wav", 1, 1 );
+            switch ( ( int ) ( g_random(  ) * 4 ) )
+            {
+                case 0:
+                    player_medikit1(  );
+                    break;
+                case 1:
+                    player_medikitb1(  );
+                    break;
+                case 2:
+                    player_medikitc1(  );
+                    break;
+                default:
+                    player_medikitd1(  );
+                    break;
+            }
+            Attack_Finished( 0.5 );
+            break;
+        case WEAP_BIOWEAPON:
+            sound( self, 1, "weapons/ax1.wav", 1, 1 );
+            switch ( ( int ) ( g_random(  ) * 4 ) )
+            {
+                case 0:
+                    player_bioweapon1(  );
+                    break;
+                case 1:
+                    player_bioweaponb1(  );
+                    break;
+                case 2:
+                    player_bioweaponc1(  );
+                    break;
+                default:
+                    player_bioweapond1(  );
+                    break;
+            }
+            Attack_Finished( 0.5 );
+            break;
+        case WEAP_TRANQ:
+            sound( self, 1, "weapons/dartgun.wav", 1, 1 );
+            player_shot1(  );
+            W_FireTranq(  );
+            Attack_Finished( 1.5 );
+            break;
+        case WEAP_LASER:
+            sound( self, 1, "weapons/railgun.wav", 1, 1 );
+            player_shot1(  );
+            W_FireLaser(  );
+            Attack_Finished( 0.4 );
+            break;
+    }
 }
 
 void W_PrintWeaponMessage(  )

@@ -152,6 +152,18 @@ void TeamFortress_ShowIDs(  )
 
 }
 
+int _isDraw ( no_teams, teamfrags_q )
+{
+    int i;
+    for( i = 2; i <= no_teams; i++ )
+    {
+        if( ( teamscores[1] != teamscores[i] && teamfrags_q ) 
+             || ( teamfrags[1] != teamfrags[i] && !teamfrags_q ))
+            return 0;
+    }
+    return 1;
+}
+
 void DumpClanScores(  )
 {
 	int     winners, no_teams = 0, printed = 0, ti = 0, teamfrags_q;
@@ -183,44 +195,27 @@ void DumpClanScores(  )
 	G_bprint( 2, "\n\n=------= MATCH RESULTS =------=\n" );
 
 
-	if ( no_teams == 2
-	     && ( ( teamscores[1] == teamscores[2] && teamfrags_q )
-		  || ( teamfrags[1] == teamfrags[2] && !teamfrags_q ) ) )
+	if ( _isDraw( no_teams, teamfrags_q ))
 		G_bprint( 2, " DRAW " );
 	else
-	{
-		if ( no_teams == 3
-		     && ( ( teamscores[1] == teamscores[2] == teamscores[3] && teamfrags_q )
-			  || ( teamfrags[1] == teamfrags[2] == teamfrags[3] && !teamfrags_q ) ) )
-			G_bprint( 2, " DRAW " );
-		else
-		{
-			if ( no_teams == 3
-			     && ( ( teamscores[1] == teamscores[2] == teamscores[3] == teamscores[4] && teamfrags_q )
-				  || ( teamfrags[1] == teamfrags[2] == teamfrags[3] == teamfrags[4]
-				       && !teamfrags_q ) ) )
-				G_bprint( 2, " DRAW " );
-			else
-			{
-				G_bprint( 2, "%s defeated ", GetTeamName( winners ) );
-				for ( i = 1; i < 4; i++ )
-				{
-					if ( winners != i && t_pl[i] )
-					{
-						st = GetTeamName( i );
-						if ( !printed )
-							G_bprint( 2, "%s", st );
-						else if ( printed == no_teams )
-							G_bprint( 2, " and %s", st );
-						else
-							G_bprint( 2, ", %s", st );
-						printed++;
+    {
+        G_bprint( 2, "%s defeated ", GetTeamName( winners ) );
+        for ( i = 1; i < 4; i++ )
+        {
+            if ( winners != i && t_pl[i] )
+            {
+                st = GetTeamName( i );
+                if ( !printed )
+                    G_bprint( 2, "%s", st );
+                else if ( printed == no_teams )
+                    G_bprint( 2, " and %s", st );
+                else
+                    G_bprint( 2, ", %s", st );
+                printed++;
 
-					}
-				}
-			}
-		}
-	}
+            }
+        }
+    }
 	G_bprint( 2, "\n\n" );
 
 	GetSVInfokeyString( "dtf", "dont_tweak_frags", st2, sizeof( st2 ), "off" );

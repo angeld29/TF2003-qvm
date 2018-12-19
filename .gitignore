@@ -1,4 +1,5 @@
 Makefile
 src/Makefile.dl
 src/Makefile.vm
+*.o
 tags

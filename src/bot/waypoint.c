@@ -369,7 +369,7 @@ void PrintPath(wp_path_t * path)
 
 wp_path_t *WaypointFindPath( waypoint_t * wp_src, waypoint_t * wp_dst )
 {
-	int     pathlen = 0, i;
+    int i;
 	wp_path_t *path = NULL, *tmpp;
 	wp_list_t *wp_l,*wp_l_end;
 
