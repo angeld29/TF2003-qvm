@@ -144,6 +144,7 @@ void DecodeLevelParms()
 	char    st[10];
 	gedict_t *ent;
 	gedict_t *te;
+    int i;
 	float fvar;
 	static int first_decode = 1;
 
@@ -226,36 +227,21 @@ void DecodeLevelParms()
 			} else
 				number_of_teams = 4;
 
-			teamlives[0] = -1;
-			teamlives[1] = -1;
-			teamlives[2] = -1;
-			teamlives[3] = -1;
-			teamlives[4] = -1;
-			illegalclasses[0] = 0;
-			illegalclasses[1] = 0;
-			illegalclasses[2] = 0;
-			illegalclasses[3] = 0;
-			illegalclasses[4] = 0;
-			teammaxplayers[0] = 100;
-			teammaxplayers[1] = 100;
-			teammaxplayers[2] = 100;
-			teammaxplayers[3] = 100;
-			teammaxplayers[4] = 100;
-
+            for(i=0; i< 5; i++)
+            {
+                teamlives[i] = -1;
+                illegalclasses[i] = 0;
+                teammaxplayers[i] = 100;
+            }
 			civilianteams = 0;
 		}
 		G_bprint( 2, "Mapname: %s\n", g_globalvars.mapname );
 		SetupTeamEqualiser();
-		teamfrags[0] = 0;
-		teamfrags[1] = 0;
-		teamfrags[2] = 0;
-		teamfrags[3] = 0;
-		teamfrags[4] = 0;
-		teamscores[0] = 0;
-		teamscores[1] = 0;
-		teamscores[2] = 0;
-		teamscores[3] = 0;
-		teamscores[4] = 0;
+        for(i=0; i< 5; i++)
+        {
+            teamfrags[i] = 0;
+            teamscores[i] = 0;
+        }
 		UpdateServerinfoScores();
 		tf_data.autokick_kills = 0;
 		tf_data.autokick_time = 0;
@@ -660,28 +646,28 @@ void DecodeLevelParms()
 			GR_TYPE_MIRV_NO		=12;	 	// Number of Mirvs a Mirv Grenade breaks into
 			GR_TYPE_NAPALM_NO	=12; 	 	// Number of flames napalm grenade breaks into (unused if net server)
 		}
-                if( tg_data.tg_enabled )
-			TG_LoadSettings();
-                else
-                {
-                        tg_data.godmode = 0;
-                        tg_data.unlimit_ammo = 0;
-                        tg_data.unlimit_grens = 0;
-                        tg_data.disable_reload = 0;
-                        tg_data.detpack_clip = TG_DETPACK_CLIP_OWNER;
-                        tg_data.detpack_drop = 0;   // 1 can drop, 0 - cannot
-                        tg_data.disable_disarm = 0; // 0 normal, 1 - disable
-                        tg_data.gren_effect = 0;    //0 -default, 1 - off for all, 2 off for self
-                        tg_data.gren_time = 0;      //0 -full time , 10 ,5 in sek
+        if( tg_data.tg_enabled )
+            TG_LoadSettings();
+        else
+        {
+            tg_data.godmode = 0;
+            tg_data.unlimit_ammo = 0;
+            tg_data.unlimit_grens = 0;
+            tg_data.disable_reload = 0;
+            tg_data.detpack_clip = TG_DETPACK_CLIP_OWNER;
+            tg_data.detpack_drop = 0;   // 1 can drop, 0 - cannot
+            tg_data.disable_disarm = 0; // 0 normal, 1 - disable
+            tg_data.gren_effect = 0;    //0 -default, 1 - off for all, 2 off for self
+            tg_data.gren_time = 0;      //0 -full time , 10 ,5 in sek
 
-                        tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
-                        tg_data.sg_disable_fire = 0;
-                        tg_data.sg_fire_bullets = true;
-                        tg_data.sg_fire_rockets = true;
-                        tg_data.sg_fire_lighting = false;
-                        tg_data.sg_unlimit_ammo = false;
-                        tg_data.tg_sbar = 0;
-                }
+            tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
+            tg_data.sg_disable_fire = 0;
+            tg_data.sg_fire_bullets = true;
+            tg_data.sg_fire_rockets = true;
+            tg_data.sg_fire_lighting = false;
+            tg_data.sg_unlimit_ammo = false;
+            tg_data.tg_sbar = 0;
+        }
 		if( tf_data.enable_bot )
 		        localcmd( "exec maps/%s.wps\n", g_globalvars.mapname );
 	}
@@ -703,7 +689,7 @@ gedict_t *FindIntermission()
 	spot = trap_find( world, FOFS( s.v.classname ), "info_intermission" );
 	if ( spot )
 	{			// pick a random one
-		cyc = g_random() * 1;
+		//cyc = g_random() * 1;
 /*		while ( cyc > 1 )
 		{
 			spot = trap_find( spot, FOFS( s.v.classname ), "info_intermission" );
@@ -829,6 +815,7 @@ void ExitIntermission()
 		GotoNextMap();
 		return;
 	}
+    /*
 	intermission_exittime = g_globalvars.time + 1;
 	intermission_running += 1;
 	if ( intermission_running == 2 )
@@ -903,7 +890,7 @@ void ExitIntermission()
 					  "Now, you have all four Runes. You sense\ntremendous invisible forces moving to\nunseal ancient barriers. Shub-Niggurath\nhad hoped to use the Runes Herself to\nclear off the Earth, but now instead,\nyou will use them to enter her home and\nconfront her as an avatar of avenging\nEarth-life. If you defeat her, you will\nbe remembered forever as the savior of\nthe planet. If she conquers, it will be\nas if you had never been born." );
 			return;
 		}
-	}
+	}*/
 	G_conprintf( "Exit Intermission.\n" );
 	GotoNextMap();
 }
