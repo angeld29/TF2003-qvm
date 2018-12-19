@@ -34,7 +34,7 @@ SOURCES= g_main.c actions.c admin.c admin_cmd.c bg_lib.c buttons.c clan.c client
          pyro.c q_shared.c qmalloc.c qmd5.c scout.c sentry.c server.c sniper.c  spectate.c spy.c status.c subs.c\
          tfort.c  tforthlp.c tfortmap.c tforttm.c tg.c triggers.c tsoldier.c version.c\
          vote.c weapons.c world.c bot/ai.c bot/ai-misc.c bot/fighting.c bot/move.c bot/qw.c bot/ui.c\
-         bot/waypoint.ñ 
+         bot/waypoint.c
 
 OBJECTS=$(SOURCES:.c=.s)
 
