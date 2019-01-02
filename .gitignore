@@ -1,5 +1,11 @@
 Makefile
 src/Makefile.dl
 src/Makefile.vm
+bin/
+VM/
+Release
+Debug
+qwprogs.vcxproj.user
+
 *.o
 tags
