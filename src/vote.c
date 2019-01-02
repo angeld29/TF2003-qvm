@@ -29,6 +29,8 @@ void Vote_ChangeMap_Run();
 
 int Vote_Admin_Init();
 void Vote_Admin_Run();
+int Vote_Timelimit_Init();
+void Vote_Timelimit_Run();
 static float elect_percentage;
 static int elect_level;
 static gedict_t* elect_player;
@@ -39,6 +41,7 @@ const vote_t votes[]=
 {
 	{"changemap", Vote_ChangeMap_Init, Vote_ChangeMap_Run, 60, 3},
 	{"admin", Vote_Admin_Init, Vote_Admin_Run, 60, 3},
+	{"timelimit", Vote_Timelimit_Init, Vote_Timelimit_Run, 60, 3},
 //	{"map", Vote_Map_Init, Vote_Map_Yes, Vote_Map_No, 60, 3},
 	{NULL}
 };
@@ -89,9 +92,9 @@ int _checkVote()
         return 0;
 
 	if( needed_votes > 1)
-		G_bprint(2, "ê%dë more votes needed\n",f1);
+		G_bprint(2, "ê%dë more votes needed\n", needed_votes);
 	else
-		G_bprint(2, "ê%dë more vote needed\n",f1);	
+		G_bprint(2, "ê%dë more vote needed\n", needed_votes);	
     return needed_votes;
 }
 
@@ -166,6 +169,31 @@ void Vote_ChangeMap_Run()
     NextLevel();
 }
 
+int vote_timelimit = 0;
+int Vote_Timelimit_Init()
+{
+    char    value[10];
+
+    if(trap_CmdArgc() != 3 ){
+		G_sprint( self, 3, "usage cmd vote timelimit <5-60>\n",self->s.v.netname);
+        return 0;
+    }
+    trap_CmdArgv( 2, value, sizeof( value ) );
+    vote_timelimit = atoi(value);
+    if( vote_timelimit < 5 || vote_timelimit > 60 ){
+		G_sprint( self, 3, "usage cmd vote timelimit <5-60>\n",self->s.v.netname);
+        return 0;
+    }
+	G_bprint(2, "%s votes for timelimit %d\n",self->s.v.netname, vote_timelimit);
+    return 1;
+}
+
+void Vote_Timelimit_Run()
+{
+    G_bprint(3, "Timelimit changed to %d\n", vote_timelimit);
+	localcmd("timelimit \"%d\"\n",vote_timelimit);
+}
+
 int Vote_Admin_Init()
 {
 	elect_percentage = GetSVInfokeyInt(  "electpercentage", NULL, 50 );
@@ -209,7 +237,7 @@ void Vote_Cmd()
 
     argc = trap_CmdArgc();
 
-    if( argc != 2 )
+    if( argc < 2 )
     {
         G_sprint( self, 2, "Avaliable votes:\n");
         for ( ucmd = votes ; ucmd->command  ; ucmd++ )
@@ -268,9 +296,9 @@ void Vote_Cmd()
         {
             current_vote = i;
             k_vote = 0;
-            self->last_vote_time = g_globalvars.time + votes[current_vote].pause * 60;
             if( ucmd->VoteInit())
             {
+                self->last_vote_time = g_globalvars.time + votes[current_vote].pause * 60;
                 if ( _addVote() )
                 {
                     votes[i].VoteRun();
@@ -279,6 +307,8 @@ void Vote_Cmd()
                 G_bprint(3, "„Ì‰ ˆÔÙÂ ˘ÂÛ");
                 G_bprint(2, " in console to approve\n");
                 _startVote();
+            }else{
+                current_vote = -1;
             }
             return;
         }
