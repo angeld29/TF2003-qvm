@@ -20,26 +20,26 @@
  *
  *  $Id: vote.c,v 1.8 2006-11-21 16:41:57 AngelD Exp $
  */
-
+   
 // vote.q: mapchange voting functions
 #include "g_local.h"
 
-void Vote_ChangeMap_Init();
-void Vote_ChangeMap_Yes();
-void Vote_ChangeMap_No();
+int Vote_ChangeMap_Init();
+void Vote_ChangeMap_Run();
 
-void Vote_Elect_Init();
-void Vote_Elect_Yes();
-void Vote_Elect_No();
+int Vote_Admin_Init();
+void Vote_Admin_Run();
 static float elect_percentage;
 static int elect_level;
 static gedict_t* elect_player;
 
 
+int CheckString(char *str);
 const vote_t votes[]=
 {
-	{"changemap", Vote_ChangeMap_Init, Vote_ChangeMap_Yes, Vote_ChangeMap_No, 60, 3},
-	{"elect", Vote_Elect_Init, Vote_Elect_Yes, Vote_Elect_No, 60, 3},
+	{"changemap", Vote_ChangeMap_Init, Vote_ChangeMap_Run, 60, 3},
+	{"admin", Vote_Admin_Init, Vote_Admin_Run, 60, 3},
+//	{"map", Vote_Map_Init, Vote_Map_Yes, Vote_Map_No, 60, 3},
 	{NULL}
 };
 static int		k_vote = 0;
@@ -61,47 +61,92 @@ int CountPlayers()
 	return num;
 }
 
-void VoteThink()
+void _clearVote()
 {
-	gedict_t* p=world;
+	gedict_t	*p = world;
+    k_vote = 0;
+    current_vote = -1;
+    while((p = trap_find(p, FOFS(s.v.classname), "player"))) 
+    {
+        p->k_voted = 0;
+    }
 
-	G_bprint(2, "The voting has timed out.\n");
-	self->s.v.nextthink = -1;
-	k_vote = 0;
-	current_vote = -1;
-        while((p = trap_find(p, FOFS(s.v.classname), "player"))) 
-        {
-		if(p->s.v.netname[0] ) p->k_voted = 0;
-	}
-	dremove(self);
+    p = trap_find(world, FOFS(s.v.classname), "voteguard");
+    if(p) {
+        p->s.v.classname  = "";
+        dremove(p);
+    }
 }
 
-void Vote_ChangeMap_Init()
+int _checkVote()
 {
-	int f1;
-	gedict_t* voteguard;
+	int f1, needed_votes;
 
 	f1 = CountPlayers();
-	if(f1 == 1) {
-		G_bprint(2, "%s changes map\n",self->s.v.netname);
-		current_vote = -1;
-		NextLevel();
-		return;	// in case we get back here
+	needed_votes = (int)(f1 * elect_percentage / 100)+1 - k_vote;
+
+	if( needed_votes < 1)
+        return 0;
+
+	if( needed_votes > 1)
+		G_bprint(2, "%d‘ more votes needed\n",f1);
+	else
+		G_bprint(2, "%d‘ more vote needed\n",f1);	
+    return needed_votes;
+}
+
+int _addVote()
+{
+	self->k_voted = 1;
+    if( k_vote > 0 )
+        G_bprint(2, "%s gives his vote\n",self->s.v.netname);
+    k_vote++;
+
+	if( _checkVote() < 1)
+	{
+        _clearVote();
+		return 1;	
 	}
 
-	
-	G_bprint(2, "%s votes for mapchange\n",self->s.v.netname);
+    return 0;
+}
 
-	if(f1/2 !=1)
-		G_bprint(2, "%d‘ total votes needed\nType ",f1/2);
-	else
-		G_bprint(2, "%d‘ total vote needed\nType ",f1/2);
+void _subVote()
+{
+	int f1, needed_votes;
 
-	G_bprint(3, "γνδ φοτε ωεσ");
-	G_bprint(2, " in console to approve\n");
+	if(!k_vote || !self->k_voted) return;
+// withdraw one's vote
+    G_bprint(2, "%s withdraws his vote\n",self->s.v.netname);
+	self->k_voted = 0;
+	k_vote--;
+	if(k_vote < 1) {
+		G_bprint(3, "Voting is closed\n");
+        _clearVote();
+		return;
+	}
+    _checkVote();
+}
 
-	k_vote = 1;
-	self->k_voted = 1;
+void VoteThink()
+{
+    gedict_t* p=world;
+
+    G_bprint(2, "The voting has timed out.\n");
+    self->s.v.nextthink = -1;
+    k_vote = 0;
+    current_vote = -1;
+    while((p = trap_find(p, FOFS(s.v.classname), "player"))) 
+    {
+        if(p->s.v.netname[0] ) p->k_voted = 0;
+    }
+    dremove(self);
+}
+
+void _startVote()
+{
+	gedict_t* voteguard;
+
 	voteguard = spawn(); // Check the 1 minute timeout for voting
 	voteguard->s.v.owner = EDICT_TO_PROG(world);
 	voteguard->s.v.classname  = "voteguard";
@@ -109,275 +154,134 @@ void Vote_ChangeMap_Init()
 	voteguard->s.v.nextthink = g_globalvars.time + votes[current_vote].timeout;
 }
 
-void Vote_ChangeMap_Yes()
+int Vote_ChangeMap_Init()
 {
-	int 		f1, f2;
-	gedict_t* 	p = world;
-
-	if(!k_vote) return;
-
-	if(self->k_voted) {
-		G_sprint(self, 2, "--- your vote is still good ---\n");
-		return;
-	}
-
-// register the vote
-	k_vote ++;
 	G_bprint(2, "%s votes for mapchange\n",self->s.v.netname);
-	f1 = CountPlayers();
-	f2 = f1 / 2 + 1;
-	if(k_vote >= f2) {
-		G_bprint(3, "Map changed by majority vote\n");
-		k_vote = 0;
-		current_vote = -1;
-        	while((p = trap_find(p, FOFS(s.v.classname), "player"))) 
-        	{
-			if(p->s.v.netname[0] ) p->k_voted = 0;
-		}
-
-		p = trap_find(world, FOFS(s.v.classname), "voteguard");
-		if(p) {
-			p->s.v.classname  = "";
-		 dremove(p);
-		}
-		NextLevel();
-		return;
-	}
-
-// calculate how many more votes are needed
-	self->k_voted = 1;
-	f1 = f2 - k_vote;
-	if(f1>1)
-		G_bprint(2, "%d‘ more votes needed\n",f1);
-	else
-		G_bprint(2, "%d‘ more vote needed\n",f1);	
+    return 1;
 }
 
-void Vote_ChangeMap_No()
+void Vote_ChangeMap_Run()
 {
-	gedict_t* p;
-	int f1, f2;
-
-// withdraw one's vote
-	if(!k_vote || !self->k_voted) return;
-
-	G_bprint(2, "%s would rather play this map\n",self->s.v.netname);
-	self->k_voted = 0;
-	k_vote--;
-	if(!k_vote) {
-		G_bprint(3, "Voting is closed\n");
-		p = trap_find(world, FOFS(s.v.classname), "voteguard");
-		if(p) 
-		{
-			p->s.v.classname  = "";
-		 	dremove(p);
-		}
-		current_vote = -1;
-		return;
-	}
-	f1 = CountPlayers();
-	f2 = (f1 / 2) + 1;
-	f1 = f2 - k_vote;
-	if(f1 > 1)
-		G_bprint(2, "%d‘ more votes needed\n",f1);
-	else
-		G_bprint(2, "%d‘ more vote needed\n",f1);
+    G_bprint(3, "Map changed by majority vote\n");
+    NextLevel();
 }
 
-void Vote_Elect_Init()
+int Vote_Admin_Init()
 {
-	int f1;
-	int needed_votes;
-	gedict_t* voteguard;
-
 	elect_percentage = GetSVInfokeyInt(  "electpercentage", NULL, 50 );
 	elect_level  = GetSVInfokeyInt(  "electlevel", NULL, 1 );
 	elect_player = self;
 	if(!elect_percentage || !elect_level)
 	{
 		G_sprint( self, 2, "Admin election disabled\n",self->s.v.netname);
-		return;
+		return 0;
 	}
 
 	if ( self->is_admin >= elect_level ) 
 	{
 		G_sprint(self, 2, "You are already an admin\n");
-		return;
+		return 0;
 	}
 
-	if( elect_percentage < 5 || elect_percentage > 95)
-		elect_percentage = 50;
-
-	f1 = CountPlayers();
-	
-	if(  elect_percentage * f1 < 100 ) 
-	{
-		G_bprint(2,  "%s ηαιξσ αδνιξ στατυσ!\n", elect_player->s.v.netname);
-		G_sprint(elect_player, 2, "Type γνδ αδνιξ for admin commands.\n");
-		current_vote = -1;
-		elect_player->is_admin = elect_level;
-		return;	
-	}
-
-	
-	G_bprint(2, "%s has requested admin rights!\n",self->s.v.netname);
-
-	k_vote = 1;
-	self->k_voted = 1;
-	needed_votes = (int)(f1 * elect_percentage / 100)+1 - k_vote;
-
-	if( needed_votes > 1 )
-		G_bprint(2, "%d‘ total votes needed\nType ",needed_votes);
-	else
-		G_bprint(2, "%d‘ total vote needed\nType ", needed_votes);
-
-	G_bprint(3, "γνδ φοτε ωεσ");
-	G_bprint(2, " in console to approve\n");
-
-	voteguard = spawn(); // Check the 1 minute timeout for voting
-	voteguard->s.v.owner = EDICT_TO_PROG(world);
-	voteguard->s.v.classname  = "voteguard";
-	voteguard->s.v.think = (func_t) VoteThink;
-	voteguard->s.v.nextthink = g_globalvars.time + votes[current_vote].timeout;
+    return 1;
 }
 
-void Vote_Elect_Yes()
+void Vote_Admin_Run()
 {
 	int 		f1, needed_votes;
-	gedict_t* 	p = world;
 
-	if(!k_vote) return;
-
-	if(self->k_voted) {
-		G_sprint(self, 2, "--- your vote is still good ---\n");
-		return;
-	}
-
-// register the vote
-	k_vote ++;
-	G_bprint(2, "%s gives his vote\n",self->s.v.netname);
-	f1 = CountPlayers();
-	needed_votes = (int)(f1 * elect_percentage / 100)+1 - k_vote;
-
-	//if(  elect_percentage * f1 < 100 * k_vote ) 
-	if( needed_votes < 1)
-	{
-		k_vote = 0;
-		current_vote = -1;
-        	while((p = trap_find(p, FOFS(s.v.classname), "player"))) 
-        	{
-			if( p->s.v.netname[0] ) p->k_voted = 0;
-		}
-
-		p = trap_find(world, FOFS(s.v.classname), "voteguard");
-		if(p) {
-			p->s.v.classname  = "";
-		 dremove(p);
-		}
-		G_bprint(2,  "%s ηαιξσ αδνιξ στατυσ!\n", elect_player->s.v.netname);
-		G_sprint(elect_player, 2, "Type γνδ αδνιξ for admin commands.\n");
-		elect_player->is_admin = elect_level;
-		return;	
-	}
-
-// calculate how many more votes are needed
-	self->k_voted = 1;
-
-	if( needed_votes > 1)
-		G_bprint(2, "%d‘ total votes needed\nType ", needed_votes);
-	else
-		G_bprint(2, "%d‘ total vote needed\nType ", needed_votes);
-
-
-}
-
-void Vote_Elect_No()
-{
-	gedict_t* p;
-	int f1, needed_votes;
-
-// withdraw one's vote
-	if(!k_vote || !self->k_voted) return;
-
-	G_bprint(2, "%s withdraws his vote\n",self->s.v.netname);
-	self->k_voted = 0;
-	k_vote--;
-	if(!k_vote) {
-		G_bprint(3, "Voting is closed\n");
-		p = trap_find(world, FOFS(s.v.classname), "voteguard");
-		if(p) 
-		{
-			p->s.v.classname  = "";
-		 	dremove(p);
-		}
-		current_vote = -1;
-		return;
-	}
-
-	f1 = CountPlayers();
-	needed_votes = (int)(f1 * elect_percentage / 100)+1 - k_vote;
-
-	
-	if(needed_votes > 1)
-		G_bprint(2, "%d‘ more votes needed\n",needed_votes);
-	else
-		G_bprint(2, "%d‘ more vote needed\n",needed_votes);
+    G_bprint(2,  "%s ηαιξσ αδνιξ στατυσ!\n", elect_player->s.v.netname);
+    G_sprint(elect_player, 2, "Type γνδ αδνιξ for admin commands.\n");
+	elect_level  = GetSVInfokeyInt(  "electlevel", NULL, 1 );
+    elect_player->is_admin = elect_level;
 }
 
 void Vote_Cmd()
 {
-        char    cmd_command[50];
-        int argc,i;
-        const vote_t*ucmd;
+    char    cmd_command[50];
+    int     argc,i;
+    const vote_t*ucmd;
 
-	if ( tf_data.cb_prematch_time > g_globalvars.time )
+    if ( tf_data.cb_prematch_time > g_globalvars.time )
+    {
+        return;
+    }
+
+    argc = trap_CmdArgc();
+
+    if( argc != 2 )
+    {
+        G_sprint( self, 2, "Avaliable votes:\n");
+        for ( ucmd = votes ; ucmd->command  ; ucmd++ )
+        {
+            G_sprint( self, 2, "%s\n",ucmd->command);
+        }
+        return;
+    }
+
+    trap_CmdArgv( 1, cmd_command, sizeof( cmd_command ) );
+
+    elect_percentage = GetSVInfokeyInt(  "electpercentage", NULL, 50 );
+	if(!elect_percentage)
 	{
+		G_sprint( self, 2, "Votes disabled\n");
 		return;
 	}
+	if( elect_percentage < 5 || elect_percentage > 95)
+		elect_percentage = 50;
 
-	argc = trap_CmdArgc();
-	
-	if( argc != 2 )
-	{
-	        G_sprint( self, 2, "Avaliable votes:\n");
-		for ( ucmd = votes ; ucmd->command  ; ucmd++ )
-		{
-			G_sprint( self, 2, "%s\n",ucmd->command);
-		}
-		return;
-	}
+    if( current_vote != -1 )
+    {
+        if(!strcmp(cmd_command,"yes"))
+        {
+            if(self->k_voted) {
+                G_sprint(self, 2, "--- your vote is still good ---\n");
+                return;
+            }
+            i = current_vote;
+            if( _addVote() )
+                votes[i].VoteRun();
+            return;
+        }
 
-	trap_CmdArgv( 1, cmd_command, sizeof( cmd_command ) );
-	if( current_vote != -1 )
-	{
-		if(!strcmp(cmd_command,"yes"))
-		{
-		        votes[current_vote].VoteYes();
-			return;
-		}
+        if(!strcmp(cmd_command,"no"))
+        {
+            if(self->k_voted) {
+                _subVote();
+            }
+            G_sprint(self, 2, "--- your vote: no ---\n");
+            //votes[current_vote].VoteNo();
+            return;
+        }
+        G_sprint( self, 2, "Vote %s in progress\n",votes[current_vote].command);
+        return;
+    }
+    if( g_globalvars.time < self->last_vote_time )
+    {
+        G_sprint( self, 2, "You cannot vote at this time.\n");
+        return;
+    }
 
-		if(!strcmp(cmd_command,"no"))
-		{
-		        votes[current_vote].VoteNo();
-			return;
-		}
-		G_sprint( self, 2, "Vote %s in progress\n",votes[current_vote].command);
-	        return;
-	}
-	if( g_globalvars.time < self->last_vote_time )
-	{
-		G_sprint( self, 2, "You cannot vote at this time.\n");
-		return;
-	}
-	for ( ucmd = votes,i=0 ; ucmd->command  ; ucmd++,i++ )
-	{
-		if( !strcmp(cmd_command,ucmd->command) )
-		{
-		        current_vote = i;
-		        self->last_vote_time = g_globalvars.time + votes[current_vote].pause * 60;
-			ucmd->VoteInit();
-			return;
-		}
-	}
-	G_sprint( self, 2, "Unknown vote.\n");
+    for ( ucmd = votes,i=0 ; ucmd->command  ; ucmd++,i++ )
+    {
+        if( !strcmp(cmd_command,ucmd->command) )
+        {
+            current_vote = i;
+            k_vote = 0;
+            self->last_vote_time = g_globalvars.time + votes[current_vote].pause * 60;
+            if( ucmd->VoteInit())
+            {
+                if ( _addVote() )
+                {
+                    votes[i].VoteRun();
+                    return;
+                }
+                G_bprint(3, "γνδ φοτε ωεσ");
+                G_bprint(2, " in console to approve\n");
+                _startVote();
+            }
+            return;
+        }
+    }
+    G_sprint( self, 2, "Unknown vote.\n");
 }

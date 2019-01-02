@@ -58,7 +58,7 @@
 #define	MAX_STRING_TOKENS	1024	// max tokens resulting from Cmd_TokenizeString
 #define	MAX_TOKEN_CHARS		1024	// max length of an individual token
 
-#define	FOFS(x) ((int)&(((gedict_t *)0)->x))
+#define	FOFS(x) ((int)&(((gedict_t *)NULL)->x))
 int             NUM_FOR_EDICT( gedict_t * e );
 
 extern tf_server_data_t tf_data;

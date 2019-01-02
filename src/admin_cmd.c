@@ -61,7 +61,7 @@ static const admin_cmd_t admin_cmds[] =
 	{NULL,NULL,0}
 };
 
-static int CheckString(char *str)
+int CheckString(char *str)
 {
 	char *strp =str,ch;
 	while((ch = *strp++))
@@ -73,6 +73,7 @@ static int CheckString(char *str)
 			case 0x0a:
 			case '\b':
 			case '"':
+			case '\'':
 				return 0;
 		}
 	}
