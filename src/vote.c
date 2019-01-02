@@ -31,6 +31,8 @@ int Vote_Admin_Init();
 void Vote_Admin_Run();
 int Vote_Timelimit_Init();
 void Vote_Timelimit_Run();
+int Vote_Map_Init();
+void Vote_Map_Run();
 static float elect_percentage;
 static int elect_level;
 static gedict_t* elect_player;
@@ -42,7 +44,7 @@ const vote_t votes[]=
 	{"changemap", Vote_ChangeMap_Init, Vote_ChangeMap_Run, 60, 3},
 	{"admin", Vote_Admin_Init, Vote_Admin_Run, 60, 3},
 	{"timelimit", Vote_Timelimit_Init, Vote_Timelimit_Run, 60, 3},
-//	{"map", Vote_Map_Init, Vote_Map_Yes, Vote_Map_No, 60, 3},
+	{"map", Vote_Map_Init, Vote_Map_Run, 60, 3},
 	{NULL}
 };
 static int		k_vote = 0;
@@ -92,9 +94,9 @@ int _checkVote()
         return 0;
 
 	if( needed_votes > 1)
-		G_bprint(2, "%d‘ more votes needed\n", needed_votes);
+		G_bprint(3, "%d‘ more votes needed\n", needed_votes);
 	else
-		G_bprint(2, "%d‘ more vote needed\n", needed_votes);	
+		G_bprint(3, "%d‘ more vote needed\n", needed_votes);	
     return needed_votes;
 }
 
@@ -102,7 +104,7 @@ int _addVote()
 {
 	self->k_voted = 1;
     if( k_vote > 0 )
-        G_bprint(2, "%s gives his vote\n",self->s.v.netname);
+        G_bprint(3, "%s gives his vote\n",self->s.v.netname);
     k_vote++;
 
 	if( _checkVote() < 1)
@@ -120,7 +122,7 @@ void _subVote()
 
 	if(!k_vote || !self->k_voted) return;
 // withdraw one's vote
-    G_bprint(2, "%s withdraws his vote\n",self->s.v.netname);
+    G_bprint(3, "%s withdraws his vote\n",self->s.v.netname);
 	self->k_voted = 0;
 	k_vote--;
 	if(k_vote < 1) {
@@ -135,7 +137,7 @@ void VoteThink()
 {
     gedict_t* p=world;
 
-    G_bprint(2, "The voting has timed out.\n");
+    G_bprint(3, "The voting has timed out.\n");
     self->s.v.nextthink = -1;
     k_vote = 0;
     current_vote = -1;
@@ -159,7 +161,7 @@ void _startVote()
 
 int Vote_ChangeMap_Init()
 {
-	G_bprint(2, "%s votes for mapchange\n",self->s.v.netname);
+	G_bprint(3, "%s votes for mapchange\n",self->s.v.netname);
     return 1;
 }
 
@@ -169,7 +171,7 @@ void Vote_ChangeMap_Run()
     NextLevel();
 }
 
-int vote_timelimit = 0;
+static int vote_timelimit = 0;
 int Vote_Timelimit_Init()
 {
     char    value[10];
@@ -184,7 +186,7 @@ int Vote_Timelimit_Init()
 		G_sprint( self, 3, "usage cmd vote timelimit <5-60>\n",self->s.v.netname);
         return 0;
     }
-	G_bprint(2, "%s votes for timelimit %d\n",self->s.v.netname, vote_timelimit);
+	G_bprint(3, "%s votes for timelimit %d\n",self->s.v.netname, vote_timelimit);
     return 1;
 }
 
@@ -192,6 +194,49 @@ void Vote_Timelimit_Run()
 {
     G_bprint(3, "Timelimit changed to %d\n", vote_timelimit);
 	localcmd("timelimit \"%d\"\n",vote_timelimit);
+}
+
+static char vote_mapname[20];
+int Vote_Map_Init()
+{
+    char    value[20];
+    char    *in, *out, ch;
+    int		cnt = 0;
+    char ml_buf[32] = {0}; 
+
+    if(trap_CmdArgc() != 3 ){
+		G_sprint( self, 3, "usage cmd vote map <mapname>\n");
+        return 0;
+    }
+    trap_CmdArgv( 2, value, sizeof( value ) );
+    in = value;
+    out = vote_mapname;
+    while( out < vote_mapname + sizeof( vote_mapname ) - 5 ){
+       ch = *in++; 
+       if( !ch ){
+           *out++ = ch;
+           break;
+       }
+       if( ( ch >= '0' && ch <= '9' ) ||
+               ( ch >= 'a' && ch <= 'z' ) ||
+               ( ch >= 'A' && ch <= 'Z' ) )
+           *out++ = ch;
+    }
+    strcpy( value, vote_mapname);
+    strcat( value, ".bsp");
+    cnt = trap_FS_GetFileList( "maps", value,  ml_buf, sizeof(ml_buf));
+    if( !cnt ){
+		G_sprint( self, 3, "map not found\n");
+        return 0;
+    }
+	G_bprint(3, "%s votes for map %s\n",self->s.v.netname, vote_mapname);
+    return 1;
+}
+
+void Vote_Map_Run()
+{
+    G_bprint(3, "Map changed by majority vote\n");
+	localcmd("map \"%s\"\n", vote_mapname);
 }
 
 int Vote_Admin_Init()
@@ -239,10 +284,10 @@ void Vote_Cmd()
 
     if( argc < 2 )
     {
-        G_sprint( self, 2, "Avaliable votes:\n");
+        G_sprint( self, 3, "Avaliable votes:\n");
         for ( ucmd = votes ; ucmd->command  ; ucmd++ )
         {
-            G_sprint( self, 2, "%s\n",ucmd->command);
+            G_sprint( self, 3, "%s\n",ucmd->command);
         }
         return;
     }
@@ -252,7 +297,7 @@ void Vote_Cmd()
     elect_percentage = GetSVInfokeyInt(  "electpercentage", NULL, 50 );
 	if(!elect_percentage)
 	{
-		G_sprint( self, 2, "Votes disabled\n");
+		G_sprint( self, 3, "Votes disabled\n");
 		return;
 	}
 	if( elect_percentage < 5 || elect_percentage > 95)
@@ -263,7 +308,7 @@ void Vote_Cmd()
         if(!strcmp(cmd_command,"yes"))
         {
             if(self->k_voted) {
-                G_sprint(self, 2, "--- your vote is still good ---\n");
+                G_sprint(self, 3, "--- your vote is still good ---\n");
                 return;
             }
             i = current_vote;
@@ -277,16 +322,16 @@ void Vote_Cmd()
             if(self->k_voted) {
                 _subVote();
             }
-            G_sprint(self, 2, "--- your vote: no ---\n");
+            G_sprint(self, 3, "--- your vote: no ---\n");
             //votes[current_vote].VoteNo();
             return;
         }
-        G_sprint( self, 2, "Vote %s in progress\n",votes[current_vote].command);
+        G_sprint( self, 3, "Vote %s in progress\n",votes[current_vote].command);
         return;
     }
     if( g_globalvars.time < self->last_vote_time )
     {
-        G_sprint( self, 2, "You cannot vote at this time.\n");
+        G_sprint( self, 3, "You cannot vote at this time.\n");
         return;
     }
 
@@ -305,7 +350,7 @@ void Vote_Cmd()
                     return;
                 }
                 G_bprint(3, "ãíä öïôå ùåó");
-                G_bprint(2, " in console to approve\n");
+                G_bprint(3, " in console to approve\n");
                 _startVote();
             }else{
                 current_vote = -1;
@@ -313,5 +358,5 @@ void Vote_Cmd()
             return;
         }
     }
-    G_sprint( self, 2, "Unknown vote.\n");
+    G_sprint( self, 3, "Unknown vote.\n");
 }
