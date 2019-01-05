@@ -203,6 +203,7 @@ int Vote_Map_Init()
     char    *in, *out, ch;
     int		cnt = 0;
     char ml_buf[32] = {0}; 
+    fileHandle_t handle = 0;
 
     if(trap_CmdArgc() != 3 ){
 		G_sprint( self, 3, "usage cmd vote map <mapname>\n");
@@ -222,13 +223,17 @@ int Vote_Map_Init()
                ( ch >= 'A' && ch <= 'Z' ) )
            *out++ = ch;
     }
-    strcpy( value, vote_mapname);
+
+    strcpy( value, "maps/");
+    strcat( value, vote_mapname);
     strcat( value, ".bsp");
-    cnt = trap_FS_GetFileList( "maps", value,  ml_buf, sizeof(ml_buf));
-    if( !cnt ){
+    cnt = trap_FS_OpenFile(value, &handle, FS_READ_BIN);
+    //cnt = trap_FS_GetFileList( "maps", value,  ml_buf, sizeof(ml_buf));
+    if( cnt < 0 ){
 		G_sprint( self, 3, "map not found\n");
         return 0;
     }
+    trap_FS_CloseFile( handle );
 	G_bprint(3, "%s votes for map %s\n",self->s.v.netname, vote_mapname);
     return 1;
 }
