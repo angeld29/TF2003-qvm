@@ -2634,8 +2634,9 @@ void ClientDisconnect()
     self->s.v.solid = 0;
     setsize( self, 0, 0, 0, 0, 0, 0 );
     //vote
-    if( current_vote != -1 )
-        votes[current_vote].VoteNo();
+    if(self->k_voted) {
+        _subVote();
+    }
 }
 
 /*

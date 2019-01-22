@@ -1,0 +1,277 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b93b2033-9741-45b3-ae59-13201a162900}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Bot">
+      <UniqueIdentifier>{d2d111cb-07af-4fc7-897f-2dbdf3964aa9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\System">
+      <UniqueIdentifier>{ed1acfeb-fc19-40a9-b9da-739d98e87883}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{ec2c2031-285e-4057-b6ae-4313b9e561f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Ents">
+      <UniqueIdentifier>{23799b05-0993-4d9d-beca-6e122794c710}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CTF">
+      <UniqueIdentifier>{f91adb00-7a7d-48de-81df-c180993fa679}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TF">
+      <UniqueIdentifier>{7dba1ab9-6fcf-4090-8096-946e8147b151}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TF\classes">
+      <UniqueIdentifier>{71320b39-2d25-40a6-9235-4a0c74acc946}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\other">
+      <UniqueIdentifier>{f24b7e2d-573d-42db-adb1-a17b1e448e57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{e1e52f22-edf0-4375-b68b-1f3891ae745b}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{7380b02a-3429-4a30-a25b-d431cec02dcd}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\bot\ai-misc.c">
+      <Filter>Source Files\Bot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bot\ai.c">
+      <Filter>Source Files\Bot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bot\fighting.c">
+      <Filter>Source Files\Bot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bot\move.c">
+      <Filter>Source Files\Bot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bot\qw.c">
+      <Filter>Source Files\Bot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bot\ui.c">
+      <Filter>Source Files\Bot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bot\waypoint.c">
+      <Filter>Source Files\Bot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\crc32.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\g_main.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\g_mem.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\g_spawn.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\g_syscalls.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mathlib.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\q_shared.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qmd5.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\version.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\admin.c">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\admin_cmd.c">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\debug.c">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\g_cmd.c">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\g_mod_command.c">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\g_tf_utils.c">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\g_utils.c">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\server.c">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\subs.c">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vote.c">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\buttons.c">
+      <Filter>Source Files\Ents</Filter>
+    </ClCompile>
+    <ClCompile Include="src\doors.c">
+      <Filter>Source Files\Ents</Filter>
+    </ClCompile>
+    <ClCompile Include="src\items.c">
+      <Filter>Source Files\Ents</Filter>
+    </ClCompile>
+    <ClCompile Include="src\misc.c">
+      <Filter>Source Files\Ents</Filter>
+    </ClCompile>
+    <ClCompile Include="src\plats.c">
+      <Filter>Source Files\Ents</Filter>
+    </ClCompile>
+    <ClCompile Include="src\triggers.c">
+      <Filter>Source Files\Ents</Filter>
+    </ClCompile>
+    <ClCompile Include="src\coop.c">
+      <Filter>Source Files\CTF</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ctf.c">
+      <Filter>Source Files\CTF</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hook.c">
+      <Filter>Source Files\CTF</Filter>
+    </ClCompile>
+    <ClCompile Include="src\actions.c">
+      <Filter>Source Files\TF</Filter>
+    </ClCompile>
+    <ClCompile Include="src\clan.c">
+      <Filter>Source Files\TF</Filter>
+    </ClCompile>
+    <ClCompile Include="src\menu.c">
+      <Filter>Source Files\TF</Filter>
+    </ClCompile>
+    <ClCompile Include="src\status.c">
+      <Filter>Source Files\TF</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tfort.c">
+      <Filter>Source Files\TF</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tforthlp.c">
+      <Filter>Source Files\TF</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tfortmap.c">
+      <Filter>Source Files\TF</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tforttm.c">
+      <Filter>Source Files\TF</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tg.c">
+      <Filter>Source Files\TF</Filter>
+    </ClCompile>
+    <ClCompile Include="src\demoman.c">
+      <Filter>Source Files\TF\classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engineer.c">
+      <Filter>Source Files\TF\classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\flare.c">
+      <Filter>Source Files\TF\classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pyro.c">
+      <Filter>Source Files\TF\classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scout.c">
+      <Filter>Source Files\TF\classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sentry.c">
+      <Filter>Source Files\TF\classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sniper.c">
+      <Filter>Source Files\TF\classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spy.c">
+      <Filter>Source Files\TF\classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tsoldier.c">
+      <Filter>Source Files\TF\classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client.c">
+      <Filter>Source Files\other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\combat.c">
+      <Filter>Source Files\other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\player.c">
+      <Filter>Source Files\other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spectate.c">
+      <Filter>Source Files\other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\weapons.c">
+      <Filter>Source Files\other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world.c">
+      <Filter>Source Files\other</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\game.def">
+      <Filter>Source Files\System</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\bg_lib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\bot_waypoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\g_consts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\g_local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\g_public.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\g_syscalls.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\g_tf_consts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mathlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\progdefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\progs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\q_shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\qmd5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tfort.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="include\tg.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

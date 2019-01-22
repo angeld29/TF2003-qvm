@@ -55,7 +55,7 @@ const static cmd_t   cmds[] = {
 	{"test", Test},
 	{"bot", Bot, CMD_SPECTATOR_ALLOWED},
 	{"tg", TG_Cmd, CMD_SPECTATOR_ALLOWED},
-	{"vote", Vote_Cmd, CMD_NOT_PREMATCH},
+	{"vote", Vote_Cmd},
         {"set", Client_Set_Cmd},
 	{"admin", Admin_Cmd, CMD_SPECTATOR_ALLOWED},
 	{"discard", TeamFortress_Cmd_Discard, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS | CMD_NOT_BUILD},

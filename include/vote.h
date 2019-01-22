@@ -23,9 +23,8 @@
 
 typedef struct {
 	char		*command;
-	void		(*VoteInit) ();
-	void		(*VoteYes) ();
-	void		(*VoteNo) ();
+	int		  (*VoteInit) ();
+	void		(*VoteRun) ();
 	int		timeout;
 	int		pause;
 }vote_t;
