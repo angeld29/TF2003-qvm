@@ -345,7 +345,7 @@ void G_sprint( gedict_t * ed, int level, const char *fmt, ... )
 	_vsnprintf( text, sizeof(text), fmt, argptr );
 	va_end( argptr );
 
-	trap_SPrint( NUM_FOR_EDICT( ed ), level, text );
+	trap_SPrint( NUM_FOR_EDICT( ed ), level, text, 0 );
 }
 
 void G_bprint( int level, const char *fmt, ... )
@@ -393,7 +393,7 @@ void stuffcmd( gedict_t * ed, const char *fmt, ... )
 	_vsnprintf( text, sizeof(text), fmt, argptr );
 	va_end( argptr );
 
-	trap_stuffcmd( NUM_FOR_EDICT( ed ), text );
+	trap_stuffcmd( NUM_FOR_EDICT( ed ), text, 0 );
 }
 
 

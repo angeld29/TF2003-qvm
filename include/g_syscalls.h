@@ -29,7 +29,7 @@ void    trap_DPrintf( const char *fmt );
 void 	trap_conprint( const char *fmt );
 
 void    trap_BPrint( int level, const char *fmt );
-void    trap_SPrint( int edn, int level, const char *fmt );
+void    trap_SPrint( int edn, int level, const char *fmt, int flags );
 void    trap_CenterPrint( int edn, const char *fmt );
 void    trap_Error( const char *fmt );
 int     trap_spawn(  );
@@ -46,7 +46,7 @@ void    trap_sound( int edn, int channel, const char *samp, float vol, float att
 int     trap_checkclient(  );
 void    trap_traceline( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y,
 			float v2_z, int nomonst, int edn );
-void    trap_stuffcmd( int edn, const char *fmt );
+void    trap_stuffcmd( int edn, const char *fmt, int flags );
 void    trap_localcmd( const char *fmt );
 void 	trap_executecmd();
 void 	trap_readcmd( const char *str, char* buf, int size );
@@ -69,7 +69,7 @@ gedict_t*	trap_findradius( gedict_t* ent, float*org, float rad );
 
 void    trap_makestatic( int edn );
 void    trap_setspawnparam( int edn );
-void    trap_changelevel( char *name );
+void    trap_changelevel( char *name, const char* entityname  );
 int     trap_multicast( float origin_x, float origin_y, float origin_z, int to );
 void    trap_logfrag( int killer, int killee );
 void    trap_infokey( int edn, const char *key, char *valbuff, int sizebuff );

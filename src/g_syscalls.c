@@ -80,9 +80,9 @@ void trap_BPrint( int level, const char *fmt )
 	syscall( G_BPRINT, level, (int) fmt );
 }
 
-void trap_SPrint( int edn, int level, const char *fmt )
+void trap_SPrint( int edn, int level, const char *fmt, int flags )
 {
-	syscall( G_SPRINT, edn, level, (int)fmt );
+	syscall( G_SPRINT, edn, level, (int)fmt, flags );
 }
 void trap_CenterPrint( int edn, const char *fmt )
 {
@@ -162,9 +162,9 @@ void trap_traceline( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y,
 		 edn );
 }
 
-void trap_stuffcmd( int edn, const char *fmt )
+void trap_stuffcmd( int edn, const char *fmt, int flags )
 {
-	syscall( G_STUFFCMD, edn, (int)fmt );
+    syscall( G_STUFFCMD, edn, (int)fmt, flags );
 }
 
 void trap_localcmd( const char *fmt )
@@ -262,9 +262,9 @@ void trap_setspawnparam( int edn )
 	syscall( G_SETSPAWNPARAMS, edn );
 }
 
-void trap_changelevel( char *name )
+void trap_changelevel( char *name, const char* entityname  )
 {
-	syscall( G_CHANGELEVEL, name );
+	syscall( G_CHANGELEVEL, name, entityname );
 }
 
 int trap_multicast( float origin_x, float origin_y, float origin_z, int to )
@@ -368,27 +368,27 @@ void    trap_TraceCapsule( float v1_x, float v1_y, float v1_z,
 		 PASSFLOAT( max_x), PASSFLOAT( max_y), PASSFLOAT( max_z));
 }
 
-int trap_FSOpenFile(char*name, fileHandle_t* handle, fsMode_t fmode )
+int trap_FS_OpenFile(char*name, fileHandle_t* handle, fsMode_t fmode )
 {
 	return syscall( G_FSOpenFile, (int)name, (int)handle, fmode );
 }
 
-void trap_FSCloseFile( fileHandle_t handle )
+void trap_FS_CloseFile( fileHandle_t handle )
 {
 	syscall( G_FSCloseFile, handle );
 }
 
-int trap_FSReadFile( char*dest, int quantity, fileHandle_t handle )
+int trap_FS_ReadFile( char*dest, int quantity, fileHandle_t handle )
 {
 	return syscall( G_FSReadFile, (int)dest, quantity, handle );
 }
 
-int trap_FSWriteFile( char*src, int quantity, fileHandle_t handle )
+int trap_FS_WriteFile( char*src, int quantity, fileHandle_t handle )
 {
 	return syscall( G_FSWriteFile, (int)src, quantity, handle );
 }
 
-int trap_FSeekFile( fileHandle_t handle, int offset, int type )
+int trap_FS_SeekFile( fileHandle_t handle, int offset, int type )
 {
 	return syscall( G_FSSeekFile, handle,offset,type );
 }

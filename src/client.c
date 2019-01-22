@@ -782,7 +782,7 @@ void GotoNextMap()
 
     if ( Q_strncmp( nextmap, g_globalvars.mapname, sizeof(nextmap) ) )
     {
-        trap_changelevel( nextmap );
+        trap_changelevel( nextmap, "" );
         tf_data.already_chosen_map = 1;
     }
     if ( GetSVInfokeyString( g_globalvars.mapname, NULL, str, sizeof( str ), "" ) )
