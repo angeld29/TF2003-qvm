@@ -35,6 +35,11 @@ int NUM_FOR_EDICT( gedict_t * e )
 	return b;
 }
 
+float bound( float a, float b, float c )
+{
+	return ( a >= c ? a : b < a ? a : b > c ? c : b);
+}
+
 
 float g_random(  )
 {
@@ -45,6 +50,19 @@ float crandom(  )
 {
 	return 2 * ( g_random(  ) - 0.5 );
 }
+
+int i_rnd( int from, int to )
+{
+	float r;
+
+	if ( from >= to )
+		return from;
+
+	r = (int)(from + (1.0 + to - from) * g_random());
+
+	return bound(from, r, to);
+}
+
 
 gedict_t *spawn(  )
 {
@@ -129,6 +147,11 @@ int strneq( const char *s1, const char *s2 )
 		s2 = null_str;
 
 	return ( strcmp( s1, s2 ) );
+}
+
+int strnull( const char *s1 )
+{
+	return (!s1 || !*s1);
 }
 
 /*
@@ -489,4 +512,60 @@ int walkmove( gedict_t * ed, float yaw, float dist )
 	other	= saveother;
 	activator= saveactivator;
 	return retv;
+}
+float cvar( const char *var )
+{
+	if ( strnull( var ) )
+		G_Error("cvar null");
+
+	return trap_cvar ( var );
+}
+
+char *cvar_string( const char *var )
+{
+	static char		string[MAX_STRINGS][1024];
+	static int		index = 0;
+
+	index %= MAX_STRINGS;
+
+	trap_cvar_string( var, string[index], sizeof( string[0] ) );
+
+	return string[index++];
+}
+
+void cvar_set( const char *var, const char *val )
+{
+	if ( strnull( var ) || val == NULL )
+		G_Error("cvar_set null");
+
+	trap_cvar_set( var, val );
+}
+
+void cvar_fset( const char *var, float val )
+{
+	if ( strnull( var ) )
+		G_Error("cvar_fset null");
+
+	trap_cvar_set_float(var, val);
+}
+
+void StopDemoRecord()
+{
+    if (!strnull(cvar_string("serverdemo"))) {
+        localcmd("sv_demostop\n");  // demo is recording, cancel before new one
+    }
+}
+void StartDemoRecord()
+{
+    char date[64];
+    extern float starttime;
+
+
+    //G_dprintf("Start demo record %f\n", cvar("demo_tmp_record"));
+	if ( cvar( "demo_tmp_record" ) )
+	{ 
+        if (!QVMstrftime (date, sizeof (date), "%Y%m%d-%H%M%S", 0))
+            _snprintf (date, sizeof (date), "%d", (int)(starttime + i_rnd (0, 9999)));
+        localcmd("sv_demoeasyrecord \"%s-%s\"\n", date, g_globalvars.mapname);
+    }
 }

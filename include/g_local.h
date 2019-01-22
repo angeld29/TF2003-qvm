@@ -58,7 +58,12 @@
 #define	MAX_STRING_TOKENS	1024	// max tokens resulting from Cmd_TokenizeString
 #define	MAX_TOKEN_CHARS		1024	// max length of an individual token
 
+#define MAX_STRINGS 128
 #define	FOFS(x) ((int)&(((gedict_t *)NULL)->x))
+#define	GOFS(x) ((int)&(((globalvars_t *)0)->x))
+
+#define FOFCLSN ( FOFS ( s.v.classname ) )
+
 int             NUM_FOR_EDICT( gedict_t * e );
 
 extern tf_server_data_t tf_data;
@@ -86,26 +91,26 @@ float           crandom( void );
 gedict_t       *spawn( void );
 void            ent_remove( gedict_t * t );
 
-gedict_t       *nextent( gedict_t * ent );
-//gedict_t       *find( gedict_t * start, int fieldoff, char *str );
-gedict_t       *findradius( gedict_t * start, vec3_t org, float rad );
-void            normalize( vec3_t value, vec3_t newvalue );
-float           vlen( vec3_t value1 );
-float           vectoyaw( vec3_t value1 );
-void            vectoangles( vec3_t value1, vec3_t ret );
-void            changeyaw( gedict_t * ent );
-void            makevectors( vec3_t vector );
-void            G_sprint( gedict_t * ed, int level, const char *fmt, ... );
-void            G_bprint( int level, const char *fmt, ... );
-void            G_centerprint( gedict_t * ed, const char *fmt, ... );
+gedict_t    *nextent( gedict_t * ent );
+//gedict_t  *find( gedict_t * start, int fieldoff, char *str );
+gedict_t    *findradius( gedict_t * start, vec3_t org, float rad );
+void        normalize( vec3_t value, vec3_t newvalue );
+float       vlen( vec3_t value1 );
+float       vectoyaw( vec3_t value1 );
+void        vectoangles( vec3_t value1, vec3_t ret );
+void        changeyaw( gedict_t * ent );
+void        makevectors( vec3_t vector );
+void        G_sprint( gedict_t * ed, int level, const char *fmt, ... );
+void        G_bprint( int level, const char *fmt, ... );
+void        G_centerprint( gedict_t * ed, const char *fmt, ... );
 void 		localcmd( const char *fmt, ... );
 void		stuffcmd( gedict_t * ed, const char *fmt, ... );
-int             streq( const char *s1, const char *s2 );
-int             strneq( const char *s1, const char *s2 );
-void            aim( vec3_t ret );
+int         strnull( const char *s1 );
+int         streq( const char *s1, const char *s2 );
+int         strneq( const char *s1, const char *s2 );
+void        aim( vec3_t ret );
 void    	setorigin( gedict_t * ed, float origin_x, float origin_y, float origin_z );
-void    	setsize( gedict_t * ed, float min_x, float min_y, float min_z, float max_x,
-		 float max_y, float max_z );
+void    	setsize( gedict_t * ed, float min_x, float min_y, float min_z, float max_x, float max_y, float max_z );
 void    	setmodel( gedict_t * ed, char *model );
 void    	sound( gedict_t * ed, int channel, char *samp, float vol, float att );
 gedict_t 	*checkclient(  );
@@ -124,7 +129,11 @@ void    	logfrag( gedict_t * killer, gedict_t * killee );
 void    	infokey( gedict_t * ed, const char *key, char *valbuff, int sizebuff );
 void    	WriteEntity( int to, gedict_t * ed );
 void    	disableupdates( gedict_t * ed, float time );
-int		walkmove( gedict_t * ed, float yaw, float dist );
+
+float		cvar( const char *var );
+char		*cvar_string( const char *var );
+void        cvar_set( const char *var, const char *val );
+void		cvar_fset( const char *var, float val );
 
 //
 //  subs.c
@@ -291,4 +300,6 @@ void Menu_Class_Input(int impulse);
 void CheckAutoKick( gedict_t * p );
 //mod_commnad
 void ModCommand();
+void StopDemoRecord();
+void StartDemoRecord();
 #endif

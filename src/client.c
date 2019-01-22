@@ -780,6 +780,7 @@ void GotoNextMap()
 
     //      gedict_t *te;
 
+    StopDemoRecord();
     if ( Q_strncmp( nextmap, g_globalvars.mapname, sizeof(nextmap) ) )
     {
         trap_changelevel( nextmap, "" );
@@ -864,6 +865,7 @@ void execute_changelevel()
     gedict_t *pos;
 
     G_conprintf( "execute_changelevel()\n" );
+    StopDemoRecord();
 
     intermission_running = 1;
 
@@ -1540,6 +1542,7 @@ void NextLevel()
 {
     gedict_t *o;
 
+    StopDemoRecord();
     if ( already_cycled )
         return;
     already_cycled = 1;
@@ -2517,6 +2520,10 @@ void ClientConnect()
     if ( intermission_running )
         GotoNextMap();
 
+    if (strnull(cvar_string("serverdemo"))) 
+        StartDemoRecord();
+
+
     self->is_admin = 0;
     if ( tf_data.clanbattle && self->has_disconnected != 1 )
     {
@@ -2570,6 +2577,7 @@ void ClientConnect()
 // self
 ///////////////
 
+int TeamFortress_GetNoPlayers();
 void ClientDisconnect()
 {
     gedict_t *te,*saveself;
@@ -2579,6 +2587,9 @@ void ClientDisconnect()
     G_bprint( PRINT_HIGH, "%s left the game with %.0f frags\n", self->s.v.netname, self->s.v.frags );
 
     sound( self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_NONE );
+
+    if( TeamFortress_GetNoPlayers() == 1 )
+        StopDemoRecord();
 
     te = trap_find( world, FOFS( s.v.classname ), "primer" );
     while ( te && te->s.v.owner != EDICT_TO_PROG( self ) )
