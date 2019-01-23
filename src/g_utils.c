@@ -380,7 +380,7 @@ void G_bprint( int level, const char *fmt, ... )
 	_vsnprintf( text, sizeof(text), fmt, argptr );
 	va_end( argptr );
 
-	trap_BPrint( level, text );
+	trap_BPrint( level, text, 0  );
 }
 
 void G_centerprint( gedict_t * ed, const char *fmt, ... )

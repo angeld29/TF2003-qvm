@@ -75,7 +75,7 @@ void trap_conprint( const char *fmt )
 }
 
 
-void trap_BPrint( int level, const char *fmt )
+void trap_BPrint( int level, const char *fmt, int flags )
 {
 	syscall( G_BPRINT, level, (int) fmt );
 }
