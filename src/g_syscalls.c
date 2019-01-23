@@ -368,7 +368,7 @@ void    trap_TraceCapsule( float v1_x, float v1_y, float v1_z,
 		 PASSFLOAT( max_x), PASSFLOAT( max_y), PASSFLOAT( max_z));
 }
 
-int trap_FS_OpenFile(char*name, fileHandle_t* handle, fsMode_t fmode )
+int trap_FS_OpenFile(const char*name, fileHandle_t* handle, fsMode_t fmode )
 {
 	return syscall( G_FSOpenFile, (int)name, (int)handle, fmode );
 }
@@ -383,7 +383,7 @@ int trap_FS_ReadFile( char*dest, int quantity, fileHandle_t handle )
 	return syscall( G_FSReadFile, (int)dest, quantity, handle );
 }
 
-int trap_FS_WriteFile( char*src, int quantity, fileHandle_t handle )
+int trap_FS_WriteFile(const char*src, int quantity, fileHandle_t handle )
 {
 	return syscall( G_FSWriteFile, (int)src, quantity, handle );
 }

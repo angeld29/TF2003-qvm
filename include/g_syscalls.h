@@ -28,7 +28,7 @@ qboolean trap_GetEntityToken( char *token, int size );
 void    trap_DPrintf( const char *fmt );
 void 	trap_conprint( const char *fmt );
 
-void    trap_BPrint( int level, const char *fmt );
+void    trap_BPrint( int level, const char *fmt, int flags );
 void    trap_SPrint( int edn, int level, const char *fmt, int flags );
 void    trap_CenterPrint( int edn, const char *fmt );
 void    trap_Error( const char *fmt );
