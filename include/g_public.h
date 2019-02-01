@@ -31,7 +31,7 @@
 //
 // g_public.h -- game module information visible to server
 
-#define	GAME_API_VERSION	12
+#define	GAME_API_VERSION	16
 
 
 //===============================================================
@@ -138,7 +138,12 @@ typedef enum
 	g_strlcpy,
 	g_strlcat,
 	G_MAKEVECTORS,
-	G_NEXTCLIENT
+	G_NEXTCLIENT,
+    G_PRECACHE_VWEP_MODEL,
+    G_SETPAUSE,
+    G_SETUSERINFO,
+    G_MOVETOGOAL,
+    _G__LASTAPI
 } gameImport_t;
 
 // !!! new things comes to end of list !!!
@@ -184,7 +189,8 @@ typedef enum
 	// The game can issue trap_argc() / trap_argv() commands to get the command
 	// and parameters.  Return qfalse if the game doesn't recognize it as a command.
 	GAME_CLIENT_SAY,			// ( int isTeamSay );
-
+    GAME_PAUSED_TIC,            // ( int duration_msec );   // duration is in msecs
+    GAME_CLEAR_EDICT,           // (self)
 } gameExport_t;
 
 
@@ -217,6 +223,7 @@ typedef struct
 	globalvars_t	*global;
 	field_t		*fields;
 	int 		APIversion;
+    int         maxentites;
 } gameData_t;
 
 typedef int		fileHandle_t;

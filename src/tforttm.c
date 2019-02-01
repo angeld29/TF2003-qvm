@@ -99,9 +99,9 @@ void SetTeamName( gedict_t * p )
         if ( p->isBot )
         {
                 if( p->team_no >0 && p->team_no <=4)
-                        trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"team",team_names[p->team_no-1 ]);
+                        trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"team",team_names[p->team_no-1 ],0);
                 else
-                        trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"team","");
+                        trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"team","",0);
         }else
 	       stuffcmd( p, "team %s\n", GetTeamName( p->team_no ) );
 }

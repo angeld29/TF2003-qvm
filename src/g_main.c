@@ -28,14 +28,21 @@ gedict_t       *self, *other;
 
 globalvars_t    g_globalvars;
 static field_t         expfields[] = {
-	{"maxspeed", FOFS( maxspeed ), F_FLOAT}	,
-	{"gravity", FOFS( gravity ), F_FLOAT},
-	{"isBot", FOFS( isBot ), F_INT},
-#ifdef VWEP_TEST
+    {"maxspeed", FOFS( maxspeed ), F_FLOAT}	,
+    {"gravity", FOFS( gravity ), F_FLOAT},
+    {"isBot", FOFS( isBot ), F_INT},
+	{"items2",      FOFS( items2 ),      F_FLOAT},
+
 	{"vw_index",    FOFS( vw_index ),    F_FLOAT},
-	{"vw_frame",    FOFS( vw_frame ),    F_FLOAT},
-#endif
-	{NULL}
+	{"movement",    FOFS( movement ),    F_VECTOR},
+	{"brokenankle", FOFS( brokenankle ), F_FLOAT},
+	{"mod_admin",   FOFS( k_admin ),     F_INT},
+	{"hideentity",  FOFS( hideentity ),  F_INT},
+	{"trackent",	FOFS( trackent ),	 F_INT},
+	{"hideplayers", FOFS( hideplayers ), F_INT},
+	{"visclients",  FOFS( visclients ),  F_INT},
+	{"teleported",  FOFS( teleported ),  F_INT},
+    {NULL}
 };
 
 static char     mapname[64];
@@ -47,144 +54,170 @@ int             api_ver;
 #define MIN_API_VERSION GAME_API_VERSION
 
 static gameData_t      gamedata =
-    { ( edict_t * ) g_edicts, sizeof( gedict_t ), &g_globalvars, expfields , MIN_API_VERSION};
+{ ( edict_t * ) g_edicts, sizeof( gedict_t ), &g_globalvars, expfields , MIN_API_VERSION, MAX_EDICTS};
 float           starttime;
 void            G_InitGame( int levelTime, int randomSeed );
 void            StartFrame( int time );
 qboolean        ClientCommand();
 qboolean        ClientUserInfoChanged();
+qboolean        ClientUserInfoChanged_after();
 void            G_EdictTouch();
 void            G_EdictThink();
 void            G_EdictBlocked();
 void            ClearGlobals();
+void initialise_spawned_ent(gedict_t* ent);
 
 /*
-================
-vmMain
+   ================
+   vmMain
 
-This is the only way control passes into the module.
-This must be the very first function compiled into the .q3vm file
-================
-*/
+   This is the only way control passes into the module.
+   This must be the very first function compiled into the .q3vm file
+   ================
+   */
 
 int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
-	    int arg6, int arg7, int arg8, int arg9, int arg10, int arg11 )
+        int arg6, int arg7, int arg8, int arg9, int arg10, int arg11 )
 {
-	ClearGlobals();
-	switch ( command )
-	{
-	case GAME_INIT:
-	        api_ver = trap_GetApiVersion();
-		if ( api_ver < MIN_API_VERSION ) 
-		{
-			G_conprintf("Mod requried API_VERSION %d or higher, server have %d\n", MIN_API_VERSION, api_ver);
-			return 0;
-		}
-		if( api_ver >= MIN_API_VERSION && api_ver <= GAME_API_VERSION )
-		{
-		        gamedata.APIversion = api_ver;
-		}
-		G_InitGame( arg0, arg1 );
-		return ( int ) ( &gamedata );
+    ClearGlobals();
+    switch ( command )
+    {
+        case GAME_INIT:
+            api_ver = trap_GetApiVersion();
+            if ( api_ver < MIN_API_VERSION ) 
+            {
+                G_conprintf("Mod requried API_VERSION %d or higher, server have %d\n", MIN_API_VERSION, api_ver);
+                return 0;
+            }
+            if( api_ver >= MIN_API_VERSION && api_ver <= GAME_API_VERSION )
+            {
+                gamedata.APIversion = api_ver;
+            }
+            G_InitGame( arg0, arg1 );
+            return ( int ) ( &gamedata );
 
-	case GAME_LOADENTS:
-		G_SpawnEntitiesFromString();
-		return 1;
+        case GAME_LOADENTS:
+            infokey( world, "mapname", mapname, sizeof(mapname) );
+            G_SpawnEntitiesFromString();
+            return 1;
 
-	case GAME_START_FRAME:
-		StartFrame( arg0 );
-		return 1;
+        case GAME_START_FRAME:
+            StartFrame( arg0 );
+            return 1;
 
-	case GAME_CLIENT_CONNECT:
-		self = PROG_TO_EDICT( g_globalvars.self );
-		self->auth_time = g_globalvars.time + 10.0;
-		self->isSpectator = arg0?1:0;
-		if ( arg0 )
-			SpectatorConnect();
-		else
-			ClientConnect();
-		return 1;
+        case GAME_CLIENT_CONNECT:
+            self = PROG_TO_EDICT( g_globalvars.self );
+            self->s.v.netname = netnames[NUM_FOR_EDICT(self)-1]; //Init client names
+            infokey( self, "netname", self->s.v.netname,  32);
+            self->auth_time = g_globalvars.time + 10.0;
+            self->isSpectator = arg0?1:0;
+            if ( arg0 )
+                SpectatorConnect();
+            else
+                ClientConnect();
+            return 1;
 
-	case GAME_PUT_CLIENT_IN_SERVER:
-		self = PROG_TO_EDICT( g_globalvars.self );
-		if ( !arg0 )
-			PutClientInServer();
-		return 1;
+        case GAME_PUT_CLIENT_IN_SERVER:
+            self = PROG_TO_EDICT( g_globalvars.self );
+            if ( !arg0 )
+                PutClientInServer();
+            return 1;
 
-	case GAME_CLIENT_DISCONNECT:
-		self = PROG_TO_EDICT( g_globalvars.self );
-		if ( arg0 )
-			SpectatorDisconnect();
-		else
-			ClientDisconnect();
-		return 1;
+        case GAME_CLIENT_DISCONNECT:
+            self = PROG_TO_EDICT( g_globalvars.self );
+            if ( arg0 )
+                SpectatorDisconnect();
+            else
+                ClientDisconnect();
+            return 1;
 
-	case GAME_SETNEWPARMS:
-		SetNewParms();
-		return 1;
+        case GAME_SETNEWPARMS:
+            SetNewParms();
+            return 1;
 
-	case GAME_CLIENT_PRETHINK:
-		self = PROG_TO_EDICT( g_globalvars.self );
-		if ( !arg0 )
-			PlayerPreThink();
-		return 1;
+        case GAME_CLIENT_PRETHINK:
+            self = PROG_TO_EDICT( g_globalvars.self );
+            if ( !arg0 )
+                PlayerPreThink();
+            return 1;
 
-	case GAME_CLIENT_POSTTHINK:
-		self = PROG_TO_EDICT( g_globalvars.self );
-		if ( !arg0 )
-			PlayerPostThink();
-		else
-			SpectatorThink();
-		return 1;
+        case GAME_CLIENT_POSTTHINK:
+            self = PROG_TO_EDICT( g_globalvars.self );
+            if ( !arg0 )
+                PlayerPostThink();
+            else
+                SpectatorThink();
+            return 1;
 
-	case GAME_EDICT_TOUCH:
-		G_EdictTouch();
-		return 1;
+        case GAME_EDICT_TOUCH:
+            G_EdictTouch();
+            return 1;
 
-	case GAME_EDICT_THINK:
-		G_EdictThink();
-		return 1;
+        case GAME_EDICT_THINK:
+            G_EdictThink();
+            return 1;
 
-	case GAME_EDICT_BLOCKED:
-		G_EdictBlocked();
-		return 1;
+        case GAME_EDICT_BLOCKED:
+            G_EdictBlocked();
+            return 1;
 
-	case GAME_SETCHANGEPARMS: //called before spawn new server for save client params
-		self = PROG_TO_EDICT( g_globalvars.self );
-		SetChangeParms();
-		return 1;
+        case GAME_SETCHANGEPARMS: //called before spawn new server for save client params
+            self = PROG_TO_EDICT( g_globalvars.self );
+            SetChangeParms();
+            return 1;
 
-	case GAME_CLIENT_COMMAND:
-	        self = PROG_TO_EDICT( g_globalvars.self );
-		return ClientCommand();
+        case GAME_CLIENT_COMMAND:
+            self = PROG_TO_EDICT( g_globalvars.self );
+            return ClientCommand();
 
-	case GAME_CLIENT_USERINFO_CHANGED:
-		// called on user /cmd setinfo	if value changed
-		// return not zero dont allow change
-		// params like GAME_CLIENT_COMMAND, but argv(0) always "setinfo" and argc always 3
+        case GAME_CLIENT_USERINFO_CHANGED:
+            // called on user /cmd setinfo	if value changed
+            // return not zero dont allow change
+            // params like GAME_CLIENT_COMMAND, but argv(0) always "setinfo" and argc always 3
 
-		self = PROG_TO_EDICT( g_globalvars.self );
-		return ClientUserInfoChanged();
+            self = PROG_TO_EDICT( g_globalvars.self );
 
-	case GAME_SHUTDOWN:
-		return 0;
+            return arg0?ClientUserInfoChanged():ClientUserInfoChanged_after();
 
-	case GAME_CONSOLE_COMMAND:
-	        
-		// called on server console command "mod"
-		// params like GAME_CLIENT_COMMAND, but argv(0) always "mod"
-		// self - rconner if can detect else world
-		// other 
-		//SV_CMD_CONSOLE		0          
-		//SV_CMD_RCON			1  
-		//SV_CMD_MASTER		2          
-		//SV_CMD_BOT			3  
-		self = PROG_TO_EDICT( g_globalvars.self );
-		ModCommand();
-		return 0;
-	}
-	
-	return 0;
+        case GAME_SHUTDOWN:
+            return 0;
+
+        case GAME_CONSOLE_COMMAND:
+
+            // called on server console command "mod"
+            // params like GAME_CLIENT_COMMAND, but argv(0) always "mod"
+            // self - rconner if can detect else world
+            // other 
+            //SV_CMD_CONSOLE		0          
+            //SV_CMD_RCON			1  
+            //SV_CMD_MASTER		2          
+            //SV_CMD_BOT			3  
+            self = PROG_TO_EDICT( g_globalvars.self );
+            ModCommand();
+            return 0;
+        case GAME_CLIENT_SAY:
+            // called on user /say or /say_team
+            // arg0 non zero if say_team
+            // return non zero if say/say_team handled by mod
+            // params like GAME_CLIENT_COMMAND
+
+            ClearGlobals();
+            return 0;//ClientSay( arg0 );
+
+        case GAME_PAUSED_TIC:
+            // called every frame when the game is paused
+            ClearGlobals();
+            //PausedTic( arg0 );
+            return 0;
+
+        case GAME_CLEAR_EDICT:
+            // Don't ClearGlobals() as this will be called during spawn()
+            initialise_spawned_ent(PROG_TO_EDICT( g_globalvars.self ));
+            return 0;
+
+    }
+
+    return 0;
 }
 
 
@@ -192,37 +225,37 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 
 void G_InitGame( int levelTime, int randomSeed )
 {
-	int             i;
-/*	int num;
-	char		dirlist[1024];
-	char*		dirptr;
-	int dirlen;*/
-//Common Initialization
-	srand( randomSeed );
-	framecount = 0;
-	starttime = levelTime * 0.001;
-	G_dprintf( "Init Game\n" );
-	//G_InitMemory();
-	memset( g_edicts, 0, sizeof( gedict_t ) * MAX_EDICTS );
-	
+    int             i;
+    /*	int num;
+        char		dirlist[1024];
+        char*		dirptr;
+        int dirlen;*/
+    //Common Initialization
+    srand( randomSeed );
+    framecount = 0;
+    starttime = levelTime * 0.001;
+    G_dprintf( "Init Game\n" );
+    //G_InitMemory();
+    memset( g_edicts, 0, sizeof( gedict_t ) * MAX_EDICTS );
 
-	world->s.v.model = worldmodel;
-	g_globalvars.mapname = mapname;
-	for ( i = 0; i < MAX_CLIENTS; i++ )
-	{
-		g_edicts[i + 1].s.v.netname = netnames[i]; //Init client names
-	}
-//TF Intialization
-	memset( &tf_data, 0, sizeof(tf_data));
-	memset( &tg_data, 0, sizeof(tg_data));
-	localcmd("serverinfo status Standby\n");
-//test
-/*        num = trap_FS_GetFileList( "SKINS" , ".pcx" , dirlist, sizeof(dirlist));
-        dirptr=dirlist;
-	for (i = 0; i < num; i++, dirptr += dirlen+1) {
-		dirlen = strlen(dirptr);
-		G_Printf("%s\n",dirptr);
-	}*/
+
+    world->s.v.model = worldmodel;
+    g_globalvars.mapname = mapname;
+    for ( i = 0; i < MAX_CLIENTS; i++ )
+    {
+        g_edicts[i + 1].s.v.netname = netnames[i]; //Init client names
+    }
+    //TF Intialization
+    memset( &tf_data, 0, sizeof(tf_data));
+    memset( &tg_data, 0, sizeof(tg_data));
+    localcmd("serverinfo status Standby\n");
+    //test
+    /*        num = trap_FS_GetFileList( "SKINS" , ".pcx" , dirlist, sizeof(dirlist));
+              dirptr=dirlist;
+              for (i = 0; i < num; i++, dirptr += dirlen+1) {
+              dirlen = strlen(dirptr);
+              G_Printf("%s\n",dirptr);
+              }*/
 }
 
 
@@ -240,20 +273,20 @@ void G_InitGame( int levelTime, int randomSeed )
 ///////////////
 void G_EdictTouch()
 {
-	self = PROG_TO_EDICT( g_globalvars.self );
-	other = PROG_TO_EDICT( g_globalvars.other );
-	if ( self->s.v.touch )
-	{
-/*#ifdef DEBUG
-	        if(self->s.v.classname && other->s.v.classname)
-	        	if(!strcmp(self->s.v.classname,"player")||!strcmp(other->s.v.classname,"player"))
-	         G_dprintf( "touch %s <-> %s\n", self->s.v.classname,other->s.v.classname);
+    self = PROG_TO_EDICT( g_globalvars.self );
+    other = PROG_TO_EDICT( g_globalvars.other );
+    if ( self->s.v.touch )
+    {
+        /*#ifdef DEBUG
+          if(self->s.v.classname && other->s.v.classname)
+          if(!strcmp(self->s.v.classname,"player")||!strcmp(other->s.v.classname,"player"))
+          G_dprintf( "touch %s <-> %s\n", self->s.v.classname,other->s.v.classname);
 #endif*/
-		( ( void ( * )() ) ( self->s.v.touch ) ) ();
-	} else
-	{
-		G_dprintf( "Null touch func" );
-	}
+        ( ( void ( * )() ) ( self->s.v.touch ) ) ();
+    } else
+    {
+        G_dprintf( "Null touch func" );
+    }
 }
 
 ////////////////
@@ -264,15 +297,15 @@ void G_EdictTouch()
 ///////////////
 void G_EdictThink()
 {
-	self = PROG_TO_EDICT( g_globalvars.self );
-	other = PROG_TO_EDICT( g_globalvars.other );
-	if ( self->s.v.think )
-	{
-		( ( void ( * )() ) ( self->s.v.think ) ) ();
-	} else
-	{
-		G_dprintf( "Null think func" );
-	}
+    self = PROG_TO_EDICT( g_globalvars.self );
+    other = PROG_TO_EDICT( g_globalvars.other );
+    if ( self->s.v.think )
+    {
+        ( ( void ( * )() ) ( self->s.v.think ) ) ();
+    } else
+    {
+        G_dprintf( "Null think func" );
+    }
 
 }
 
@@ -286,24 +319,33 @@ void G_EdictThink()
 ///////////////
 void G_EdictBlocked()
 {
-	self = PROG_TO_EDICT( g_globalvars.self );
-	other = PROG_TO_EDICT( g_globalvars.other );
+    self = PROG_TO_EDICT( g_globalvars.self );
+    other = PROG_TO_EDICT( g_globalvars.other );
 
-	if ( self->s.v.blocked )
-	{
-		( ( void ( * )() ) ( self->s.v.blocked ) ) ();
-	} else
-	{
+    if ( self->s.v.blocked )
+    {
+        ( ( void ( * )() ) ( self->s.v.blocked ) ) ();
+    } else
+    {
 #ifdef PARANOID
-		G_dprintf("Null blocked func");
+        G_dprintf("Null blocked func");
 #endif
-	}
+    }
 
 }
 
 float sv_gravity;
 void ClearGlobals()
 {
-	damage_attacker = damage_inflictor = activator = self = other = newmis = world;
-	sv_gravity = trap_cvar("sv_gravity");
+    damage_attacker = damage_inflictor = activator = self = other = newmis = world;
+    sv_gravity = trap_cvar("sv_gravity");
+}
+
+void initialise_spawned_ent(gedict_t* ent)
+{
+    /*int n = NUM_FOR_EDICT(ent);
+      if( n>0 && n <= MAX_CLIENTS ){
+      ent->s.v.netname = netnames[n-1]; //Init client names
+      infokey(ent, "netname", ent->s.v.netname, 32);
+      }*/
 }

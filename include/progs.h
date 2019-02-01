@@ -25,18 +25,6 @@
 #define	MAX_ENT_LEAFS	16
 
 typedef struct shared_edict_s {
-	qboolean        free;
-	link_t          area;	// linked to a division node or leaf
-
-	int             num_leafs;
-	short           leafnums[MAX_ENT_LEAFS];
-
-	entity_state_t  baseline;
-
-	float           freetime;	// sv.time when the object was freed
-	//double                lastruntime;            // sv.time when SV_RunEntity was last
-	float           lastruntime1, lastruntime2;	//VM not support double // called for this edict (Tonik)
-
 	entvars_t       v;	// C exported fields from progs
 // other fields from progs come immediately after
 } edict_t;
@@ -49,7 +37,20 @@ typedef void (*th_pain_func_t)(struct gedict_s *, float);
 typedef struct gedict_s {
 	edict_t         s;
 	//custom fields
+	float	items2;				   // using  ZQ_ITEMS2 extension in mvdsv we can use per client sigils for runes
+	int 	k_admin;         // if player is an admin, flags
+	float 			brokenankle; // player can't jump for a while after falling and get damaged
 	float           maxspeed, gravity;
+	float           vw_index;
+	int         hideentity;             // links to entity to hide in eye chasecam
+	int			trackent;			// pseudo spectating for players.
+	qboolean       hideplayers;            // if set, all players hidden (read by mvdsv)
+// { highlights which clients this entity was visible to
+	unsigned int visclients;
+// }
+	// let mvdsv know when player has teleported, and adjust for high-ping
+	int          teleported;
+
 	char           *mdl;
 	char           *killtarget;
 	int            worldtype;	// 0=medieval 1=metal 2=base
@@ -71,6 +72,7 @@ typedef struct gedict_s {
 //
 // doors, etc
 //
+	vec3_t		movement;
 	vec3_t          dest, dest1, dest2;
 	vec3_t          pos1, pos2;
 	vec3_t          mangle;

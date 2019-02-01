@@ -28,7 +28,12 @@ qboolean trap_GetEntityToken( char *token, int size );
 void    trap_DPrintf( const char *fmt );
 void 	trap_conprint( const char *fmt );
 
+#define BPRINT_IGNOREINDEMO  (1<<0) // broad cast print will be not put in demo
+#define BPRINT_IGNORECLIENTS (1<<1) // broad cast print will not be seen by clients, but may be seen in demo
+#define BPRINT_QTVONLY       (1<<2) // if broad cast print goes to demo, then it will be only qtv sream, but not file
+#define BPRINT_IGNORECONSOLE (1<<3) // broad cast print will not be put in server console
 void    trap_BPrint( int level, const char *fmt, int flags );
+#define SPRINT_IGNOREINDEMO   (   1<<0) // do not put such message in mvd demo
 void    trap_SPrint( int edn, int level, const char *fmt, int flags );
 void    trap_CenterPrint( int edn, const char *fmt );
 void    trap_Error( const char *fmt );
@@ -36,6 +41,7 @@ int     trap_spawn(  );
 void    trap_remove( int edn );
 void    trap_precache_sound( char *name );
 void    trap_precache_model( char *name );
+intptr_t     trap_precache_vwep_model( char *name );
 void    trap_setorigin( int edn, float origin_x, float origin_y, float origin_z );
 void    trap_setsize( int edn, float min_x, float min_y, float min_z, float max_x,
 		      float max_y, float max_z );
@@ -46,6 +52,9 @@ void    trap_sound( int edn, int channel, const char *samp, float vol, float att
 int     trap_checkclient(  );
 void    trap_traceline( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y,
 			float v2_z, int nomonst, int edn );
+
+#define STUFFCMD_IGNOREINDEMO (   1<<0) // do not put in mvd demo
+#define STUFFCMD_DEMOONLY     (   1<<1) // put in mvd demo only
 void    trap_stuffcmd( int edn, const char *fmt, int flags );
 void    trap_localcmd( const char *fmt );
 void 	trap_executecmd();
@@ -97,7 +106,7 @@ int	trap_FS_ReadFile( char*dest, int quantity, fileHandle_t handle );
 int	trap_FS_WriteFile( const char*src, int quantity, fileHandle_t handle );
 int	trap_FS_SeekFile( fileHandle_t handle, int offset, int type );
 int	trap_FS_TellFile( fileHandle_t handle );
-int 	trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
+intptr_t 	trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf, intptr_t bufsize, intptr_t flags );
 
 int 	trap_Map_Extension( const char* ext_name, int mapto);
 
@@ -109,14 +118,15 @@ int 	trap_Map_Extension( const char* ext_name, int mapto);
 
 int 	trap_AddBot( const char* name, int bottomcolor, int topcolor, const char* skin);
 int 	trap_RemoveBot( int edn );
-int 	trap_SetBotUserInfo( int edn, const char* varname, const char* value );
+intptr_t 	trap_SetBotUserInfo( intptr_t edn, const char* varname, const char* value, intptr_t flags );
 int 	trap_SetBotCMD( int edn,int msec, float angles_x, float angles_y, float angles_z, 
                                 int forwardmove, int sidemove, int upmove, 
                                 int buttons, int impulse);
 
-#ifdef VWEP_TEST
-void    trap_precache_vwep_model( int pos, char *name );
-#endif
-int QVMstrftime( char *valbuff, int sizebuff, const char *fmt, int offset );
+void	trap_setpause ( intptr_t pause );
+int     QVMstrftime( char *valbuff, int sizebuff, const char *fmt, int offset );
+void    trap_makevectors( float *v );
+intptr_t     trap_movetogoal( float dist );
+#define SETUSERINFO_STAR          (1<<0) // allow set star keys
+intptr_t 	trap_SetUserInfo( intptr_t edn, const char* varname, const char* value, intptr_t flags );
 
-void trap_makevectors( float *v );

@@ -112,13 +112,10 @@ void trap_precache_model( char *name )
 {
 	syscall( G_PRECACHE_MODEL, (int) name );
 }
-
-#ifdef VWEP_TEST
-void trap_precache_vwep_model( int pos, char *name )
+intptr_t trap_precache_vwep_model( char *name )
 {
-	syscall( G_PRECACHE_VWEP_MODEL, pos, (int) name );
+	return syscall( G_PRECACHE_VWEP_MODEL, (intptr_t) name );
 }
-#endif
 
 void trap_setorigin( int edn, float origin_x, float origin_y, float origin_z )
 {
@@ -432,6 +429,11 @@ int QVMstrftime( char *valbuff, int sizebuff, const char *fmt, int offset )
 	return syscall( G_QVMstrftime, (int)valbuff, sizebuff, (int)fmt, offset );
 }
 
+void 	trap_setpause( intptr_t pause )
+{
+	syscall( G_SETPAUSE, pause );
+}
+
 
 void trap_makevectors( float *v )
 {
@@ -441,5 +443,15 @@ void trap_makevectors( float *v )
 gedict_t* trap_nextclient( gedict_t *v )
 {
 	return (gedict_t*)syscall( G_NEXTCLIENT, (int)v );
+}
+
+intptr_t 	trap_SetUserInfo( intptr_t edn, const char* varname, const char* value, intptr_t flags )
+{
+        return syscall( G_SETUSERINFO, edn, (intptr_t)varname, (intptr_t)value, flags );
+}
+
+intptr_t trap_movetogoal( float dist )
+{
+	return syscall( G_MOVETOGOAL, PASSFLOAT( dist ) );
 }
 

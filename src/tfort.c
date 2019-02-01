@@ -1477,9 +1477,9 @@ void TeamFortress_SetSkin( gedict_t * p )
 	if( p->isBot )
 	{
 	        if ( p->s.v.skin )
-	                trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"skin",TeamFortress_GetSkin( p ));
+	                trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"skin",TeamFortress_GetSkin( p ),0);
 	        else
-	                trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"skin","base");
+	                trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"skin","base",0);
 
 	}else
 	{
@@ -1496,9 +1496,9 @@ void TeamFortress_SetColor( gedict_t * p, int top, int bottom )
         if( p->isBot )
         {
                 _snprintf(tmp, sizeof(tmp), "%d",top);
-                trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"topcolor",tmp);
+                trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"topcolor",tmp,0);
                 _snprintf(tmp, sizeof(tmp),"%d",bottom);
-                trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"bottomcolor",tmp);
+                trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"bottomcolor",tmp,0);
         }else
         {
                 stuffcmd( p, "color %d %d\n",top,bottom);
