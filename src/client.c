@@ -199,7 +199,7 @@ void DecodeLevelParms()
         tf_data.invis_only = 0;
         if ( coop || !deathmatch )
             tf_data.toggleflags |= TFLAG_CLASS_PERSIST;
-        strncpy( nextmap, g_globalvars.mapname, sizeof(nextmap) );
+        strncpy( nextmap, mapname, sizeof(nextmap) );
         tf_data.allow_hook = 1;
 
         ent = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
@@ -235,7 +235,7 @@ void DecodeLevelParms()
             }
             civilianteams = 0;
         }
-        G_bprint( 2, "Mapname: %s\n", g_globalvars.mapname );
+        G_bprint( 2, "Mapname: %s\n", mapname );
         SetupTeamEqualiser();
         for(i=0; i< 5; i++)
         {
@@ -669,7 +669,7 @@ void DecodeLevelParms()
             tg_data.tg_sbar = 0;
         }
         if( tf_data.enable_bot )
-            localcmd( "exec maps/%s.wps\n", g_globalvars.mapname );
+            localcmd( "exec maps/%s.wps\n", mapname );
     }
 }
 
@@ -781,12 +781,12 @@ void GotoNextMap()
     //      gedict_t *te;
 
     StopDemoRecord();
-    if ( Q_strncmp( nextmap, g_globalvars.mapname, sizeof(nextmap) ) )
+    if ( Q_strncmp( nextmap, mapname, sizeof(nextmap) ) )
     {
         trap_changelevel( nextmap, "" );
         tf_data.already_chosen_map = 1;
     }
-    if ( GetSVInfokeyString( g_globalvars.mapname, NULL, str, sizeof( str ), "" ) )
+    if ( GetSVInfokeyString( mapname, NULL, str, sizeof( str ), "" ) )
     {
         strncpy( nextmap, str, sizeof(nextmap) );
         tf_data.already_chosen_map = 1;
@@ -908,7 +908,7 @@ void changelevel_touch()
         return;
 
     if ( ( trap_cvar( "samelevel" ) == 2 )
-            || ( ( trap_cvar( "samelevel" ) == 3 ) && ( strneq( g_globalvars.mapname, "start" ) ) ) )
+            || ( ( trap_cvar( "samelevel" ) == 3 ) && ( strneq( mapname, "start" ) ) ) )
     {
         return;
     }

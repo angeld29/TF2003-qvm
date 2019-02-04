@@ -59,8 +59,9 @@
 #define	MAX_TOKEN_CHARS		1024	// max length of an individual token
 
 #define MAX_STRINGS 128
-#define	FOFS(x) ((int)&(((gedict_t *)NULL)->x))
-#define	GOFS(x) ((int)&(((globalvars_t *)0)->x))
+
+#define	FOFS(x) ((intptr_t)&(((gedict_t *)0)->x))
+//#define	GOFS(x) ((int)&(((globalvars_t *)0)->x))
 
 #define FOFCLSN ( FOFS ( s.v.classname ) )
 
@@ -68,7 +69,9 @@ int             NUM_FOR_EDICT( gedict_t * e );
 
 extern tf_server_data_t tf_data;
 
-extern gedict_t g_edicts[];
+
+extern gedict_t g_edicts[MAX_EDICTS];
+extern char mapname[64];
 extern globalvars_t g_globalvars;
 extern gedict_t *world;
 extern gedict_t *self, *other;
@@ -129,7 +132,6 @@ void    	logfrag( gedict_t * killer, gedict_t * killee );
 void    	infokey( gedict_t * ed, const char *key, char *valbuff, int sizebuff );
 void    	WriteEntity( int to, gedict_t * ed );
 void    	disableupdates( gedict_t * ed, float time );
-
 float		cvar( const char *var );
 char		*cvar_string( const char *var );
 void        cvar_set( const char *var, const char *val );

@@ -63,8 +63,6 @@ const static cmd_t   cmds[] = {
 	{"detpack", TeamFortress_Cmd_Detpack, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS },
 	{NULL, NULL, 0}
 };
-extern void trap_CmdArgv( int arg, char *valbuff, int sizebuff );
-
 
 qboolean ClientCommand(  )
 {

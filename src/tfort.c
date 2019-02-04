@@ -2743,7 +2743,7 @@ void TeamFortress_ExecMapScript( gedict_t * p )
 	        return;
 
 	stuffcmd( p, "exec mapdefault.cfg\n" );
-	stuffcmd( p, "exec %s.cfg", g_globalvars.mapname );
+	stuffcmd( p, "exec %s.cfg", mapname );
 }
 
 void KickCheater( gedict_t * p )

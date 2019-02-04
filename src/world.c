@@ -129,11 +129,11 @@ void SP_worldspawn(  )
 		if ( cycledir[0] )
 		{
 			localcmd( "exec %s/mapdefault.cfg\n", cycledir );
-			localcmd( "exec %s/%s.cfg\n", cycledir, g_globalvars.mapname );
+			localcmd( "exec %s/%s.cfg\n", cycledir, mapname );
 		} else
 		{
 			localcmd( "exec qwmcycle/mapdefault.cfg\n" );
-			localcmd( "exec qwmcycle/%s.cfg\n", g_globalvars.mapname );
+			localcmd( "exec qwmcycle/%s.cfg\n", mapname );
 		}
 	}
 // the area based ambient sounds MUST be the first precache_sounds

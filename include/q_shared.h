@@ -66,16 +66,17 @@
 #include <time.h>
 #include <ctype.h>
 #include <limits.h>
-	#if defined( _WIN32 )
+	#if !defined( _WIN32 ) || !defined(_MSC_VER)
+	// so intptr_t is defined for all non MS compilers
+	#include <stdint.h>
+	#endif
+
+	#if !defined( _WIN32 )
     // so intptr_t is defined for all non MS compilers
-    #include <stdint.h>
-
-	#else
-
 	#define _vsnprintf vsnprintf
 	#define _snprintf snprintf
 
-	#endif // defined( _WIN32 )
+	#endif // !defined( _WIN32 )
 
 
 #endif
@@ -115,7 +116,10 @@ typedef enum qboolean_e {false, true}	qboolean;
 
 //typedef int	string_t;
 typedef char*	string_t;
-typedef int	func_t;
+typedef intptr_t	func_t;
+typedef int      stringref_t;
+typedef int      funcref_t;
+
 
 
 typedef float vec_t;

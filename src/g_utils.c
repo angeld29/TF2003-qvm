@@ -70,6 +70,7 @@ gedict_t *spawn(  )
 
 	if ( !t || t == world )
 		DebugTrap( "spawn return world\n" );
+    initialise_spawned_ent(t);
 	return t;
 }
 
@@ -103,6 +104,12 @@ gedict_t *nextent( gedict_t * ent )
 	else
 		return NULL;
 }
+
+gedict_t *find( gedict_t * start, int fieldoff, const char *str )
+{
+    return (gedict_t*) trap_find( start, fieldoff, str );
+}
+
 
 void normalize( vec3_t value, vec3_t newvalue )
 {
@@ -566,6 +573,6 @@ void StartDemoRecord()
 	{ 
         if (!QVMstrftime (date, sizeof (date), "%Y%m%d-%H%M%S", 0))
             _snprintf (date, sizeof (date), "%d", (int)(starttime + i_rnd (0, 9999)));
-        localcmd("sv_demoeasyrecord \"%s-%s\"\n", date, g_globalvars.mapname);
+        localcmd("sv_demoeasyrecord \"%s-%s\"\n", date, mapname);
     }
 }
