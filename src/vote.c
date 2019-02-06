@@ -220,7 +220,7 @@ int Vote_Map_Init()
        }
        if( ( ch >= '0' && ch <= '9' ) ||
                ( ch >= 'a' && ch <= 'z' ) ||
-               ( ch >= 'A' && ch <= 'Z' ) )
+               ( ch >= 'A' && ch <= 'Z' ) || ch == '_' )
            *out++ = ch;
     }
 
