@@ -2506,7 +2506,7 @@ void W_ChangeWeapon(  )
 			fl = 1;
 		else
 		{
-			if ( self->s.v.impulse == 40 )
+			if ( self->s.v.impulse == AXE_IMP )
 			{
 				if ( !( it & ( 2 | 4 | 16 | 8 ) ) )
 					have_weapon = 0;
@@ -2682,7 +2682,7 @@ void W_ChangeWeapon(  )
 												am = 1;
 										} else
 										{
-											if ( self->s.v.impulse == 176 )
+											if ( self->s.v.impulse == TF_MEDIKIT )
 											{
 												fl = 4;
 												if ( it & 4 )
@@ -3076,7 +3076,7 @@ void ImpulseCommands(  )
 		self->s.v.impulse = 0;
 		return;
 	}
-	if ( self->s.v.impulse == 171 )
+	if ( self->s.v.impulse == TF_SPECIAL_SKILL )
 		UseSpecialSkill(  );
 
         if( tg_data.tg_enabled )
@@ -3134,106 +3134,106 @@ void ImpulseCommands(  )
 		case 6:
 		case 7:
 		case 8:
-		case 176:
-		case 40:
+        case TF_MEDIKIT:
+		case AXE_IMP:
 			W_ChangeWeapon(  );
 			break;
-		case 22:
-		case 39:
+		case TF_HOOK_IMP1:
+		case TF_HOOK_IMP2:
 			if ( tf_data.allow_hook )
 				W_ChangeWeapon(  );
 			break;
-		case 69:
+		case TF_WEAPLAST:
 			if ( self->last_weapon )
 				W_ChangeWeapon(  );
 			break;
-		case 10:
-		case 12:
+		case TF_WEAPNEXT:
+		case TF_WEAPPREV:
 			CycleWeaponCommand(  );
 			break;
-		case 150:
-		case 151:
+		case TF_GRENADE_1:
+		case TF_GRENADE_2:
 			TeamFortress_PrimeGrenade(  );
 			break;
-		case 162:
+		case TF_SCAN_10:
 			TeamFortress_Scan_Angel( 10, 0 );
 			break;
-		case 163:
+		case TF_SCAN_30:
 			TeamFortress_Scan_Angel( 30, 0 );
 			break;
-		case 164:
+		case TF_SCAN_100:
 			TeamFortress_Scan_Angel( 100, 0 );
 			break;
-		case 165:
+		case TF_DETPACK_5:
 			TeamFortress_SetDetpack( 5 );
 			break;
-		case 166:
+		case TF_DETPACK_20:
 			TeamFortress_SetDetpack( 20 );
 			break;
-		case 167:
+        case TF_DETPACK_50:
 			TeamFortress_SetDetpack( 50 );
 			break;
-		case 172:
+		case TF_DROP_AMMO:
 			self->current_menu = MENU_DROP;
 			self->menu_count = MENU_REFRESH_RATE - 5;
 			break;
-		case 173:
+		case TF_RELOAD:
 			TeamFortress_ReloadCurrentWeapon(  );
 			break;
-		case 184:
+		case TF_DISCARD:
 			TeamFortress_Discard(  );
 			break;
 		}
 	}
 	switch ( ( int ) self->s.v.impulse )
 	{
-	case 135:
+	case TF_INVENTORY:
 		TeamFortress_Inventory(  );
 		break;
-	case 181:
+	case TF_MEDIC_HELPME:
 		if ( self->playerclass )
 			TeamFortress_SaveMe(  );
 		break;
-	case 185:
+	case TF_ID:
 		TeamFortress_ID(  );
 		break;
-	case 186:
+	case TF_SHOWIDS:
 		TeamFortress_ShowIDs(  );
 		break;
-	case 152:
+	case TF_GRENADE_T:
 		TeamFortress_ThrowGrenade(  );
 		break;
-	case 194:
+	case TF_DROPGOAL:
 		if ( self->playerclass )
 			DropGoalItems(  );
 		break;
-	case 170:
+	case TF_PB_DETONATE:
 		TeamFortress_DetonatePipebombs(  );
 		break;
-	case 169:
+	case TF_DETPACK_STOP:
 		TeamFortress_DetpackStop(  );
 		break;
-	case 188:
+	case TF_ENGINEER_DETSENTRY:
 		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
 			DestroyBuilding( self, "building_sentrygun" );
 		break;
-	case 187:
+	case TF_ENGINEER_DETDISP:
 		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
 			DestroyBuilding( self, "building_dispenser" );
 		break;
-	case 196:
+	/*case 196:
 		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
 			DestroyBuilding( self, "building_teleporter_exit" );
 		break;
 	case 197:
 		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
 			DestroyBuilding( self, "building_teleporter_entrance" );
-		break;
-	case 177:
+		break;*/
+	case TF_SPY_SPY:
 		if ( self->playerclass == PC_SPY )
 			TeamFortress_SpyGoUndercover(  );
 		break;
-	case 178:
+	case TF_SPY_DIE:
 		if ( self->playerclass == PC_SPY )
 			TeamFortress_SpyFeignDeath( 0 );
 		break;
@@ -3241,7 +3241,7 @@ void ImpulseCommands(  )
 		if ( self->playerclass == PC_SPY )
 			TeamFortress_SpyFeignDeath( 1 );
 		break;
-	case 179:
+	case TF_ENGINEER_BUILD:
 		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
 			TeamFortress_EngineerBuild(  );
 		break;
@@ -3249,24 +3249,24 @@ void ImpulseCommands(  )
 		if ( self->playerclass == PC_SCOUT )
 			ScannerSwitch(  );
 		break;
-	case 23:
+	case TF_FLAG_INFO:
 		if ( CTF_Map == 1 )
 			TeamFortress_CTF_FlagInfo(  );
 		else
 			TeamFortress_DisplayDetectionItems(  );
 		break;
-	case 118:
+	case TF_DISPLAYLOCATION:
 		display_location(  );
 		break;
 	default:
 		DeadImpulses(  );
 		break;
 	}
-	if ( self->s.v.impulse == 168 )
+	if ( self->s.v.impulse == TF_DETPACK )
 	{
 		self->last_impulse = self->s.v.impulse;
 	}
-	if ( self->s.v.impulse == 159 )
+	if ( self->s.v.impulse == TF_SCAN )
 		self->last_impulse = self->s.v.impulse;
 	self->s.v.impulse = 0;
 }
@@ -3283,35 +3283,39 @@ void PreMatchImpulses(  )
 	case 6:
 	case 7:
 	case 8:
-	case 176:
-	case 40:
+	case TF_MEDIKIT:
+	case AXE_IMP:
 		W_ChangeWeapon(  );
 		break;
-	case 22:
-	case 39:
+	case TF_HOOK_IMP1:
+	case TF_HOOK_IMP2:
 		if ( tf_data.allow_hook )
 			W_ChangeWeapon(  );
 		break;
-	case 10:
-	case 12:
+    case TF_WEAPLAST:
+        if ( self->last_weapon )
+            W_ChangeWeapon(  );
+        break;
+	case TF_WEAPPREV:
+	case TF_WEAPNEXT:
 		CycleWeaponCommand(  );
 		break;
 	}
 	switch ( ( int ) self->s.v.impulse )
 	{
-	case 135:
+	case TF_INVENTORY:
 		TeamFortress_Inventory(  );
 		break;
-	case 185:
+	case TF_ID:
 		TeamFortress_ID(  );
 		break;
-	case 23:
+	case TF_FLAG_INFO:
 		if ( CTF_Map == 1 )
 			TeamFortress_CTF_FlagInfo(  );
 		else
 			TeamFortress_DisplayDetectionItems(  );
 		break;
-	case 118:
+	case TF_DISPLAYLOCATION:
 		display_location(  );
 		break;
 	}
@@ -3321,89 +3325,83 @@ void DeadImpulses(  )
 {
 	switch ( ( int ) self->s.v.impulse )
 	{
-	case 136:
+	case TF_SHOWTF:
 		TeamFortress_ShowTF(  );
 		break;
-	case 174:
+	case TF_AUTOZOOM:
 		TeamFortress_AutoZoomToggle(  );
 		break;
-	case 137:
+	case TF_SHOWLEGALCLASSES:
 		TeamFortress_DisplayLegalClasses(  );
 		break;
-	case 100:
-	case 101:
-	case 102:
-	case 103:
-	case 104:
-	case 105:
-	case 106:
-	case 107:
-	case 108:
-	case 109:
-	case 110:
+	case TF_CHANGEPC:
+	case TF_CHANGEPC + 1:
+	case TF_CHANGEPC + 2:
+	case TF_CHANGEPC + 3:
+	case TF_CHANGEPC + 4:
+	case TF_CHANGEPC + 5:
+	case TF_CHANGEPC + 6:
+	case TF_CHANGEPC + 7:
+	case TF_CHANGEPC + 8:
+	case TF_CHANGEPC + 9:
+	case TF_CHANGEPC + 10:
 		TeamFortress_ChangeClass(  );
 		break;
-	case 99:
+	case TF_CHANGEPC_MENU:
 		if ( self->playerclass && deathmatch == 3 && ( tf_data.cb_prematch_time < g_globalvars.time ) )
 		{
 			self->current_menu = MENU_CHANGECLASS;
 			self->menu_count = MENU_REFRESH_RATE;
 		}
 		break;
-	case 131:
+	case TF_HELP_MAP:
 		TeamFortress_HelpMap(  );
 		break;
-	case 119:
+	case TF_STATUS_QUERY:
 		TeamFortress_StatusQuery(  );
 		break;
-	case 140:
-		TeamFortress_TeamSet( 1 );
+	case TF_TEAM_1:
+	case TF_TEAM_2:
+	case TF_TEAM_3:
+	case TF_TEAM_4:
+		TeamFortress_TeamSet( (int)self->s.v.impulse - TF_TEAM_1 + 1);
 		break;
-	case 141:
-		TeamFortress_TeamSet( 2 );
-		break;
-	case 142:
-		TeamFortress_TeamSet( 3 );
-		break;
-	case 143:
-		TeamFortress_TeamSet( 4 );
-		break;
-	case 145:
+	case TF_TEAM_SCORES:
 		TeamFortress_TeamShowScores( 0 );
 		break;
-	case 144:
+	case TF_TEAM_CLASSES:
 		TeamFortress_TeamShowMemberClasses_New( self );
 		break;
-	case 182:
+	case TF_STATUSBAR_ON:
 		self->StatusRefreshTime = g_globalvars.time + 0.2;
 		self->StatusBarSize = self->StatusBarSize + 1;
 		if ( self->StatusBarSize > 2 )
 			self->StatusBarSize = 1;
 		break;
-	case 183:
+	case TF_STATUSBAR_OFF:
 		self->StatusRefreshTime = g_globalvars.time + 60;
 		self->StatusBarSize = 0;
 		break;
-	case 71:
-	case 72:
-	case 73:
-	case 74:
-	case 75:
-	case 76:
-	case 77:
-	case 78:
-	case 79:
-	case 80:
-	case 81:
-		StatusRes( self->s.v.impulse - 71 );
+	case TF_STATUSBAR_RES_START:
+	case TF_STATUSBAR_RES_START +  1:
+	case TF_STATUSBAR_RES_START +  2:
+	case TF_STATUSBAR_RES_START +  3:
+	case TF_STATUSBAR_RES_START +  4:
+	case TF_STATUSBAR_RES_START +  5:
+	case TF_STATUSBAR_RES_START +  6:
+	case TF_STATUSBAR_RES_START +  7:
+	case TF_STATUSBAR_RES_START +  8:
+	case TF_STATUSBAR_RES_START +  9:
+	case TF_STATUSBAR_RES_START +  10:
+		StatusRes( self->s.v.impulse - TF_STATUSBAR_RES_START );
 		break;
-	case 23:
+	case TF_FLAG_INFO:
 		if ( CTF_Map == 1 )
 			TeamFortress_CTF_FlagInfo(  );
 		else
 			TeamFortress_DisplayDetectionItems(  );
 		break;
-	case 13:
+	case TF_ALIAS_CHECK:
 		G_sprint( self, 2, "Aliases checked.\n" );
 		self->got_aliases = 1;
 		self->s.v.impulse = 0;
@@ -3433,21 +3431,21 @@ void Angel_SaveImpulse( int impulse )
 		self->s.v.impulse = 0;
 		return;
 	}
-	if ( self->s.v.impulse == 152 && ( self->tfstate & TFSTATE_GRENPRIMED ) )
+	if ( self->s.v.impulse == TF_GRENADE_T && ( self->tfstate & TFSTATE_GRENPRIMED ) )
 		self->tf_impulse = self->tf_impulse | SI_THROWGREN;
-	else if ( self->s.v.impulse == 170 )
+	else if ( self->s.v.impulse == TF_PB_DETONATE )
 		self->tf_impulse = self->tf_impulse | SI_DETPIPE;
-	else if ( self->s.v.impulse == 171 )
+	else if ( self->s.v.impulse == TF_SPECIAL_SKILL )
 		self->tf_impulse = self->tf_impulse | SI_SPECIAL;
-	else if ( self->s.v.impulse == 173 )
+	else if ( self->s.v.impulse == TF_RELOAD )
 		self->tf_impulse = self->tf_impulse | SI_RELOAD;
-	else if ( self->s.v.impulse == 184 )
+	else if ( self->s.v.impulse == TF_DISCARD )
 		self->tf_impulse = self->tf_impulse | SI_DISCARD;
-	else if ( self->s.v.impulse == 150 && !( self->tfstate & TFSTATE_GRENPRIMED ) )
+	else if ( self->s.v.impulse == TF_GRENADE_1 && !( self->tfstate & TFSTATE_GRENPRIMED ) )
 	{
 		self->tf_impulse = self->tf_impulse - ( self->tf_impulse & SI_PRIMETWO );
 		self->tf_impulse = self->tf_impulse | SI_PRIMEONE;
-	} else if ( self->s.v.impulse == 151 && !( self->tfstate & TFSTATE_GRENPRIMED ) )
+	} else if ( self->s.v.impulse == TF_GRENADE_2 && !( self->tfstate & TFSTATE_GRENPRIMED ) )
 	{
 		self->tf_impulse = self->tf_impulse - ( self->tf_impulse & SI_PRIMEONE );
 		self->tf_impulse = self->tf_impulse | SI_PRIMETWO;
@@ -3466,19 +3464,19 @@ int Angel_GetSavedImpulse(  )
 	if ( self->tf_impulse & SI_PRIMEONE )
 	{
 		self->tf_impulse = self->tf_impulse - ( self->tf_impulse & SI_PRIMEONE );
-		return 150;
+		return TF_GRENADE_1;
 	} else if ( self->tf_impulse & SI_PRIMETWO )
 	{
 		self->tf_impulse = self->tf_impulse - ( self->tf_impulse & SI_PRIMETWO );
-		return 151;
+		return TF_GRENADE_2;
 	} else if ( self->tf_impulse & SI_THROWGREN )
 	{
 		self->tf_impulse = self->tf_impulse - ( self->tf_impulse & SI_THROWGREN );
-		return 152;
+		return TF_GRENADE_T;
 	} else if ( self->tf_impulse & SI_DETPIPE )
 	{
 		self->tf_impulse = self->tf_impulse - ( self->tf_impulse & SI_DETPIPE );
-		return 170;
+		return TF_PB_DETONATE;
 	} else if ( self->imp1 )
 	{
 		saved = self->imp1;
@@ -3487,15 +3485,15 @@ int Angel_GetSavedImpulse(  )
 	} else if ( self->tf_impulse & SI_DISCARD )
 	{
 		self->tf_impulse = self->tf_impulse - ( self->tf_impulse & SI_DISCARD );
-		return 184;
+		return TF_DISCARD;
 	} else if ( self->tf_impulse & SI_SPECIAL )
 	{
 		self->tf_impulse = self->tf_impulse - ( self->tf_impulse & SI_SPECIAL );
-		return 171;
+		return TF_SPECIAL_SKILL;
 	} else if ( self->tf_impulse & SI_RELOAD )
 	{
 		self->tf_impulse = self->tf_impulse - ( self->tf_impulse & SI_RELOAD );
-		return 173;
+		return TF_RELOAD;
 	}
 /* REMOVE!!!
 if (self.imp1){

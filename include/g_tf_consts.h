@@ -107,9 +107,9 @@
 #define TF_ALIAS_CHECK  13 
 
 // CTF Support Impulses
-#define HOOK_IMP1  22
-#define FLAG_INFO  23
-#define HOOK_IMP2  39
+#define TF_HOOK_IMP1  22
+#define TF_FLAG_INFO  23
+#define TF_HOOK_IMP2  39
 
 // Axe
 #define AXE_IMP   40
@@ -129,12 +129,18 @@
 #define TF_CAM_FADETOWHITE  61
 #define TF_CAM_FADEFROMWHITE 62
 
+#define TF_WEAPNEXT             10  // Selects the next weapon slot
+#define TF_WEAPPREV             12  // Selects the previous weapon slot
+#define TF_WEAPLAST             69  // Selects the last used weapon slot
+
+
 // Status Bar Resolution Settings.  Same as CTF to maintain ease of use.
 #define TF_STATUSBAR_RES_START 71
 #define TF_STATUSBAR_RES_END 81
 
 // Added to PC_??? to get impulse to use if this clashes with your 
 // own impulses, just change this value, not the PC_??
+#define TF_CHANGEPC_MENU   99 
 #define TF_CHANGEPC   100 
 // The next few impulses are all the class selections
 //PC_SCOUT  101 
@@ -210,6 +216,7 @@
 
 // drop/pass commands
 #define TF_DROPKEY   175
+#define TF_DROPGOAL   194
 
 // Select Medikit  
 #define TF_MEDIKIT   176
@@ -217,6 +224,7 @@
 // Spy Impulses
 #define TF_SPY_SPY   177  // On net, go invisible, on LAN, change skin/color
 #define TF_SPY_DIE   178  // Feign Death
+#define TF_SPY_SFEIGN_IMPULSE 199
 
 // Engineer Impulses
 #define TF_ENGINEER_BUILD 179
@@ -234,6 +242,9 @@
 
 // ID Player impulse
 #define TF_ID       185
+#define TF_SHOWIDS       186
+#define TF_ENGINEER_DETDISP     187  // Engineer: Detonate dispenser for Engineer
+#define TF_ENGINEER_DETSENTRY   188  // Engineer: Detonate sentry gun for Engineer
 
 /*==================================================*/
 /* Colors           */
@@ -617,7 +628,6 @@
 #define TF_AUTOIDTIME 0.5
 #define TF_AUTOSCAN_TIME 0.5
 
-#define TF_SPY_SFEIGN_IMPULSE 199
 
 #define TF_EXEC_MAP_MASK  1
 #define TF_EXEC_CLASS_MASK  2
