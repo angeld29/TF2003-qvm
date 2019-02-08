@@ -2444,10 +2444,84 @@ void W_PrintWeaponMessage(  )
 		break;
 	}
 }
+int W_CanUseWeapon( int weapon )
+    // 1 no ammo
+    // 2 no ammo assault
+    // 3 no weapon
+    // 0 ok 
+{
+    if( !( weapon & self->weapons_carried )) return 3;
+    switch( weapon )
+    {
+        case WEAP_HOOK:
+            if ( !tf_data.allow_hook ) return 0;
+            if ( self->hook_out )
+                Reset_Grapple( self->hook );
+            break;
+        case WEAP_SNIPER_RIFLE: 
+            if ( self->s.v.ammo_shells < tf_data.snip_ammo ) return 1;
+            break;
+        case WEAP_SHOTGUN://   128
+        case WEAP_TRANQ://    262144
+        case WEAP_AUTO_RIFLE://   64
+            if ( self->s.v.ammo_shells < 1 ) return 1;
+            break;
+        case WEAP_SUPER_SHOTGUN://  256
+            if ( self->s.v.ammo_shells < 2 ) return 1;
+            break;
+        case WEAP_NAILGUN://   512
+        case WEAP_SUPER_NAILGUN://  1024
+        case WEAP_LASER://    524288
+            if ( self->s.v.ammo_nails < 1 ) return 1;
+            break;
+        case WEAP_GRENADE_LAUNCHER:// 2048
+        case WEAP_ROCKET_LAUNCHER:// 8192
+        case WEAP_INCENDIARY://   16384
+            if ( self->s.v.ammo_rockets < 1 ) return 1;
+            break;
+        case WEAP_FLAMETHROWER://  4096
+        case WEAP_LIGHTNING://   65536
+            if ( self->s.v.ammo_cells < 1 ) return 1;
+            break;
+        case WEAP_ASSAULT_CANNON://  32768
+            if ( self->s.v.ammo_shells < self->assault_min_shells ) return 1;
+            if ( self->s.v.ammo_cells < 4 ) return 2;
+            break;
+        default:
+            break;
+    };
+    return 0;
+}
+
+struct w_impulse_s{
+    int impulse;
+    int mask;
+    int weapons[10];
+};
+
+static struct w_impulse_s w_impulses[]={
+    {1, 0, { WEAP_SPANNER, /*WEAP_BIOWEAPON, */WEAP_MEDIKIT, WEAP_HOOK, WEAP_AXE, 0 }},
+    {2, 0, { WEAP_SNIPER_RIFLE, WEAP_SHOTGUN, WEAP_TRANQ, WEAP_LASER }},
+    {3, 0, { WEAP_AUTO_RIFLE, WEAP_SUPER_SHOTGUN}},
+    {4, 0, { WEAP_NAILGUN}},
+    {5, 0, { WEAP_SUPER_NAILGUN}},
+    {6, 0, { WEAP_FLAMETHROWER, WEAP_GRENADE_LAUNCHER}},
+    {7, 0, { WEAP_INCENDIARY, WEAP_ROCKET_LAUNCHER, WEAP_ASSAULT_CANNON, WEAP_GRENADE_LAUNCHER}},
+    {8, 0, { WEAP_LIGHTNING }},
+    {TF_MEDIKIT, 0, { WEAP_MEDIKIT }},
+    {AXE_IMP, 0, { WEAP_SPANNER, /*WEAP_BIOWEAPON, */WEAP_MEDIKIT, WEAP_HOOK, WEAP_AXE, 0 }},
+    {TF_HOOK_IMP1, 0, { WEAP_HOOK, 0 }},
+    {TF_HOOK_IMP2, 0, { WEAP_HOOK, 0 }},
+    {0},
+};
 
 void W_ChangeWeapon(  )
 {
 	int     it, am, fl, wm = 0, have_weapon, usable;
+    int *weapons;
+    struct w_impulse_s* wi = &w_impulses[0];
+    struct w_impulse_s wlast = { TF_WEAPLAST, 0, { 0,0} };
+
 	if ( self->tfstate & TFSTATE_RELOADING )
 		return;
 	it = self->weapons_carried;
@@ -2455,327 +2529,53 @@ void W_ChangeWeapon(  )
 	am = 0;
 	usable = 0;
 	have_weapon = 1;
-	if ( self->s.v.impulse == 1 )
-	{
-		if ( !( it & ( 1 | 2 | 4 | 16 | 8 ) ) )
-			have_weapon = 0;
-		while ( !usable && have_weapon )
-		{
-			if ( fl == 8 )
-			{
-				fl = 2;
-				if ( it & 2 )
-					usable = 1;
-				usable = 0;
-			} else
-			{
-				if ( fl == 2 )
-				{
-					fl = 4;
-					if ( it & 4 )
-						usable = 1;
-				} else
-				{
-					if ( fl == 4 )
-					{
-						fl = 1;
-						if ( tf_data.allow_hook && ( fl & 1 ) )
-							usable = 1;
-						if ( self->hook_out )
-							Reset_Grapple( self->hook );
-					} else
-					{
-						if ( fl == 1 )
-						{
-							fl = 16;
-							if ( it & 16 )
-								usable = 1;
-						} else
-						{
-							fl = 8;
-							if ( it & 8 )
-								usable = 1;
-						}
-					}
-				}
-			}
-		}
-	} else
-	{
-		if ( tf_data.allow_hook && ( self->s.v.impulse == 22 || self->s.v.impulse == 39 ) )
-			fl = 1;
-		else
-		{
-			if ( self->s.v.impulse == AXE_IMP )
-			{
-				if ( !( it & ( 2 | 4 | 16 | 8 ) ) )
-					have_weapon = 0;
-				while ( !usable && have_weapon )
-				{
-					if ( fl == 8 )
-					{
-						fl = 2;
-						if ( it & 2 )
-							usable = 1;
-						usable = 0;
-					} else
-					{
-						if ( fl == 2 )
-						{
-							fl = 4;
-							if ( it & 4 )
-								usable = 1;
-						} else
-						{
-							if ( fl == 4 )
-							{
-								fl = 16;
-								if ( it & 16 )
-									usable = 1;
-							} else
-							{
-								fl = 8;
-								if ( it & 8 )
-									usable = 1;
-							}
-						}
-					}
-				}
-			} else
-			{
-				if ( self->s.v.impulse == 2 )
-				{
-					if ( it & 32 )
-					{
-						fl = 32;
-						if ( self->s.v.ammo_shells < tf_data.snip_ammo )
-							am = 1;
-					} else
-					{
-						if ( it & 128 )
-						{
-							fl = 128;
-							if ( self->s.v.ammo_shells < 1 )
-								am = 1;
-						} else
-						{
-							if ( it & 262144 )
-							{
-								fl = 262144;
-								if ( self->s.v.ammo_shells < 1 )
-									am = 1;
-							} else
-							{
-								if ( it & 524288 )
-								{
-									fl = 524288;
-									if ( self->s.v.ammo_nails < 1 )
-										am = 1;
-								} else
-									have_weapon = 0;
-							}
-						}
-					}
-				} else
-				{
-					if ( self->s.v.impulse == 3 )
-					{
-						if ( it & 64 )
-						{
-							fl = 64;
-							if ( self->s.v.ammo_shells < 1 )
-								am = 1;
-						} else
-						{
-							fl = 256;
-							if ( self->s.v.ammo_shells < 2 )
-								am = 1;
-						}
-					} else
-					{
-						if ( self->s.v.impulse == 4 )
-						{
-							fl = 512;
-							if ( self->s.v.ammo_nails < 1 )
-								am = 1;
-						} else
-						{
-							if ( self->s.v.impulse == 5 )
-							{
-								fl = 1024;
-								if ( self->s.v.ammo_nails < 2 )
-									am = 1;
-							} else
-							{
-								if ( self->s.v.impulse == 6 )
-								{
-									if ( it & 4096 )
-									{
-										fl = 4096;
-										if ( self->s.v.ammo_cells < 1 )
-											am = 1;
-									} else
-									{
-										if ( it & 2048 )
-										{
-											fl = 2048;
-											if ( self->s.v.ammo_rockets <
-											     1 )
-												am = 1;
-											wm = 0;
-										} else
-											have_weapon = 0;
-									}
-								} else
-								{
-									if ( self->s.v.impulse == 7 )
-									{
-										if ( it & 16384 )
-										{
-											fl = 16384;
-											if ( self->s.v.ammo_rockets <
-											     3 )
-												am = 1;
-										} else
-										{
-											if ( it & 8192 )
-											{
-												fl = 8192;
-												if ( self->s.v.
-												     ammo_rockets < 1 )
-													am = 1;
-											} else
-											{
-												if ( it & 32768 )
-												{
-													fl = 32768;
-													if ( self->s.v.
-													     ammo_shells
-													     <=
-													     self->assault_min_shells )
-														am = 1;
-													else
-													{
-														if ( self->s.v.ammo_cells < 4 )
-															am = 2;
-													}
-												} else
-												{
-													if ( it & 2048 )
-													{
-														fl = 2048;
-														wm = 1;
-														if ( self->s.v.ammo_rockets < 1 )
-															am = 1;
-													} else
-														have_weapon
-														    = 0;
-												}
-											}
-										}
-									} else
-									{
-										if ( self->s.v.impulse == 8 )
-										{
-											fl = 65536;
-											if ( self->s.v.ammo_cells < 1 )
-												am = 1;
-										} else
-										{
-											if ( self->s.v.impulse == TF_MEDIKIT )
-											{
-												fl = 4;
-												if ( it & 4 )
-													usable = 1;
-											} else
-											{
-												if ( self->s.v.
-												     impulse == 69 )
-												{
-													fl = self->
-													    last_weapon;
-													if ( ( fl &
-													       WEAP_ASSAULT_CANNON )
-													     && self->s.
-													     v.
-													     ammo_shells
-													     <=
-													     self->assault_min_shells )
-														am = 1;
-													if ( it & self->
-													     last_weapon )
-														usable =
-														    1;
-													if ( fl &
-													     (  64 |
-													       128 | 256
-													       | 32768 |
-													       262144 )
-													     && self->s.
-													     v.
-													     ammo_shells
-													     < 1 )
-													{
-														am = 1;
-													}else
-													{
-                                                                                                          if( (fl & 32) && self->s.v.ammo_shells < tf_data.snip_ammo)
-                                                                                                          	am = 1;
-													else
-													{
-														if ( fl
-														     &
-														     ( 512
-														       |
-														       1024
-														       |
-														       524288 )
-														     &&
-														     self->
-														     s.
-														     v.
-														     ammo_nails
-														     <
-														     1 )
-															am = 1;
-														else
-														{
-															if ( fl & ( 2048 | 8192 ) && self->s.v.ammo_rockets < 1 )
-																am = 1;
-															else
-															{
-																if ( fl & ( 4096 | 65536 ) && self->s.v.ammo_cells < 1 )
-																	am = 1;
-																else
-																{
-																	if ( fl == 16384 && self->s.v.ammo_rockets < 3 )
-																		am = 1;
-																	else
-																	{
-																		if ( fl == WEAP_ASSAULT_CANNON && self->s.v.ammo_cells < 4 )
-																			am = 2;
-																	}
-																}
-															}
-														}
-													}
-													if ( !am )
-														wm = self->last_weaponmode;
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+    if ( self->s.v.impulse == TF_WEAPLAST && self->last_weapon)
+    {
+        wi = &wlast;
+        wi->mask = self->last_weapon;
+        wi->weapons[0] = self->last_weapon;
+        wm = self->last_weaponmode;
+    }else{
+        while( wi->impulse && wi->impulse != self->s.v.impulse ) wi++;
+    }
+    if( !wi->impulse){
+        self->s.v.impulse = 0;
+        return;
+    }
+
+    if( wi->mask == 0 ){
+        int* w = wi->weapons;
+        while(*w){
+            wi->mask |= *w++;
+        };
+    }
+    if( wi->mask & it ){
+        int* w = wi->weapons;
+        while( *w && *w++ != fl );
+        if( !*w) w = wi->weapons;
+        fl = *w;
+        do{
+            am = W_CanUseWeapon(*w);
+            if(!am){
+                fl = *w; 
+                break;
+            }
+            w++;
+            if( !*w) w = wi->weapons;
+            if( *w == fl ){ fl = 0; break;}
+        }while(*w != fl );
+        if( am == 3 || fl == 0 ){
+            have_weapon = 0;
+            am = 0;
+        }
+
+    }else{
+        have_weapon = 0;
+    }
+    if( self->s.v.impulse == 7 && fl == WEAP_GRENADE_LAUNCHER ) wm = 1;
+    
 	self->s.v.impulse = 0;
-	if ( !have_weapon || !( it & fl ) )
+	if ( !fl || !have_weapon || !( it & fl ) )
 	{
 		G_sprint( self, 2, "no weapon.\n" );
 		return;

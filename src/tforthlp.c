@@ -87,6 +87,9 @@ void TeamFortress_MOTD(  )
 	{
 		TeamFortress_Alias( "detpipe", 170, 0 );
 		TeamFortress_Alias( "reload", 173, 0 );
+        TeamFortress_Alias("weapnext", TF_WEAPNEXT, 0);
+        TeamFortress_Alias("weapprev", TF_WEAPPREV, 0);
+        TeamFortress_Alias("weaplast", TF_WEAPLAST, 0);
 		TeamFortress_Alias( "scan10", 162, 0 );
 		TeamFortress_Alias( "scan30", 163, 0 );
 		TeamFortress_Alias( "scan50", 164, 0 );
