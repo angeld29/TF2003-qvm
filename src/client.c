@@ -783,11 +783,13 @@ void GotoNextMap()
     StopDemoRecord();
     if ( Q_strncmp( nextmap, mapname, sizeof(nextmap) ) )
     {
+        G_dprintf("nextmap: %s, mapname: %s\n", nextmap, mapname);
         trap_changelevel( nextmap, "" );
         tf_data.already_chosen_map = 1;
     }
     if ( GetSVInfokeyString( mapname, NULL, str, sizeof( str ), "" ) )
     {
+        G_dprintf("nextmap: %s, mapname: %s str: %s\n", nextmap, mapname, str);
         strncpy( nextmap, str, sizeof(nextmap) );
         tf_data.already_chosen_map = 1;
         return;
@@ -796,6 +798,7 @@ void GotoNextMap()
     if ( !tf_data.already_chosen_map )
     {
         nextlevel = GetSVInfokeyInt( "n", NULL, 0 );
+        G_dprintf("nextlevel: %d nextmap: %s, mapname: %s \n", nextlevel, nextmap, mapname);
         nextlevel++;
 
         localcmd( "serverinfo n %d\n", nextlevel );
@@ -2766,31 +2769,31 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
             }
             switch ( tf_data.deathmsg )
             {
-                case 8:
+                case DMSG_GREN_HAND:
                     switch ( targ->playerclass )
                     {
-                        case 2:
+                        case PC_SNIPER:
                             deathstring = "%s got splattered by his own grenade\n";
                             break;
-                        case 3:
+                        case PC_SOLDIER:
                             deathstring = "%s sat on his own grenade\n";
                             break;
-                        case 4:
+                        case PC_DEMOMAN:
                             deathstring = "%s got to know his grenade too well\n";
                             break;
-                        case 5:
+                        case PC_MEDIC:
                             deathstring = "%s caught the end of his own grenade\n";
                             break;
-                        case 6:
+                        case PC_HVYWEAP:
                             deathstring = "%s got too close to his own grenade\n";
                             break;
-                        case 7:
+                        case PC_PYRO:
                             deathstring = "%s let his own grenade get the best of him\n";
                             break;
-                        case 8:
+                        case PC_SPY:
                             deathstring = "%s tiptoed over his own grenade\n";
                             break;
-                        case 9:
+                        case PC_ENGINEER:
                             deathstring = "%s stared at his grenade too long\n";
                             break;
                         default:
@@ -2798,16 +2801,16 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
                             break;
                     }
                     break;
-                case 9:
+                case DMSG_GREN_NAIL:
                     deathstring = "%s hammers himself\n";
                     break; 
-                case 10:
+                case DMSG_GREN_MIRV:
                     switch ( targ->playerclass )
                     {
-                        case 4:
+                        case PC_DEMOMAN:
                             deathstring = "%s practiced his own Mirv dance\n";
                             break;
-                        case 6:
+                        case PC_HVYWEAP:
                             deathstring = "%s allowed his Mirv to turn against him\n";
                             break;
                         default:
@@ -2816,56 +2819,56 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
 
                     }
                     break;
-                case 11:
+                case DMSG_GREN_PIPE:
                     deathstring = "%s ambushes himself with his own pipebombs\n";
                     break;
-                case 40:
+                case DMSG_PIPEBOMB:
                     deathstring = "%s tried to juggle his own pipebombs\n";
                     break;
-                case 24:
+                case DMSG_GREN_GAS:
                     deathstring = "%s chokes on his own gas\n";
                     break;
-                case 30:
+                case DMSG_GREN_EMP:
                     deathstring = "%s explodes his ammo and body\n";
                     break;
-                case 41:
+                case DMSG_CALTROP:
                     deathstring = "%s stepped on too many of his own caltrops\n";
                     break;
-                case 35:
+                case DMSG_GREN_FLASH:
                     deathstring = "%s is charred by his own flash grenade\n";
                     break;
-                case 31:
+                case DMSG_GREN_EMP_AMMO:
                     deathstring = "%s detonates an ammo box too close to him\n";
                     break;
-                case 12:
+                case DMSG_DETPACK:
                     deathstring = "%s set the detpack and forgot to run\n";
                     break;
-                case 13:
+                case DMSG_BIOWEAPON:
                     deathstring = "%s died impossibly!\n";
                     break;
-                case 6:
+                case DMSG_ROCKETL:
                     if ( rnum < 0.5 )
                         deathstring = "%s becomes bored with life\n";
                     else
                         deathstring = "%s checks if his weapon is loaded\n";
                     break;
-                case 33:
+                case DMSG_INCENDIARY:
                     deathstring = "%s chars himself with an incendiary rocket\n";
                     break;
-                case 5:
+                case DMSG_GRENADEL:
                     deathstring = "%s tries to put the pin back in\n";
                     break;
-                case 15:
+                case DMSG_FLAME:
                     deathstring = "%s torches himself\n";
                     break;
-                case 7:
+                case DMSG_LIGHTNING:
                     if ( targ->s.v.waterlevel > 1 )
                         deathstring = "%s discharges into the water.\n";
                     break;
-                case 38:
+                case DMSG_SG_EXPLODION:
                     deathstring = "%s gets too friendly with his sentrygun.\n";
                     break;
-                case 39:
+                case DMSG_DISP_EXPLODION:
                     deathstring = "%s dispenses with himself.\n";
                     break;
             }
@@ -3019,31 +3022,31 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
                 //normal player vs player messages
                 switch ( tf_data.deathmsg )
                 {
-                    case 8:
+                    case DMSG_GREN_HAND:
                         switch ( attacker->playerclass )
                         {
-                            case 2:
+                            case PC_SNIPER:
                                 deathstring = "%s got up-close and personal with %s's grenade\n";
                                 break;
-                            case 3:
+                            case PC_SOLDIER:
                                 deathstring = "%s played catch with %s's grenade\n";
                                 break;
-                            case 4:
+                            case PC_DEMOMAN:
                                 deathstring = "%s received a pineapple enema from %s\n";
                                 break;
-                            case 5:
+                            case PC_MEDIC:
                                 deathstring = "%s fetched %s's pineapple\n";
                                 break;
-                            case 6:
+                            case PC_HVYWEAP:
                                 deathstring = "%s caught too much shrapnel from %s's grenade\n";
                                 break;
-                            case 7:
+                            case PC_PYRO:
                                 deathstring = "%s tried to pick up %s's hot potato\n";
                                 break;
-                            case 8:
+                            case PC_SPY:
                                 deathstring = "%s thought %s was tossing him a spare grenade\n";
                                 break;
-                            case 9:
+                            case PC_ENGINEER:
                                 deathstring =
                                     "%s stops to ponder the technical details of %s's grenade\n";
                                 break;
@@ -3052,59 +3055,59 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
                                 break;
                         }
                         break;
-                    case 9:
+                    case DMSG_GREN_NAIL:
                         deathstring = "%s gets flayed by %s's nail grenade\n";
                         break;
-                    case 10:
+                    case DMSG_GREN_MIRV:
                         if ( attacker->playerclass == 4 )
                             deathstring = "%s does a dance on %s's Mirv grenade\n";
                         else
                             deathstring = "%s gets spammed by %s's Mirv grenade\n";
                         break;
-                    case 11:
+                    case DMSG_GREN_PIPE:
                         deathstring = "%s is caught by %s's pipebomb trap\n";
                         break;
-                    case 40:
+                    case DMSG_PIPEBOMB:
                         deathstring = "%s fell victim to %s's fireworks\n";
                         break;
-                    case 24:
+                    case DMSG_GREN_GAS:
                         deathstring = "%s gags on %s's noxious gasses\n";
                         break;
-                    case 30:
+                    case DMSG_GREN_EMP:
                         deathstring = "%s's ammo detonates him as %s's EMP fries it\n";
                         break;
-                    case 41:
+                    case DMSG_CALTROP:
                         deathstring = "%s stepped on too many of %s's caltrops\n";
                         break;
-                    case 35:
+                    case DMSG_GREN_FLASH:
                         deathstring = "%s is charred by %s's flash grenade\n";
                         break;
-                    case 31:
+                    case DMSG_GREN_EMP_AMMO:
                         deathstring = "%s stands near some ammo as %s's EMP nukes it\n";
                         break;
-                    case 12:
+                    case DMSG_DETPACK:
                         deathstring = "%s reaches orbit via %s's detpack\n";
                         break;
-                    case 16:
+                    case DMSG_DETPACK_DIS:
                         deathstring = "%s cut the red wire of %s's detpack\n";
                         break;
-                    case 13:
+                    case DMSG_BIOWEAPON:
                         deathstring = "%s dies from %s's mysterious tropical disease\n";
                         break;
-                    case 14:
+                    case DMSG_BIOWEAPON_ATT:
                         deathstring = "%s escapes infection from %s by dying first\n";
                         break;
-                    case 5:
+                    case DMSG_GRENADEL:
                         deathstring = "%s eats %s's pineapple\n";
                         if ( targ->s.v.health < -40 )
                             deathstring = "%s was gibbed by %s's grenade\n";
                         break;
-                    case 6:
+                    case DMSG_ROCKETL:
                         deathstring = "%s rides %s's rocket\n";
                         if ( targ->s.v.health < -40 )
                             deathstring = "%s was gibbed by %s's rocket\n";
                         break;
-                    case 15:
+                    case DMSG_FLAME:
                         switch ( ( int ) ( rnum * 5 ) )
                         {
                             case 0:
@@ -3124,28 +3127,28 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
                                 break;
                         }
                         break;
-                    case 17:
+                    case DMSG_AXE:
                         switch ( attacker->playerclass )
                         {
-                            case 8:
+                            case PC_SPY:
                                 deathstring = "%s was knife-murdered by %s\n";
                                 break;
-                            case 1:
+                            case PC_SCOUT:
                                 deathstring = "%s's mellon was split by %s\n";
                                 break;
-                            case 2:
+                            case PC_SNIPER:
                                 deathstring = "%s was put on the chop block by %s\n";
                                 break;
-                            case 3:
+                            case PC_SOLDIER:
                                 deathstring = "%s was sliced and diced by %s's blade\n";
                                 break;
-                            case 4:
+                            case PC_DEMOMAN:
                                 deathstring = "%s is split from crotch to sternum by %s's axe swing\n";
                                 break;
-                            case 6:
+                            case PC_HVYWEAP:
                                 deathstring = "%s is split in two with a powerful axe blow from %s\n";
                                 break;
-                            case 7:
+                            case PC_PYRO:
                                 deathstring = "%s's death put another notch on %s's axe\n";
                                 break;
                             default:
@@ -3154,28 +3157,28 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
                         }
                         break;
 
-                    case 32:
+                    case DMSG_SPANNER:
                         deathstring = "%s was spanner-murdered by %s\n";
                         break;
-                    case 1:
+                    case DMSG_SHOTGUN:
                         switch ( attacker->playerclass )
                         {
-                            case 1:
+                            case PC_SCOUT:
                                 deathstring = "%s got too close to %s's muzzleflash\n";
                                 break;
-                            case 3:
+                            case PC_SOLDIER:
                                 deathstring = "%s practices being %s's clay pigeon\n";
                                 break;
-                            case 4:
+                            case PC_DEMOMAN:
                                 deathstring = "%s was on the receiving end of %s's shotgun barrel\n";
                                 break;
-                            case 5:
+                            case PC_MEDIC:
                                 deathstring = "%s was fed a lead diet by %s\n";
                                 break;
-                            case 6:
+                            case PC_HVYWEAP:
                                 deathstring = "%s got blasted by %s's last resort\n";
                                 break;
-                            case 7:
+                            case PC_PYRO:
                                 deathstring = "%s got more than a powderburn from %s's shotgun blast\n";
                                 break;
                             default:
@@ -3183,23 +3186,23 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
                                 break;
                         }
                         break;
-                    case 2:
+                    case DMSG_SSHOTGUN:
                         switch ( attacker->playerclass )
                         {
 
-                            case 3:
+                            case PC_SOLDIER:
                                 deathstring = "%s was turned into swiss cheese by %s's buckshot\n";
                                 break;
-                            case 5:
+                            case PC_MEDIC:
                                 deathstring = "%s got a double-dose of %s's buckshot\n";
                                 break;
-                            case 6:
+                            case PC_HVYWEAP:
                                 deathstring = "%s unfortunately forgot %s carried a super-shotgun\n";
                                 break;
-                            case 8:
+                            case PC_SPY:
                                 deathstring = "%s gets ventilated by %s's super-shotgun blast\n";
                                 break;
-                            case 9:
+                            case PC_ENGINEER:
                                 deathstring = "%s's body got chuck full of %s's lead pellets\n";
                                 break;
                             default:
@@ -3207,16 +3210,16 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
                                 break;
                         }
                         break;
-                    case 3:
+                    case DMSG_NAILGUN:
                         switch ( attacker->playerclass )
                         {
-                            case 1:
+                            case PC_SCOUT:
                                 deathstring = "%s caught one too many nails from %s\n";
                                 break;
-                            case 2:
+                            case PC_SNIPER:
                                 deathstring = "%s ran into %s's nails\n";
                                 break;
-                            case 8:
+                            case PC_SPY:
                                 deathstring = "%s was turned into %s's pin-cushion\n";
                                 break;
                             default:
@@ -3224,19 +3227,19 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
                                 break;
                         }
                         break;
-                    case 4:
+                    case DMSG_SNAILGUN:
                         deathstring = "%s was punctured by %s\n";
                         break;
-                    case 7:
+                    case DMSG_LIGHTNING:
                         if ( attacker->s.v.waterlevel > 1 )
                             deathstring = "%s accepts %s's discharge\n";
                         else
                             deathstring = "%s accepts %s's shaft\n";
                         break;
-                    case 21:
+                    case DMSG_HOOK:
                         deathstring = "%s grappled with %s\n";
                         break;
-                    case 18:
+                    case DMSG_SNIPERRIFLE:
                         if ( rnum <= 0.3 )
                         {
                             deathstring = "%s takes a bullet in the chest from %s\n";
@@ -3245,7 +3248,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
                             deathstring = "%s succumbs to sniperfire from %s\n";
                         }
                         break;
-                    case 29:
+                    case DMSG_SNIPERHEADSHOT:
                         if ( rnum <= 0.5 )
                         {
                             deathstring = "%s gets a third eye from %s\n";
@@ -3254,7 +3257,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
                             deathstring = "%s gets his head blown off by %s\n";
                         }
                         break;
-                    case 28:
+                    case DMSG_SNIPERLEGSHOT:
                         if ( rnum <= 0.5 )
                         {
                             deathstring = "%s is made legless by %s\n";
@@ -3263,28 +3266,28 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
                             deathstring = "%s gets his legs blown off by %s\n";
                         }
                         break;
-                    case 19:
+                    case DMSG_AUTORIFLE:
                         deathstring = "%s collects %s's bullet spray.\n";
                         break;
-                    case 20:
+                    case DMSG_ASSAULTCANNON:
                         deathstring = "%s gets sawn in half by %s\n";
                         break;
-                    case 22:
+                    case DMSG_BACKSTAB:
                         deathstring = "%s gets knifed from behind by %s\n";
                         break;
-                    case 25:
+                    case DMSG_TRANQ:
                         deathstring = "%s is put to sleep by %s\n";
                         break;
-                    case 26:
+                    case DMSG_LASERBOLT:
                         deathstring = "%s gets a hole in his heart from %s's railgun\n";
                         break;
-                    case 33:
+                    case DMSG_INCENDIARY:
                         deathstring = "%s gets well done by %s's incendiary rocket\n";
                         break;
-                    case 38:
+                    case DMSG_SG_EXPLODION:
                         deathstring = "%s gets destroyed by %s's exploding sentrygun\n";
                         break;
-                    case 39:
+                    case DMSG_DISP_EXPLODION:
                         deathstring = "%s didn't insert the correct change into %s's dispenser.\n";
                         break;
 
