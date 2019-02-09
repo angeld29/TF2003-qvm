@@ -2520,8 +2520,8 @@ void ClientConnect()
     TeamFortress_ExecMapScript( self );
     self->has_disconnected = 0;
 
-    if ( intermission_running )
-        GotoNextMap();
+    //if ( intermission_running )
+        //GotoNextMap();
 
     if (strnull(cvar_string("serverdemo"))) 
         StartDemoRecord();

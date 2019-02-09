@@ -2515,6 +2515,7 @@ static struct w_impulse_s w_impulses[]={
     {0},
 };
 
+
 void W_ChangeWeapon(  )
 {
 	int     it, am, fl, wm = 0, have_weapon, usable;
@@ -2599,13 +2600,68 @@ void W_ChangeWeapon(  )
 	self->StatusRefreshTime = g_globalvars.time + 0.1;
 }
 
-void CycleWeaponCommand(  )
+struct weapon_s{
+    int w;
+    int mode;
+};
+
+const struct weapon_s weapon_cycle[] = { 
+    { WEAP_AXE             , 0},
+    { WEAP_SPANNER         , 0},
+    { WEAP_SHOTGUN         , 0},
+    { WEAP_LASER           , 0},
+    { WEAP_TRANQ           , 0},
+    { WEAP_SNIPER_RIFLE    , 0},
+    { WEAP_AUTO_RIFLE      , 0},
+    { WEAP_SUPER_SHOTGUN   , 0},
+    { WEAP_NAILGUN         , 0},
+    { WEAP_SUPER_NAILGUN   , 0},
+    { WEAP_GRENADE_LAUNCHER, 0},
+    { WEAP_GRENADE_LAUNCHER, 1},
+    { WEAP_ROCKET_LAUNCHER , 0},
+    { WEAP_LIGHTNING       , 0},
+    { WEAP_FLAMETHROWER    , 0},
+    { WEAP_INCENDIARY      , 0},
+    { WEAP_ASSAULT_CANNON  , 0},
+    { WEAP_HOOK            , 0},
+    { WEAP_MEDIKIT         , 0},
+    { WEAP_BIOWEAPON       , 0},
+    { WEAP_MEDIKIT         , 0},
+    { 0,0                    }
+};                          
+const struct weapon_s weapon_cycle_rev[] = { 
+    { WEAP_MEDIKIT         , 0},
+    { WEAP_BIOWEAPON       , 0},
+    { WEAP_MEDIKIT         , 0},
+    { WEAP_HOOK            , 0},
+    { WEAP_ASSAULT_CANNON  , 0},
+    { WEAP_INCENDIARY      , 0},
+    { WEAP_FLAMETHROWER    , 0},
+    { WEAP_LIGHTNING       , 0},
+    { WEAP_ROCKET_LAUNCHER , 0},
+    { WEAP_GRENADE_LAUNCHER, 1},
+    { WEAP_GRENADE_LAUNCHER, 0},
+    { WEAP_SUPER_NAILGUN   , 0},
+    { WEAP_NAILGUN         , 0},
+    { WEAP_SUPER_SHOTGUN   , 0},
+    { WEAP_AUTO_RIFLE      , 0},
+    { WEAP_SNIPER_RIFLE    , 0},
+    { WEAP_TRANQ           , 0},
+    { WEAP_LASER           , 0},
+    { WEAP_SHOTGUN         , 0},
+    { WEAP_SPANNER         , 0},
+    { WEAP_AXE             , 0},
+    { 0,0                    }
+};                          
+void CycleWeaponCommand( int prev )
 {
 	float   it;
-	float   am;
-	float   cont;
-	float   loopcount;
-	float   lw;
+	int   lw;
+    int wm;
+    int am;
+    const struct weapon_s *wp;
+
+    wp = !prev ?&weapon_cycle[0] : &weapon_cycle_rev[0];
 
 	if ( self->s.v.weaponmodel[0] == 0 || !self->current_weapon )
 		return;
@@ -2613,225 +2669,27 @@ void CycleWeaponCommand(  )
 		return;
 	it = self->weapons_carried;
 	self->s.v.impulse = 0;
-	loopcount = 0;
 	lw = self->current_weapon;
-	while ( 1 )
-	{
-		am = 0;
-		cont = 0;
-		if ( self->current_weapon == WEAP_AXE )
-			self->current_weapon = WEAP_SPANNER;
-		else
-		{
-			if ( self->current_weapon == WEAP_SPANNER )
-			{
-				self->current_weapon = WEAP_SHOTGUN;
-				if ( self->s.v.ammo_shells < 1 )
-					am = 1;
-			} else
-			{
-				if ( self->current_weapon == WEAP_SHOTGUN )
-				{
-					self->current_weapon = WEAP_LASER;
-					if ( self->s.v.ammo_nails < 1 )
-						am = 1;
-				} else
-				{
-					if ( self->current_weapon == WEAP_LASER )
-					{
-						self->current_weapon = WEAP_TRANQ;
-						if ( self->s.v.ammo_shells < 1 )
-							am = 1;
-					} else
-					{
-						if ( self->current_weapon == WEAP_TRANQ )
-						{
-							self->current_weapon = WEAP_SNIPER_RIFLE;
-							if ( self->s.v.ammo_shells < 1 )
-								am = 1;
-						} else
-						{
-							if ( self->current_weapon == WEAP_SNIPER_RIFLE )
-							{
-								self->current_weapon = WEAP_AUTO_RIFLE;
-								if ( self->s.v.ammo_shells < tf_data.snip_ammo )
-									am = 1;
-							} else
-							{
-								if ( self->current_weapon == WEAP_AUTO_RIFLE )
-								{
-									self->current_weapon = WEAP_SUPER_SHOTGUN;
-									if ( self->s.v.ammo_shells < 2 )
-										am = 1;
-								} else
-								{
-									if ( self->current_weapon ==
-									     WEAP_SUPER_SHOTGUN )
-									{
-										self->current_weapon = WEAP_NAILGUN;
-										if ( self->s.v.ammo_nails < 1 )
-											am = 1;
-									} else
-									{
-										if ( self->current_weapon ==
-										     WEAP_NAILGUN )
-										{
-											self->current_weapon =
-											    WEAP_SUPER_NAILGUN;
-											if ( self->s.v.ammo_nails < 2 )
-												am = 1;
-										} else
-										{
-											if ( self->current_weapon ==
-											     WEAP_SUPER_NAILGUN )
-											{
-												self->current_weapon =
-												    WEAP_GRENADE_LAUNCHER;
-												self->weaponmode = 0;
-												if ( self->s.v.
-												     ammo_rockets < 1 )
-													am = 1;
-											} else
-											{
-												if ( self->
-												     current_weapon ==
-												     WEAP_GRENADE_LAUNCHER
-												     && !self->
-												     weaponmode )
-												{
-													self->
-													    current_weapon
-													    =
-													    WEAP_GRENADE_LAUNCHER;
-													self->
-													    weaponmode =
-													    1;
-													if ( self->s.v.
-													     ammo_rockets
-													     < 1 )
-														am = 1;
-												} else
-												{
-													if ( self->
-													     current_weapon
-													     ==
-													     WEAP_GRENADE_LAUNCHER
-													     && self->
-													     weaponmode
-													     == 1 )
-													{
-														self->
-														    current_weapon
-														    =
-														    WEAP_ROCKET_LAUNCHER;
-														if ( self->s.v.ammo_rockets < 1 )
-															am = 1;
-													} else
-													{
-														if ( self->current_weapon == WEAP_ROCKET_LAUNCHER )
-														{
-															self->
-															    current_weapon
-															    =
-															    WEAP_LIGHTNING;
-															if ( self->s.v.ammo_cells < 1 )
-																am = 1;
-														} else
-														{
-															if ( self->current_weapon == WEAP_LIGHTNING )
-															{
-																self->
-																    current_weapon
-																    =
-																    WEAP_FLAMETHROWER;
-																if ( self->s.v.ammo_cells < 1 )
-																	am = 1;
-															} else
-															{
-																if ( self->current_weapon == WEAP_FLAMETHROWER )
-																{
-																	self->
-																	    current_weapon
-																	    =
-																	    WEAP_INCENDIARY;
-																	if ( self->s.v.ammo_rockets < 3 )
-																		am = 1;
-																} else
-																{
-																	if ( self->current_weapon == WEAP_INCENDIARY )
-																	{
-																		self->
-																		    current_weapon
-																		    =
-																		    WEAP_ASSAULT_CANNON;
-																		if ( self->s.v.ammo_cells < 4 )
-																			am = 1;
-																		if ( self->s.v.ammo_shells <= self->assault_min_shells )
-																			am = 1;
-																	} else
-																	{
-																		if ( self->current_weapon == WEAP_ASSAULT_CANNON )
-																		{
-																			self->
-																			    current_weapon
-																			    =
-																			    WEAP_HOOK;
-																			if ( !tf_data.allow_hook )
-																				am = 1;
-																		} else
-																		{
-																			if ( self->current_weapon == WEAP_HOOK )
-																				self->
-																				    current_weapon
-																				    =
-																				    WEAP_MEDIKIT;
-																			else
-																			{
-																				if ( self->current_weapon == WEAP_BIOWEAPON )
-																					self->
-																					    current_weapon
-																					    =
-																					    WEAP_MEDIKIT;
-																				else
-																				{
-																					if ( self->current_weapon == WEAP_MEDIKIT )
-																						self->
-																						    current_weapon
-																						    =
-																						    WEAP_AXE;
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		if ( loopcount > 30 )
-			return;
-		loopcount = loopcount + 1;
-		if ( ( self->weapons_carried & self->current_weapon ) && !am )
-		{
-			if ( self->current_weapon != 2048 )
-				self->weaponmode = 0;
+    wm = ( lw == WEAP_GRENADE_LAUNCHER) ? self->weaponmode : 0;
+
+    while( wp->w && (wp->w != lw || wp->mode != wm) ) wp++;
+    if( !wp->w ) return;
+
+    do{
+        wp++;
+        if( !wp->w ) wp = !prev ?&weapon_cycle[0] : &weapon_cycle_rev[0];
+        am = W_CanUseWeapon( wp->w );
+        if(!am){
+            self->weaponmode = wp->mode;
+            self->current_weapon = wp->w;
 			self->last_weapon = lw;
+            self->last_weaponmode = wm;
 			W_SetCurrentAmmo(  );
 			W_PrintWeaponMessage(  );
 			self->StatusRefreshTime = g_globalvars.time + 0.1;
-			return;
-		}
-	}
+            return;
+        }
+    }while( wp->w != lw || wp->mode != wm );
 }
 
 
@@ -2948,8 +2806,10 @@ void ImpulseCommands(  )
 				W_ChangeWeapon(  );
 			break;
 		case TF_WEAPNEXT:
+			CycleWeaponCommand( 0 );
+            break;
 		case TF_WEAPPREV:
-			CycleWeaponCommand(  );
+			CycleWeaponCommand( 1 );
 			break;
 		case TF_GRENADE_1:
 		case TF_GRENADE_2:
@@ -3096,10 +2956,12 @@ void PreMatchImpulses(  )
         if ( self->last_weapon )
             W_ChangeWeapon(  );
         break;
-	case TF_WEAPPREV:
-	case TF_WEAPNEXT:
-		CycleWeaponCommand(  );
-		break;
+    case TF_WEAPNEXT:
+        CycleWeaponCommand( 0 );
+        break;
+    case TF_WEAPPREV:
+        CycleWeaponCommand( 1 );
+        break;
 	}
 	switch ( ( int ) self->s.v.impulse )
 	{
