@@ -22,6 +22,43 @@
  */
 
 #include "g_local.h"
+
+typedef struct {
+    int w, bit_item, bit_ammo; 
+	int			ammo_ofs;
+	fieldtype_t	ammo_type;
+    int ammo_shells, ammo_nails, ammo_rockets, ammo_cells;
+    int clip, reload_time;
+    void (* fire_func)();
+    void (* can_use_f)();
+    float attack_finished;
+    const char* model,*model_mode,*sound;
+    int   have_mode;
+}weapon_info_t;
+
+const weapon_info_t weapons_info[]= {
+{  WEAP_HOOK             , IT_AXE,              0,          0,                     0,0,0,0,0, 0,0,         0,0, 0.1, "progs/v_grap.mdl", "", "", 0},
+{  WEAP_BIOWEAPON        , IT_AXE,              0,          0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_bio.mdl", "", "weapons/ax1.wav", 0},
+{  WEAP_MEDIKIT          , IT_AXE,              0,          FOFS(ammo_medikit),    F_INT,0,0,0,0, 0,0,     0,0, 0.5, "progs/v_medi.mdl", "", "weapons/ax1.wav", 0},
+{  WEAP_SPANNER          , IT_AXE,              0,          0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_span.mdl", "", "weapons/ax1.wav", 0},
+{  WEAP_AXE              , IT_AXE,              0,          0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "", "", "weapons/ax1.wav", 0},
+{  WEAP_SNIPER_RIFLE     , IT_SHOTGUN,          IT_SHELLS,  FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 0,0,   0,0, 1.5, "progs/v_srifle.mdl", "", "weapons/sniper.wav", 0},
+{  WEAP_AUTO_RIFLE       , IT_SUPER_SHOTGUN,    IT_SHELLS,  FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 0,0,   0,0, 0.1, "progs/v_srifle.mdl", "", "weapons/sniper.wav", 0},
+{  WEAP_SHOTGUN          , IT_SHOTGUN,          IT_SHELLS,  FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 8,2,   0,0, 0.5, "progs/v_shot.mdl", "", "weapons/guncock.wav", 0},
+{  WEAP_SUPER_SHOTGUN    , IT_SUPER_SHOTGUN,    IT_SHELLS,  FOFS(s.v.ammo_shells), F_FLOAT,2,0,0,0, 16,2,  0,0, 0.7, "progs/v_shot2.mdl", "", "weapons/shotgn2.wav", 0},
+{  WEAP_NAILGUN          , IT_NAILGUN,          IT_NAILS,   FOFS(s.v.ammo_nails),  F_FLOAT,0,1,0,0, 0,0,   0,0, 0.0, "progs/v_nail.mdl", "", "", 0},
+{  WEAP_SUPER_NAILGUN    , IT_SUPER_NAILGUN,    IT_NAILS,   FOFS(s.v.ammo_nails),  F_FLOAT,0,4,0,0, 0,0,   0,0, 0.0, "progs/v_nail2.mdl", "", "", 0},
+{  WEAP_GRENADE_LAUNCHER , IT_GRENADE_LAUNCHER, IT_ROCKETS, FOFS(s.v.ammo_rockets),F_FLOAT,0,0,1,0, 6,4,   0,0, 0.6, "progs/v_rock.mdl", "progs/v_pipe.mdl", "weapons/grenade.wav", 1},
+{  WEAP_FLAMETHROWER     , IT_GRENADE_LAUNCHER, IT_CELLS,   FOFS(s.v.ammo_cells),  F_FLOAT,0,0,0,1, 0,0,   0,0, 0.0, "progs/v_flame.mdl", "", "", 0},
+{  WEAP_ROCKET_LAUNCHER  , IT_ROCKET_LAUNCHER,  IT_ROCKETS, FOFS(s.v.ammo_rockets),F_FLOAT,0,0,1,0, 4,5,   0,0, 0.8, "progs/v_rock2.mdl", "", "weapons/sgun1.wav", 0},
+{  WEAP_INCENDIARY       , IT_ROCKET_LAUNCHER,  IT_ROCKETS, FOFS(s.v.ammo_rockets),F_FLOAT,0,0,3,0, 0,0,   0,0, 1.2, "progs/v_rock2.mdl", "", "weapons/sgun1.wav", 0},
+{  WEAP_ASSAULT_CANNON   , IT_ROCKET_LAUNCHER,  IT_SHELLS,  FOFS(s.v.ammo_shells), F_FLOAT,0,0,0,0, 0,0,   0,0, 0.0, "progs/v_asscan.mdl", "", 0},
+{  WEAP_LIGHTNING        , IT_LIGHTNING,        IT_CELLS,   FOFS(s.v.ammo_cells),  F_FLOAT,0,0,0,1, 0,0,   0,0, 0.1, "", "", "weapons/lstart.wav", 0},
+{  WEAP_DETPACK          , 0,                   },
+{  WEAP_TRANQ            , IT_SHOTGUN,          IT_SHELLS,  FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 0,0,   0,0, 1.5, "progs/v_tgun.mdl", "", "weapons/dartgun.wav", 0},
+{  WEAP_LASER            , IT_SHOTGUN,          IT_NAILS,   FOFS(s.v.ammo_nails),  F_FLOAT,0,1,0,0, 0,0,   0,0, 0.4, "progs/v_rail.mdl", "", "weapons/railgun.wav", 0},
+};
+
 void    item_megahealth_rot(  );
 
 float   button_touch(  );
@@ -2470,14 +2507,18 @@ int W_CanUseWeapon( int weapon )
             if ( self->s.v.ammo_shells < 2 ) return 1;
             break;
         case WEAP_NAILGUN://   512
-        case WEAP_SUPER_NAILGUN://  1024
         case WEAP_LASER://    524288
             if ( self->s.v.ammo_nails < 1 ) return 1;
             break;
+        case WEAP_SUPER_NAILGUN://  1024
+            if ( self->s.v.ammo_nails < 4 ) return 1;
+            break;
         case WEAP_GRENADE_LAUNCHER:// 2048
         case WEAP_ROCKET_LAUNCHER:// 8192
-        case WEAP_INCENDIARY://   16384
             if ( self->s.v.ammo_rockets < 1 ) return 1;
+            break;
+        case WEAP_INCENDIARY://   16384
+            if ( self->s.v.ammo_rockets < 3 ) return 1;
             break;
         case WEAP_FLAMETHROWER://  4096
         case WEAP_LIGHTNING://   65536
@@ -2514,7 +2555,6 @@ static struct w_impulse_s w_impulses[]={
     {TF_HOOK_IMP2, 0, { WEAP_HOOK, 0 }},
     {0},
 };
-
 
 void W_ChangeWeapon(  )
 {

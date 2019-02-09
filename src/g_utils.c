@@ -576,3 +576,16 @@ void StartDemoRecord()
         localcmd("sv_demoeasyrecord \"%s-%s\"\n", date, mapname);
     }
 }
+
+int log2powerof2( unsigned int v )
+{
+    //static const unsigned int b[] = {0xAAAAAAAA, 0xCCCCCCCC, 0xF0F0F0F0, 0xFF00FF00, 0xFFFF0000};
+    register unsigned int r = (v & 0xAAAAAAAA) != 0;
+    r |= ((v & 0xFFFF0000) != 0) << 4;
+    r |= ((v & 0xFF00FF00) != 0) << 3;
+    r |= ((v & 0xF0F0F0F0) != 0) << 2;
+    r |= ((v & 0xCCCCCCCC) != 0) << 1;
+
+    return r;
+}
+

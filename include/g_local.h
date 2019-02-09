@@ -304,4 +304,5 @@ void CheckAutoKick( gedict_t * p );
 void ModCommand();
 void StopDemoRecord();
 void StartDemoRecord();
+int log2powerof2( unsigned int v );
 #endif

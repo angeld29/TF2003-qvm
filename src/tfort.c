@@ -48,7 +48,7 @@ typedef struct class_settings_s{
 }class_settings_t;
 
 
-const class_settings_t class_set[] = {
+static const class_settings_t class_set[] = {
 	{
 	 0,
 	 1, 0, 0,
