@@ -59,6 +59,7 @@ const weapon_info_t weapons_info[]= {
 {  WEAP_LASER            , IT_SHOTGUN,          IT_NAILS,   FOFS(s.v.ammo_nails),  F_FLOAT,0,1,0,0, 0,0,   0,0, 0.4, "progs/v_rail.mdl", "", "weapons/railgun.wav", 0},
 };
 
+#define WEAPON_BY_BIT(bit) &weapons_info[log2powerof2(bit)-1]
 void    item_megahealth_rot(  );
 
 float   button_touch(  );
@@ -2556,6 +2557,33 @@ static struct w_impulse_s w_impulses[]={
     {0},
 };
 
+void W_SetWeapon( int fl, int wm, int am )
+{
+	int it = self->weapons_carried;
+	if ( !fl ||  !( it & fl ) )
+	{
+		G_sprint( self, 2, "no weapon.\n" );
+		return;
+	}
+	if ( am == 1 )
+	{
+		G_sprint( self, 2, "not enough ammo.\n" );
+		return;
+	}
+	if ( am == 2 )
+	{
+		G_sprint( self, 2, "not enough cells to power assault cannon.\n" );
+		return;
+	}
+	self->last_weaponmode = self->weaponmode;
+	self->last_weapon = self->current_weapon;
+	self->current_weapon = fl;
+	self->weaponmode = wm;
+	W_SetCurrentAmmo(  );
+	W_PrintWeaponMessage(  );
+	self->StatusRefreshTime = g_globalvars.time + 0.1;
+}
+
 void W_ChangeWeapon(  )
 {
 	int     it, am, fl, wm = 0, have_weapon, usable;
@@ -2570,19 +2598,18 @@ void W_ChangeWeapon(  )
 	am = 0;
 	usable = 0;
 	have_weapon = 1;
-    if ( self->s.v.impulse == TF_WEAPLAST && self->last_weapon)
+    if ( self->s.v.impulse == TF_WEAPLAST )
     {
-        wi = &wlast;
-        wi->mask = self->last_weapon;
-        wi->weapons[0] = self->last_weapon;
-        wm = self->last_weaponmode;
+        self->s.v.impulse = 0;
+        if( !self->last_weapon ) return;
+        am = W_CanUseWeapon( self->last_weapon );
+        W_SetWeapon( self->last_weapon, self->last_weaponmode, am );
+        return; 
     }else{
         while( wi->impulse && wi->impulse != self->s.v.impulse ) wi++;
     }
-    if( !wi->impulse){
-        self->s.v.impulse = 0;
-        return;
-    }
+    self->s.v.impulse = 0;
+    if( !wi->impulse){ return; }
 
     if( wi->mask == 0 ){
         int* w = wi->weapons;
@@ -2613,31 +2640,10 @@ void W_ChangeWeapon(  )
     }else{
         have_weapon = 0;
     }
-    if( self->s.v.impulse == 7 && fl == WEAP_GRENADE_LAUNCHER ) wm = 1;
+    if( wi->impulse == 7 && fl == WEAP_GRENADE_LAUNCHER ) wm = 1;
     
 	self->s.v.impulse = 0;
-	if ( !fl || !have_weapon || !( it & fl ) )
-	{
-		G_sprint( self, 2, "no weapon.\n" );
-		return;
-	}
-	if ( am == 1 )
-	{
-		G_sprint( self, 2, "not enough ammo.\n" );
-		return;
-	}
-	if ( am == 2 )
-	{
-		G_sprint( self, 2, "not enough cells to power assault cannon.\n" );
-		return;
-	}
-	self->last_weaponmode = self->weaponmode;
-	self->last_weapon = self->current_weapon;
-	self->current_weapon = fl;
-	self->weaponmode = wm;
-	W_SetCurrentAmmo(  );
-	W_PrintWeaponMessage(  );
-	self->StatusRefreshTime = g_globalvars.time + 0.1;
+    W_SetWeapon( fl, wm, am );
 }
 
 struct weapon_s{
