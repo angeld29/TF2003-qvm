@@ -803,11 +803,50 @@ void Dispenser_Die(  )
     self->s.v.nextthink = g_globalvars.time + 0.1;
 }
 
+int Engineer_Dispenser_Repair( gedict_t* disp)
+{
+    int metalcost;
+    if (disp->s.v.health < disp->s.v.max_health ) return 0;
+
+    metalcost = ( disp->s.v.max_health - disp->s.v.health ) / 5;
+    if ( metalcost > self->s.v.ammo_cells )
+        metalcost = self->s.v.ammo_cells;
+    if( metalcost <= 0 ) return 0;
+    self->s.v.ammo_cells = self->s.v.ammo_cells - metalcost;
+    disp->s.v.health = disp->s.v.health + metalcost * 5;
+    return 1;
+}
+
+int Engineer_Dispenser_Dismantle( gedict_t* disp )
+{
+    G_sprint( self, 2, "You dismantle the Dispenser.\n" );
+    self->s.v.ammo_cells = self->s.v.ammo_cells + BUILD_COST_DISPENSER / 2;
+    if ( disp->real_owner != self )
+    {
+        G_sprint( disp->real_owner, 2, "%s dismantled your Dispenser.\n", self->s.v.netname );
+        teamsprint( disp->real_owner->team_no, disp->real_owner, ( char * ) self->s.v.netname );
+        teamsprint( disp->real_owner->team_no, disp->real_owner, " dismantled " );
+        teamsprint( disp->real_owner->team_no, disp->real_owner, ( char * ) disp->real_owner->s.v.netname );
+        teamsprint( disp->real_owner->team_no, disp->real_owner, "'s Dispenser.\n" );
+    }
+    dremove( disp );
+    disp->real_owner->has_dispenser -= 1;
+    return 1;
+}
 //=========================================================================
 // Engineer has used a Spanner on the Dispenser
 void Engineer_UseDispenser( gedict_t * disp )
 {
     gedict_t *dist_checker;
+
+    if (!tf_data.old_spanner) {
+        if( self->team_no && TeamFortress_isTeamsAllied( self->team_no , disp->real_owner->team_no) ){
+            if(Engineer_Dispenser_Repair(disp)) return;
+        }else{
+            Engineer_Dispenser_Dismantle(disp);
+            return;
+        }
+    }
 
     G_sprint( self, 2,
 	      "Dispenser has %.0f health\n%.0f shells, %.0f nails,%.0f rockets\n%.0f cells, and %.0f armor\n",
@@ -829,20 +868,140 @@ void Engineer_UseDispenser( gedict_t * disp )
 }
 
 //=========================================================================
+// Sentry stuff
+int Engineer_SentryGun_Upgrade( gedict_t* gun )
+{
+    if ( gun->s.v.weapon < 3 && ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.tg_enabled ) )
+    {
+        if ( !tg_data.tg_enabled )
+            self->s.v.ammo_cells = self->s.v.ammo_cells - 130;
+
+        if( tg_data.tg_enabled ){
+            gun->s.v.weapon = 3;
+            gun->s.v.max_health = 216;
+            gun->maxammo_shells = 144;
+            gun->s.v.health = gun->s.v.max_health;
+            gun->s.v.ammo_shells = 144;
+            gun->s.v.ammo_rockets = 20;
+            G_sprint( self, 2, "You have upgraded/fixed/reloaded sentrygun\n" );
+        } else {
+            gun->s.v.weapon = gun->s.v.weapon + 1;
+            gun->s.v.max_health = gun->s.v.max_health * 1.2;
+            gun->s.v.health = gun->s.v.max_health;
+            gun->maxammo_shells = gun->maxammo_shells * 1.2;
+            G_sprint( self, 2, "You upgrade the Sentry Gun to level %.0f\n",
+                            gun->s.v.weapon );
+        }
+
+        sound( gun, 3, "weapons/turrset.wav", 1, 1 );
+        if ( gun->s.v.weapon == 2 ){
+            gun->s.v.think = ( func_t ) lvl2_sentry_stand;
+            gun->s.v.skin = 1;
+        } else {
+            gun->s.v.think = ( func_t ) lvl3_sentry_stand;
+            gun->s.v.skin = 2;
+        }
+        return 1;
+    }
+    return 0;
+}
+
+int Engineer_SentryGun_Repair( gedict_t* gun )
+{
+    int metalcost;
+    if( !(gun->s.v.health < gun->s.v.max_health && self->s.v.ammo_cells > 0)) return 0;
+    metalcost = ( gun->s.v.max_health - gun->s.v.health ) / 5;
+
+    if ( !tg_data.unlimit_ammo )
+    {
+        if ( metalcost > self->s.v.ammo_cells )
+            metalcost = self->s.v.ammo_cells;
+
+        self->s.v.ammo_cells = self->s.v.ammo_cells - metalcost;
+    }
+    if( metalcost <= 0 ) return 0;
+    gun->s.v.health = gun->s.v.health + metalcost * 5;
+    return 1;
+}
+
+int Engineer_SentryGun_InsertAmmo( gedict_t* gun )
+{
+    int am = 20 * 2;
+    if (!( (gun->s.v.ammo_shells < gun->maxammo_shells 
+                    && self->s.v.ammo_shells > 0)
+                || ( gun->s.v.weapon == 3 
+                    && gun->s.v.ammo_rockets < gun->maxammo_rockets
+                    && self->s.v.ammo_rockets > 0))) 
+        return 0;
+    if ( am > self->s.v.ammo_shells )
+        am = self->s.v.ammo_shells;
+    if ( am > gun->maxammo_shells - gun->s.v.ammo_shells )
+        am = gun->maxammo_shells - gun->s.v.ammo_shells;
+
+    if ( !tg_data.unlimit_ammo )
+        self->s.v.ammo_shells = self->s.v.ammo_shells - am;
+
+    gun->s.v.ammo_shells = gun->s.v.ammo_shells + am;
+    if ( gun->s.v.weapon == 3 )
+    {
+        am = 10 * 2;
+        if ( am > self->s.v.ammo_rockets )
+            am = self->s.v.ammo_rockets;
+        if ( am > gun->maxammo_rockets - gun->s.v.ammo_rockets )
+            am = gun->maxammo_rockets - gun->s.v.ammo_rockets;
+        
+        if ( !tg_data.unlimit_ammo )
+            self->s.v.ammo_rockets = self->s.v.ammo_rockets - am;
+        gun->s.v.ammo_rockets = gun->s.v.ammo_rockets + am;
+    }
+    return 1;
+}
+
+int Engineer_SentryGun_Dismantle( gedict_t* gun )
+{
+    G_sprint( self, 2, "You dismantle the Sentry Gun.\n" );
+    self->s.v.ammo_cells = self->s.v.ammo_cells + 130 / 2;
+    if ( gun->real_owner != self )
+    {
+        G_sprint( gun->real_owner, 2, "%s dismantled your Sentry Gun.\n", self->s.v.netname );
+        teamsprint( gun->real_owner->team_no, gun->real_owner, ( char * ) self->s.v.netname );
+        teamsprint( gun->real_owner->team_no, gun->real_owner, " dismantled " );
+        teamsprint( gun->real_owner->team_no, gun->real_owner, gun->real_owner->s.v.netname );
+        teamsprint( gun->real_owner->team_no, gun->real_owner, "'s Sentry Gun.\n" );
+    }
+    dremove( gun->trigger_field );
+    dremove( gun );
+    gun->real_owner->has_sentry -= 1;
+    return 1;
+}
+//=========================================================================
 // Engineer has used a Spanner on the SentryGun
 void Engineer_UseSentryGun( gedict_t * gun )
 {
     gedict_t *dist_checker;
+    int status = 0;
+    // automate tasks if old_spanner setting is disabled
+    if (!tf_data.old_spanner) {
+        if( self->team_no && TeamFortress_isTeamsAllied( self->team_no , gun->real_owner->team_no) ){
+            status += Engineer_SentryGun_Upgrade(gun);
+            status += Engineer_SentryGun_Repair(gun);
+            status += Engineer_SentryGun_InsertAmmo(gun);
+            if( status ) return;
+        }else{
+            Engineer_SentryGun_Dismantle(gun);
+            return;
+        }
+    }
 
     G_sprint( self, 2, "Level %.0f Sentry Gun has %.0f health, %.0f shells",
-	      gun->s.v.weapon, gun->s.v.health, gun->s.v.ammo_shells );
+            gun->s.v.weapon, gun->s.v.health, gun->s.v.ammo_shells );
     if ( gun->s.v.weapon == 3 )
     {
-	G_sprint( self, 2, ", %.0f rockets", gun->s.v.ammo_rockets );
+        G_sprint( self, 2, ", %.0f rockets", gun->s.v.ammo_rockets );
     }
 
     if ( gun->has_sentry &&  tg_data.tg_enabled )
-	G_sprint( self, 2, ", static" );
+        G_sprint( self, 2, ", static" );
 
     G_sprint( self, 2, "\n" );
     self->current_menu = MENU_ENGINEER_FIX_SENTRYGUN;
@@ -981,27 +1140,14 @@ void Engineer_RemoveBuildings( gedict_t * eng )
 void Eng_SGUp(  )
 {
     gedict_t *sg;
-//    int numupg = 0;
+    //    int numupg = 0;
 
     for ( sg = world; (sg = trap_find( sg, FOFS( s.v.classname ), "building_sentrygun" )); )
     {
-	if ( sg->s.v.weapon == 3 && sg->s.v.ammo_shells == 144 && sg->s.v.ammo_rockets == 20
-	     && sg->s.v.health == sg->s.v.max_health )
-	    continue;
-
-	sg->s.v.weapon = 3;
-	sg->s.v.max_health = 216;
-	sg->maxammo_shells = 144;
-	sg->s.v.health = sg->s.v.max_health;
-	sound( sg, 3, "weapons/turrset.wav", 1, 1 );
-	sg->s.v.think = ( func_t ) lvl3_sentry_stand;
-	sg->s.v.skin = 2;
-	G_sprint( self, 2, "You have upgraded/fixed/reloaded sentrygun\n" );
-	sg->s.v.ammo_shells = 144;
-	sg->s.v.ammo_rockets = 20;
-	return;
+        if ( sg->real_owner == self )
+            Engineer_SentryGun_Upgrade( sg );
     }
-    G_sprint( self, 2, "no sg to upgrade\n" );
+    //G_sprint( self, 2, "no sg to upgrade\n" );
 }
 
 void Eng_DispLoad(  )
@@ -1056,18 +1202,18 @@ void Eng_SGReload(  )
 
     for ( sg = world; (sg = trap_find( sg, FOFS( s.v.classname ), "building_sentrygun" )); )
     {
-	if ( sg->s.v.ammo_shells == sg->maxammo_shells && sg->s.v.ammo_rockets == sg->maxammo_rockets
-	     && sg->s.v.health == sg->s.v.max_health )
-	    continue;
-	sg->s.v.health = sg->s.v.max_health;
-	sg->s.v.ammo_shells = sg->maxammo_shells;
-	sg->s.v.ammo_rockets = sg->maxammo_rockets;
-	sound( sg, 3, "weapons/turrset.wav", 1, 1 );
-	G_sprint( self, 2, "You have fixed/reloaded ONE sentrygun\n" );
-	return;
+        if ( sg->s.v.ammo_shells == sg->maxammo_shells 
+                && sg->s.v.ammo_rockets == sg->maxammo_rockets
+                && sg->s.v.health == sg->s.v.max_health )
+            continue;
+        sg->s.v.health = sg->s.v.max_health;
+        sg->s.v.ammo_shells = sg->maxammo_shells;
+        sg->s.v.ammo_rockets = sg->maxammo_rockets;
+        sound( sg, 3, "weapons/turrset.wav", 1, 1 );
+        G_sprint( self, 2, "You have fixed/reloaded ONE sentrygun\n" );
+        return;
     }
     G_sprint( self, 2, "no sg to reload\n" );
-
 }
 
 

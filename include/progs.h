@@ -379,53 +379,49 @@ typedef enum arena_modes_e
 }arena_modes_t;
 
 
-typedef struct tf_server_data_s{
-	int             toggleflags;
-	float           respawn_delay_time;
-	int             live_camera;
-	int             already_chosen_map;
-
-	int             clanbattle;
-	float           clan_scores_dumped;
-	float           cb_prematch_time;
-	float           cb_ceasefire_time;
-
-	int             game_locked;
-	int             last_id;
-
-	int             spy_off;
-	int             old_grens;
-	int             new_flash;
-	int             invis_only;
-	int             allow_hook;
-	int             flagem_checked;
-	int             cease_fire;
-	int             allow_drop_goal;
-
-	float           autokick_time;
-	int             autokick_kills;
-	int             deathmsg;
-	int             birthday;
-
-	int		cheat_pause;
-	int		disable_grens;
-	int		topcolor_check;
-//	sentry_types_t	sentry_type;
-	qboolean	sg_newfind;
-	sg_sfire_t	sg_sfire;
-	qboolean	sg_rfire;
-	int		sgppl;
-	int		snip_range_fix,snip_fps,snip_ammo;
-	float		snip_time;
-	int		add_pipe;
-	int		new_gas;
-	int		pyrotype;
-	int		gren2box,random_tf_spawn,disable_powerups,flag_timer,detpack_block;
-	int		mtfl;
-	int 		lan_mode;
-//bot
-	int             enable_bot;
-	int             botResupplyBetweenKills;
-	arena_modes_t   arena_mode;
+typedef struct tf_server_data_s {
+    int            toggleflags;
+    float          respawn_delay_time;
+    int            live_camera;
+    int            already_chosen_map;
+    int            clanbattle;
+    float          clan_scores_dumped;
+    float          cb_prematch_time;
+    float          cb_ceasefire_time;
+    int            game_locked;
+    int            last_id;
+    int            spy_off;
+    int            old_grens;
+    int            new_flash;
+    int            invis_only;
+    int            allow_hook;
+    int            flagem_checked;
+    int            cease_fire;
+    int            allow_drop_goal;
+    float          autokick_time;
+    int            autokick_kills;
+    int            deathmsg;
+    int            birthday;
+    int            cheat_pause;
+    int            disable_grens;
+    int            topcolor_check;
+    //             sentry_types_t                                                       sentry_type;
+    qboolean       sg_newfind;
+    sg_sfire_t     sg_sfire;
+    qboolean       sg_rfire;
+    qboolean       old_spanner;
+    int            sgppl;
+    int            snip_range_fix,snip_fps,snip_ammo;
+    float          snip_time;
+    int            add_pipe;
+    int            new_gas;
+    int            pyrotype;
+    int            gren2box,random_tf_spawn,disable_powerups,flag_timer,detpack_block;
+    int            mtfl;
+    int            lan_mode;
+    //bot
+    int            enable_bot;
+    int            botResupplyBetweenKills;
+    arena_modes_t  arena_mode;
 
 } tf_server_data_t;

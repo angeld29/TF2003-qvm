@@ -262,11 +262,12 @@ int build_number (void);
 //g_tf_utils.c
 
 qboolean 	GetSVInfokeyString( const char*key, const char* key2, char*value, int size, const char*defaultval);
-int		GetSVInfokeyInt   ( const char*key, const char* key2, int defalutval);
+int		    GetSVInfokeyInt   ( const char*key, const char* key2, int defalutval);
 float 		GetSVInfokeyFloat ( const char*key, const char* key2, float defalutval);
+qboolean    GetSVInfokeyBool  ( const char*key, const char *key2, qboolean defaultval);
 
 qboolean 	GetInfokeyString( gedict_t*pl, const char*key, const char* key2, char*value, int size, const char*defaultval);
-int		GetInfokeyInt   ( gedict_t*pl, const char*key, const char* key2, int defalutval);
+int		    GetInfokeyInt   ( gedict_t*pl, const char*key, const char* key2, int defalutval);
 
 void  		KickPlayer( int psize, gedict_t* p);
 void  		muzzleflash();

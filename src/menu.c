@@ -673,6 +673,8 @@ void Menu_EngineerFix_Dispenser( menunum_t menu )
 		     "—‘ Nothing                     \n\n" );
 }
 
+int Engineer_Dispenser_Repair( gedict_t* disp);
+int Engineer_Dispenser_Dismantle( gedict_t* disp );
 void Menu_EngineerFix_Dispenser_Input( int inp )
 {
 	float   metalcost;
@@ -724,33 +726,10 @@ void Menu_EngineerFix_Dispenser_Input( int inp )
 		self->building->s.v.armorvalue = self->building->s.v.armorvalue + am;
 		break;
 	case 3:
-		metalcost =
-		    ( self->building->s.v.max_health - self->building->s.v.health ) / 5;
-		if ( metalcost > self->s.v.ammo_cells )
-			metalcost = self->s.v.ammo_cells;
-		self->s.v.ammo_cells = self->s.v.ammo_cells - metalcost;
-		self->building->s.v.health = self->building->s.v.health + metalcost * 5;
+        Engineer_Dispenser_Repair(self->building);
 		break;
 	case 4:
-		G_sprint( self, 2, "You dismantle the Dispenser.\n" );
-		self->s.v.ammo_cells = self->s.v.ammo_cells + BUILD_COST_DISPENSER / 2;
-		if ( self->building->real_owner != self )
-		{
-			G_sprint( self->building->real_owner, 2,
-				  "%s dismantled your Dispenser.\n", self->s.v.netname );
-			teamsprint( self->building->real_owner->team_no,
-				    self->building->real_owner,
-				    ( char * ) self->s.v.netname );
-			teamsprint( self->building->real_owner->team_no,
-				    self->building->real_owner, " dismantled " );
-			teamsprint( self->building->real_owner->team_no,
-				    self->building->real_owner,
-				    ( char * ) self->building->real_owner->s.v.netname );
-			teamsprint( self->building->real_owner->team_no,
-				    self->building->real_owner, "'s Dispenser.\n" );
-		}
-		dremove( self->building );
-		self->building->real_owner->has_dispenser -= 1;
+        Engineer_Dispenser_Dismantle(self->building);
 		break;
 	case 5:
 		break;
@@ -780,29 +759,40 @@ const char *menu_eng_fixsg_static = "™‘ Make static                 \n";
 const char *menu_eng_fixsg_nostatic = "™‘ Make no static              \n";
 void Menu_EngineerFix_SentryGun( menunum_t menu )
 {
-	const char *s_upgrade = "\n", *s_static = "";
+    const char *s_upgrade = "\n", *s_static = "";
 
-	if ( self->building->s.v.weapon < 3
-	     && ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.tg_enabled ) )
-		s_upgrade = menu_eng_fixsg_upgrade;
+    if ( tg_data.tg_enabled )
+    {
+        if ( self->building->has_sentry )
+            s_static = menu_eng_fixsg_nostatic;
+        else
+            s_static = menu_eng_fixsg_static;
+    }
+    if( tf_data.old_spanner ){
+        if ( self->building->s.v.weapon < 3
+                && ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.tg_enabled ) )
+            s_upgrade = menu_eng_fixsg_upgrade;
 
-	if ( tg_data.tg_enabled )
-	{
-		if ( self->building->has_sentry )
-			s_static = menu_eng_fixsg_nostatic;
-		else
-			s_static = menu_eng_fixsg_static;
-	}
-	CenterPrint( self, "Action:                            \n"
-		     "“‘ Put Ammo into Sentry Gun    \n"
-		     "%s"
-		     "•‘ Repair Sentry Gun           \n"
-		     "–‘ Dismantle Sentry Gun        \n"
-		     "—‘ Nothing                     \n\n"
-		     "˜‘ Rotate SentryGun            \n" "%s", s_upgrade, s_static );
+        CenterPrint( self, "Action:                            \n"
+                "“‘ Put Ammo into Sentry Gun    \n"
+                "%s"
+                "•‘ Repair Sentry Gun           \n"
+                "–‘ Dismantle Sentry Gun        \n"
+                "—‘ Nothing                     \n\n"
+                "˜‘ Rotate SentryGun            \n" "%s", s_upgrade, s_static );
+    }else{
+        CenterPrint( self, "Action:                            \n"
+                "–‘ Dismantle Sentry Gun        \n"
+                "—‘ Nothing                     \n\n"
+                "˜‘ Rotate SentryGun            \n" "%s", s_static );
+    }
 
 }
 
+int Engineer_SentryGun_Upgrade( gedict_t* gun );
+int Engineer_SentryGun_Repair( gedict_t* gun );
+int Engineer_SentryGun_InsertAmmo( gedict_t* gun );
+int Engineer_SentryGun_Dismantle( gedict_t* gun );
 void Menu_EngineerFix_SentryGun_Input( int inp )
 {
 	float   am;
@@ -818,108 +808,16 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 	switch ( inp )
 	{
 	case 1:
-		am = 20 * 2;
-		if ( am > self->s.v.ammo_shells )
-			am = self->s.v.ammo_shells;
-		if ( am >
-		     self->building->maxammo_shells - self->building->s.v.ammo_shells )
-			am = self->building->maxammo_shells -
-			    self->building->s.v.ammo_shells;
-		if ( !tg_data.unlimit_ammo )
-			self->s.v.ammo_shells = self->s.v.ammo_shells - am;
-		self->building->s.v.ammo_shells = self->building->s.v.ammo_shells + am;
-		if ( self->building->s.v.weapon == 3 )
-		{
-			am = 10 * 2;
-			if ( am > self->s.v.ammo_rockets )
-				am = self->s.v.ammo_rockets;
-			if ( am >
-			     self->building->maxammo_rockets -
-			     self->building->s.v.ammo_rockets )
-				am = self->building->maxammo_rockets -
-				    self->building->s.v.ammo_rockets;
-			if ( !tg_data.unlimit_ammo )
-				self->s.v.ammo_rockets = self->s.v.ammo_rockets - am;
-			self->building->s.v.ammo_rockets =
-			    self->building->s.v.ammo_rockets + am;
-			break;
+        Engineer_SentryGun_InsertAmmo(self->building);
+        break;
 	case 2:
-			if ( self->building->s.v.weapon < 3
-			     && ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN
-				  || tg_data.tg_enabled ) )
-			{
-				if ( !tg_data.tg_enabled )
-					self->s.v.ammo_cells = self->s.v.ammo_cells - 130;
-
-				self->building->s.v.weapon =
-				    self->building->s.v.weapon + 1;
-				self->building->s.v.max_health =
-				    self->building->s.v.max_health * 1.2;
-				self->building->s.v.health =
-				    self->building->s.v.max_health;
-				self->building->maxammo_shells =
-				    self->building->maxammo_shells * 1.2;
-				if ( self->building->s.v.weapon == 2 )
-				{
-					sound( self->building, 3, "weapons/turrset.wav",
-					       1, 1 );
-					self->building->s.v.think =
-					    ( func_t ) lvl2_sentry_stand;
-					self->building->s.v.skin = 1;
-				} else
-				{
-					sound( self->building, 3, "weapons/turrset.wav",
-					       1, 1 );
-					self->building->s.v.think =
-					    ( func_t ) lvl3_sentry_stand;
-					self->building->s.v.skin = 2;
-				}
-				G_sprint( self, 2,
-					  "You upgrade the Sentry Gun to level %.0f\n",
-					  self->building->s.v.weapon );
-			}
+        Engineer_SentryGun_Upgrade(self->building);
 			break;
 	case 3:
-			metalcost =
-			    ( self->building->s.v.max_health -
-			      self->building->s.v.health ) / 5;
-
-			if ( !tg_data.unlimit_ammo )
-			{
-				if ( metalcost > self->s.v.ammo_cells )
-					metalcost = self->s.v.ammo_cells;
-
-				self->s.v.ammo_cells = self->s.v.ammo_cells - metalcost;
-			}
-			self->building->s.v.health =
-			    self->building->s.v.health + metalcost * 5;
-
-			break;
+        Engineer_SentryGun_Repair(self->building);
+        break;
 	case 4:
-			G_sprint( self, 2, "You dismantle the Sentry Gun.\n" );
-			self->s.v.ammo_cells = self->s.v.ammo_cells + 130 / 2;
-			if ( self->building->real_owner != self )
-			{
-				G_sprint( self->building->real_owner, 2,
-					  "%s dismantled your Sentry Gun.\n",
-					  self->s.v.netname );
-				teamsprint( self->building->real_owner->team_no,
-					    self->building->real_owner,
-					    ( char * ) self->s.v.netname );
-				teamsprint( self->building->real_owner->team_no,
-					    self->building->real_owner, " dismantled " );
-				teamsprint( self->building->real_owner->team_no,
-					    self->building->real_owner,
-					    self->building->real_owner->s.v.netname );
-				teamsprint( self->building->real_owner->team_no,
-					    self->building->real_owner,
-					    "'s Sentry Gun.\n" );
-			}
-			dremove( self->building->trigger_field );
-			dremove( self->building );
-			self->building->real_owner->has_sentry -= 1;
-		}
-
+        Engineer_SentryGun_Dismantle(self->building);
 		break;
 	case 6:
 		G_sprint( self, 2, "Rotating 45 degrees to the left...\n" );
