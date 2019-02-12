@@ -763,18 +763,16 @@ void LaunchSGRocketNEW(gedict_t*targ, int new)
     setsize( newmis, 0, 0, 0, 0, 0, 0 );
 
     //try fire to targ origin
+    trap_makevectors( self->s.v.angles);
+    VectorScale( g_globalvars.v_forward, 8, vtemp );
+    VectorAdd( vtemp, self->s.v.origin, src  );
+    src[2] += 16;
+    
     VectorCopy( targ->s.v.origin, dst );
     VectorSubtract( dst, src, dir );
     normalize(dir,norm_dir);
 
-    VectorScale( norm_dir, 8, vtemp );
-    VectorAdd( vtemp, self->s.v.origin, src );
-    src[2] += 16;
-
-
     if ( new ) {
-
-
         //чтобы не попадать в подставку
         traceline( PASSVEC3( src ), PASSVEC3( dst ), 0, self );
 
@@ -792,8 +790,6 @@ void LaunchSGRocketNEW(gedict_t*targ, int new)
             VectorAdd(src,vtemp,src);
         }
 
-
-        setorigin( newmis, PASSVEC3( src ) );
         //prediction
         for ( time = 0 ; time < 3 ; time+=0.05 )
         {
@@ -838,6 +834,7 @@ void LaunchSGRocketNEW(gedict_t*targ, int new)
     trap_multicast(PASSVEC3(dst), 1);
 #endif
 
+    setorigin( newmis, PASSVEC3( src ) );
     VectorSubtract( dst, src, dir );
     normalize(dir,norm_dir);
     VectorScale( norm_dir, 800, newmis->s.v.velocity );
@@ -846,6 +843,8 @@ void LaunchSGRocketNEW(gedict_t*targ, int new)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+#define SENTRY_ROCKET_TIME 1.5
+#define SENTRY_ROCKET_TIME_OLD 3
 int Sentry_Fire(  )
 {
     vec3_t  dir;
@@ -874,7 +873,7 @@ int Sentry_Fire(  )
 
         LaunchSGRocketNEW(enemy, tf_data.sg_rfire ? 1 : 0);
 
-        self->super_damage_finished = g_globalvars.time + 3;
+        self->super_damage_finished = g_globalvars.time + (tf_data.sg_rfire ? SENTRY_ROCKET_TIME: SENTRY_ROCKET_TIME_OLD);
         if( !tg_data.sg_unlimit_ammo ) 
             self->s.v.ammo_rockets = self->s.v.ammo_rockets - 1;
 

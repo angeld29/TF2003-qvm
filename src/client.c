@@ -325,8 +325,8 @@ void DecodeLevelParms()
         if ( timelimit && ( ( timelimit ) < tf_data.cb_prematch_time ) )
         {
             timelimit += tf_data.cb_prematch_time;
-            _snprintf( st, sizeof(st), "%d", (int)( timelimit / 60 ) );
-            trap_cvar_set( "timelimit", st );
+
+            trap_cvar_set_float( "timelimit", timelimit );
         }
 
         GetSVInfokeyString( "a", "autoteam", st, sizeof( st ), "" );
@@ -2528,13 +2528,12 @@ void ClientConnect()
     if ( intermission_running )
     {
     //    GotoNextMap();
-        /*gedict_t *o = spawn();
+        gedict_t *o = spawn();
         o->map = nextmap;
 
         o->s.v.think = ( func_t ) execute_changelevel;
-        o->s.v.nextthink = g_globalvars.time + 0.1;*/
+        o->s.v.nextthink = g_globalvars.time + 0.1;
         G_conprintf( "ClientConnect intermission... %d %f %f\n", intermission_running, intermission_exittime, g_globalvars.time );
-        intermission_exittime = g_globalvars.time + 0.1;
 
         return;
     }

@@ -876,22 +876,11 @@ int Engineer_SentryGun_Upgrade( gedict_t* gun )
         if ( !tg_data.tg_enabled )
             self->s.v.ammo_cells = self->s.v.ammo_cells - 130;
 
-        if( tg_data.tg_enabled ){
-            gun->s.v.weapon = 3;
-            gun->s.v.max_health = 216;
-            gun->maxammo_shells = 144;
-            gun->s.v.health = gun->s.v.max_health;
-            gun->s.v.ammo_shells = 144;
-            gun->s.v.ammo_rockets = 20;
-            G_sprint( self, 2, "You have upgraded/fixed/reloaded sentrygun\n" );
-        } else {
-            gun->s.v.weapon = gun->s.v.weapon + 1;
-            gun->s.v.max_health = gun->s.v.max_health * 1.2;
-            gun->s.v.health = gun->s.v.max_health;
-            gun->maxammo_shells = gun->maxammo_shells * 1.2;
-            G_sprint( self, 2, "You upgrade the Sentry Gun to level %.0f\n",
-                            gun->s.v.weapon );
-        }
+        gun->s.v.weapon = gun->s.v.weapon + 1;
+        gun->s.v.max_health = gun->s.v.max_health * 1.2;
+        gun->s.v.health = gun->s.v.max_health;
+        gun->maxammo_shells = gun->maxammo_shells * 1.2;
+        G_sprint( self, 2, "You upgrade the Sentry Gun to level %.0f\n", gun->s.v.weapon );
 
         sound( gun, 3, "weapons/turrset.wav", 1, 1 );
         if ( gun->s.v.weapon == 2 ){
