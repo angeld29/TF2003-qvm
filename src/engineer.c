@@ -879,10 +879,10 @@ int Engineer_SentryGun_Upgrade( gedict_t* gun )
 {
     if( !tg_data.tg_enabled  && (self->playerclass != PC_ENGINEER ))
         return 0;
-    if ( gun->s.v.weapon < 3 && ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.tg_enabled ) )
+    if ( gun->s.v.weapon < 3 && ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.unlimit_ammo ) )
     {
         if ( !tg_data.unlimit_ammo )
-            self->s.v.ammo_cells = self->s.v.ammo_cells - 130;
+            self->s.v.ammo_cells = self->s.v.ammo_cells - BUILD_COST_SENTRYGUN;
 
         gun->s.v.weapon = gun->s.v.weapon + 1;
         gun->s.v.max_health = gun->s.v.max_health * 1.2;
