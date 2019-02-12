@@ -831,7 +831,6 @@ void IntermissionThink()
     int     currp;
     char    sl[64], str[64];
 
-    G_conprintf( "IntermissionThink intermission... %d %f %f\n", intermission_running, intermission_exittime, g_globalvars.time );
     if ( g_globalvars.time < intermission_exittime )
         return;
 
@@ -839,7 +838,7 @@ void IntermissionThink()
         return;
 
 
-    G_conprintf( "Intermission think.\n" );
+    //G_conprintf( "Intermission think.\n" );
     GotoNextMap();
 
     if ( GetSVInfokeyString( "nmap", NULL, sl, sizeof( sl ), "" ) )
@@ -2528,12 +2527,13 @@ void ClientConnect()
     if ( intermission_running )
     {
     //    GotoNextMap();
-        gedict_t *o = spawn();
-        o->map = nextmap;
+        //gedict_t *o = spawn();
+        //o->map = nextmap;
 
-        o->s.v.think = ( func_t ) execute_changelevel;
-        o->s.v.nextthink = g_globalvars.time + 0.1;
+        //o->s.v.think = ( func_t ) execute_changelevel;
+        //o->s.v.nextthink = g_globalvars.time + 0.1;
         G_conprintf( "ClientConnect intermission... %d %f %f\n", intermission_running, intermission_exittime, g_globalvars.time );
+        intermission_exittime = g_globalvars.time + 0.3;
 
         return;
     }

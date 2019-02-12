@@ -218,11 +218,17 @@ qboolean ClientUserInfoChanged(  )
 
 }
 
+extern char    nextmap[64];
+extern char    mapname[64];
+extern int   intermission_running ;
+extern float intermission_exittime;
 void Test(  )
 {
         G_sprint( self, 2, "fire_held_down %d button0 %.0f\n", self->fire_held_down,self->s.v.button0 );
         G_sprint( self, 2, "movetype  %.0f solid %.0f\n", self->s.v.movetype,self->s.v.solid );
         G_sprint( self, 2, "toggleflags %d\n", tf_data.toggleflags );
         G_sprint( self, 2, "timelimit %d %f %f\n", timelimit, tf_data.cb_prematch_time, g_globalvars.time );
+        G_sprint( self, 2, "mapname %s %s\n", mapname, nextmap);
+        G_sprint( self, 2, " intermission... %d %f %f\n", intermission_running, intermission_exittime, g_globalvars.time );
 }
 
