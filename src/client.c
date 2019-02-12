@@ -2528,12 +2528,13 @@ void ClientConnect()
     if ( intermission_running )
     {
     //    GotoNextMap();
-        gedict_t *o = spawn();
+        /*gedict_t *o = spawn();
         o->map = nextmap;
 
         o->s.v.think = ( func_t ) execute_changelevel;
-        o->s.v.nextthink = g_globalvars.time + 0.1;
+        o->s.v.nextthink = g_globalvars.time + 0.1;*/
         G_conprintf( "ClientConnect intermission... %d %f %f\n", intermission_running, intermission_exittime, g_globalvars.time );
+        intermission_exittime = g_globalvars.time + 0.1;
 
         return;
     }
