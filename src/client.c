@@ -44,8 +44,8 @@ float   rj;
 
    =============================================================================
    */
-float   intermission_running = 0;
-float   intermission_exittime = 0;
+int   intermission_running = 0;
+float intermission_exittime = 0;
 char    nextmap[64] = "";
 
 /*QUAKED info_intermission (1 0.5 0.5) (-16 -16 -16) (16 16 16)
@@ -647,28 +647,28 @@ void DecodeLevelParms()
             GR_TYPE_MIRV_NO		=12;	 	// Number of Mirvs a Mirv Grenade breaks into
             GR_TYPE_NAPALM_NO	=12; 	 	// Number of flames napalm grenade breaks into (unused if net server)
         }
+
+        tg_data.godmode = 0;
+        tg_data.unlimit_ammo = 0;
+        tg_data.unlimit_grens = 0;
+        tg_data.disable_reload = 0;
+        tg_data.detpack_clip = TG_DETPACK_CLIP_OWNER;
+        tg_data.detpack_drop = 0;   // 1 can drop, 0 - cannot
+        tg_data.disable_disarm = 0; // 0 normal, 1 - disable
+        tg_data.gren_effect = 0;    //0 -default, 1 - off for all, 2 off for self
+        tg_data.gren_time = 0;      //0 -full time , 10 ,5 in sek
+
+        tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
+        tg_data.sg_disable_fire = 0;
+        tg_data.sg_fire_bullets = true;
+        tg_data.sg_fire_rockets = true;
+        tg_data.sg_fire_lighting = false;
+        tg_data.sg_unlimit_ammo = false;
+        tg_data.tg_sbar = 0;
+
         if( tg_data.tg_enabled )
             TG_LoadSettings();
-        else
-        {
-            tg_data.godmode = 0;
-            tg_data.unlimit_ammo = 0;
-            tg_data.unlimit_grens = 0;
-            tg_data.disable_reload = 0;
-            tg_data.detpack_clip = TG_DETPACK_CLIP_OWNER;
-            tg_data.detpack_drop = 0;   // 1 can drop, 0 - cannot
-            tg_data.disable_disarm = 0; // 0 normal, 1 - disable
-            tg_data.gren_effect = 0;    //0 -default, 1 - off for all, 2 off for self
-            tg_data.gren_time = 0;      //0 -full time , 10 ,5 in sek
 
-            tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
-            tg_data.sg_disable_fire = 0;
-            tg_data.sg_fire_bullets = true;
-            tg_data.sg_fire_rockets = true;
-            tg_data.sg_fire_lighting = false;
-            tg_data.sg_unlimit_ammo = false;
-            tg_data.tg_sbar = 0;
-        }
         if( tf_data.enable_bot )
             localcmd( "exec maps/%s.wps\n", mapname );
     }
@@ -831,6 +831,7 @@ void IntermissionThink()
     int     currp;
     char    sl[64], str[64];
 
+    G_conprintf( "IntermissionThink intermission... %d %f %f\n", intermission_running, intermission_exittime, g_globalvars.time );
     if ( g_globalvars.time < intermission_exittime )
         return;
 
@@ -1289,6 +1290,9 @@ void PutClientInServer()
     gedict_t *te;
     vec3_t  v;
     char    s[10];
+
+    if ( intermission_running )
+        GotoNextMap();
 
     if( self->isBot )
     {
@@ -2521,8 +2525,18 @@ void ClientConnect()
     TeamFortress_ExecMapScript( self );
     self->has_disconnected = 0;
 
-    //if ( intermission_running )
-        //GotoNextMap();
+    if ( intermission_running )
+    {
+    //    GotoNextMap();
+        gedict_t *o = spawn();
+        o->map = nextmap;
+
+        o->s.v.think = ( func_t ) execute_changelevel;
+        o->s.v.nextthink = g_globalvars.time + 0.1;
+        G_conprintf( "ClientConnect intermission... %d %f %f\n", intermission_running, intermission_exittime, g_globalvars.time );
+
+        return;
+    }
 
     if (strnull(cvar_string("serverdemo"))) 
         StartDemoRecord();

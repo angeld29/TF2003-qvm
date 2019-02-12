@@ -171,7 +171,7 @@ void            SUB_Null();
 void            CopyToBodyQue( gedict_t * ent );
 
 // client.c
-extern float    intermission_running;
+extern int    intermission_running;
 extern float    intermission_exittime;
 extern int     modelindex_eyes, modelindex_player, modelindex_null;
 

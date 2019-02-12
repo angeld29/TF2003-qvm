@@ -652,7 +652,7 @@ void TeamFortress_ID(  )
 			if ( self == trace_ent->real_owner )
 			{
 				G_centerprint( self,
-					       "\n\n\n\nYour Dispenser\nHealth: %.0f Armor %.0f\nShells %.0f Nails %.0f\nRockets %.0f Cells %.0f\n",
+					       "\n\n\n\nYour Dispenser\nHealth: %.0f Armor: %.0f\nShells: %.0f Nails: %.0f\nRockets: %.0f Cells: %.0f\n",
 					       trace_ent->s.v.health, trace_ent->s.v.armorvalue,
 					       trace_ent->s.v.ammo_shells, trace_ent->s.v.ammo_nails,
 					       trace_ent->s.v.ammo_rockets, trace_ent->s.v.ammo_cells );
@@ -663,7 +663,7 @@ void TeamFortress_ID(  )
 				     && self->playerclass == PC_ENGINEER )
 				{
 					G_centerprint( self,
-						       "\n\n\n\nDispenser made by %s\nHealth: %.0f Armor %.0f\nShells %.0f Nails %.0f\nRockets %.0f Cells %.0f\n",
+						       "\n\n\n\nDispenser made by %s\nHealth: %.0f Armor: %.0f\nShells: %.0f Nails: %.0f\nRockets: %.0f Cells: %.0f\n",
 						       trace_ent->real_owner->s.v.netname, trace_ent->s.v.health,
 						       trace_ent->s.v.armorvalue, trace_ent->s.v.ammo_shells,
 						       trace_ent->s.v.ammo_nails, trace_ent->s.v.ammo_rockets,

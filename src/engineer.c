@@ -805,15 +805,15 @@ void Dispenser_Die(  )
 
 int Engineer_Dispenser_Repair( gedict_t* disp)
 {
-    int metalcost;
-    if (disp->s.v.health < disp->s.v.max_health ) return 0;
+    float metalcost;
+    if (disp->s.v.health >= disp->s.v.max_health ) return 0;
 
-    metalcost = ( disp->s.v.max_health - disp->s.v.health ) / 5;
+    metalcost = ( disp->s.v.max_health - disp->s.v.health ) / 5.0;
     if ( metalcost > self->s.v.ammo_cells )
         metalcost = self->s.v.ammo_cells;
     if( metalcost <= 0 ) return 0;
-    self->s.v.ammo_cells = self->s.v.ammo_cells - metalcost;
-    disp->s.v.health = disp->s.v.health + metalcost * 5;
+    self->s.v.ammo_cells = self->s.v.ammo_cells - floor(metalcost);
+    disp->s.v.health = disp->s.v.health + metalcost * 5.0;
     return 1;
 }
 
@@ -849,7 +849,7 @@ void Engineer_UseDispenser( gedict_t * disp )
     }
 
     G_sprint( self, 2,
-	      "Dispenser has %.0f health\n%.0f shells, %.0f nails,%.0f rockets\n%.0f cells, and %.0f armor\n",
+	      "Dispenser has %.0f health\n%.0f shells, %.0f nails, %.0f rockets\n%.0f cells, and %.0f armor\n",
 	      disp->s.v.health, disp->s.v.ammo_shells, disp->s.v.ammo_nails, disp->s.v.ammo_rockets,
 	      disp->s.v.ammo_cells, disp->s.v.armorvalue );
     // Pop up the menu
@@ -908,16 +908,16 @@ int Engineer_SentryGun_Upgrade( gedict_t* gun )
 
 int Engineer_SentryGun_Repair( gedict_t* gun )
 {
-    int metalcost;
+    float metalcost;
     if( !(gun->s.v.health < gun->s.v.max_health && self->s.v.ammo_cells > 0)) return 0;
-    metalcost = ( gun->s.v.max_health - gun->s.v.health ) / 5;
+    metalcost = ( gun->s.v.max_health - gun->s.v.health ) / 5.0;
 
     if ( !tg_data.unlimit_ammo )
     {
         if ( metalcost > self->s.v.ammo_cells )
             metalcost = self->s.v.ammo_cells;
 
-        self->s.v.ammo_cells = self->s.v.ammo_cells - metalcost;
+        self->s.v.ammo_cells = self->s.v.ammo_cells - floor(metalcost);
     }
     if( metalcost <= 0 ) return 0;
     gun->s.v.health = gun->s.v.health + metalcost * 5;
