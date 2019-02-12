@@ -24,7 +24,7 @@
 #include "g_local.h"
 
 typedef struct {
-    int w, bit_item, bit_ammo; 
+    int w, bit_item, bit_ammo, wnum; 
 	int			ammo_ofs;
 	fieldtype_t	ammo_type;
     int ammo_shells, ammo_nails, ammo_rockets, ammo_cells;
@@ -37,29 +37,30 @@ typedef struct {
 }weapon_info_t;
 
 const weapon_info_t weapons_info[]= {
-{  WEAP_HOOK             , IT_AXE,              0,          0,                     0,0,0,0,0, 0,0,         0,0, 0.1, "progs/v_grap.mdl", "", "", 0},
-{  WEAP_BIOWEAPON        , IT_AXE,              0,          0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_bio.mdl", "", "weapons/ax1.wav", 0},
-{  WEAP_MEDIKIT          , IT_AXE,              0,          FOFS(ammo_medikit),    F_INT,0,0,0,0, 0,0,     0,0, 0.5, "progs/v_medi.mdl", "", "weapons/ax1.wav", 0},
-{  WEAP_SPANNER          , IT_AXE,              0,          0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_span.mdl", "", "weapons/ax1.wav", 0},
-{  WEAP_AXE              , IT_AXE,              0,          0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "", "", "weapons/ax1.wav", 0},
-{  WEAP_SNIPER_RIFLE     , IT_SHOTGUN,          IT_SHELLS,  FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 0,0,   0,0, 1.5, "progs/v_srifle.mdl", "", "weapons/sniper.wav", 0},
-{  WEAP_AUTO_RIFLE       , IT_SUPER_SHOTGUN,    IT_SHELLS,  FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 0,0,   0,0, 0.1, "progs/v_srifle.mdl", "", "weapons/sniper.wav", 0},
-{  WEAP_SHOTGUN          , IT_SHOTGUN,          IT_SHELLS,  FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 8,2,   0,0, 0.5, "progs/v_shot.mdl", "", "weapons/guncock.wav", 0},
-{  WEAP_SUPER_SHOTGUN    , IT_SUPER_SHOTGUN,    IT_SHELLS,  FOFS(s.v.ammo_shells), F_FLOAT,2,0,0,0, 16,2,  0,0, 0.7, "progs/v_shot2.mdl", "", "weapons/shotgn2.wav", 0},
-{  WEAP_NAILGUN          , IT_NAILGUN,          IT_NAILS,   FOFS(s.v.ammo_nails),  F_FLOAT,0,1,0,0, 0,0,   0,0, 0.0, "progs/v_nail.mdl", "", "", 0},
-{  WEAP_SUPER_NAILGUN    , IT_SUPER_NAILGUN,    IT_NAILS,   FOFS(s.v.ammo_nails),  F_FLOAT,0,4,0,0, 0,0,   0,0, 0.0, "progs/v_nail2.mdl", "", "", 0},
-{  WEAP_GRENADE_LAUNCHER , IT_GRENADE_LAUNCHER, IT_ROCKETS, FOFS(s.v.ammo_rockets),F_FLOAT,0,0,1,0, 6,4,   0,0, 0.6, "progs/v_rock.mdl", "progs/v_pipe.mdl", "weapons/grenade.wav", 1},
-{  WEAP_FLAMETHROWER     , IT_GRENADE_LAUNCHER, IT_CELLS,   FOFS(s.v.ammo_cells),  F_FLOAT,0,0,0,1, 0,0,   0,0, 0.0, "progs/v_flame.mdl", "", "", 0},
-{  WEAP_ROCKET_LAUNCHER  , IT_ROCKET_LAUNCHER,  IT_ROCKETS, FOFS(s.v.ammo_rockets),F_FLOAT,0,0,1,0, 4,5,   0,0, 0.8, "progs/v_rock2.mdl", "", "weapons/sgun1.wav", 0},
-{  WEAP_INCENDIARY       , IT_ROCKET_LAUNCHER,  IT_ROCKETS, FOFS(s.v.ammo_rockets),F_FLOAT,0,0,3,0, 0,0,   0,0, 1.2, "progs/v_rock2.mdl", "", "weapons/sgun1.wav", 0},
-{  WEAP_ASSAULT_CANNON   , IT_ROCKET_LAUNCHER,  IT_SHELLS,  FOFS(s.v.ammo_shells), F_FLOAT,0,0,0,0, 0,0,   0,0, 0.0, "progs/v_asscan.mdl", "", 0},
-{  WEAP_LIGHTNING        , IT_LIGHTNING,        IT_CELLS,   FOFS(s.v.ammo_cells),  F_FLOAT,0,0,0,1, 0,0,   0,0, 0.1, "", "", "weapons/lstart.wav", 0},
+{  0 },
+{  WEAP_HOOK             , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.1, "progs/v_grap.mdl", "", "", 0},
+{  WEAP_BIOWEAPON        , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_bio.mdl", "", "weapons/ax1.wav", 0},
+{  WEAP_MEDIKIT          , IT_AXE,              0,          0, FOFS(ammo_medikit),    F_INT,0,0,0,0, 0,0,     0,0, 0.5, "progs/v_medi.mdl", "", "weapons/ax1.wav", 0},
+{  WEAP_SPANNER          , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_span.mdl", "", "weapons/ax1.wav", 0},
+{  WEAP_AXE              , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "", "", "weapons/ax1.wav", 0},
+{  WEAP_SNIPER_RIFLE     , IT_SHOTGUN,          IT_SHELLS,  1, FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 0,0,   0,0, 1.5, "progs/v_srifle.mdl", "", "weapons/sniper.wav", 0},
+{  WEAP_AUTO_RIFLE       , IT_SUPER_SHOTGUN,    IT_SHELLS,  2, FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 0,0,   0,0, 0.1, "progs/v_srifle.mdl", "", "weapons/sniper.wav", 0},
+{  WEAP_SHOTGUN          , IT_SHOTGUN,          IT_SHELLS,  1, FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 8,2,   0,0, 0.5, "progs/v_shot.mdl", "", "weapons/guncock.wav", 0},
+{  WEAP_SUPER_SHOTGUN    , IT_SUPER_SHOTGUN,    IT_SHELLS,  2, FOFS(s.v.ammo_shells), F_FLOAT,2,0,0,0, 16,2,  0,0, 0.7, "progs/v_shot2.mdl", "", "weapons/shotgn2.wav", 0},
+{  WEAP_NAILGUN          , IT_NAILGUN,          IT_NAILS,   4, FOFS(s.v.ammo_nails),  F_FLOAT,0,1,0,0, 0,0,   0,0, 0.0, "progs/v_nail.mdl", "", "", 0},
+{  WEAP_SUPER_NAILGUN    , IT_SUPER_NAILGUN,    IT_NAILS,   8, FOFS(s.v.ammo_nails),  F_FLOAT,0,4,0,0, 0,0,   0,0, 0.0, "progs/v_nail2.mdl", "", "", 0},
+{  WEAP_GRENADE_LAUNCHER , IT_GRENADE_LAUNCHER, IT_ROCKETS, 16, FOFS(s.v.ammo_rockets),F_FLOAT,0,0,1,0, 6,4,   0,0, 0.6, "progs/v_rock.mdl", "progs/v_pipe.mdl", "weapons/grenade.wav", 1},
+{  WEAP_FLAMETHROWER     , IT_GRENADE_LAUNCHER, IT_CELLS,   16, FOFS(s.v.ammo_cells),  F_FLOAT,0,0,0,1, 0,0,   0,0, 0.0, "progs/v_flame.mdl", "", "", 0},
+{  WEAP_ROCKET_LAUNCHER  , IT_ROCKET_LAUNCHER,  IT_ROCKETS, 32, FOFS(s.v.ammo_rockets),F_FLOAT,0,0,1,0, 4,5,   0,0, 0.8, "progs/v_rock2.mdl", "", "weapons/sgun1.wav", 0},
+{  WEAP_INCENDIARY       , IT_ROCKET_LAUNCHER,  IT_ROCKETS, 32, FOFS(s.v.ammo_rockets),F_FLOAT,0,0,3,0, 0,0,   0,0, 1.2, "progs/v_rock2.mdl", "", "weapons/sgun1.wav", 0},
+{  WEAP_ASSAULT_CANNON   , IT_ROCKET_LAUNCHER,  IT_SHELLS,  32, FOFS(s.v.ammo_shells), F_FLOAT,0,0,0,0, 0,0,   0,0, 0.0, "progs/v_asscan.mdl", "", 0},
+{  WEAP_LIGHTNING        , IT_LIGHTNING,        IT_CELLS,   64, FOFS(s.v.ammo_cells),  F_FLOAT,0,0,0,1, 0,0,   0,0, 0.1, "", "", "weapons/lstart.wav", 0},
 {  WEAP_DETPACK          , 0,                   },
-{  WEAP_TRANQ            , IT_SHOTGUN,          IT_SHELLS,  FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 0,0,   0,0, 1.5, "progs/v_tgun.mdl", "", "weapons/dartgun.wav", 0},
-{  WEAP_LASER            , IT_SHOTGUN,          IT_NAILS,   FOFS(s.v.ammo_nails),  F_FLOAT,0,1,0,0, 0,0,   0,0, 0.4, "progs/v_rail.mdl", "", "weapons/railgun.wav", 0},
+{  WEAP_TRANQ            , IT_SHOTGUN,          IT_SHELLS,  1, FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 0,0,   0,0, 1.5, "progs/v_tgun.mdl", "", "weapons/dartgun.wav", 0},
+{  WEAP_LASER            , IT_SHOTGUN,          IT_NAILS,   1, FOFS(s.v.ammo_nails),  F_FLOAT,0,1,0,0, 0,0,   0,0, 0.4, "progs/v_rail.mdl", "", "weapons/railgun.wav", 0},
 };
 
-#define WEAPON_BY_BIT(bit) &weapons_info[log2powerof2(bit)-1]
+#define WEAPON_BY_BIT(bit) &weapons_info[log2powerof2(bit)]
 void    item_megahealth_rot(  );
 
 float   button_touch(  );
@@ -1798,6 +1799,7 @@ PLAYER WEAPON USE
 void W_SetCurrentAmmo(  )
 {
 	int     items;
+    weapon_info_t* wi;
 
 	if ( self->s.v.health <= 0 || !self->current_weapon )
 		return;
@@ -1807,7 +1809,41 @@ void W_SetCurrentAmmo(  )
 	items = self->s.v.items;
 	items -= items & ( IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS );
 	self->s.v.weapon = 0;
-	switch ( self->current_weapon )
+    if( self->current_weapon == WEAP_AXE && self->playerclass == PC_SPY ){
+        self->s.v.currentammo = 0;
+        if ( !self->weaponmode )
+            self->s.v.weaponmodel = "progs/v_knife.mdl";
+        else
+            self->s.v.weaponmodel = "progs/v_knife2.mdl";
+        self->s.v.weaponframe = 0;
+        return;
+    }else{
+        wi = WEAPON_BY_BIT( self->current_weapon );
+        if( wi->w == self->current_weapon ){
+            self->s.v.currentammo = 0;
+            if( wi->have_mode && self->weaponmode == 1 ){
+                self->s.v.weaponmodel = wi->model_mode;
+            }else{
+                self->s.v.weaponmodel = wi->model;
+            }
+            if( wi->ammo_ofs){
+                if(wi->ammo_type == F_INT ){
+                    self->s.v.currentammo = *(int*)((byte*)self + wi->ammo_ofs );
+                }else{
+                    self->s.v.currentammo = *(float*)((byte*)self + wi->ammo_ofs );
+                }
+            }
+            items |= wi->bit_item;
+            items |= wi->bit_ammo;
+            self->s.v.items = items;
+            self->s.v.weaponframe = 0;
+        }else{
+            self->s.v.currentammo = 0;
+            self->s.v.weaponmodel = "";
+            self->s.v.weaponframe = 0;
+        }
+    }
+	/*switch ( self->current_weapon )
 	{
 	case WEAP_AXE:
 		self->s.v.currentammo = 0;
@@ -1993,7 +2029,7 @@ void W_SetCurrentAmmo(  )
 		self->s.v.weaponframe = 0;
 		break;
 	}
-	self->s.v.items = items;
+	self->s.v.items = items;*/
 }
 
 int W_BestWeapon(  )
