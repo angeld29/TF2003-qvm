@@ -1970,7 +1970,7 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 			}
 		}
 		Item->s.v.owner = EDICT_TO_PROG( world );
-		Item->s.v.flags = ( int ) Item->s.v.flags - ( ( int ) Item->s.v.flags & 512 );
+		Item->s.v.flags = ( int ) Item->s.v.flags - ( ( int ) Item->s.v.flags & FL_ONGROUND );
 		setsize( Item, PASSVEC3( Item->goal_min ), PASSVEC3( Item->goal_max ) );
 		TeamFortress_SetSpeed( AP );
 		return;

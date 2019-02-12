@@ -1534,7 +1534,7 @@ void ThrowHead( char *gibname, float dm )
 	setsize( self, -16, -16, 0, 16, 16, 56 );
 	VelocityForDamage( dm, self->s.v.velocity );
 	self->s.v.origin[2] = self->s.v.origin[2] - 24;
-	self->s.v.flags = ( int ) self->s.v.flags - ( ( int ) self->s.v.flags & 512 );
+	self->s.v.flags = ( int ) self->s.v.flags - ( ( int ) self->s.v.flags & FL_ONGROUND );
 	SetVector( self->s.v.avelocity, 0, crandom(  ) * 600, 0 );
 }
 
@@ -1552,7 +1552,7 @@ void HeadShotThrowHead( char *gibname )
 	VectorScale( self->s.v.velocity, 600, self->s.v.velocity );
 	//self->s.v.velocity = normalize(self->head_shot_vector) * 600;
 	self->s.v.origin[2] = self->s.v.origin[2] + 24;
-	self->s.v.flags = ( int ) self->s.v.flags - ( ( int ) self->s.v.flags & 512 );
+	self->s.v.flags = ( int ) self->s.v.flags - ( ( int ) self->s.v.flags & FL_ONGROUND );
 	SetVector( self->s.v.avelocity, 0, 0, 0 );
 }
 
@@ -1695,7 +1695,7 @@ void PlayerDie(  )
 	SetVector( self->s.v.view_ofs, 0, 0, -8 );
 	self->s.v.deadflag = DEAD_DYING;
 	self->s.v.solid = SOLID_NOT;
-	self->s.v.flags = ( int ) self->s.v.flags - ( ( int ) self->s.v.flags & 512 );
+	self->s.v.flags = ( int ) self->s.v.flags - ( ( int ) self->s.v.flags & FL_ONGROUND );
 	self->s.v.movetype = MOVETYPE_TOSS;
 	if ( self->s.v.velocity[2] < 10 )
 		self->s.v.velocity[2] = self->s.v.velocity[2] + g_random(  ) * 300;

@@ -383,7 +383,7 @@ void ConcussionGrenadeTimer(  )
 	src[1] = owner->s.v.origin[1] + owner->s.v.maxs[1] + 2;
 	src[2] = owner->s.v.origin[2];
 	pos = trap_pointcontents( PASSVEC3( src ) );
-	if ( ( ( int ) owner->s.v.flags & FL_ONGROUND ) || ( ( int ) owner->s.v.flags & 16 ) )
+	if ( ( ( int ) owner->s.v.flags & FL_ONGROUND ) || ( ( int ) owner->s.v.flags & FL_INWATER) )
 	{
 		if ( !owner->is_feigning )
 		{

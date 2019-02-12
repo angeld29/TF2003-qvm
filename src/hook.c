@@ -319,7 +319,7 @@ void Anchor_Grapple(  )
 	owner->on_hook = 1;
 	if ( ( int ) owner->s.v.flags & 512 )
 	{
-		owner->s.v.flags = ( int ) owner->s.v.flags - 512;
+		owner->s.v.flags = ( int ) owner->s.v.flags - FL_ONGROUND;
 		setorigin( owner, PASSVEC3( owner->s.v.origin ) + 1 );
 	}
         // CHAIN2 is a looping sample. Use LEFTY as a flag so that client.qc
