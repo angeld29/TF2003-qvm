@@ -2,6 +2,9 @@ Makefile
 src/Makefile.dl
 src/Makefile.vm
 .vs/
+_cmake/
+_build/
+_buildout/
 bin/
 VM/
 Release

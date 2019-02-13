@@ -75,4 +75,5 @@ set ( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON )
 # Создание динамической библиотеки с именем example
 add_library( qwprogs SHARED ${SOURCE_LIB} )	
 target_include_directories ( qwprogs PRIVATE "include" )
+set_target_properties(qwprogs PROPERTIES PREFIX "")
 
