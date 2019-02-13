@@ -226,7 +226,6 @@ void TG_Cmd()
 	{
 		G_sprint(self, 2, "Training Ground mode not active\n");
 		return;
-	
 	}
 	argc = trap_CmdArgc();
 	if(argc<2)
