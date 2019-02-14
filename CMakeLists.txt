@@ -77,7 +77,7 @@ set( SOURCE_LIB
 # Включение экспорта всех символов для создания динамической библиотеки
 set ( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON )
 set ( VM_DIR "vm" )
-set ( QVM_COMPILER "lcc" )
+set ( QVM_COMPILER "q3lcc" )
 set ( QVM_LINKER "q3asm" )
 set ( QVM_LIST_FILE "${CMAKE_CACHEFILE_DIR}/game.q3asm" )
 set ( QVM_C_FLAGS -DQ3_VM -S -Wf-target=bytecode -Wf-g)
