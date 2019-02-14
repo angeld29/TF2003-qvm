@@ -2,6 +2,7 @@
 cmake_minimum_required( VERSION 3.4.0 )
 # Если версия установленой программы ниже, то ошибка выполнения
 
+add_subdirectory(tools/q3asm)
 # Название проекта и проверка доступности компиляторя с++
 project( qwprogs C )			
 #ADD_CUSTOM_TARGET(qvm 

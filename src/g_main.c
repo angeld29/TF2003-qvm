@@ -83,7 +83,7 @@ void initialise_spawned_ent(gedict_t* ent);
     self = self_; \
     other = other_; \
     newmis = newmis_; 
-int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
+intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5,
         int arg6, int arg7, int arg8, int arg9, int arg10, int arg11 )
 {
     gedict_t* damage_attacker_= damage_attacker;
@@ -109,7 +109,7 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
             }
             G_InitGame( arg0, arg1 );
             RestoreGlobals();
-            return ( int ) ( &gamedata );
+            return ( intptr_t ) ( &gamedata );
 
         case GAME_LOADENTS:
             infokey( world, "mapname", mapname, sizeof(mapname) );
@@ -376,38 +376,3 @@ void ClearGlobals()
     damage_attacker = damage_inflictor = activator = self = other = newmis = world;
     sv_gravity = trap_cvar("sv_gravity");
 }
-
-
-#ifdef idx64
-// Should be "" but too many references in code simply checking for 0 to mean null string...
-#define        FOFS_s(x) ((intptr_t)&(((gedict_t *)0)->s.v.x))
-#define PR2SetStringFieldOffset(ent, field) \
-       ent->s.v.field ## _ = NUM_FOR_EDICT(ent) * sizeof(gedict_t) + FOFS_s(field); \
-       ent->s.v.field = 0;
-
-#define PR2SetFuncFieldOffset(ent, field) \
-       ent->s.v.field ## _ = NUM_FOR_EDICT(ent) * sizeof(gedict_t) + FOFS_s(field); \
-       ent->s.v.field = (func_t) SUB_Null;
-#endif
-
-void initialise_spawned_ent(gedict_t* ent)
-{
-#ifdef idx64
-       PR2SetStringFieldOffset(ent, classname);
-       PR2SetStringFieldOffset(ent, model);
-       PR2SetFuncFieldOffset(ent, touch);
-       PR2SetFuncFieldOffset(ent, use);
-       PR2SetFuncFieldOffset(ent, think);
-       PR2SetFuncFieldOffset(ent, blocked);
-       PR2SetStringFieldOffset(ent, weaponmodel);
-       PR2SetStringFieldOffset(ent, netname);
-       PR2SetStringFieldOffset(ent, target);
-       PR2SetStringFieldOffset(ent, targetname);
-       PR2SetStringFieldOffset(ent, message);
-       PR2SetStringFieldOffset(ent, noise);
-       PR2SetStringFieldOffset(ent, noise1);
-       PR2SetStringFieldOffset(ent, noise2);
-       PR2SetStringFieldOffset(ent, noise3);
-#endif
-}
-

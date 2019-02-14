@@ -2596,6 +2596,7 @@ void ClientConnect()
 ///////////////
 
 int TeamFortress_GetNoPlayers();
+void _subVote();
 void ClientDisconnect()
 {
     gedict_t *te,*saveself;

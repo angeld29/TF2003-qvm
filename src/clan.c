@@ -152,7 +152,7 @@ void TeamFortress_ShowIDs(  )
 
 }
 
-int _isDraw ( no_teams, teamfrags_q )
+int _isDraw ( int no_teams, int teamfrags_q )
 {
     int i;
     for( i = 2; i <= no_teams; i++ )

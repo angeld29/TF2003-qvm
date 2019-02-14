@@ -64,6 +64,39 @@ int i_rnd( int from, int to )
 }
 
 
+#ifdef idx64
+// Should be "" but too many references in code simply checking for 0 to mean null string...
+#define        FOFS_s(x) ((intptr_t)&(((gedict_t *)0)->s.v.x))
+#define PR2SetStringFieldOffset(ent, field) \
+       ent->s.v.field ## _ = NUM_FOR_EDICT(ent) * sizeof(gedict_t) + FOFS_s(field); \
+       ent->s.v.field = 0;
+
+#define PR2SetFuncFieldOffset(ent, field) \
+       ent->s.v.field ## _ = NUM_FOR_EDICT(ent) * sizeof(gedict_t) + FOFS_s(field); \
+       ent->s.v.field = (func_t) SUB_Null;
+#endif
+
+void initialise_spawned_ent(gedict_t* ent)
+{
+#ifdef idx64
+       PR2SetStringFieldOffset(ent, classname);
+       PR2SetStringFieldOffset(ent, model);
+       PR2SetFuncFieldOffset(ent, touch);
+       PR2SetFuncFieldOffset(ent, use);
+       PR2SetFuncFieldOffset(ent, think);
+       PR2SetFuncFieldOffset(ent, blocked);
+       PR2SetStringFieldOffset(ent, weaponmodel);
+       PR2SetStringFieldOffset(ent, netname);
+       PR2SetStringFieldOffset(ent, target);
+       PR2SetStringFieldOffset(ent, targetname);
+       PR2SetStringFieldOffset(ent, message);
+       PR2SetStringFieldOffset(ent, noise);
+       PR2SetStringFieldOffset(ent, noise1);
+       PR2SetStringFieldOffset(ent, noise2);
+       PR2SetStringFieldOffset(ent, noise3);
+#endif
+}
+
 gedict_t *spawn(  )
 {
 	gedict_t *t = &g_edicts[trap_spawn(  )];
