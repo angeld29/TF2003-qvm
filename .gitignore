@@ -1,4 +1,3 @@
-Makefile
 src/Makefile.dl
 src/Makefile.vm
 .vs/

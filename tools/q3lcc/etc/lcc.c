@@ -54,7 +54,9 @@ extern int suffix(char *, char *[], int);
 extern char *tempname(char *);
 
 extern int access(const char *, int);
+#ifndef _WIN32
 extern int getpid(void);
+#endif
 
 extern char *cpp[], *include[], *com[], inputs[], *suffixes[];
 extern int option(char *);
@@ -84,7 +86,7 @@ int main(int argc, char *argv[]) {
 	
 	progname = argv[0];
 
-	//updatePaths( progname );
+	updatePaths( progname );
 
 	ac = argc + 50;
 	av = alloc(ac*sizeof(char *));
@@ -519,7 +521,7 @@ static void help(void) {
 /* initinputs - if LCCINPUTS or include is defined, use them to initialize various lists */
 static void initinputs(void) {
 	char *s = getenv("LCCINPUTS");
-	List b;
+	List b,list;
 
 	if (s == 0 && (s = inputs)[0] == 0)
 		s = ".";
