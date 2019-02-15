@@ -12,9 +12,13 @@ void appendDirToIncludeList( char *dir )
 	int i;
 	char *fqdir;
 
-	fqdir = (char *)newstring( (uchar *)includelist[NINCLUDE-1].file, 256, 0 );
-	strcat( fqdir, "/" );
-	strcat( fqdir, dir );
+    if( dir[0] == '.' ){
+        fqdir = (char *)newstring( (uchar *)includelist[NINCLUDE-1].file, 256, 0 );
+        strcat( fqdir, "/" );
+        strcat( fqdir, dir );
+    }else{
+        fqdir = (char *)newstring( dir, strlen(dir), 0 );
+    }
 
 	//avoid adding it more than once
 	for (i=NINCLUDE-2; i>=0; i--) {

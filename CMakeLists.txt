@@ -84,8 +84,7 @@ set ( QVM_COMPILER "q3lcc" )
 set ( QVM_LINKER "q3asm" )
 set ( QVM_LIST_FILE "${CMAKE_CURRENT_BINARY_DIR}/game.q3asm" )
 set ( QVM_C_FLAGS -DQ3_VM -S -Wf-target=bytecode -Wf-g)
-set ( INCFLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/include)
-set ( INCFLAGS -I../include -I../../include)
+set ( INCFLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/include )
 add_custom_target(vmdir 
     COMMAND ${CMAKE_COMMAND} -E make_directory ${VM_DIR}
     )
@@ -108,7 +107,6 @@ endforeach(file)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${DIR_SRC}/${SRC_VM_SYSCALL} ${VM_DIR}/${SRC_VM_SYSCALL} )
 file(APPEND ${QVM_LIST_FILE} "${VM_DIR}/${SRC_VM_SYSCALL}\n")
 message(STATUS ${QVM_LIST_FILE})
-message(STATUS ${INCFLAGS})
 
 add_custom_command(OUTPUT qwprogs.qvm 
         COMMAND ${QVM_LINKER} -m -f ${QVM_LIST_FILE}
