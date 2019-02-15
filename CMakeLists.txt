@@ -96,11 +96,11 @@ foreach(file ${SRC_VM} )
     get_filename_component (file_asm ${file_asm} NAME_WE)
     string( CONCAT  file_asm ${file_asm} ".asm")
     #message(STATUS ${file_asm})
-    list( APPEND SOURCE_ASM ${file_asm})
+    list( APPEND SOURCE_ASM ${VM_DIR}/${file_asm})
     file(APPEND ${QVM_LIST_FILE} "${VM_DIR}/${file_asm}\n")
-    add_custom_command(OUTPUT ${file_asm}
+    add_custom_command(OUTPUT ${VM_DIR}/${file_asm}
         COMMAND ${QVM_COMPILER} ${QVM_C_FLAGS} ${INCFLAGS} "${CMAKE_CURRENT_SOURCE_DIR}/${file}" -o "${VM_DIR}/${file_asm}"
-        DEPENDS vmdir 
+        DEPENDS vmdir ${file}
         )
 endforeach(file)
 

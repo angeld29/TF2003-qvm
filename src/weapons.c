@@ -2630,7 +2630,7 @@ void W_ChangeWeapon(  )
             }
             w++;
             if( !*w) w = wi->weapons;
-            if( *w == fl ){ fl = 0; break;}
+            if( *w == fl ){ return;}
         }while(*w != fl );
         if( am == 3 || fl == 0 ){
             have_weapon = 0;
@@ -2642,7 +2642,6 @@ void W_ChangeWeapon(  )
     }
     if( wi->impulse == 7 && fl == WEAP_GRENADE_LAUNCHER ) wm = 1;
     
-	self->s.v.impulse = 0;
     W_SetWeapon( fl, wm, am );
 }
 
