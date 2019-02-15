@@ -222,11 +222,9 @@ void T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker, float
 		dir[1] = targ->s.v.origin[1] - ( inflictor->s.v.absmin[1] + inflictor->s.v.absmax[1] ) * 0.5;
 		dir[2] = targ->s.v.origin[2] - ( inflictor->s.v.absmin[2] + inflictor->s.v.absmax[2] ) * 0.5;
 		VectorNormalize( dir );
-		if ( ( damage <
-		       60 ) & ( streq( attacker->s.v.classname,
-				       "player" ) ) & ( streq( targ->s.v.classname,
-							       "player" ) ) &
-		     strneq( attacker->s.v.netname, targ->s.v.netname ) )
+		if ( ( damage < 60 ) && ( streq( attacker->s.v.classname, "player" ) ) 
+                && ( streq( targ->s.v.classname, "player" ) ) 
+                && strneq( attacker->s.v.netname, targ->s.v.netname ) )
 		{
 			targ->s.v.velocity[0] += dir[0] * damage * 11;
 			targ->s.v.velocity[1] += dir[1] * damage * 11;
