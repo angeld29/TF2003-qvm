@@ -65,7 +65,3 @@ add_executable(q3lcc etc/bytecode.c etc/lcc.c )
 add_dependencies(q3lcc q3cpp q3rcc)
 target_include_directories (q3lcc  PRIVATE "cpp ")
 
-LIST(APPEND CMAKE_PROGRAM_PATH ${CMAKE_CURRENT_BINARY_DIR}) 
-set( ENV{PATH} ${CMAKE_CURRENT_BINARY_DIR})
-
-message(STATUS ${CMAKE_PROGRAM_PATH})
