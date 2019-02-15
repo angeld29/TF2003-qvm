@@ -104,4 +104,3 @@ equ		trap_precache_vwep_model	-90
 equ		trap_setpause -91
 equ		trap_SetUserInfo -92
 equ		trap_movetogoal -93
-

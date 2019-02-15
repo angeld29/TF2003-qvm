@@ -7,71 +7,73 @@ add_subdirectory(tools/q3asm)
 project( qwprogs C )			
 #ADD_CUSTOM_TARGET(qvm 
 # Установка переменной со списком исходников
-set( SRC_NATIVE "src/g_syscalls.c")
+set ( DIR_SRC "src" )
+set( SRC_NATIVE "${DIR_SRC}/g_syscalls.c")
+set( SRC_VM_SYSCALL "g_syscalls.asm")
 set( VM_LIB   
-    "src/bg_lib.c"
-    "src/qmalloc.c"
+    "${DIR_SRC}/bg_lib.c"
+    "${DIR_SRC}/qmalloc.c"
     )
 set( SOURCE_LIB 
-    "src/g_main.c"
-    "src/bot/ai.c"
-    "src/bot/ai-misc.c"
-    "src/bot/fighting.c"
-    "src/bot/move.c"
-    "src/bot/qw.c"
-    "src/bot/ui.c"
-    "src/bot/waypoint.c"
-    "src/actions.c"
-    "src/admin.c"
-    "src/admin_cmd.c"
-    "src/arena.c"
-    "src/buttons.c"
-    "src/clan.c"
-    "src/client.c"
-    "src/combat.c"
-    "src/coop.c"
-    "src/crc32.c"
-    "src/ctf.c"
-    "src/debug.c"
-    "src/demoman.c"
-    "src/doors.c"
-    "src/engineer.c"
-    "src/flare.c"
-    "src/g_cmd.c"
-    "src/g_mem.c"
-    "src/g_mod_command.c"
-    "src/g_spawn.c"
-    "src/g_tf_utils.c"
-    "src/g_utils.c"
-    "src/hook.c"
-    "src/items.c"
-    "src/mathlib.c"
-    "src/menu.c"
-    "src/misc.c"
-    "src/plats.c"
-    "src/player.c"
-    "src/pyro.c"
-    "src/q_shared.c"
-    "src/qmd5.c"
-    "src/scout.c"
-    "src/sentry.c"
-    "src/server.c"
-    "src/sniper.c"
-    "src/spectate.c"
-    "src/spy.c"
-    "src/status.c"
-    "src/subs.c"
-    "src/tfort.c"
-    "src/tforthlp.c"
-    "src/tfortmap.c"
-    "src/tforttm.c"
-    "src/tg.c"
-    "src/triggers.c"
-    "src/tsoldier.c"
-    "src/version.c"
-    "src/vote.c"
-    "src/weapons.c"
-    "src/world.c"
+    "${DIR_SRC}/g_main.c"
+    "${DIR_SRC}/bot/ai.c"
+    "${DIR_SRC}/bot/ai-misc.c"
+    "${DIR_SRC}/bot/fighting.c"
+    "${DIR_SRC}/bot/move.c"
+    "${DIR_SRC}/bot/qw.c"
+    "${DIR_SRC}/bot/ui.c"
+    "${DIR_SRC}/bot/waypoint.c"
+    "${DIR_SRC}/actions.c"
+    "${DIR_SRC}/admin.c"
+    "${DIR_SRC}/admin_cmd.c"
+    "${DIR_SRC}/arena.c"
+    "${DIR_SRC}/buttons.c"
+    "${DIR_SRC}/clan.c"
+    "${DIR_SRC}/client.c"
+    "${DIR_SRC}/combat.c"
+    "${DIR_SRC}/coop.c"
+    "${DIR_SRC}/crc32.c"
+    "${DIR_SRC}/ctf.c"
+    "${DIR_SRC}/debug.c"
+    "${DIR_SRC}/demoman.c"
+    "${DIR_SRC}/doors.c"
+    "${DIR_SRC}/engineer.c"
+    "${DIR_SRC}/flare.c"
+    "${DIR_SRC}/g_cmd.c"
+    "${DIR_SRC}/g_mem.c"
+    "${DIR_SRC}/g_mod_command.c"
+    "${DIR_SRC}/g_spawn.c"
+    "${DIR_SRC}/g_tf_utils.c"
+    "${DIR_SRC}/g_utils.c"
+    "${DIR_SRC}/hook.c"
+    "${DIR_SRC}/items.c"
+    "${DIR_SRC}/mathlib.c"
+    "${DIR_SRC}/menu.c"
+    "${DIR_SRC}/misc.c"
+    "${DIR_SRC}/plats.c"
+    "${DIR_SRC}/player.c"
+    "${DIR_SRC}/pyro.c"
+    "${DIR_SRC}/q_shared.c"
+    "${DIR_SRC}/qmd5.c"
+    "${DIR_SRC}/scout.c"
+    "${DIR_SRC}/sentry.c"
+    "${DIR_SRC}/server.c"
+    "${DIR_SRC}/sniper.c"
+    "${DIR_SRC}/spectate.c"
+    "${DIR_SRC}/spy.c"
+    "${DIR_SRC}/status.c"
+    "${DIR_SRC}/subs.c"
+    "${DIR_SRC}/tfort.c"
+    "${DIR_SRC}/tforthlp.c"
+    "${DIR_SRC}/tfortmap.c"
+    "${DIR_SRC}/tforttm.c"
+    "${DIR_SRC}/tg.c"
+    "${DIR_SRC}/triggers.c"
+    "${DIR_SRC}/tsoldier.c"
+    "${DIR_SRC}/version.c"
+    "${DIR_SRC}/vote.c"
+    "${DIR_SRC}/weapons.c"
+    "${DIR_SRC}/world.c"
     )		
 
 # Включение экспорта всех символов для создания динамической библиотеки
@@ -79,31 +81,34 @@ set ( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON )
 set ( VM_DIR "vm" )
 set ( QVM_COMPILER "q3lcc" )
 set ( QVM_LINKER "q3asm" )
-set ( QVM_LIST_FILE "${CMAKE_CACHEFILE_DIR}/game.q3asm" )
+set ( QVM_LIST_FILE "${CMAKE_CURRENT_BINARY_DIR}/game.q3asm" )
 set ( QVM_C_FLAGS -DQ3_VM -S -Wf-target=bytecode -Wf-g)
-set ( INCFLAGS -I../include)
+set ( INCFLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_custom_target(vmdir COMMAND 
     ${CMAKE_COMMAND} -E make_directory ${VM_DIR}
     )
 set ( SRC_VM  ${SOURCE_LIB} ${VM_LIB} )
 file(WRITE ${QVM_LIST_FILE} "-o qwprogs\n")
+
 foreach(file ${SRC_VM} )
-    string(REGEX REPLACE "^src/" "" file_asm ${file})
+    string(REGEX REPLACE "^${DIR_SRC}/" "" file_asm ${file})
     get_filename_component (file_asm ${file_asm} NAME_WE)
     string( CONCAT  file_asm ${file_asm} ".asm")
     #message(STATUS ${file_asm})
     list( APPEND SOURCE_ASM ${file_asm})
     file(APPEND ${QVM_LIST_FILE} "${VM_DIR}/${file_asm}\n")
     add_custom_command(OUTPUT ${file_asm}
-        COMMAND ${QVM_COMPILER} ${QVM_C_FLAGS} ${INCFLAGS} "../${file}" -o "${VM_DIR}/${file_asm}"
+        COMMAND ${QVM_COMPILER} ${QVM_C_FLAGS} ${INCFLAGS} "${CMAKE_CURRENT_SOURCE_DIR}/${file}" -o "${VM_DIR}/${file_asm}"
         DEPENDS vmdir 
         )
 endforeach(file)
-file(APPEND ${QVM_LIST_FILE} "../src/g_syscalls.asm\n")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${DIR_SRC}/${SRC_VM_SYSCALL} ${VM_DIR}/ )
+file(APPEND ${QVM_LIST_FILE} "${VM_DIR}/${SRC_VM_SYSCALL}\n")
 message(STATUS ${QVM_LIST_FILE})
+
 add_custom_command(OUTPUT qwprogs.qvm 
         COMMAND ${QVM_LINKER} -m -f ${QVM_LIST_FILE}
-        DEPENDS ${SOURCE_ASM}
+        DEPENDS ${SOURCE_ASM} 
     )
 add_custom_target(qvm DEPENDS qwprogs.qvm )
 # Создание динамической библиотеки с именем example
