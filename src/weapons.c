@@ -32,7 +32,7 @@ typedef struct {
     void (* fire_func)();
     void (* can_use_f)();
     float attack_finished;
-    const char* model,*model_mode,*sound;
+    char* model,*model_mode,*sound;
     int   have_mode;
 }weapon_info_t;
 
@@ -60,7 +60,7 @@ const weapon_info_t weapons_info[]= {
 {  WEAP_LASER            , IT_SHOTGUN,          IT_NAILS,   1, FOFS(s.v.ammo_nails),  F_FLOAT,0,1,0,0, 0,0,   0,0, 0.4, "progs/v_rail.mdl", "", "weapons/railgun.wav", 0},
 };
 
-#define WEAPON_BY_BIT(bit) &weapons_info[log2powerof2(bit)]
+#define WEAPON_BY_BIT(bit) &weapons_info[log2powerof2(bit) + 1]
 void    item_megahealth_rot(  );
 
 float   button_touch(  );
@@ -1796,10 +1796,9 @@ PLAYER WEAPON USE
 ===============================================================================
 */
 
-void W_SetCurrentAmmo(  )
+void W_SetCurrentAmmo_old(  )
 {
 	int     items;
-    weapon_info_t* wi;
 
 	if ( self->s.v.health <= 0 || !self->current_weapon )
 		return;
@@ -1809,41 +1808,7 @@ void W_SetCurrentAmmo(  )
 	items = self->s.v.items;
 	items -= items & ( IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS );
 	self->s.v.weapon = 0;
-    if( self->current_weapon == WEAP_AXE && self->playerclass == PC_SPY ){
-        self->s.v.currentammo = 0;
-        if ( !self->weaponmode )
-            self->s.v.weaponmodel = "progs/v_knife.mdl";
-        else
-            self->s.v.weaponmodel = "progs/v_knife2.mdl";
-        self->s.v.weaponframe = 0;
-        return;
-    }else{
-        wi = WEAPON_BY_BIT( self->current_weapon );
-        if( wi->w == self->current_weapon ){
-            self->s.v.currentammo = 0;
-            if( wi->have_mode && self->weaponmode == 1 ){
-                self->s.v.weaponmodel = wi->model_mode;
-            }else{
-                self->s.v.weaponmodel = wi->model;
-            }
-            if( wi->ammo_ofs){
-                if(wi->ammo_type == F_INT ){
-                    self->s.v.currentammo = *(int*)((byte*)self + wi->ammo_ofs );
-                }else{
-                    self->s.v.currentammo = *(float*)((byte*)self + wi->ammo_ofs );
-                }
-            }
-            items |= wi->bit_item;
-            items |= wi->bit_ammo;
-            self->s.v.items = items;
-            self->s.v.weaponframe = 0;
-        }else{
-            self->s.v.currentammo = 0;
-            self->s.v.weaponmodel = "";
-            self->s.v.weaponframe = 0;
-        }
-    }
-	/*switch ( self->current_weapon )
+	switch ( self->current_weapon )
 	{
 	case WEAP_AXE:
 		self->s.v.currentammo = 0;
@@ -2029,7 +1994,55 @@ void W_SetCurrentAmmo(  )
 		self->s.v.weaponframe = 0;
 		break;
 	}
-	self->s.v.items = items;*/
+	self->s.v.items = items;
+}
+void W_SetCurrentAmmo(  )
+{
+	int     items;
+    const weapon_info_t* wi;
+
+	if ( self->s.v.health <= 0 || !self->current_weapon )
+		return;
+	if ( self->current_weapon == WEAP_ASSAULT_CANNON && ( self->tfstate & TFSTATE_AIMING ) )
+		return;
+	player_run(  );
+	items = self->s.v.items;
+	items -= items & ( IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS );
+	self->s.v.weapon = 0;
+    if( self->current_weapon == WEAP_AXE && self->playerclass == PC_SPY ){
+        self->s.v.currentammo = 0;
+        if ( !self->weaponmode )
+            self->s.v.weaponmodel = "progs/v_knife.mdl";
+        else
+            self->s.v.weaponmodel = "progs/v_knife2.mdl";
+        self->s.v.weaponframe = 0;
+        return;
+    }else{
+        wi = WEAPON_BY_BIT( self->current_weapon );
+        if( wi->w == self->current_weapon ){
+            self->s.v.currentammo = 0;
+            if( wi->have_mode && self->weaponmode == 1 ){
+                self->s.v.weaponmodel = wi->model_mode;
+            }else{
+                self->s.v.weaponmodel = wi->model;
+            }
+            if( wi->ammo_ofs){
+                if(wi->ammo_type == F_INT ){
+                    self->s.v.currentammo = *(int*)((byte*)self + wi->ammo_ofs );
+                }else{
+                    self->s.v.currentammo = *(float*)((byte*)self + wi->ammo_ofs );
+                }
+            }
+            items |= wi->bit_item;
+            items |= wi->bit_ammo;
+            self->s.v.items = items;
+            self->s.v.weaponframe = 0;
+        }else{
+            self->s.v.currentammo = 0;
+            self->s.v.weaponmodel = "";
+            self->s.v.weaponframe = 0;
+        }
+    }
 }
 
 int W_BestWeapon(  )

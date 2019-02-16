@@ -618,6 +618,7 @@ int log2powerof2( unsigned int v )
     r |= ((v & 0xFF00FF00) != 0) << 3;
     r |= ((v & 0xF0F0F0F0) != 0) << 2;
     r |= ((v & 0xCCCCCCCC) != 0) << 1;
+    //G_sprint( self, 2, "log %d %d\n", v, r);
 
     return r;
 }

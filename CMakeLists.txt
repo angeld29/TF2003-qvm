@@ -114,11 +114,13 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${DIR_SRC}/${SRC_VM_SYSCALL} ${VM_DIR
 file(APPEND ${QVM_LIST_FILE} "${VM_DIR}/${SRC_VM_SYSCALL}\n")
 message(STATUS ${QVM_LIST_FILE})
 
-add_custom_command(OUTPUT qwprogs.qvm 
-        COMMAND ${QVM_LINKER} -m -f ${QVM_LIST_FILE}
-        DEPENDS ${SOURCE_ASM} 
-    )
-add_custom_target(qvm DEPENDS qwprogs.qvm )
+#add_custom_command(OUTPUT qwprogs.qvm 
+#COMMAND ${QVM_LINKER} -m -f ${QVM_LIST_FILE}
+#DEPENDS ${SOURCE_ASM} )
+add_custom_target(qvm 
+    COMMAND ${QVM_LINKER} -m -f ${QVM_LIST_FILE}
+        DEPENDS ${SOURCE_ASM} )
+    #DEPENDS qwprogs.qvm )
 # Создание динамической библиотеки с именем example
 add_library( qwprogs SHARED ${SOURCE_LIB} ${SRC_NATIVE} )	
 target_include_directories ( qwprogs PRIVATE "include" )
