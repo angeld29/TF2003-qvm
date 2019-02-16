@@ -5,7 +5,7 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 # which compilers to use for C and C++
 set(tools gcc-4.7-linaro-rpi-gnueabihf)
 SET(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc)
-SET(CMAKE_CXX_COMPILER arm-linux-gnueabihf-cpp)
+#SET(CMAKE_CXX_COMPILER arm-linux-gnueabihf-cpp)
 
 # here is the target environment located
 #SET(CMAKE_FIND_ROOT_PATH  /usr/i586-mingw32msvc /home/alex/mingw-install )
