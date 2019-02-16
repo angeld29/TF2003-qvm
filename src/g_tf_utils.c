@@ -79,7 +79,7 @@ qboolean GetSVInfokeyBool( const char *key, const char *key2, qboolean defaultva
     char value[10]; 
 
     if( !GetSVInfokeyString( key, key2, value, sizeof(value), defaultval? "on":"off"))
-        return false;
+        return defaultval;
     if( streq( value, "on") ) return true; 
 
     return false;

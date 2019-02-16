@@ -30,13 +30,9 @@ void TG_LoadSettings()
 {
     char    st[10];
 
-    GetSVInfokeyString( "sg_fire", NULL, st, sizeof( st ), "on" );
-    if ( !strcmp( st, "off" ) )
-        tg_data.sg_disable_fire = 1;
-    else
-        tg_data.sg_disable_fire = 0;
+    tg_data.sg_disable_fire = !GetSVInfokeyBool( "tg_sg_fire", NULL, true );
 
-    GetSVInfokeyString( "sg_find", NULL, st, sizeof( st ), "" );
+    GetSVInfokeyString( "tg_sg_find", NULL, st, sizeof( st ), "" );
     if ( !strcmp( st, "all" ) )
         tg_data.sg_allow_find = TG_SG_FIND_IGNORE_OFF;
     else if( !strcmp( st, "self" ) )
@@ -53,28 +49,10 @@ void TG_LoadSettings()
                 tg_data.sg_fire_type = TG_SG_FIRE_BULLETS;
                 else
                 tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;*/
-    GetSVInfokeyString( "sg_fire_bullets", NULL, st, sizeof( st ), "on" );
-    if( !strcmp(st,"off") )
-        tg_data.sg_fire_bullets = false;
-    else
-        tg_data.sg_fire_bullets = true;
-    GetSVInfokeyString( "sg_fire_rockets", NULL, st, sizeof( st ), "on" );
-    tg_data.sg_fire_rockets = true;
-    if( !strcmp(st,"off") )
-        tg_data.sg_fire_rockets = false;
-    else
-        tg_data.sg_fire_rockets = true;
-    GetSVInfokeyString( "sg_fire_lighting", NULL, st, sizeof( st ), "off" );
-    if( !strcmp(st,"off") )
-        tg_data.sg_fire_lighting = false;
-    else
-        tg_data.sg_fire_lighting = true;
-    GetSVInfokeyString( "sg_unlimit_ammo", NULL, st, sizeof( st ), "off" );
-    if( !strcmp(st,"on") )
-        tg_data.sg_unlimit_ammo = true;
-    else
-        tg_data.sg_unlimit_ammo = false;
-
+    tg_data.sg_fire_bullets = GetSVInfokeyBool( "tg_sg_fire_bullets", NULL, true );
+    tg_data.sg_fire_rockets = GetSVInfokeyBool( "tg_sg_fire_rockets", NULL, true );
+    tg_data.sg_fire_lighting = GetSVInfokeyBool( "tg_sg_fire_lighting", NULL, false );
+    tg_data.sg_unlimit_ammo = GetSVInfokeyBool( "tg_sg_unlimit_ammo", NULL, false );
 
     GetSVInfokeyString( "gren_eff", NULL, st, sizeof( st ), "" );
     if ( !strcmp( st, "off" ) )
@@ -84,54 +62,17 @@ void TG_LoadSettings()
     else
         tg_data.gren_effect = TG_GREN_EFFECT_ON;
 
-    GetSVInfokeyString( "gren_time", NULL, st, sizeof( st ), "" );
-    if ( !strcmp( st, "10" ) )
-        tg_data.gren_time = 10;
-    else if( !strcmp( st, "5" ) )
-        tg_data.gren_time = 5;
-    else
-        tg_data.gren_time = 0;
+    tg_data.gren_time = GetSVInfokeyInt( "tg_gren_time", NULL, 0 );
+    tg_data.godmode = GetSVInfokeyBool( "tg_god", NULL, false );
+    tg_data.disable_reload = GetSVInfokeyBool( "tg_disable_reload", NULL, false );
+    tg_data.unlimit_ammo = GetSVInfokeyBool( "tg_unl_ammo", NULL, false );
+    tg_data.unlimit_grens = GetSVInfokeyBool( "tg_unl_gren", NULL, false );
+    tg_data.disable_disarm = GetSVInfokeyBool( "tg_dg_da", "tg_disable_disarm", false );
+    tg_data.detpack_drop = GetSVInfokeyBool( "tg_dp_drop", NULL, false );
+    tg_data.tg_sbar = GetSVInfokeyBool( "tg_sbar", NULL, false );
+    
+    GetSVInfokeyString( "tg_dp_clip", NULL, st, sizeof( st ), "" );
 
-
-    GetSVInfokeyString( "god", NULL, st, sizeof( st ), "off" );
-    if ( !strcmp( st, "on" ) )
-        tg_data.godmode = 1;
-    else
-        tg_data.godmode = 0;
-
-    GetSVInfokeyString( "disable_reload", NULL, st, sizeof( st ), "off" );
-    if ( !strcmp( st, "on" ) )
-        tg_data.disable_reload = 1;
-    else
-        tg_data.disable_reload = 0;
-
-    GetSVInfokeyString( "unl_ammo", NULL, st, sizeof( st ), "off" );
-    if ( !strcmp( st, "on" ) )
-        tg_data.unlimit_ammo = 1;
-    else
-        tg_data.unlimit_ammo = 0;
-
-    GetSVInfokeyString( "unl_gren", NULL, st, sizeof( st ), "off" );
-    if ( !strcmp( st, "on" ) )
-        tg_data.unlimit_grens = 1;
-    else
-        tg_data.unlimit_grens = 0;
-
-
-    GetSVInfokeyString( "dp_da", NULL, st, sizeof( st ), "on" );
-    if ( !strcmp( st, "off" ) )
-        tg_data.disable_disarm = 1;
-    else
-        tg_data.disable_disarm = 0;
-
-    GetSVInfokeyString( "dp_drop", NULL, st, sizeof( st ), "off" );
-    if ( !strcmp( st, "on" ) )
-        tg_data.detpack_drop = 1;
-    else
-        tg_data.detpack_drop = 0;
-
-
-    GetSVInfokeyString( "dp_clip", NULL, st, sizeof( st ), "" );
     if ( !strcmp( st, "off" ) )
         tg_data.detpack_clip = TG_DETPACK_SOLID_ALL;
     else if( !strcmp( st, "all" ) )
@@ -139,79 +80,6 @@ void TG_LoadSettings()
     else
         tg_data.detpack_clip = TG_DETPACK_CLIP_OWNER;
     Detpack_SetClip();
-
-    tf_data.sg_newfind = true;
-    tf_data.sg_sfire   = SG_SFIRE_NEW;
-
-    GetSVInfokeyString( "sg", NULL, st, sizeof( st ), "new" );
-    if ( !strcmp( st, "old" ) )
-    {
-        tf_data.sg_newfind = false;
-        tf_data.sg_sfire   = SG_SFIRE_281;
-    }
-    if ( !strcmp( st, "fix" ) )
-    {
-        tf_data.sg_newfind = false;
-        tf_data.sg_sfire   = SG_SFIRE_MTFL2;
-    }
-
-    if ( !strcmp( st, "oldmtfl" ) )
-    {
-        tf_data.sg_newfind = false;
-        tf_data.sg_sfire   = SG_SFIRE_MTFL1;
-    }
-    if ( !strcmp( st, "mtflf" ) )
-    {
-        tf_data.sg_newfind = true;
-        tf_data.sg_sfire   = SG_SFIRE_MTFL1;
-    }
-
-    if ( !strcmp( st, "oldf" ) )
-    {
-        tf_data.sg_newfind = true;
-        tf_data.sg_sfire   = SG_SFIRE_281;
-    }
-
-    GetSVInfokeyString( "sg_newfind", NULL, st, sizeof( st ), "on" );
-    if ( !strcmp( st, "off" ) )
-        tf_data.sg_newfind = false;
-    else
-        tf_data.sg_newfind = true;
-
-
-    GetSVInfokeyString( "sg_sfire", NULL, st, sizeof( st ), "new" );
-
-    if( !strcmp(st, "old"))
-        tf_data.sg_sfire = SG_SFIRE_281;
-
-    if( !strcmp(st, "mtfl1"))
-        tf_data.sg_sfire = SG_SFIRE_MTFL1;
-
-    if( !strcmp(st, "mtfl2"))
-        tf_data.sg_sfire = SG_SFIRE_MTFL2;
-
-    GetSVInfokeyString( "sg_rfire", NULL, st, sizeof( st ), "old" );
-
-    if( !strcmp(st, "new"))
-        tf_data.sg_rfire = true;
-    else
-        tf_data.sg_rfire = false;
-
-    tf_data.sgppl = GetSVInfokeyInt( "sgppl", NULL, 12 );
-    if ( tf_data.sgppl < 0 )
-        tf_data.sgppl = 0;
-
-    GetSVInfokeyString( "dtpb", NULL, st, sizeof( st ), "on" );
-    if ( !strcmp( st, "off" ) )
-        tf_data.detpack_block = 0;
-    else
-        tf_data.detpack_block = 1;
-
-    GetSVInfokeyString( "tg_sbar", NULL, st, sizeof( st ), "off" );
-    if ( !strcmp( st, "on" ) )
-        tg_data.tg_sbar = 1;
-    else
-        tg_data.tg_sbar = 0;
 
 }
 

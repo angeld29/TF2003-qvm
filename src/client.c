@@ -193,6 +193,7 @@ void DecodeLevelParms()
             return;
         }
         first_decode = 0;
+        memset( &tf_data, 0, sizeof(tf_data));
         tf_data.toggleflags = g_globalvars.parm10;
         tf_data.flagem_checked = 0;
         tf_data.allow_hook = 0;
@@ -200,7 +201,6 @@ void DecodeLevelParms()
         if ( coop || !deathmatch )
             tf_data.toggleflags |= TFLAG_CLASS_PERSIST;
         strncpy( nextmap, mapname, sizeof(nextmap) );
-        tf_data.allow_hook = 1;
 
         ent = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
         if ( ent )
@@ -256,34 +256,26 @@ void DecodeLevelParms()
 
         autoteam_time = 30;
 
-        GetSVInfokeyString( "bd", "birthday", st, sizeof( st ), "off" );
-        if ( !strcmp( st, "on" ) )
+        tf_data.birthday = GetSVInfokeyBool( "bd", "birthday", false );
+        if( tf_data.birthday )
         {
-            tf_data.birthday = 1;
             te = spawn();
             te->s.v.weapon = 10;
             te->s.v.nextthink = g_globalvars.time + 60;
             te->s.v.think = ( func_t ) BirthdayTimer;
-        } else
-        {
-            tf_data.birthday = 0;
         }
-        GetSVInfokeyString( "c", "clan", st, sizeof( st ), "off" );
-        if ( !strcmp( st, "on" ) )
+        tf_data.clanbattle = GetSVInfokeyBool( "c", "clan", false );
+        if (tf_data.clanbattle)
         {
-            tf_data.clanbattle = 1;
             tf_data.clan_scores_dumped = 0;
             tf_data.game_locked = 0;
 
-            GetSVInfokeyString( "lg", "locked_game", st, sizeof( st ), "off" );
-            if ( !strcmp( st, "on" ) )
-                tf_data.game_locked = 1;
-        } else
-            tf_data.clanbattle = 0;
+            tf_data.game_locked = GetSVInfokeyBool( "lg", "locked_game", false );
+        } 
 
         fvar = GetSVInfokeyFloat( "pm", "prematch", 0 );
-        if( fvar < 0 )
-            fvar = 0;
+        if( fvar < 0 ) fvar = 0;
+
         tf_data.cb_prematch_time = g_globalvars.time + fvar * 60;
         if( fvar )
         {
@@ -350,49 +342,21 @@ void DecodeLevelParms()
         {
             tf_data.autokick_kills = GetSVInfokeyInt( "akk", "autokick_kills", 0 );
         }
-        GetSVInfokeyString( "t", "teamfrags", st, sizeof( st ), "" );
-        if ( !strcmp( st, "on" ) )
+        if ( GetSVInfokeyBool( "t", "teamfrags", false ) )
             tf_data.toggleflags |= TFLAG_TEAMFRAGS;
-        else
-        {
-            if ( !strcmp( st, "off" ) )
-                tf_data.toggleflags -= ( tf_data.toggleflags & TFLAG_TEAMFRAGS );
+        else {
+            tf_data.toggleflags -= ( tf_data.toggleflags & TFLAG_TEAMFRAGS );
         }
-        GetSVInfokeyString( "fts", "fullteamscore", st, sizeof( st ), "off" );
-        if ( !strcmp( st, "on" ) )
+        if ( GetSVInfokeyBool( "fts", "fullteamscore", false ) )
             tf_data.toggleflags |= TFLAG_FULLTEAMSCORE;
 
-        GetSVInfokeyString( "g", "grapple", st, sizeof( st ), "off" );
-        if ( !strcmp( st, "off" ) )
-            tf_data.allow_hook = 0;
-
-        if ( !( tf_data.toggleflags & TFLAG_GRAPPLE ) && strcmp( st, "on" ) )
-            tf_data.allow_hook = 0;
-
-        if ( !GetSVInfokeyString( "og", "old_grenades", st, sizeof( st ), "on" ) )
-            GetSVInfokeyString( "old_grens", NULL, st, sizeof( st ), "on" );
-
-        if ( !strcmp( st, "on" ) )
-            tf_data.old_grens = 1;
-
-        GetSVInfokeyString( "spy", NULL, st, sizeof( st ), "on" );
-        if ( !strcmp( st, "off" ) )
-            tf_data.spy_off = 1;
-
-        GetSVInfokeyString( "s", "spyinvis", st, sizeof( st ), "off" );
-
-        if ( !strcmp( st, "on" ) || ( tf_data.toggleflags & TFLAG_SPYINVIS ) )
-            tf_data.invis_only = 1;
-        else
-        {
-            if ( !strcmp( st, "off" ) )
-                tf_data.invis_only = 0;
-        }
-
+        tf_data.allow_hook = GetSVInfokeyBool( "g", "grapple", false );
+        tf_data.old_grens = GetSVInfokeyBool( "og", "old_grens", true );
+        tf_data.spy_off = !GetSVInfokeyBool( "spy", NULL, true );
+        tf_data.invis_only = GetSVInfokeyBool( "s", "spyinvis", false );
 
         tf_data.cheat_pause = GetSVInfokeyInt( "cp", NULL, 1 );
-        if ( tf_data.cheat_pause <= 0 )
-            tf_data.cheat_pause = 1;
+        if ( tf_data.cheat_pause <= 0 ) tf_data.cheat_pause = 1;
 
         ////top colors
         tf_data.topcolor_check = 0;
@@ -423,37 +387,20 @@ void DecodeLevelParms()
             team_top_colors[4] = TeamFortress_TeamGetColor( 4 ) - 1;
 
 
-        GetSVInfokeyString( "adg", "allow_drop_goal", st, sizeof( st ), "off" );
-        if ( !strcmp( st, "on" ) )
-            tf_data.allow_drop_goal = 1;
-        else
-            tf_data.allow_drop_goal = 0;
-
-        GetSVInfokeyString( "add_pipe", NULL, st, sizeof( st ), "on" );
-        if ( !strcmp( st, "on" ) )
-            tf_data.add_pipe = 1;
-        else
-            tf_data.add_pipe = 0;
-
-        GetSVInfokeyString( "nf", "new_flash", st, sizeof( st ), "on" );
-        if ( !strcmp( st, "on" ) )
-            tf_data.new_flash = 1;
-        else
-            tf_data.new_flash = 0;
-
+        tf_data.allow_drop_goal = GetSVInfokeyBool( "adg", "allow_drop_goal", false );
+        tf_data.add_pipe = GetSVInfokeyBool( "add_pipe", "add_pipe", true );
+        tf_data.new_flash = GetSVInfokeyBool( "nf", "new_flash", true );
         tf_data.new_gas = GetSVInfokeyInt( "new_gas", NULL, GAS_DEFAULT );
-
-
 
         tf_data.sg_newfind = true;
         tf_data.sg_sfire   = SG_SFIRE_NEW;
-
         GetSVInfokeyString( "sg", NULL, st, sizeof( st ), "new" );
         if ( !strcmp( st, "old" ) )
         {
             tf_data.sg_newfind = false;
             tf_data.sg_sfire   = SG_SFIRE_281;
         }
+
         if ( !strcmp( st, "fix" ) )
         {
             tf_data.sg_newfind = false;
@@ -477,12 +424,7 @@ void DecodeLevelParms()
             tf_data.sg_sfire   = SG_SFIRE_281;
         }
 
-        GetSVInfokeyString( "sg_newfind", NULL, st, sizeof( st ), "on" );
-        if ( !strcmp( st, "off" ) )
-            tf_data.sg_newfind = false;
-        else
-            tf_data.sg_newfind = true;
-
+        tf_data.sg_newfind = GetSVInfokeyBool( "sg_newfind", NULL, true );
 
         GetSVInfokeyString( "sg_sfire", NULL, st, sizeof( st ), "new" );
 
@@ -496,7 +438,7 @@ void DecodeLevelParms()
             tf_data.sg_sfire = SG_SFIRE_MTFL2;
 
 
-        GetSVInfokeyString( "sg_rfire", NULL, st, sizeof( st ), "old" );
+        GetSVInfokeyString( "sg_rfire", NULL, st, sizeof( st ), "new" );
 
         if( !strcmp(st, "new"))
             tf_data.sg_rfire = true;
@@ -508,20 +450,15 @@ void DecodeLevelParms()
             tf_data.sgppl = 0;
 
         tf_data.old_spanner = GetSVInfokeyBool( "old_spanner", NULL, false );
-        tf_data.disable_grens = GetSVInfokeyInt( "dg", "disable_grens", 0 );
+        tf_data.disable_grens = GetSVInfokeyBool( "dg", "disable_grens", false );
 
-        GetSVInfokeyString( "dtpb", NULL, st, sizeof( st ), "on" );
-        if ( !strcmp( st, "off" ) )
-            tf_data.detpack_block = 0;
-        else
+        if ( GetSVInfokeyBool( "dtpb", NULL, true )  )
             tf_data.detpack_block = 1;
 
-        GetSVInfokeyString( "dp", "disable_powerups", st, sizeof( st ), "off" );
-        if ( !strcmp( st, "on" ) )
+        if ( GetSVInfokeyBool( "dp", "disable_powerups", false )  )
             tf_data.disable_powerups = 1;
 
-        GetSVInfokeyString( "ft", "flag_timer", st, sizeof( st ), "on" );
-        if ( !strcmp( st, "on" ) )
+        if ( GetSVInfokeyBool( "ft", "flag_timer", true )  )
             tf_data.flag_timer = 1;
 
 
@@ -529,9 +466,7 @@ void DecodeLevelParms()
         if ( tf_data.snip_fps < 0 )
             tf_data.snip_fps = 72;
 
-        GetSVInfokeyString( "srf", "snip_range_fix", st, sizeof( st ), "off" );
-        if ( !strcmp( st, "on" ) )
-            tf_data.snip_range_fix = 1;
+        tf_data.snip_range_fix = GetSVInfokeyBool( "srf", "snip_range_fix", false );
 
         tf_data.snip_ammo = GetSVInfokeyInt( "snip_ammo", NULL, 1 );
         if ( tf_data.snip_ammo < 0 )
@@ -546,24 +481,14 @@ void DecodeLevelParms()
         if ( tf_data.gren2box < 0 )
             tf_data.gren2box = 0;
 
-
-        GetSVInfokeyString( "rts", "random_team_spawn", st, sizeof( st ), "on" );
-        if ( !strcmp( st, "on" ) )
-            tf_data.random_tf_spawn = 1;
-
-        GetSVInfokeyString( "lan", NULL, st, sizeof( st ), "off" );
-        if ( !strcmp( st, "on" ) )
-            tf_data.lan_mode = 1;
+        tf_data.random_tf_spawn = GetSVInfokeyBool( "rts", "random_team_spawn", true );
+        tf_data.lan_mode = GetSVInfokeyBool( "lan", "lan", false );
 
 
         memset( &tg_data, 0, sizeof(tg_data));
-        GetSVInfokeyString( "tg", "training_ground", st, sizeof( st ), "off" );
-        if ( !strcmp( st, "on" ) )
-            tg_data.tg_enabled = 1;
+        tg_data.tg_enabled = GetSVInfokeyBool( "tg", "training_ground", false );
 
-        GetSVInfokeyString( "enable_bot",NULL, st, sizeof( st ), "off" );
-        if ( !strcmp( st, "on" ) )
-            tf_data.enable_bot = 1;
+        tf_data.enable_bot = GetSVInfokeyBool( "enable_bot", NULL, false );
 
         GetSVInfokeyString( "arena",NULL, st, sizeof( st ), "off" );
 
@@ -592,8 +517,8 @@ void DecodeLevelParms()
             ent->s.v.think = ( func_t ) autoteam_think;
         }
 
-        GetSVInfokeyString( "mtfl", NULL, st, sizeof( st ), "off" );
-        if ( !strcmp( st, "on" ) )
+        tf_data.mtfl = GetSVInfokeyBool( "mtfl", NULL, false );
+        if( tf_data.mtfl )
         {
             tf_data.mtfl = 1;
             tf_data.allow_hook = 0;
@@ -628,8 +553,7 @@ void DecodeLevelParms()
             tg_data.tg_enabled = 0;
             tf_data.enable_bot = 0;
             tf_data.arena_mode = ARENA_MODE_NONE;
-        } else
-            tf_data.mtfl = 0;
+        } 
 
         //SETUP LAN CONSTANTS
         if( !tf_data.lan_mode ) 
