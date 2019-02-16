@@ -5,9 +5,14 @@ mkdir _cmake
 for name in linux-amd64 linux-armhf linux-i686 windows-x64 windows-x86; do
     mkdir _cmake/$name
     cd _cmake/$name
-    cmake -DCMAKE_TOOLCHAIN_FILE=../../tools/cross-cmake/$name.cmake -G Ninja ../..
-    cmake --build .
+    cmake -DCMAKE_TOOLCHAIN_FILE=../../tools/cross-cmake/$name.cmake -G Ninja ../.. 
+    cmake --build . --config Release
     cd ../..
 done;
+mkdir _cmake/qvm
+cd _cmake/qvm
+cmake -G Ninja ../.. 
+cmake --build . --config Release --target qvm
+
 
 
