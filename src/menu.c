@@ -200,12 +200,12 @@ void Menu_Input( int impulse )
 
 extern char *team_menu_string;
 const char *team_menu_strings[] = {
-	"              ",
-	"░⌠▒ Team One  ",
-	"░■▒ Team Two  ",
-	"░∙▒ Team Three",
-	"░√▒ Team Four ",
-	"░≈▒ Auto Team ",
+	 "              ",
+	_M1 " Team One  ",
+	_M2 " Team Two  ",
+	_M3 " Team Three",
+	_M4 " Team Four ",
+	_M5 " Auto Team ",
 };
 
 void Menu_Team( menunum_t menu )
@@ -224,9 +224,9 @@ void Menu_Team( menunum_t menu )
 	if ( CTF_Map == 1 )
 		CenterPrint( self,
 			     "=== Choose Your Team ===\n\n"
-			     "░⌠▒ Blue Team           \n"
-			     "░■▒ Red Team            \n\n\n\n"
-			     "░≥▒ Bind my keys for me!\n\n"
+			     _M1 " Blue Team           \n"
+			     _M2 " Red Team            \n\n\n\n"
+			     _M7 " Bind my keys for me!\n\n"
 			     "For full details on this patch:\n"
 			     "http://www.telefragged.com/teamfortress/\n" );
 	else
@@ -264,14 +264,21 @@ void Menu_Team_Input( int inp )
 	self->s.v.impulse = 0;
 }
 
-const char *class_hdr = "=== Choose Your Class ===";
-const char *class_str = "░⌠▒ Scout   \n"
-    "░■▒ Sniper  \n" "░∙▒ Soldier \n" "░√▒ Demoman \n" "░≈▒ Medic   \n" "░≤▒ HWGuy   \n"
-    "░≥▒ Pyro    \n";
-const char *class_spy = "░ ▒ Spy     \n";
-const char *class_eng = "░⌡▒ Engineer\n";
-const char *class_rpc = "░▓▒ RandomPC\n";
-const char *class_bd = "░▓▒ The Birthday Boy\n";
+const char *class_str = 
+"=== Choose Your Class ===\n\n\n"
+    _M1 " Scout   \n"
+    _M2 " Sniper  \n" 
+    _M3 " Soldier \n" 
+    _M4 " Demoman \n" 
+    _M5 " Medic   \n" 
+    _M6 " HWGuy   \n"
+    _M7 " Pyro    \n"
+    "%s"
+    _M9 " Engineer\n"
+    "%s";
+const char *class_spy = _M8 " Spy     \n";
+const char *class_rpc = _M0 " RandomPC\n";
+const char *class_bd = _M0 " The Birthday Boy\n";
 
 void Menu_Class( menunum_t menu )
 {
@@ -310,7 +317,6 @@ void Menu_Class( menunum_t menu )
 				return;
 			}
 			break;
-
 		}
 	}
 	if ( TeamFortress_TeamIsCivilian( self->team_no ) )
@@ -318,20 +324,7 @@ void Menu_Class( menunum_t menu )
 		CenterPrint( self, "Your team can only be Civilians.\n" );
 		return;
 	}
-	if ( tf_data.spy_off == 1 )
-	{
-		CenterPrint( self, "%s\n\n%s%s%s", class_hdr, class_str, class_eng,
-			     class_rpc );
-		return;
-	}
-	if ( tf_data.birthday == 1 )
-	{
-		CenterPrint( self, "%s\n\n%s%s%s%s", class_hdr, class_str, class_spy,
-			     class_eng, class_bd );
-		return;
-	}
-	CenterPrint( self, "%s\n\n%s%s%s%s", class_hdr, class_str, class_spy, class_eng,
-		     class_rpc );
+    CenterPrint( self, class_str, tf_data.spy_off? "": class_spy, tf_data.birthday ? class_bd: class_rpc);
 }
 
 void Menu_Class_Input( int imp )
@@ -357,23 +350,17 @@ void Menu_Class_Input( int imp )
 	self->s.v.impulse = 0;
 }
 
+#define AMMO_DROP_STR   _M1 " Shells                      \n" \
+			            _M2 " Nails                       \n" \
+			            _M3 " Rockets                     \n" \
+			            _M4 " Cells                       \n" \
+			            _M5 " Nothing                     \n\n" 
 void Menu_Drop( menunum_t menu )
 {
 	if ( self->playerclass == PC_ENGINEER )
-		CenterPrint( self, "Drop or Make:                   \n"
-			     "░⌠▒ Shells                      \n"
-			     "░■▒ Nails                       \n"
-			     "░∙▒ Rockets                     \n"
-			     "░√▒ Cells                       \n"
-			     "░≈▒ Nothing                     \n\n" );
+		CenterPrint( self, "Drop or Make:                   \n" AMMO_DROP_STR );
 	else
-		CenterPrint( self, "Drop:                           \n"
-			     "░⌠▒ Shells                      \n"
-			     "░■▒ Nails                       \n"
-			     "░∙▒ Rockets                     \n"
-			     "░√▒ Cells                       \n"
-			     "░≈▒ Nothing                     \n\n" );
-
+		CenterPrint( self, "Drop:                           \n" AMMO_DROP_STR );
 }
 
 void    TeamFortress_DropAmmo( int type );
@@ -395,119 +382,93 @@ void Menu_Intro( menunum_t menu )
 		GetSVInfokeyString( "motd2", NULL, st2, sizeof( st2 ), "" );
 		CenterPrint( self, "%s\n%s", st1, st2 );
 	} else
-		CenterPrint( self, "Welcome to тЕАМфОРТРЕСС ■▓▓∙\n"
-			     "by ░sd▒ angel for мтфл\n"
+		CenterPrint( self, "Welcome to " _T _e _a _m _F _o _r _t _r _e _s _s  " " _2 _0 _0 _3 "\n"
+			     "by " _LSB "sd" _RSB " angel for " _M _T _F _L "\n"
 			     "======================================\n"
 			     "http://mtfl.sd.ru\n" );
 }
 
+#define WEAP_STR _W _E _A _P _O _N _S ":                     \n"
+#define _PRESS8_ALIAS "\nPress " _8 " for alias help\n"
+#define _WSG  _M1 " Shotgun                  \n" 
+#define _WSSG _M2 " Super Shotgun            \n" 
+#define _WNG  _M4 " Nailgun                  \n"
+#define _WSR  _M2 " Sniper Rifle             \n"
+#define _WAR  _M3 " Auto Rifle               \n"
+#define _WRL  _M7 " Rocket Launcher          \n"
+#define _WGL  _M6 " Grenade Launcher         \n"
+#define _WPL  _M7 " Pipebomb Launcher        \n"
+#define _W__      "                             \n"
+#define _WMK  _M1 " Medikit/BioWeapon        \n"
+#define _WSNG _M4 " Super Nailgun            \n"
+#define _WASC _M7 " Assault Cannon           \n"
+#define _WICC _M7 " Incendiary Cannon        \n"
+#define _WKNF _M1 " Knife                    \n"
+#define _WTRG _M2 " Tranquiliser Gun         \n"
+#define _WFMT _M7 " Flamethrower             \n"
+#define _WSPN _M1 " Spanner                  \n"
+#define _WRLG _M2 " RailGun                  \n" 
+#define _SCOUT _S _C _O _U _T
+#define _SNIP _S _N _I _P _E _R 
+#define _SOLD _S _O _L _D _I _E _R
+#define _DEMO _D _E _M _O _L _I _T _I _O _N " " _M _A _N
+#define _MEDIC _M _E _D _I _C
+#define _HWGUY _H _E _A _W _Y " " _W _E _P _O _N _S " " _G _U _Y 
+#define _PYRO _P _Y _R _O 
+#define _SPY  _S _P _Y 
+#define _ENG _E _N _G _I _N _E _E _R 
+
 const char *classhelp1[] = {
 	"",
-	"сцоут Details:               \n\n"
-	    "веапонс:                     \n"
-	    "░■▒ Shotgun                  \n" "░√▒ Nailgun                  \n\n"
-	    "Press   for alias help\n",
-
-	"снипер Details:              \n\n"
-	    "веапонс:                     \n"
-	    "░■▒ Sniper Rifle             \n"
-	    "░∙▒ Auto Rifle               \n" "░√▒ Nailgun                  \n\n"
-	    "Press   for alias help\n",
-
-	"солдиер Details:             \n\n"
-	    "веапонс:                     \n"
-	    "░■▒ Shotgun                  \n"
-	    "░∙▒ Super Shotgun            \n" "░≥▒ Rocket Launcher          \n\n"
-	    "Press   for alias help\n",
-
-	"демолитионс ман Details:     \n\n"
-	    "веапонс:                     \n"
-	    "░■▒ Shotgun                  \n"
-	    "░≤▒ Grenade Launcher         \n"
-	    "░≥▒ Pipebomb Launcher        \n" "                             \n\n"
-	    "Press   for alias help\n",
-
-	"медиц Details:               \n\n"
-	    "веапонс:                     \n"
-	    "░⌠▒ Medikit/BioWeapon        \n"
-	    "░■▒ Shotgun                  \n"
-	    "░∙▒ Super Shotgun            \n" "░≈▒ Super Nailgun            \n\n"
-	    "Press   for alias help\n",
-
-	"хеажы веапонс гуы Details:   \n\n"
-	    "веапонс:                     \n"
-	    "░■▒ Shotgun                  \n"
-	    "░∙▒ Super Shotgun            \n" "░≥▒ Assault Cannon           \n\n"
-	    "Press   for alias help\n",
-
-	"пыро Details:                \n\n"
-	    "веапонс:                     \n"
-	    "░■▒ Shotgun                  \n"
-	    "░≤▒ Flamethrower             \n" "░≥▒ Incendiary Cannon        \n\n"
-	    "Press   for alias help\n",
-
-	"спы Details:                 \n\n"
-	    "веапонс:                     \n"
-	    "░⌠▒ Knife                    \n"
-	    "░■▒ Tranquiliser Gun         \n"
-	    "░∙▒ Super Shotgun            \n" "░√▒ Nailgun                  \n\n"
-	    "Press   for alias help\n",
-
-	"енгинеер Details:            \n\n"
-	    "веапонс:                     \n"
-	    "░⌠▒ Spanner                  \n"
-	    "░■▒ RailGun                  \n" "░∙▒ Super Shotgun            \n\n"
-	    "Press   for alias help\n"
+	_SCOUT " Details:               \n\n" WEAP_STR _WSG _WNG _PRESS8_ALIAS,
+    _SNIP  " Details:              \n\n" WEAP_STR _WSR _WAR _WNG _PRESS8_ALIAS, 
+	_SOLD  " Details:             \n\n" WEAP_STR _WSG _WSSG _WRL _PRESS8_ALIAS,
+    _DEMO  " Details:     \n\n" WEAP_STR _WSG _WGL _WPL _PRESS8_ALIAS,
+    _MEDIC " Details:               \n\n" WEAP_STR _WMK _WSG _WSNG _PRESS8_ALIAS,
+    _HWGUY " Details:   \n\n" WEAP_STR _WSG _WSSG _WASC _PRESS8_ALIAS,
+    _PYRO  " Details:                \n\n" WEAP_STR _WSG _WFMT _WICC _PRESS8_ALIAS,
+    _SPY   " Details:                 \n\n" WEAP_STR _WKNF _WTRG _WSSG _WNG _PRESS8_ALIAS,
+    _ENG   " Details:            \n\n" WEAP_STR  _WSPN _WRLG _WSSG _PRESS8_ALIAS,
 };
+#define GREN_STR _G _R _E _N _A _D _E _S ":            \n"
+#define SPEC_CMD_STR _S _P _E _C _I _A _L " " _C _O _M _M _A _N _D _S ":   \n"
 const char *classhelp2[] = {
 	"",
-	"гренадес:            \nFlash Grenade       \nConcussion Grenade  \n\nспециал цоммандс:   \nScanner : scan10,scan30,scan50,autoscan\nScanner mode : scane,scanf    \n\nPress   for alias help\n",
-	"гренадес:            \nHand Grenade        \nFlare               \n\nспециал цоммандс:   \nautozoom : Toggle Rifle Autozooming\n\n\nPress   for alias help\n",
-	"гренадес:            \nHand Grenade        \nNail Grenade        \n\nспециал цоммандс:   \nNone\n\n\nPress   for alias help\n",
-	"гренадес:            \nHand Grenade        \nMirv Grenade        \n\nспециал цоммандс:   \nThe Detpack : +det5,+det20,+det50\nDetonate Pipebombs : detpipe  \n\n\nPress   for alias help\n",
-	"гренадес:            \nHand Grenade        \nConcussion Grenade  \n\nспециал цоммандс:   \nNone\n\n\nPress   for alias help\n",
-	"гренадес:            \nHand Grenade        \nMirv Grenade        \n\nспециал цоммандс:   \nNone\n\n\nPress   for alias help\n",
-	"гренадес:            \nHand Grenade        \nNapalm Grenade      \n\nспециал цоммандс:   \nNone\n\n\nPress   for alias help\n",
-	"гренадес:            \nHand Grenade        \nHallucinogen Grenade\n\nспециал цоммандс:   \nGo Undercover : disguise\nFeign Death : feign, sfeign\n\n\nPress   for alias help\n",
-	"гренадес:            \nHand Grenade        \nEMP Grenade         \n\nспециал цоммандс:   \nStart Building : build   \nDestroy : detdispenser, detsentry\n\nPress   for alias help\n"
+	GREN_STR "Flash Grenade       \nConcussion Grenade  \n\n" SPEC_CMD_STR "Scanner : scan10,scan30,scan50,autoscan\nScanner mode : scane,scanf    \n" _PRESS8_ALIAS,
+	GREN_STR "Hand Grenade        \nFlare               \n\n" SPEC_CMD_STR "autozoom : Toggle Rifle Autozooming\n\n" _PRESS8_ALIAS,
+	GREN_STR "Hand Grenade        \nNail Grenade        \n\n" SPEC_CMD_STR "None\n\n" _PRESS8_ALIAS,
+	GREN_STR "Hand Grenade        \nMirv Grenade        \n\n" SPEC_CMD_STR "The Detpack : +det5,+det20,+det50\nDetonate Pipebombs : detpipe  \n\n" _PRESS8_ALIAS,
+	GREN_STR "Hand Grenade        \nConcussion Grenade  \n\n" SPEC_CMD_STR "None\n\n" _PRESS8_ALIAS,
+	GREN_STR "Hand Grenade        \nMirv Grenade        \n\n" SPEC_CMD_STR "None\n\n" _PRESS8_ALIAS,
+	GREN_STR "Hand Grenade        \nNapalm Grenade      \n\n" SPEC_CMD_STR "None\n\n" _PRESS8_ALIAS,
+	GREN_STR "Hand Grenade        \nHallucinogen Grenade\n\n" SPEC_CMD_STR "Go Undercover : disguise\nFeign Death : feign, sfeign\n\n" _PRESS8_ALIAS,
+	GREN_STR "Hand Grenade        \nEMP Grenade         \n\n" SPEC_CMD_STR "Start Building : build   \nDestroy : detdispenser, detsentry\n" _PRESS8_ALIAS
 };
 char   *class_stuffcmd[] = {
 	"",
-	"сцоут Details:\nвеапонс:\n   ░■▒ Shotgun\n   ░√▒ Nailgun\n"
-	    "гренадес:\n   Flash\n   Concussion Grenade\nспециал цоммандс:\n"
+	_SCOUT " Details:\n" WEAP_STR _WSG _WNG                 
+        GREN_STR "   Flash\n   Concussion Grenade\n" SPEC_CMD_STR 
 	    "Scanner : scan10,scan30,scan50,autoscan\nScanner mode : scane,scanf\n\n",
-
-	"снипер Details:\n\nвеапонс:\n   ░■▒ Sniper Rifle           \n   ░■▒ Auto Rifle             \n"
-	    "░√▒ Nailgun\nгренадес:\n   Hand Grenade\n   Flare\n\nспециал цоммандс:\n"
+    _SNIP  " Details:\n" WEAP_STR _WSR _WAR _WNG            
+        GREN_STR "   Hand Grenade\n   Flare\n\n" SPEC_CMD_STR
 	    "  autozoom : Toggle Rifle Autozooming\n\n\n",
-
-	"солдиер Details:\n\nвеапонс:\n   ░■▒ Shotgun\n   ░∙▒ Super Shotgun\n"
-	    "   ░≥▒ Rocket Launcher\nгренадес:\n   Hand Grenade\n   Nail Grenade\n"
-	    "специал цоммандс:\n   None\n\n\n",
-
-	"демолитионс ман Details:\n\nвеапонс:\n   ░■▒ Shotgun\n   ░≤▒ Grenade Launcher         \n   ░≥▒ Pipebomb Launcher        \n"
-	    "гренадес:\n   Hand Grenade\n   Mirv Grenade\n"
-	    "специал цоммандс:\n   The Detpack : +det5,+det20,+det50\n   Detonate Pipebombs : detpipe\n\n\n",
-
-	"медиц Details:\n\nвеапонс:\n   ░⌠▒ Medikit/BioWeapon\n   ░■▒ Shotgun\n   ░∙▒ Super Shotgun\n"
-	    "   ░≈▒ Super Nailgun\nгренадес:\n   Hand Grenade\n   Concussion Grenade\n"
-	    "специал цоммандс:\n   None\n\n\n",
-
-	"хеажы веапонс гуы Details:\n\nвеапонс:\n   ░■▒ Shotgun\n   ░∙▒ Super Shotgun\n"
-	    "   ░≥▒ Assault Cannon\nгренадес:\n   Hand Grenade\n"
-	    "   Mirv Grenade\nспециал цоммандс:\n   None\n\n\n",
-
-	"пыро Details:\n\nвеапонс:\n   ░■▒ Shotgun\n   ░≤▒ Flamethrower\n   ░≥▒ Incendiary Cannon\n"
-	    "гренадес:\n   Hand Grenade\n   Napalm Grenade\n"
-	    "специал цоммандс:\n   None\n\n\n",
-
-	"спы Details:\n\nвеапонс:\n   ░⌠▒ Knife           \n   ░■▒ Tranquiliser Gun\n   ░∙▒ Super Shotgun\n   ░√▒ Nailgun\n"
-	    "гренадес:\n   Hand Grenade\n   Hallucinogenic Grenade\n"
-	    "специал цоммандс:\n   Go Undercover : disguise\n   Feign Death: feign, sfeign\n\n",
-
-	"енгинеер Details:\n\nвеапонс:\n   ░⌠▒ Spanner\n   ░■▒ RailGun\n   ░∙▒ Super Shotgun\n"
-	    "гренадес:\n   Hand Grenade\n   EMP Grenade\n"
-	    "специал цоммандс:\n   Start Building : build\n   Destroy : detdispenser, detsentry\n\n"
+	_SOLD  " Details:\n" WEAP_STR _WSG _WSSG _WRL           
+        GREN_STR "   Hand Grenade\n   Nail Grenade\n" SPEC_CMD_STR "   None\n\n\n",
+    _DEMO  " Details:\n" WEAP_STR _WSG _WGL _WPL            
+        GREN_STR "   Hand Grenade\n   Mirv Grenade\n" SPEC_CMD_STR
+	    "   The Detpack : +det5,+det20,+det50\n   Detonate Pipebombs : detpipe\n\n\n",
+    _MEDIC " Details:\n" WEAP_STR _WMK _WSG _WSNG           
+        GREN_STR "   Hand Grenade\n   Concussion Grenade\n" SPEC_CMD_STR "   None\n\n\n",
+    _HWGUY " Details:\n" WEAP_STR _WSG _WSSG _WASC          
+        GREN_STR "   Hand Grenade\n   Mirv Grenade\n" SPEC_CMD_STR "   None\n\n\n",
+    _PYRO  " Details:\n" WEAP_STR _WSG _WFMT _WICC          
+        GREN_STR "   Hand Grenade\n   Napalm Grenade\n" SPEC_CMD_STR "   None\n\n\n",
+    _SPY   " Details:\n" WEAP_STR _WKNF _WTRG _WSSG _WNG    
+        GREN_STR "   Hand Grenade\n   Hallucinogenic Grenade\n" SPEC_CMD_STR
+	    "   Go Undercover : disguise\n   Feign Death: feign, sfeign\n\n",
+    _ENG   " Details:\n" WEAP_STR  _WSPN _WRLG _WSSG        
+        GREN_STR "   Hand Grenade\n   EMP Grenade\n" SPEC_CMD_STR
+	    "   Start Building : build\n   Destroy : detdispenser, detsentry\n\n"
 };
 void Menu_ClassHelp( menunum_t menu )
 {

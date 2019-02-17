@@ -37,6 +37,7 @@
 #include "tfort.h"
 #include "spy.h"
 #include "bot.h"
+#include "qchars.h"
 
 
 #include "menu.h"
