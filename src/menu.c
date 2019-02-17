@@ -513,11 +513,11 @@ void Menu_RepeatHelp( menunum_t menu )
 }
 
 const char *menu_eng_header = "Action:                           \n";
-const char *menu_eng_builddisp = "“‘ Build Ammo&Armor Dispenser   \n";
-const char *menu_eng_buildsentry = "”‘ Build Sentry Gun             \n";
-const char *menu_eng_exit = "—‘ Nothing                      \n\n";
-const char *menu_eng_detdisp = "™‘ Remotely Detonate Dispenser  \n";
-const char *menu_eng_detsentry = "š‘ Remotely Detonate Sentry Gun \n";
+const char *menu_eng_builddisp = _M1 " Build Ammo&Armor Dispenser   \n";
+const char *menu_eng_buildsentry = _M2 " Build Sentry Gun             \n";
+const char *menu_eng_exit = _M5 " Nothing                      \n\n";
+const char *menu_eng_detdisp = _M7 " Remotely Detonate Dispenser  \n";
+const char *menu_eng_detsentry = _M8 " Remotely Detonate Sentry Gun \n";
 
 
 void Menu_Engineer( menunum_t menu )
@@ -627,11 +627,11 @@ void Menu_Engineer_Input( int inp )
 void Menu_EngineerFix_Dispenser( menunum_t menu )
 {
 	CenterPrint( self, "Action:                            \n"
-		     "“‘ Put Ammo into Dispenser     \n"
-		     "”‘ Put Armor into Dispenser    \n"
-		     "•‘ Repair Dispenser            \n"
-		     "–‘ Dismantle Dispenser         \n"
-		     "—‘ Nothing                     \n\n" );
+		     _M1 " Put Ammo into Dispenser     \n"
+		     _M2 " Put Armor into Dispenser    \n"
+		     _M3 " Repair Dispenser            \n"
+		     _M4 " Dismantle Dispenser         \n"
+		     _M5 " Nothing                     \n\n" );
 }
 
 int Engineer_Dispenser_Repair( gedict_t* disp);
@@ -715,9 +715,9 @@ void Menu_EngineerFix_Dispenser_Input( int inp )
 }
 
 
-const char *menu_eng_fixsg_upgrade = "”‘ Upgrade Sentry Gun          \n";
-const char *menu_eng_fixsg_static = "™‘ Make static                 \n";
-const char *menu_eng_fixsg_nostatic = "™‘ Make no static              \n";
+const char *menu_eng_fixsg_upgrade = _M2 " Upgrade Sentry Gun          \n";
+const char *menu_eng_fixsg_static = _M7 " Make static                 \n";
+const char *menu_eng_fixsg_nostatic = _M7 " Make no static              \n";
 void Menu_EngineerFix_SentryGun( menunum_t menu )
 {
     const char *s_upgrade = "\n", *s_static = "";
@@ -735,17 +735,17 @@ void Menu_EngineerFix_SentryGun( menunum_t menu )
             s_upgrade = menu_eng_fixsg_upgrade;
 
         CenterPrint( self, "Action:                            \n"
-                "“‘ Put Ammo into Sentry Gun    \n"
+                _M1 " Put Ammo into Sentry Gun    \n"
                 "%s"
-                "•‘ Repair Sentry Gun           \n"
-                "–‘ Dismantle Sentry Gun        \n"
-                "—‘ Nothing                     \n\n"
-                "˜‘ Rotate SentryGun            \n" "%s", s_upgrade, s_static );
+                _M3 " Repair Sentry Gun           \n"
+                _M4 " Dismantle Sentry Gun        \n"
+                _M5 " Nothing                     \n\n"
+                _M6 " Rotate SentryGun            \n" "%s", s_upgrade, s_static );
     }else{
         CenterPrint( self, "Action:                            \n"
-                "–‘ Dismantle Sentry Gun        \n"
-                "—‘ Nothing                     \n\n"
-                "˜‘ Rotate SentryGun            \n" "%s", s_static );
+                _M4 " Dismantle Sentry Gun        \n"
+                _M5 " Nothing                     \n\n"
+                _M6 " Rotate SentryGun            \n" "%s", s_static );
     }
 
 }
@@ -817,9 +817,9 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 void Menu_Dispenser( menunum_t menu )
 {
 	CenterPrint( self, "Use Dispenser:                     \n"
-		     "“‘ Withdraw some ammo          \n"
-		     "”‘ Withdraw some Armor         \n"
-		     "•‘ Nothing                     \n\n" );
+		     _M1 " Withdraw some ammo          \n"
+		     _M2 " Withdraw some Armor         \n"
+		     _M3 " Nothing                     \n\n" );
 }
 
 void Menu_Dispenser_Input( int inp )
@@ -1013,7 +1013,17 @@ void Menu_Spy_Input( int inp )
 void Menu_Spy_Skin( menunum_t menu )
 {
 	CenterPrint( self,
-		     "Change Skin to:\n“‘ Scout   \n”‘ Sniper  \n•‘ Soldier \n–‘ Demoman \n—‘ Medic   \n˜‘ Hvwep   \n™‘ Pyro    \nš‘ Spy     \n›‘ Engineer\n\n" );
+		     "Change Skin to:\n"
+    _M1 " Scout   \n"
+    _M2 " Sniper  \n" 
+    _M3 " Soldier \n" 
+    _M4 " Demoman \n" 
+    _M5 " Medic   \n" 
+    _M6 " HWGuy   \n"
+    _M7 " Pyro    \n"
+    _M8 " Spy     \n"
+    _M9 " Engineer\n"
+             "\n" );
 }
 
 void Menu_Spy_Skin_Input( int inp )
@@ -1216,12 +1226,12 @@ void Menu_BirthDay_Input( int inp )
 void TG_Main_Menu( menunum_t menu )
 {
 	CenterPrint( self, "Options:\n"
-		     "1) SG options                 \n"
-		     "2) Detpack option             \n"
-		     "3) Cheats                     \n"
-		     "4) Load defaults              \n"
-		     "5) Saved position             \n"
-		     "7) Nothing                    \n" );
+		     _M1 " SG options                 \n"
+		     _M2 " Detpack option             \n"
+		     _M3 " Cheats                     \n"
+		     _M4 " Load defaults              \n"
+		     _M5 " Saved position             \n"
+		     _M7 " Nothing                    \n" );
 }
 
 void TG_Main_Menu_Input( int inp )
@@ -1257,17 +1267,17 @@ void TG_Main_Menu_Input( int inp )
 }
 
 const char *sentry_sfire_names[] = {
-	"4) Sentry Shells Fire: NEW    \n",
-	"4) Sentry Shells Fire: 2.8.1  \n",
-	"4) Sentry Shells Fire: MTFL1  \n",
-	"4) Sentry Shells Fire: MTFL2  \n"
+	_M4 " Sentry Shells Fire: NEW    \n",
+	_M4 " Sentry Shells Fire: 2.8.1  \n",
+	_M4 " Sentry Shells Fire: MTFL1  \n",
+	_M4 " Sentry Shells Fire: MTFL2  \n"
 };
 
 const char *sentry_find_names[] = {
-	"6)†ignore teammates           \n",
-	"6)ˆignore owner               \n",
-	"6)‰ignore OFF                 \n",
-	"6)‡ignore all targets         \n",
+	_M6 "†ignore teammates           \n",
+	_M6 "ˆignore owner               \n",
+	_M6 "‰ignore OFF                 \n",
+	_M6 "‡ignore all targets         \n",
 };
 
 /*const char *sentry_firetype_names[] = {
