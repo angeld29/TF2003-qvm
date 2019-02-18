@@ -2592,14 +2592,14 @@ struct w_impulse_s{
 
 static struct w_impulse_s w_impulses[]={
     {1, 0, { WEAP_SPANNER, /*WEAP_BIOWEAPON, */WEAP_MEDIKIT, WEAP_HOOK, WEAP_AXE, 0 }},
-    {2, 0, { WEAP_SNIPER_RIFLE, WEAP_SHOTGUN, WEAP_TRANQ, WEAP_LASER }},
-    {3, 0, { WEAP_AUTO_RIFLE, WEAP_SUPER_SHOTGUN}},
-    {4, 0, { WEAP_NAILGUN}},
-    {5, 0, { WEAP_SUPER_NAILGUN}},
-    {6, 0, { WEAP_FLAMETHROWER, WEAP_GRENADE_LAUNCHER}},
-    {7, 0, { WEAP_INCENDIARY, WEAP_ROCKET_LAUNCHER, WEAP_ASSAULT_CANNON, WEAP_GRENADE_LAUNCHER}},
-    {8, 0, { WEAP_LIGHTNING }},
-    {TF_MEDIKIT, 0, { WEAP_MEDIKIT }},
+    {2, 0, { WEAP_SNIPER_RIFLE, WEAP_SHOTGUN, WEAP_TRANQ, WEAP_LASER, 0 }},
+    {3, 0, { WEAP_AUTO_RIFLE, WEAP_SUPER_SHOTGUN, 0}},
+    {4, 0, { WEAP_NAILGUN, 0}},
+    {5, 0, { WEAP_SUPER_NAILGUN, 0}},
+    {6, 0, { WEAP_FLAMETHROWER, WEAP_GRENADE_LAUNCHER, 0}},
+    {7, 0, { WEAP_INCENDIARY, WEAP_ROCKET_LAUNCHER, WEAP_ASSAULT_CANNON, WEAP_GRENADE_LAUNCHER, 0}},
+    {8, 0, { WEAP_LIGHTNING, 0 }},
+    {TF_MEDIKIT, 0, { WEAP_MEDIKIT , 0}},
     {AXE_IMP, 0, { WEAP_SPANNER, /*WEAP_BIOWEAPON, */WEAP_MEDIKIT, WEAP_HOOK, WEAP_AXE, 0 }},
     {TF_HOOK_IMP1, 0, { WEAP_HOOK, 0 }},
     {TF_HOOK_IMP2, 0, { WEAP_HOOK, 0 }},
@@ -2638,7 +2638,6 @@ void W_ChangeWeapon(  )
 	int     it, am, fl, wm = 0, have_weapon, usable;
     int *weapons;
     struct w_impulse_s* wi = &w_impulses[0];
-    struct w_impulse_s wlast = { TF_WEAPLAST, 0, { 0,0} };
 
 	if ( self->tfstate & TFSTATE_RELOADING )
 		return;
@@ -2660,7 +2659,7 @@ void W_ChangeWeapon(  )
     self->s.v.impulse = 0;
     if( !wi->impulse){ return; }
 
-    if( wi->mask == 0 ){
+    if( wi->mask == 0 ){//init mask
         int* w = wi->weapons;
         while(*w){
             wi->mask |= *w++;
