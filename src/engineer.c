@@ -288,7 +288,7 @@ void EMPGrenadeExplode(  )
                         TF_T_Damage( te, self, PROG_TO_EDICT( self->s.v.owner ), expsize, 2, 4 );
                         te->s.v.ammo_shells = ceil( te->s.v.ammo_shells * 0.25 );
                         te->s.v.ammo_rockets = ceil( te->s.v.ammo_rockets * 0.25 );
-                        if ( te->playerclass != 9 )
+                        if ( te->playerclass != PC_ENGINEER )
                             te->s.v.ammo_cells = ceil( te->s.v.ammo_cells * 0.25 );
                         oldself = self;
                         self = te;

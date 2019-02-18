@@ -44,18 +44,16 @@ void TeamFortress_MOTD(  )
 		if ( !self->got_aliases )
 			G_sprint( self, 2, "\n\n\n" );
 		G_sprint( self, 2, "Type help for more info.\n" );
-		G_sprint( self, 2, "Ñõáëå×ïòìä ÔåáíÆïòôòåóó ”’’•\n" );
+		G_sprint( self, 3, "QuakeWorld TeamFortress 2003\n" );
 
 		if( tf_data.enable_bot )
 		{
 		      G_sprint( self, 2, "Bots Enabled\n" );
 		}
 
-//		G_sprint(self, 2, "Official ÍÔÆÌ version\n");
-
-		G_sprint( self, 2, "by sd‘ angel for ÍÔÆÌ\n" );
+		G_sprint( self, 2, "by " _LSB "sd" _RSB " angel for " _M _T _F _L "\n" );
 		G_sprint( self, 2, "Bug reports to angel_death@mail.ru\n" );
-		G_sprint( self, 2, "http://íôæì®óä®òõ\n" );
+		G_sprint( self, 2, "http://" _m _t _f _l "."  _s _d "."  _r _u"\n" );
 
 		self->menu_displaytime = 0;
 		self->current_menu = MENU_INTRO;

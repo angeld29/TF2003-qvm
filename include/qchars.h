@@ -88,3 +88,9 @@
 //#define _ "\xDD"
 //#define _ "\xDE"
 //#define _ "\xDF"
+#define LED_G "\x86"
+#define LED_R "\x87"
+#define LED_Y "\x88"
+#define LED_B "\x89"
+
+#define TF2003 _T _e _a _m _F _o _r _t _r _e _s _s  " " _2 _0 _0 _3

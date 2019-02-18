@@ -508,7 +508,7 @@ void Menu_ClassHelp2( menunum_t menu )
 
 void Menu_RepeatHelp( menunum_t menu )
 {
-	CenterPrint( self, "Press š to see this help again\n" );
+	CenterPrint( self, "Press " _8 " to see this help again\n" );
 	self->current_menu = MENU_DEFAULT;
 }
 
@@ -904,15 +904,15 @@ void Menu_Dispenser_Input( int inp )
 
 }
 
-const char *spy_menu_feign = "•‘ Start Feigning              \n"
-    "–‘ Silent Feign                \n";
-const char *spy_menu_stop_feign = "•‘ Stop Feigning               \n";
-const char *spy_menu_undecover = "“‘ Change Skin                 \n"
-    "”‘ Change Color                \n";
+const char *spy_menu_feign = _M3 " Start Feigning              \n"
+                             _M4 " Silent Feign                \n";
+const char *spy_menu_stop_feign = _M3 " Stop Feigning               \n";
+const char *spy_menu_undecover  = _M1 " Change Skin                 \n"
+                                  _M2 " Change Color                \n";
 
-const char *spy_menu_reset_skin = "—‘ Reset Skin                  \n";
-const char *spy_menu_reset_color = "—‘ Reset Color                 \n";
-const char *spy_menu_reset_skin_color = "—‘ Reset Skin and Color        \n";
+const char *spy_menu_reset_skin = _M5 " Reset Skin                  \n";
+const char *spy_menu_reset_color = _M5 " Reset Color                 \n";
+const char *spy_menu_reset_skin_color = _M5 " Reset Skin and Color        \n";
 void Menu_Spy( menunum_t menu )
 {
 	const char *s_undercover = spy_menu_undecover, *s_feign = "", *s_reset = "";
@@ -942,7 +942,7 @@ void Menu_Spy( menunum_t menu )
 
 	CenterPrint( self, "Action:                           \n"
 		     "%s%s%s"
-		     "˜‘ Nothing                     \n\n",
+		     _M6 " Nothing                     \n\n",
 		     s_undercover, s_feign, s_reset );
 }
 
@@ -950,7 +950,7 @@ void Menu_Spy_Input( int inp )
 {
 	if ( inp == 1 || inp == 2 )
 	{
-		if ( ( int ) self->s.v.effects & ( 8 | 4 ) )
+		if ( ( int ) self->s.v.effects & ( EF_DIMLIGHT | EF_BRIGHTLIGHT ) )
 		{
 			G_sprint( self, 2, "You can't go undercover while glowing.\n" );
 			ResetMenu(  );
@@ -1274,16 +1274,16 @@ const char *sentry_sfire_names[] = {
 };
 
 const char *sentry_find_names[] = {
-	_M6 "†ignore teammates           \n",
-	_M6 "ˆignore owner               \n",
-	_M6 "‰ignore OFF                 \n",
-	_M6 "‡ignore all targets         \n",
+	_M6 LED_G "ignore teammates           \n",
+	_M6 LED_Y "ignore owner               \n",
+	_M6 LED_B "ignore OFF                 \n",
+	_M6 LED_R "ignore all targets         \n",
 };
 
 /*const char *sentry_firetype_names[] = {
-	"7) Fire bullets & rockets     \n",
-	"7) Fire bullets               \n",
-	"7) Fire lightning (no damage) \n"
+	_M7  Fire bullets & rockets     \n",
+	_M7  Fire bullets               \n",
+	_M7  Fire lightning (no damage) \n"
 };*/
 void TG_SGOptions_Menu( menunum_t menu )
 {
@@ -1293,23 +1293,23 @@ void TG_SGOptions_Menu( menunum_t menu )
 
 	if ( tf_data.sg_newfind )
 	{
-		s_sg_newfind = "1)‰Sentry New Find Target ON  \n";
+		s_sg_newfind = _M1 LED_B "Sentry New Find Target ON  \n";
 		_snprintf( s_sgppl, sizeof( s_sgppl ), "       %3d ppl emulation      \n",
 			   tf_data.sgppl );
 	} else
 	{
-		s_sg_newfind = "1)‡Sentry New Find Target OFF \n";
+		s_sg_newfind = _M1 LED_R "Sentry New Find Target OFF \n";
 		_snprintf( s_sgppl, sizeof( s_sgppl ), "\n" );
 	}
 	if ( tf_data.sg_rfire )
-		s_sg_rfire = "3)‰Sentry Rocket Fire: NEW    \n";
+		s_sg_rfire = _M3 LED_B "Sentry Rocket Fire: NEW    \n";
 	else
-		s_sg_rfire = "3)‡Sentry Rocket Fire: OLD    \n";
+		s_sg_rfire = _M3 LED_R "Sentry Rocket Fire: OLD    \n";
 
 	if ( tg_data.sg_unlimit_ammo )
-		s_sg_unlimit_ammo = "5)‰Unlimited ammo ON          \n";
+		s_sg_unlimit_ammo = _M5 LED_B "Unlimited ammo ON          \n";
 	else
-		s_sg_unlimit_ammo = "5)‡Unlimited ammo OFF         \n";
+		s_sg_unlimit_ammo = _M5 LED_R "Unlimited ammo OFF         \n";
 
 
 	if ( tf_data.sg_sfire >= SG_SFIRE_NUM )
@@ -1325,16 +1325,16 @@ void TG_SGOptions_Menu( menunum_t menu )
   if(tg_data.sg_fire_type >= TG_SG_FIRE_NUM)
   	tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;
   s_sgfiretype = sentry_firetype_names[tg_data.sg_fire_type];*/
-	s_sgfiretype = "7) Fire type                  \n";
+	s_sgfiretype = _M7 " Fire type                  \n";
 	if ( tg_data.tg_sbar )
-		s_sbar = "8)‰Eng Sbar for All           \n";
+		s_sbar = _M8 LED_B "Eng Sbar for All           \n";
 	else
-		s_sbar = "8)‡Limited Eng Sbar           \n";
+		s_sbar = _M8 LED_R "Limited Eng Sbar           \n";
 
 	CenterPrint( self, "Sentry Gun Options:\n"
 		     "%s%s%s%s"
 		     "%s%s%s%s"
-		     "9) Nothing                    \n",
+		     _M9 " Nothing                    \n",
 		     s_sg_newfind, s_sgppl, s_sg_rfire, s_sg_sfire,
 		     s_sg_unlimit_ammo, s_sg_find, s_sgfiretype, s_sbar );
 }
@@ -1397,20 +1397,23 @@ void TG_SG_Fire_Menu( menunum_t menu )
 	const char *s_sg_firebullets, *s_sg_firerockets, *s_sg_firelighting, *s_sg_fire;
 
 	s_sg_firebullets = ( tg_data.sg_fire_bullets ) ?
-	    "2)‰Fire bullets ON            \n" : "2)‡Fire bullets OFF           \n";
+	    _M2 LED_B "Fire bullets ON            \n" : 
+        _M2 LED_R "Fire bullets OFF           \n";
 	s_sg_firerockets = ( tg_data.sg_fire_rockets ) ?
-	    "3)‰Fire rockets ON            \n" : "3)‡Fire rockets OFF           \n";
+	    _M3 LED_B "Fire rockets ON            \n" : 
+        _M3 LED_R "Fire rockets OFF           \n";
 	s_sg_firelighting = ( tg_data.sg_fire_lighting ) ?
-	    "4)‰Fire lighting ON           \n" : "4)‡Fire lighting OFF          \n";
+	    _M4 LED_B "Fire lighting ON           \n" : 
+        _M4 LED_R "Fire lighting OFF          \n";
 
 	if ( !tg_data.sg_disable_fire )
-		s_sg_fire = "1)‰fire ON                    \n";
+		s_sg_fire = _M1 LED_B "fire ON                    \n";
 	else
-		s_sg_fire = "1)‡fire OFF                   \n";
+		s_sg_fire = _M1 LED_R "fire OFF                   \n";
 
 	CenterPrint( self, "Sentry Gun Fire type:\n"
 		           "%s%s%s%s" 
-		           "5) Nothing                    \n", 
+		           _M5 " Nothing                    \n", 
 		           s_sg_fire,s_sg_firebullets, s_sg_firerockets, s_sg_firelighting);
 
 }
@@ -1449,36 +1452,36 @@ void TG_Detpack_Menu( menunum_t menu )
 	switch ( tg_data.detpack_clip )
 	{
 	case TG_DETPACK_SOLID_ALL:
-		s_clip = "1)‰detpack clip is ALL        \n";
+		s_clip = _M1 LED_B "detpack clip is ALL        \n";
 		break;
 
 	case TG_DETPACK_CLIP_ALL:
-		s_clip = "1)‡detpack clip is OFF        \n";
+		s_clip = _M1 LED_R "detpack clip is OFF        \n";
 		break;
 
 	case TG_DETPACK_CLIP_OWNER:
 	default:
-		s_clip = "1)ˆdetpack clip is ON         \n";
+		s_clip = _M1 LED_Y "detpack clip is ON         \n";
 		break;
 	}
 	if ( tg_data.disable_disarm )
-		s_disarm = "2)‡don't disarm detpacks      \n";
+		s_disarm = _M2 LED_R "don't disarm detpacks      \n";
 	else
-		s_disarm = "2)‰disarm detpacks            \n";
+		s_disarm = _M2 LED_B "disarm detpacks            \n";
 
 	if ( tg_data.detpack_drop )
-		s_drop = "3)‰drop detpacks              \n";
+		s_drop = _M3 LED_B "drop detpacks              \n";
 	else
-		s_drop = "3)‡don't drop detpacks        \n";
+		s_drop = _M3 LED_R "don't drop detpacks        \n";
 
 	if ( tf_data.detpack_block )
-		s_block = "4)‡Stack detpacks: TF2003     \n";
+		s_block = _M4 LED_R "Stack detpacks: TF2003     \n";
 	else
-		s_block = "4)‰Stack detpacks: TF 2.8.1   \n";
+		s_block = _M4 LED_B "Stack detpacks: TF 2.8.1   \n";
 
 	CenterPrint( self, "Detpack options:\n"
 		     "%s%s%s%s"
-		     "5) Nothing                    \n",
+		     _M5 " Nothing                    \n",
 		     s_clip, s_disarm, s_drop, s_block );
 }
 
@@ -1520,16 +1523,16 @@ void TG_Cheats_Menu( menunum_t menu )
 	switch ( tg_data.gren_effect )
 	{
 	case TG_GREN_EFFECT_OFF:
-		s_gren_effect = "3)‡Grenade effect OFF         \n";
+		s_gren_effect = _M3 LED_R "Grenade effect OFF         \n";
 		break;
 
 	case TG_GREN_EFFECT_OFF_FORSELF:
-		s_gren_effect = "3)ˆGrenade effect OFF for self\n";
+		s_gren_effect = _M3 LED_Y "Grenade effect OFF for self\n";
 		break;
 
 	case TG_GREN_EFFECT_ON:
 	default:
-		s_gren_effect = "3)‰Grenade effect ON          \n";
+		s_gren_effect = _M3 LED_B "Grenade effect ON          \n";
 		break;
 
 	}
@@ -1538,31 +1541,31 @@ void TG_Cheats_Menu( menunum_t menu )
 
 	case 0:
 	default:
-		s_gren_time = "4)‰Grenade effect time: full  \n";
+		s_gren_time = _M4 LED_B "Grenade effect time: full  \n";
 		break;
 	case 5:
-		s_gren_time = "4)‡Grenade effect time: 5 sec \n";
+		s_gren_time = _M4 LED_R "Grenade effect time: 5 sec \n";
 		break;
 	case 10:
-		s_gren_time = "4)ˆGrenade effect time: 10 sec\n";
+		s_gren_time = _M4 LED_Y "Grenade effect time: 10 sec\n";
 		break;
 
 	}
 	CenterPrint( self, "Cheats menu:\n"
 		     "%s%s%s%s%s%s"
-		     "7) Nothing                    \n",
+		     _M7 " Nothing                    \n",
 		     ( tg_data.
-		       unlimit_ammo ) ? "1)‰Unlimited ammo ON          \n" :
-		     "1)‡Unlimited ammo OFF         \n",
+		       unlimit_ammo ) ? _M1 LED_B "Unlimited ammo ON          \n" :
+		     _M1 LED_R "Unlimited ammo OFF         \n",
 		     ( tg_data.
-		       unlimit_grens ) ? "2)‰Unlimited grenades ON      \n" :
-		     "2)‡Unlimited grenades OFF     \n", s_gren_effect, s_gren_time,
+		       unlimit_grens ) ? _M2 LED_B "Unlimited grenades ON      \n" :
+		     _M2 LED_R "Unlimited grenades OFF     \n", s_gren_effect, s_gren_time,
 		     ( tg_data.
-		       godmode ) ? "5)‰God Mode ON                \n" :
-		     "5)‡God Mode OFF               \n",
+		       godmode ) ? _M5 LED_B "God Mode ON                \n" :
+		     _M5 LED_R "God Mode OFF               \n",
 		     ( tg_data.
-		       disable_reload ) ? "6)‰Reload Disabled            \n" :
-		     "6)‡Reload Enabled             \n" );
+		       disable_reload ) ? _M6 LED_B "Reload Disabled            \n" :
+		     _M6 LED_R "Reload Enabled             \n" );
 }
 
 void TG_Cheats_Menu_Input( int inp )
@@ -1608,17 +1611,17 @@ vec3_t  savepos = { 0, 0, 0 }
 void TG_SavePosition_Menu( menunum_t menu )
 {
 	if ( VectorCompareF( savepos, 0, 0, 0 ) )
-		CenterPrint( self, "\n1) Save Position              \n"
+		CenterPrint( self, "\n" _M1 " Save Position              \n"
 			     "                              \n"
 			     "                              \n"
 			     "                              \n"
-			     "5) Nothing                    " );
+			     _M5 " Nothing                    " );
 	else
-		CenterPrint( self, "\n1) Save Position              \n"
-			     "2) Show Position              \n"
-			     "3) Restore Position           \n"
-			     "4) Delete saved position      \n"
-			     "5) Nothing                    " );
+		CenterPrint( self, "\n" _M1 " Save Position              \n"
+			     _M2 " Show Position              \n"
+			     _M3 " Restore Position           \n"
+			     _M4 " Delete saved position      \n"
+			     _M5 " Nothing                    " );
 }
 
 
