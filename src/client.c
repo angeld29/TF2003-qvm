@@ -1801,7 +1801,7 @@ void PlayerPreThink()
 
     if ( self->undercover_team || self->undercover_skin || self->is_undercover )
     {
-        if ( ( int ) self->s.v.effects & ( 8 | 4 ) )
+        if ( ( int ) self->s.v.effects & ( EF_DIMLIGHT | EF_BRIGHTLIGHT ))
         {
             G_sprint( self, 1, "The glowing removes your disguise.\n" );
             Spy_RemoveDisguise( self );
