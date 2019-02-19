@@ -2261,23 +2261,23 @@ void W_Attack(  )
             switch ( ( int ) ( g_random(  ) * 4 ) )
             {
                 case 0:
-                    player_axe1(  );
+                    player_naxe(119,1, W_FireAxe);
                     break;
                 case 1:
-                    player_axeb1(  );
+                    player_naxe(125,5, W_FireAxe);
                     break;
                 case 2:
-                    player_axec1(  );
+                    player_naxe(131,1, W_FireAxe);
                     break;
                 default:
-                    player_axed1(  );
+                    player_naxe(137,5, W_FireAxe);
                     break;
             }
             break;
         case WEAP_SPANNER:
             Attack_Finished( 0.5 );
             sound( self, 1, "weapons/ax1.wav", 1, 1 );
-            player_axe1(  );
+            player_naxe(119,1, W_FireSpanner);
             break;
         case WEAP_HOOK:
             if ( !self->hook_out )
@@ -2287,7 +2287,7 @@ void W_Attack(  )
         case WEAP_SHOTGUN:
             if ( CheckForReload(  ) == 1 )
                 return;
-            player_shot1(  );
+            player_shot(113);
             W_FireShotgun(  );
             self->reload_shotgun += 1;
             self->StatusRefreshTime = g_globalvars.time + 0.1;
@@ -2297,7 +2297,7 @@ void W_Attack(  )
         case WEAP_SUPER_SHOTGUN:
             if ( CheckForReload(  ) == 1 )
                 return;
-            player_shot1(  );
+            player_shot(113);
             W_FireSuperShotgun(  );
             self->reload_super_shotgun += 2;
             self->StatusRefreshTime = g_globalvars.time + 0.1;
@@ -2311,7 +2311,7 @@ void W_Attack(  )
         case WEAP_GRENADE_LAUNCHER:
             if ( CheckForReload(  ) == 1 )
                 return;
-            player_rocket1(  );
+            player_shot(107);
             W_FireGrenade(  );
             self->reload_grenade_launcher += 1;
             self->StatusRefreshTime = g_globalvars.time + 0.1;
@@ -2321,7 +2321,7 @@ void W_Attack(  )
         case WEAP_ROCKET_LAUNCHER:
             if ( CheckForReload(  ) == 1 )
                 return;
-            player_rocket1(  );
+            player_shot(107);
             W_FireRocket(  );
             self->reload_rocket_launcher += 1;
             self->StatusRefreshTime = g_globalvars.time + 0.1;
@@ -2336,7 +2336,7 @@ void W_Attack(  )
         case WEAP_SNIPER_RIFLE:
             if ( ( ( int ) self->s.v.flags & FL_ONGROUND ) || self->hook_out )
             {
-                player_shot1(  );
+                player_shot(113);
                 W_FireSniperRifle(  );
                 self->allow_snip_time = g_globalvars.time + tf_data.snip_time;
                 Attack_Finished( 1.5 );
@@ -2362,7 +2362,7 @@ void W_Attack(  )
             }
             break;
         case WEAP_FLAMETHROWER:
-            player_shot1(  );
+            player_shot(113);
             W_FireFlame(  );
             if ( self->s.v.waterlevel > 2 )
                 Attack_Finished( 1 );
@@ -2372,7 +2372,7 @@ void W_Attack(  )
             }
             break;
         case WEAP_INCENDIARY:
-            player_rocket1(  );
+            player_shot(107);
             W_FireIncendiaryCannon(  );
             Attack_Finished( 1.2 );
             break;
@@ -2381,16 +2381,16 @@ void W_Attack(  )
             switch ( ( int ) ( g_random(  ) * 4 ) )
             {
                 case 0:
-                    player_medikit1(  );
+                    player_naxe(119,1, W_FireMedikit);
                     break;
                 case 1:
-                    player_medikitb1(  );
+                    player_naxe(125,5, W_FireMedikit);
                     break;
                 case 2:
-                    player_medikitc1(  );
+                    player_naxe(131,1, W_FireMedikit);
                     break;
                 default:
-                    player_medikitd1(  );
+                    player_naxe(137,5, W_FireMedikit);
                     break;
             }
             Attack_Finished( 0.5 );
@@ -2400,29 +2400,29 @@ void W_Attack(  )
             switch ( ( int ) ( g_random(  ) * 4 ) )
             {
                 case 0:
-                    player_bioweapon1(  );
+                    player_naxe(119,1, W_FireBioweapon);
                     break;
                 case 1:
-                    player_bioweaponb1(  );
+                    player_naxe(125,5, W_FireBioweapon);
                     break;
                 case 2:
-                    player_bioweaponc1(  );
+                    player_naxe(131,1, W_FireBioweapon);
                     break;
                 default:
-                    player_bioweapond1(  );
+                    player_naxe(137,5, W_FireBioweapon);
                     break;
             }
             Attack_Finished( 0.5 );
             break;
         case WEAP_TRANQ:
             sound( self, 1, "weapons/dartgun.wav", 1, 1 );
-            player_shot1(  );
+            player_shot(113);
             W_FireTranq(  );
             Attack_Finished( 1.5 );
             break;
         case WEAP_LASER:
             sound( self, 1, "weapons/railgun.wav", 1, 1 );
-            player_shot1(  );
+            player_shot(113);
             W_FireLaser(  );
             Attack_Finished( 0.4 );
             break;

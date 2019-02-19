@@ -28,6 +28,8 @@ void player_stand1();
 void player_run();
 void player_touch();
 
+void player_naxe( int frame, int wframe, th_die_func_t f );
+void player_shot(int start);
 void player_shot1();
 void player_shot2();
 void player_shot3();

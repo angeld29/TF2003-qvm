@@ -34,7 +34,7 @@ typedef void (*th_die_func_t)();
 typedef void (*th_pain_func_t)(struct gedict_s *, float);
 
 struct thick_s {
-    th_die_func_t frame_func, last_func;
+    th_die_func_t frame_func, last_func, last_think;
     int start, end;
 };
 

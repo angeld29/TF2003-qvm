@@ -1,6 +1,6 @@
 src/Makefile.dl
 src/Makefile.vm
-.vs/
+*.asm
 _cmake/
 _build/
 _buildout/

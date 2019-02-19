@@ -220,7 +220,28 @@ void player_run(  )
 	}
 	self->walkframe = self->walkframe + 1;
 }
+void player_shot_think()
+{
+	self->s.v.nextthink += 0.1;
+    self->s.v.frame += 1;
+    self->s.v.weaponframe += 1;
+    if( self->s.v.frame >= self->frame_info.end ){
+        self->s.v.think = (func_t)player_run;
+    }
+}
 
+void player_shot( int start )
+{
+	self->s.v.frame = start;
+	self->s.v.think = (func_t)player_shot_think;
+	self->s.v.nextthink = g_globalvars.time + 0.1;
+    self->frame_info.start = start;
+    self->frame_info.end = start + 5;
+
+	self->s.v.weaponframe = 1;
+	muzzleflash(  );
+}
+/*
 void player_shot1(  )
 {
 	self->s.v.frame = 113;
@@ -274,7 +295,7 @@ void player_shot6(  )
 	self->s.v.nextthink = g_globalvars.time + 0.1;
 
 	self->s.v.weaponframe = 6;
-}
+}*/
 
 void player_autorifle1(  )
 {
@@ -304,6 +325,44 @@ void player_autorifle3(  )
 	self->s.v.weaponframe = 6;
 }
 
+void player_naxe4(  )
+{
+	self->s.v.frame += 1;
+	self->s.v.weaponframe += 1;
+	self->s.v.think = ( func_t ) player_run;
+	self->s.v.nextthink = g_globalvars.time + 0.1;
+}
+
+void player_naxe3(  )
+{
+	self->s.v.frame += 1;
+	self->s.v.weaponframe += 1;
+	self->s.v.think = ( func_t ) player_naxe4;
+	self->s.v.nextthink = g_globalvars.time + 0.1;
+
+    self->frame_info.last_func();
+}
+
+void player_naxe2(  )
+{
+	self->s.v.frame += 1;
+	self->s.v.weaponframe += 1;
+	self->s.v.think = ( func_t ) player_naxe3;
+	self->s.v.nextthink = g_globalvars.time + 0.1;
+
+}
+
+void player_naxe( int frame, int wframe, th_die_func_t f  )
+{
+	self->s.v.frame = frame;
+	self->s.v.think = ( func_t ) player_naxe2;
+	self->s.v.nextthink = g_globalvars.time + 0.1;
+    self->frame_info.last_func = f;
+
+	self->s.v.weaponframe = wframe;
+}
+
+/*
 void player_axe1(  )
 {
 	self->s.v.frame = 119;
@@ -462,7 +521,7 @@ void player_axed4(  )
 	self->s.v.nextthink = g_globalvars.time + 0.1;
 
 	self->s.v.weaponframe = 8;
-}
+}*/
 
 void player_chain1(  )
 {
@@ -545,7 +604,7 @@ void player_chain5(  )
 
 	self->s.v.weaponframe = 0;
 }
-
+/*
 void player_medikit1(  )
 {
 	self->s.v.frame = 119;
@@ -692,8 +751,8 @@ void player_medikitd4(  )
 	self->s.v.nextthink = g_globalvars.time + 0.1;
 
 	self->s.v.weaponframe = 8;
-}
-
+}*/
+/*
 void player_bioweapon1(  )
 {
 	self->s.v.frame = 119;
@@ -840,7 +899,7 @@ void player_bioweapond4(  )
 	self->s.v.nextthink = g_globalvars.time + 0.1;
 
 	self->s.v.weaponframe = 8;
-}
+}*/
 
 void player_nail1(  )
 {
@@ -1142,7 +1201,7 @@ void player_light2(  )
 	Attack_Finished( 0.2 );
 }
 
-void player_rocket1(  )
+/*void player_rocket1(  )
 {
 	self->s.v.frame = 107;
 	self->s.v.think = ( func_t ) player_rocket2;
@@ -1195,7 +1254,7 @@ void player_rocket6(  )
 	self->s.v.nextthink = g_globalvars.time + 0.1;
 
 	self->s.v.weaponframe = 6;
-}
+}*/
 
 
 void    DeathBubbles( int num_bubbles );
@@ -1278,6 +1337,7 @@ void PainSound(  )
 	return;
 }
 
+/*
 void player_pain1(  )
 {
 	self->s.v.frame = 35;
@@ -1377,6 +1437,7 @@ void player_axpain6(  )
 	self->s.v.nextthink = g_globalvars.time + 0.1;
 
 }
+*/
 
 void player_pain( gedict_t * attacker, float take  )
 {
@@ -1395,10 +1456,14 @@ void player_pain( gedict_t * attacker, float take  )
 	}
 	if ( self->s.v.button0 && self->current_weapon == WEAP_ASSAULT_CANNON )
 		return;
+	PainSound(  );
+	self->s.v.weaponframe = 0;
 	if ( self->current_weapon <= 16 )
-		player_axpain1(  );
+        set_think( self, 29 , 34, NULL, NULL, player_run );
+		//player_axpain1(  );
 	else
-		player_pain1(  );
+        set_think( self, 35 , 40, NULL, NULL, player_run );
+		//player_pain1(  );
 }
 
 
@@ -1630,7 +1695,7 @@ void GibPlayer(  )
 	else
 		sound( self, 2, "player/udeath.wav", 1, 0 );
 }
-
+#define player_die(start,end) set_think( self, start, end, NULL, PlayerDead, NULL )
 void PlayerDie(  )
 {
 //	float   i;
@@ -1710,7 +1775,7 @@ void PlayerDie(  )
 	if ( self->current_weapon <= 16 )
 	{
 		//player_die_ax1(  );
-        set_think( self, 41, 49, NULL, PlayerDead );
+        player_die(41, 49);
 		TeamFortress_SetupRespawn( 0 );
 		return;
 	}
@@ -1719,23 +1784,23 @@ void PlayerDie(  )
 	{
 		case 0:
 			//player_diea1(  );
-            set_think( self, 50, 60, NULL, PlayerDead );
+            player_die( 50, 60 );
 			break;
 		case 1:
 			//player_dieb1(  );
-            set_think( self, 61, 69, NULL, PlayerDead );
+            player_die(61, 69);
 			break;
 		case 2:
-            set_think( self, 70, 84, NULL, PlayerDead );
+            player_die(70, 84);
 			//player_diec1(  );
 			break;
 		case 3:
-            set_think( self, 85, 93, NULL, PlayerDead );
+            player_die(85, 93);
 			//player_died1(  );
 			break;
 		default:
+            player_die(93, 102);
 			//player_diee1(  );
-            set_think( self, 93, 102, NULL, PlayerDead );
 			break;
 	
 	}
