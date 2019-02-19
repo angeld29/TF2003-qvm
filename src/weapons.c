@@ -53,7 +53,7 @@ const weapon_info_t weapons_info[]= {
 {  WEAP_FLAMETHROWER     , IT_GRENADE_LAUNCHER, IT_CELLS,   16, FOFS(s.v.ammo_cells),  F_FLOAT,0,0,0,1, 0,0,   0,0, 0.0, "progs/v_flame.mdl", "", "", 0},
 {  WEAP_ROCKET_LAUNCHER  , IT_ROCKET_LAUNCHER,  IT_ROCKETS, 32, FOFS(s.v.ammo_rockets),F_FLOAT,0,0,1,0, 4,5,   0,0, 0.8, "progs/v_rock2.mdl", "", "weapons/sgun1.wav", 0},
 {  WEAP_INCENDIARY       , IT_ROCKET_LAUNCHER,  IT_ROCKETS, 32, FOFS(s.v.ammo_rockets),F_FLOAT,0,0,3,0, 0,0,   0,0, 1.2, "progs/v_rock2.mdl", "", "weapons/sgun1.wav", 0},
-{  WEAP_ASSAULT_CANNON   , IT_ROCKET_LAUNCHER,  IT_SHELLS,  32, FOFS(s.v.ammo_shells), F_FLOAT,0,0,0,0, 0,0,   0,0, 0.0, "progs/v_asscan.mdl", "", 0},
+{  WEAP_ASSAULT_CANNON   , IT_ROCKET_LAUNCHER,  IT_SHELLS,  32, FOFS(s.v.ammo_shells), F_FLOAT,0,0,0,6, 0,0,   0,0, 0.0, "progs/v_asscan.mdl", "", 0},
 {  WEAP_LIGHTNING        , IT_LIGHTNING,        IT_CELLS,   64, FOFS(s.v.ammo_cells),  F_FLOAT,0,0,0,1, 0,0,   0,0, 0.1, "", "", "weapons/lstart.wav", 0},
 {  WEAP_DETPACK          , 0,                   },
 {  WEAP_TRANQ            , IT_SHOTGUN,          IT_SHELLS,  1, FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 0,0,   0,0, 1.5, "progs/v_tgun.mdl", "", "weapons/dartgun.wav", 0},
@@ -61,6 +61,7 @@ const weapon_info_t weapons_info[]= {
 };
 
 #define WEAPON_BY_BIT(bit) &weapons_info[log2powerof2(bit) + 1]
+
 void    item_megahealth_rot(  );
 
 float   button_touch(  );
@@ -2045,113 +2046,53 @@ void W_SetCurrentAmmo(  )
     }
 }
 
+const int best_weapon_list[] = { WEAP_LIGHTNING, WEAP_ASSAULT_CANNON, WEAP_FLAMETHROWER,
+    WEAP_SUPER_NAILGUN, WEAP_SUPER_SHOTGUN, WEAP_LASER, WEAP_NAILGUN,
+    WEAP_SHOTGUN, WEAP_TRANQ, WEAP_MEDIKIT, WEAP_SPANNER, WEAP_AXE,
+    0,
+};
 int W_BestWeapon(  )
 {
 	int     it;
+    const weapon_info_t * wi;
+    const int* w = &best_weapon_list[0];
 
 	it = self->weapons_carried;
-	if ( self->s.v.ammo_cells >= 1 && ( it & WEAP_LIGHTNING ) && self->s.v.waterlevel <= 1 )
-		return WEAP_LIGHTNING;
-	else
-	{
-		if ( self->s.v.ammo_cells >= 6 && self->s.v.ammo_shells > self->assault_min_shells
-		     && ( it & WEAP_ASSAULT_CANNON ) )
+    do{
+        wi = WEAPON_BY_BIT( *w );
+
+        if( !( wi->w & it ) ) continue;
+        
+        if( wi->w == WEAP_ASSAULT_CANNON && 
+                (self->s.v.ammo_cells >= 6 && self->s.v.ammo_shells > self->assault_min_shells ) ){
 			return WEAP_ASSAULT_CANNON;
-		else
-		{
-			if ( self->s.v.ammo_cells >= 1 && ( it & WEAP_FLAMETHROWER ) )
-				return WEAP_FLAMETHROWER;
-			else
-			{
-				if ( self->s.v.ammo_nails >= 2 && ( it & WEAP_SUPER_NAILGUN ) )
-					return WEAP_SUPER_NAILGUN;
-				else
-				{
-					if ( self->s.v.ammo_shells >= 2 && ( it & WEAP_SUPER_SHOTGUN ) )
-						return WEAP_SUPER_SHOTGUN;
-					else
-					{
-						if ( self->s.v.ammo_nails >= 1 && ( it & WEAP_LASER ) )
-							return WEAP_LASER;
-						else
-						{
-							if ( self->s.v.ammo_nails >= 1 && ( it & WEAP_NAILGUN ) )
-								return WEAP_NAILGUN;
-							else
-							{
-								if ( self->s.v.ammo_shells >= 1
-								     && ( it & WEAP_SHOTGUN ) )
-									return WEAP_SHOTGUN;
-								else
-								{
-									if ( self->s.v.ammo_shells >= 1
-									     && ( it & WEAP_TRANQ ) )
-										return WEAP_TRANQ;
-									else
-									{
-										if ( it & WEAP_MEDIKIT )
-											return WEAP_MEDIKIT;
-										else
-										{
-											if ( it & WEAP_SPANNER )
-												return WEAP_SPANNER;
-											else
-											{
-												if ( it & WEAP_AXE )
-													return WEAP_AXE;
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+        }
+        if( wi->ammo_shells && self->s.v.ammo_shells < wi->ammo_shells ) continue;
+        if( wi->ammo_nails && self->s.v.ammo_nails < wi->ammo_nails ) continue;
+        if( wi->ammo_rockets && self->s.v.ammo_rockets < wi->ammo_rockets ) continue;
+        if( wi->ammo_cells && self->s.v.ammo_cells < wi->ammo_cells ) continue;
+        return *w;
+    } while( *(++w) );
 	return 0;
 }
 
 int W_CheckNoAmmo(  )
 {
-	if ( self->current_weapon == WEAP_MEDIKIT )
-		return 1;
-	else
-	{
-		if ( self->current_weapon == WEAP_BIOWEAPON )
-			return 1;
-		else
-		{
-			if ( self->current_weapon == WEAP_AXE || self->current_weapon == WEAP_HOOK
-			     || self->current_weapon == WEAP_SPANNER )
-				return 1;
-			else
-			{
-				if ( self->current_weapon == WEAP_INCENDIARY )
-				{
-					if ( self->s.v.currentammo >= 3 )
-						return 1;
-				} else
-				{
-				
-					if( self->current_weapon == WEAP_SNIPER_RIFLE )
-					{
-						if ( self->s.v.currentammo >= tf_data.snip_ammo )
-							return 1;
-					}else
-					{
-						if ( self->s.v.currentammo > 0 )
-							return 1;
-					}
-				}
-			}
-		}
-	}
-	self->current_weapon = W_BestWeapon(  );
-	W_SetCurrentAmmo(  );
-	W_PrintWeaponMessage(  );
-	return 0;
+    int it;
+    it = self->current_weapon;
+    if( it & (WEAP_MEDIKIT | WEAP_SPANNER| WEAP_AXE | WEAP_HOOK ) )
+        return 1;
+    if ( it == WEAP_INCENDIARY && ( self->s.v.currentammo >= 3 ))
+        return 1;
+    if( it == WEAP_SNIPER_RIFLE && ( self->s.v.currentammo >= tf_data.snip_ammo ))
+        return 1;
+    if ( self->s.v.currentammo > 0 )
+        return 1;
+
+    self->current_weapon = W_BestWeapon();
+    W_SetCurrentAmmo(  );
+    W_PrintWeaponMessage(  );
+    return 0;
 }
 
 void W_Reload_shotgun(  )
