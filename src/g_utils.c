@@ -630,11 +630,11 @@ void _think_func(  )
         if( self->frame_info.last_func )
             self->frame_info.last_func();
     }else{
-        self->s.v.frame = self->s.v.frame + 1;
+        self->s.v.frame += 1;
         if( self->frame_info.frame_func )
             self->frame_info.frame_func();
     }
-	self->s.v.nextthink = g_globalvars.time + 0.1;
+	self->s.v.nextthink += 0.1;
     self->s.v.think = (func_t)_think_func;
 }
 
