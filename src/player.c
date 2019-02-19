@@ -1709,7 +1709,8 @@ void PlayerDie(  )
 	self->s.v.angles[2] = 0;
 	if ( self->current_weapon <= 16 )
 	{
-		player_die_ax1(  );
+		//player_die_ax1(  );
+        set_think( self, 41, 49, NULL, PlayerDead );
 		TeamFortress_SetupRespawn( 0 );
 		return;
 	}
@@ -1717,19 +1718,24 @@ void PlayerDie(  )
 	switch((int)( g_random(  ) * 5 ))
 	{
 		case 0:
-			player_diea1(  );
+			//player_diea1(  );
+            set_think( self, 50, 60, NULL, PlayerDead );
 			break;
 		case 1:
-			player_dieb1(  );
+			//player_dieb1(  );
+            set_think( self, 61, 69, NULL, PlayerDead );
 			break;
 		case 2:
-			player_diec1(  );
+            set_think( self, 70, 84, NULL, PlayerDead );
+			//player_diec1(  );
 			break;
 		case 3:
-			player_died1(  );
+            set_think( self, 85, 93, NULL, PlayerDead );
+			//player_died1(  );
 			break;
 		default:
-			player_diee1(  );
+			//player_diee1(  );
+            set_think( self, 93, 102, NULL, PlayerDead );
 			break;
 	
 	}
@@ -1745,6 +1751,7 @@ void set_suicide_frame(  )
 	setsize( self, -16, -16, -24, 16, 16, 32 );
 }
 
+/*
 void player_diea1(  )
 {
 	self->s.v.frame = 50;
@@ -2245,7 +2252,7 @@ void player_die_ax9(  )
 	self->s.v.nextthink = g_globalvars.time + 0.1;
 
 	PlayerDead(  );
-}
+}*/
 
 void Headless_Think(  )
 {

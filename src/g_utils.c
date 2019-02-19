@@ -623,3 +623,29 @@ int log2powerof2( unsigned int v )
     return r;
 }
 
+void _think_func(  )
+{
+    
+    if( self->s.v.frame >= self->frame_info.end ){
+        if( self->frame_info.last_func )
+            self->frame_info.last_func();
+    }else{
+        self->s.v.frame = self->s.v.frame + 1;
+        if( self->frame_info.frame_func )
+            self->frame_info.frame_func();
+    }
+	self->s.v.nextthink = g_globalvars.time + 0.1;
+    self->s.v.think = (func_t)_think_func;
+}
+
+void set_think( gedict_t* e, int start, int end, th_die_func_t frame_func, th_die_func_t last_func )
+{
+    e->s.v.think = (func_t)_think_func;
+    e->s.v.frame = start;
+    e->frame_info.start = start;
+    e->frame_info.end = end;
+    e->frame_info.frame_func = frame_func;
+    e->frame_info.last_func = last_func;
+    if( e->frame_info.frame_func )
+        e->frame_info.frame_func();
+}
