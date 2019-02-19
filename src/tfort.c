@@ -808,11 +808,11 @@ void TeamFortress_ShowTF(  )
 
     }
     G_sprint( self, 2, "Sentry Rockets Fire: " );
-    if(tf_data.sg_rfire)
-        G_sprint( self, 3, "NEW\n" );
-    else
-        G_sprint( self, 3, "OLD\n" );
+    G_sprint( self, 3, tf_data.sg_rfire ? "NEW\n" : "OLD\n" );
 
+    G_sprint( self, 2, "Spanner mode: " );
+    G_sprint( self, 3, tf_data.old_spanner ? "OLD\n" : "NEW\n" );
+    
     G_sprint( self, 2, "New Gas Options %d:\n" ,tf_data.new_gas );
     if( (tf_data.new_gas & GAS_MASK_COLOR) && !(tf_data.new_gas & GAS_MASK_ALLSPYS))
     {
