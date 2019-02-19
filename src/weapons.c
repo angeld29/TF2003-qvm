@@ -3121,7 +3121,7 @@ void Angel_SaveImpulse( int impulse )
 {
 	if ( self->s.v.impulse <= 9 )
 	{
-		if ( self->current_weapon == 8 )
+		if ( self->current_weapon == WEAP_SPANNER )
 			return;
 		self->imp1 = self->s.v.impulse;
 		self->s.v.impulse = 0;

@@ -1680,36 +1680,21 @@ void TeamFortress_SetEquipment(  )
 
 int TeamFortress_GetMaxAmmo( gedict_t * Retriever, int AmmoType )
 {
-	if ( AmmoType == IT_SHELLS )
-		return Retriever->maxammo_shells;
-	else
-	{
-		if ( AmmoType == IT_NAILS )
-			return Retriever->maxammo_nails;
-		else
-		{
-			if ( AmmoType == IT_CELLS )
-				return Retriever->maxammo_cells;
-			else
-			{
-				if ( AmmoType == IT_ROCKETS )
-					return Retriever->maxammo_rockets;
-				else
-				{
-					if ( AmmoType == WEAP_MEDIKIT )
-						return Retriever->maxammo_medikit;
-					else
-					{
-						if ( AmmoType == WEAP_DETPACK )
-							return Retriever->maxammo_detpack;
-					}
-				}
-			}
-		}
-	}
-	G_conprintf( "Error in TeamFortress_GetMaxAmmo()\n" );
-	G_conprintf( "Invalid ammo type passed.\n" );
-	return 0;
+    if ( AmmoType == IT_SHELLS )
+        return Retriever->maxammo_shells;
+    if ( AmmoType == IT_NAILS )
+        return Retriever->maxammo_nails;
+    if ( AmmoType == IT_CELLS )
+        return Retriever->maxammo_cells;
+    if ( AmmoType == IT_ROCKETS )
+        return Retriever->maxammo_rockets;
+    if ( AmmoType == WEAP_MEDIKIT )
+        return Retriever->maxammo_medikit;
+    if ( AmmoType == WEAP_DETPACK )
+        return Retriever->maxammo_detpack;
+    G_conprintf( "Error in TeamFortress_GetMaxAmmo()\n" );
+    G_conprintf( "Invalid ammo type passed.\n" );
+    return 0;
 }
 
 int TeamFortress_CanGetWeapon( gedict_t * Retriever, int WeaponType )
