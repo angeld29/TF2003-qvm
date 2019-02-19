@@ -93,4 +93,8 @@
 #define LED_Y "\x88"
 #define LED_B "\x89"
 
-#define TF2003 _T _e _a _m _F _o _r _t _r _e _s _s  " " _2 _0 _0 _3
+#define _TF2003 _T _e _a _m _F _o _r _t _r _e _s _s  " " _2 _0 _0 _3
+#define _MTFL _M _T _F _L
+#define _BY_SD_ANGEL "by " _LSB "sd" _RSB " angel for " _MTFL
+#define _ON _O _N
+#define _OFF _O _F _F

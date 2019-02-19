@@ -51,7 +51,7 @@ void TeamFortress_MOTD(  )
 		      G_sprint( self, 2, "Bots Enabled\n" );
 		}
 
-		G_sprint( self, 2, "by " _LSB "sd" _RSB " angel for " _M _T _F _L "\n" );
+		G_sprint( self, 2, _BY_SD_ANGEL "\n" );
 		G_sprint( self, 2, "Bug reports to angel_death@mail.ru\n" );
 		G_sprint( self, 2, "http://" _m _t _f _l "."  _s _d "."  _r _u"\n" );
 

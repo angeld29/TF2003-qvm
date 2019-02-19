@@ -271,7 +271,7 @@ void Red_Def_command( int argc )
         	}
         	te->take_sshot = 1;
                 red_def_mode = true;
-                G_bprint(2,"Òεδ-ΔΕζ νοδε αγτιφατεδ\n");
+                G_bprint(3, "Red-DEF mode activated\n");
                 return;
         }
         if( !strcmp(cmd_command,"off") )
@@ -279,7 +279,7 @@ void Red_Def_command( int argc )
                 if( !red_def_mode )
                 {
         	        if( self != world )
-                                G_sprint(self,2,"Red-Def mode not active\n");
+                                G_sprint(self,3,"Red-Def mode not active\n");
                         return;
                 }
 	        Goal = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
@@ -310,7 +310,7 @@ void Red_Def_command( int argc )
         	}
         	te->take_sshot = 0;
                 red_def_mode = false;
-                G_bprint(2,"Òεδ-ΔΕζ νοδε δεαγτιφατεδ\n");
+                G_bprint(3, "Red-DEF mode deactivated\n");
                 return;
         }
 

@@ -2307,43 +2307,43 @@ qboolean PrintClientSetting( gedict_t * p, const char *key )
         case 0x4C60C3F1:	//ch
         case 0x33653DAA:	//classhelp
             if ( p->settings_bits & TF_CLASS_HELP_MASK )
-                G_sprint( p, 2, "Classhelp is ÏÎ\n" );
+                G_sprint( p, 2, "Classhelp is " _ON "\n" );
             else
-                G_sprint( p, 2, "Classhelp is ÏÆÆ\n" );
+                G_sprint( p, 2, "Classhelp is " _OFF "\n" );
             break;
 
         case 0x58862793:	//ms
         case 0x02E5FD61:	//multiscan
             if ( !( p->settings_bits & TF_MULTISCAN_MASK ) )
-                G_sprint( p, 2, "Multiscan is ÏÎ\n" );
+                G_sprint( p, 2, "Multiscan is " _ON "\n" );
             else
-                G_sprint( p, 2, "Multiscan is ÏÆÆ\n" );
+                G_sprint( p, 2, "Multiscan is " _OFF "\n" );
             break;
         case 0x8DE8BDFF:	//ec
         case 0x6BDB6A88:	//exec_class
             if ( p->settings_bits & TF_EXEC_CLASS_MASK )
-                G_sprint( p, 2, "Exec class is ÏÎ\n" );
+                G_sprint( p, 2, "Exec class is " _ON "\n" );
             else
-                G_sprint( p, 2, "Exec class is ÏÆÆ\n" );
+                G_sprint( p, 2, "Exec class is " _OFF "\n" );
             break;
         case 0x6A5090F8:	//em
         case 0x5B8710D3:	//exec_map
             if ( p->settings_bits & TF_EXEC_MAP_MASK )
-                G_sprint( p, 2, "Exec map is ÏÎ\n" );
+                G_sprint( p, 2, "Exec map is " _ON "\n" );
             else
-                G_sprint( p, 2, "Exec map is ÏÆÆ\n" );
+                G_sprint( p, 2, "Exec map is " _OFF "\n" );
             break;
         case 0xCAD67046:	//take_sshot
             if ( p->settings_bits & TF_EXEC_MAP_MASK )
-                G_sprint( p, 2, "Take screenshot is ÏÎ\n" );
+                G_sprint( p, 2, "Take screenshot is " _ON "\n" );
             else
-                G_sprint( p, 2, "Take screenshot is ÏÆÆ\n" );
+                G_sprint( p, 2, "Take screenshot is " _OFF "\n" );
             break;
         case 0xE5A257DF:	//grensound
             if ( p->internal_settings_bits & TF_INTERNAL_GRENSOUND )
-                G_sprint( p, 2, "Grenade sound is ÏÎ\n" );
+                G_sprint( p, 2, "Grenade sound is " _ON "\n" );
             else
-                G_sprint( p, 2, "Grenade sound is ÏÆÆ\n" );
+                G_sprint( p, 2, "Grenade sound is " _OFF "\n" );
             break;
         default:
             return false;

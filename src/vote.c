@@ -268,8 +268,8 @@ void Vote_Admin_Run()
 {
 	int 		f1, needed_votes;
 
-    G_bprint(2,  "%s ηαιξσ αδνιξ στατυσ!\n", elect_player->s.v.netname);
-    G_sprint(elect_player, 2, "Type γνδ αδνιξ for admin commands.\n");
+    G_bprint(2,  "%s "  _g _a _i _n " " _a _d _m _i _n " " _r _i _g _h _t _s "!\n", elect_player->s.v.netname);
+    G_sprint(elect_player, 2, "Type " _c _m _d " " _a _d _m _i _n " for admin commands.\n");
 	elect_level  = GetSVInfokeyInt(  "electlevel", NULL, 1 );
     elect_player->is_admin = elect_level;
 }
@@ -354,8 +354,8 @@ void Vote_Cmd()
                     votes[i].VoteRun();
                     return;
                 }
-                G_bprint(3, "γνδ φοτε ωεσ");
-                G_bprint(3, " in console to approve\n");
+                G_bprint(2, _c _m _d " " _v _o _t _e " " _y _e _s);
+                G_bprint(2, " in console to approve\n");
                 _startVote();
             }else{
                 current_vote = -1;

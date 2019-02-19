@@ -1384,8 +1384,8 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 	gedict_t *te;
 	float   winners;
 //	float   gotone;
-        static const char *ctf_msg_your_team_gotflag = "\n\n\nYour team гот the енемы flag!!";
-        static const char *ctf_msg_your_flag_taken   = "\n\n\nYour flag has been такен!!";
+        static const char *ctf_msg_your_team_gotflag = "\n\n\nYour team " _G _O _T " the " _E _N _E _M _Y " flag!!";
+        static const char *ctf_msg_your_flag_taken   = "\n\n\nYour flag has been " _T _A _K _E _N "!!";
         static const char *ctf_msgs_you_take_flag[] = {
                  "\n\n\nYou got the enemy flag!\n\nFlee!" ,
                  "\n\n\nYou got the enemy flag!\n\nHead for home!" ,
@@ -1464,7 +1464,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
   				} else
   					CenterPrint( te, ctf_msg_your_flag_taken );
   			}
-  			G_bprint( 2, "%s гот the блуе flag!\n", AP->s.v.netname );
+  			G_bprint( 2, "%s " _G _O _T " the " _B _L _U _E " flag!\n", AP->s.v.netname );
   			AP->s.v.items = ( int ) AP->s.v.items | IT_KEY1;
                         break;
                       case 2:
@@ -1480,7 +1480,7 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
   				} else
   					CenterPrint( te, ctf_msg_your_flag_taken );
   			}
-  			G_bprint( 2, "%s гот the ред flag!\n", AP->s.v.netname );
+  			G_bprint( 2, "%s " _G _O _T " the " _R _E _D " flag!\n", AP->s.v.netname );
   			AP->s.v.items = ( int ) AP->s.v.items | IT_KEY2;
                         break;
                       case 3:
@@ -1489,13 +1489,13 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
        				if ( te->team_no == 2 )
        				{
        					if ( te == AP )
-       						CenterPrint( te,"\n\n\nYou цаптуред the flag!!" );
+       						CenterPrint( te,"\n\n\nYou " _C _A _P _T _U _R _E _D " the flag!!" );
        					else
-       						CenterPrint( te,"\n\n\nYour flag was цаптуред!!" );
+       						CenterPrint( te,"\n\n\nYour flag was " _C _A _P _T _U _R _E _D "!!" );
        				} else
-       					CenterPrint( te, "\n\n\nYour team цаптуред the flag!!" );
+       					CenterPrint( te, "\n\n\nYour team " _C _A _P _T _U _R _E _D " the flag!!" );
        			}
-       			G_bprint( 2, "%s цаптуред the ред flag!\n", AP->s.v.netname );
+       			G_bprint( 2, "%s " _C _A _P _T _U _R _E _D " the " _R _E _D " flag!\n", AP->s.v.netname );
        			AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY2 );
                         break;
                       case 4:
@@ -1504,13 +1504,13 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
        				if ( te->team_no == 1 )
        				{
        					if ( te == AP )
-       						CenterPrint( te,"\n\n\nYou цаптуред the flag!!" );
+       						CenterPrint( te,"\n\n\nYou " _C _A _P _T _U _R _E _D " the flag!!" );
        					else
-       						CenterPrint( te,"\n\n\nYour flag was цаптуред!!" );
+       						CenterPrint( te,"\n\n\nYour flag was " _C _A _P _T _U _R _E _D "!!" );
        				} else
-       					CenterPrint( te, "\n\n\nYour team цаптуред the flag!!" );
+       					CenterPrint( te, "\n\n\nYour team " _C _A _P _T _U _R _E _D " the flag!!" );
        			}
-       			G_bprint( 2, "%s цаптуред the блуе flag!\n", AP->s.v.netname );
+       			G_bprint( 2, "%s " _C _A _P _T _U _R _E _D " the " _B _L _U _E " flag!\n", AP->s.v.netname );
        			AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY1 );
                         break;
                 }
@@ -1701,14 +1701,14 @@ void item_tfgoal_touch(  )
 			{
 				if ( other->team_no == 1 )
 				{
-					G_bprint( 2, "%s ретурнед the блуе flag!\n", other->s.v.netname );
+					G_bprint( 2, "%s " _R _E _T _U _R _N _E _D " the " _B _L _U _E " flag!\n", other->s.v.netname );
 					te = trap_find( world, FOFS( s.v.classname ), "player" );
 					while ( te )
 					{
 						if ( te->team_no == 1 )
-							CenterPrint( te, "\n\n\nYour flag was ретурнед!!" );
+							CenterPrint( te, "\n\n\nYour flag was " _R _E _T _U _R _N _E _D "!!" );
 						else
-							CenterPrint( te, "\n\n\nThe енемы flag was ретурнед!!" );
+							CenterPrint( te, "\n\n\nThe " _E _N _E _M _Y " flag was " _R _E _T _U _R _N _E _D "!!" );
 						te = trap_find( te, FOFS( s.v.classname ), "player" );
 					}
 					self->goal_state = 2;
@@ -1733,15 +1733,15 @@ void item_tfgoal_touch(  )
 				{
 					if ( other->team_no == 2 )
 					{
-						G_bprint( 2, "%s ретурнед the ред flag!\n", other->s.v.netname );
+						G_bprint( 2, "%s " _R _E _T _U _R _N _E _D " the " _R _E _D " flag!\n", other->s.v.netname );
 						te = trap_find( world, FOFS( s.v.classname ), "player" );
 						while ( te )
 						{
 							if ( te->team_no == 2 )
-								CenterPrint( te, "\n\n\n Your flag was ретурнед!!" );
+								CenterPrint( te, "\n\n\n Your flag was " _R _E _T _U _R _N _E _D "!!" );
 							else
 								CenterPrint( te,
-									     "\n\n\n The енемы flag was ретурнед!!" );
+									     "\n\n\n The " _E _N _E _M _Y " flag was " _R _E _T _U _R _N _E _D "!!" );
 							te = trap_find( te, FOFS( s.v.classname ), "player" );
 						}
 						self->goal_state = 2;
@@ -2228,7 +2228,7 @@ void SP_item_flag_team2(  )
 	trap_precache_sound( "boss2/pop2.wav" );
 	self->s.v.classname = "item_tfgoal";
 	self->s.v.netname = "Team 1 Flag";
-	self->broadcast = " гот the enemy team's flag!\n";
+	self->broadcast = " " _G _O _T " the enemy team's flag!\n";
 	self->deathtype = "You've got the enemy flag!\n";
 	self->s.v.noise = "ogre/ogwake.wav";
 	if ( tf_data.toggleflags & TFLAG_USE_WAR_STD )
@@ -2258,8 +2258,8 @@ void SP_item_flag_team2(  )
 	dp->items_allowed = 2;
 	dp->goal_no = 3;
 	dp->goal_effects = TFGE_AP | TFGE_AP_TEAM;
-	dp->broadcast = " цаптуред the enemy flag!\n";
-	dp->s.v.message = "You цаптуред the enemy flag!\n";
+	dp->broadcast = " " _C _A _P _T _U _R _E _D " the enemy flag!\n";
+	dp->s.v.message = "You " _C _A _P _T _U _R _E _D " the enemy flag!\n";
 	dp->s.v.noise = "boss2/pop2.wav";
 	dp->goal_result = TFGR_ADD_BONUSES;
 	dp->activate_goal_no = 5;
@@ -2299,7 +2299,7 @@ void SP_item_flag_team1(  )
 	trap_precache_sound( "boss2/pop2.wav" );
 	self->s.v.classname = "item_tfgoal";
 	self->s.v.netname = "Team 2 Flag";
-	self->broadcast = " гот the enemy team's flag!\n";
+	self->broadcast = " " _G _O _T " the enemy team's flag!\n";
 	self->deathtype = "You've got the enemy flag!\n";
 	self->s.v.noise = "ogre/ogwake.wav";
 	if ( tf_data.toggleflags & TFLAG_USE_WAR_STD )
@@ -2329,8 +2329,8 @@ void SP_item_flag_team1(  )
 	dp->items_allowed = 1;
 	dp->goal_no = 4;
 	dp->goal_effects = TFGE_AP | TFGE_AP_TEAM;
-	dp->broadcast = " цаптуред the enemy flag!\n";
-	dp->s.v.message = "You цаптуред the enemy flag!\n";
+	dp->broadcast = " " _C _A _P _T _U _R _E _D " the enemy flag!\n";
+	dp->s.v.message = "You " _C _A _P _T _U _R _E _D " the enemy flag!\n";
 	dp->s.v.noise = "boss2/pop2.wav";
 	dp->goal_result = TFGR_ADD_BONUSES;
 	dp->activate_goal_no = 6;

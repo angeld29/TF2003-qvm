@@ -718,277 +718,280 @@ void TeamFortress_Inventory(  )
 
 void TeamFortress_ShowTF(  )
 {
-	float fl;
-	int	it,i;
+    float fl;
+    int	it,i;
 
-	if ( tf_data.toggleflags & TFLAG_CLASS_PERSIST )
-		G_sprint( self, 2, "Class Persistence On.\n" );
-	else
-		G_sprint( self, 2, "Class Persistence Off.\n" );
+    if ( tf_data.toggleflags & TFLAG_CLASS_PERSIST )
+        G_sprint( self, 2, "Class Persistence On.\n" );
+    else
+        G_sprint( self, 2, "Class Persistence Off.\n" );
 
-	if ( tf_data.toggleflags & TFLAG_CHEATCHECK )
-		G_sprint( self, 2, "Cheat Checking On.\n" );
-	else
-		G_sprint( self, 2, "Cheat Checking Off.\n" );
+    if ( tf_data.toggleflags & TFLAG_CHEATCHECK )
+        G_sprint( self, 2, "Cheat Checking On.\n" );
+    else
+        G_sprint( self, 2, "Cheat Checking Off.\n" );
 
-	if ( tf_data.toggleflags & TFLAG_AUTOTEAM )
-		G_sprint( self, 2, "AutoTeam On.\n" );
-	else
-		G_sprint( self, 2, "AutoTeam Off.\n" );
+    if ( tf_data.toggleflags & TFLAG_AUTOTEAM )
+        G_sprint( self, 2, "AutoTeam On.\n" );
+    else
+        G_sprint( self, 2, "AutoTeam Off.\n" );
 
-	if ( tf_data.toggleflags & TFLAG_RESPAWNDELAY )
-		G_sprint( self, 2, "%.0f second Respawn Delay.\n", tf_data.respawn_delay_time );
-	else
-		G_sprint( self, 2, "No Respawn Delay.\n" );
+    if ( tf_data.toggleflags & TFLAG_RESPAWNDELAY )
+        G_sprint( self, 2, "%.0f second Respawn Delay.\n", tf_data.respawn_delay_time );
+    else
+        G_sprint( self, 2, "No Respawn Delay.\n" );
 
-	if ( tf_data.toggleflags & TFLAG_TEAMFRAGS )
-		G_sprint( self, 2, "TeamFrags On.\n" );
-	else
-		G_sprint( self, 2, "TeamFrags Off.\n" );
+    if ( tf_data.toggleflags & TFLAG_TEAMFRAGS )
+        G_sprint( self, 2, "TeamFrags On.\n" );
+    else
+        G_sprint( self, 2, "TeamFrags Off.\n" );
 
-	if ( tf_data.allow_hook )
-		G_sprint( self, 2, "Grapple On.\n" );
-	else
-		G_sprint( self, 2, "Grapple Off.\n" );
+    if ( tf_data.allow_hook )
+        G_sprint( self, 2, "Grapple On.\n" );
+    else
+        G_sprint( self, 2, "Grapple Off.\n" );
 
-	if ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE )
-		G_sprint( self, 2, "Full TeamScore On.\n" );
-	else
-		G_sprint( self, 2, "Full TeamScore Off.\n" );
+    if ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE )
+        G_sprint( self, 2, "Full TeamScore On.\n" );
+    else
+        G_sprint( self, 2, "Full TeamScore Off.\n" );
 
-	if ( tf_data.clanbattle == 1 )
-	{
-		fl = GetSVInfokeyFloat( "pm", "prematch", 0 ) * 60;
-		G_sprint( self, 2, "Clan battle: ÏÎ\nPrematch: %d seconds\n", (int)fl );
-		fl =  GetSVInfokeyFloat( "cft", "ceasefire_time", 0 ) * 60;
-		G_sprint( self, 2, "Cease fire: %d seconds\n", (int)fl );
-	} else
-		G_sprint( self, 2, "Clan battle: ÏÆÆ\n" );
-	G_sprint( self, 2, "Cheat pause: %d\n", ( int ) tf_data.cheat_pause );
+    if ( tf_data.clanbattle == 1 )
+    {
+        fl = GetSVInfokeyFloat( "pm", "prematch", 0 ) * 60;
+        G_sprint( self, 2, "Clan battle: " _ON "\nPrematch: %d seconds\n", (int)fl );
+        fl =  GetSVInfokeyFloat( "cft", "ceasefire_time", 0 ) * 60;
+        G_sprint( self, 2, "Cease fire: %d seconds\n", (int)fl );
+    } else
+        G_sprint( self, 2, "Clan battle: " _OFF "\n" );
+    G_sprint( self, 2, "Cheat pause: %d\n", ( int ) tf_data.cheat_pause );
 
-	if ( tf_data.old_grens )
-		G_sprint( self, 2, "ÏÌÄ grenades\n" );
-	else
-		G_sprint( self, 2, "ÎÅ× grenades\n" );
+    if ( tf_data.old_grens )
+        G_sprint( self, 2, _O _L _D " grenades\n" );
+    else
+        G_sprint( self, 2, _N _E _W " grenades\n" );
 
-	if( tf_data.topcolor_check )
-	{
-		G_sprint( self, 2, "Topcolor checking enabled\n" );
-	        for ( i = 1 ; i <= number_of_teams  ; i++ )
-	        {
-	        	it = TeamFortress_TeamGetTopColor(i);
-	        	G_sprint( self, 2, " Team %d topcolor: %2d %s\n",i , it, TeamFortress_TeamGetColorString( it - 1 ));
-	        }
-	}else
-		G_sprint( self, 2, "Topcolor checking disabled\n" );
+    if( tf_data.topcolor_check )
+    {
+        G_sprint( self, 2, "Topcolor checking enabled\n" );
+        for ( i = 1 ; i <= number_of_teams  ; i++ )
+        {
+            it = TeamFortress_TeamGetTopColor(i);
+            G_sprint( self, 2, " Team %d topcolor: %2d %s\n",i , it, TeamFortress_TeamGetColorString( it - 1 ));
+        }
+    }else
+        G_sprint( self, 2, "Topcolor checking disabled\n" );
 
-	if( tf_data.sg_newfind )
-		G_sprint( self, 2, "Sentry New Find Target: %d ppl\n", tf_data.sgppl );
-	else
-		G_sprint( self, 2, "Sentry New Find Target: ÏÆÆ\n" );
-	
-	switch ( tf_data.sg_sfire )
-	{
-	case SG_SFIRE_281:
-		G_sprint( self, 2, "Sentry Shells Fire: 2.8.1\n" );
-		break;
-	case SG_SFIRE_MTFL1:
-		G_sprint( self, 2, "Sentry Shells Fire: 2.8.1 fixed(mtfl)\n" );
-		break;
-	case SG_SFIRE_MTFL2:
-		G_sprint( self, 2, "Sentry Shells Fire: MTFL2\n" );
-		break;
-	case SG_SFIRE_NEW:
-		G_sprint( self, 2, "Sentry Shells Fire: NEW\n" );
-		break;
-	default:
-		break;
-			
-	}
-	if(tf_data.sg_rfire)
-		G_sprint( self, 2, "Sentry Rockets Fire: NEW\n" );
-	else
-		G_sprint( self, 2, "Sentry Rockets Fire: OLD\n" );
-	
-	G_sprint( self, 2, "New Gas Options %d:\n" ,tf_data.new_gas );
-	if( (tf_data.new_gas & GAS_MASK_COLOR) && !(tf_data.new_gas & GAS_MASK_ALLSPYS))
-	{
-	 if( tf_data.new_gas & GAS_MASK_ALLCOLORS)
-	 	it = 16;
-	 else
-	 {
-	 	if( tf_data.new_gas & GAS_MASK_4COLORS)
-	 		it = 4;
-	 	else
-	 		it = number_of_teams;
-	 }
-	 G_sprint( self, 2, " Players Colors: %d\n", it );
-	}
-	if( tf_data.new_gas & GAS_MASK_ALLSPYS)
-		G_sprint( self, 2, " Players Skins: Spys\n" );
-	else
-	{
-		if( tf_data.new_gas & GAS_MASK_SKIN)
-			G_sprint( self, 2, " Players Skins: Random\n" );
-	}
-	
-	if( tf_data.new_gas & GAS_MASK_PALETTE)
-		G_sprint( self, 2, " Palette: ÏÎ\n" );
-	else
-		G_sprint( self, 2, " Palette: ÏÆÆ\n" );
-	
-	if( tf_data.new_gas & GAS_MASK_NEWGREN_EFFECTS)
-		G_sprint( self, 2, " New Gren Effects: ÏÎ\n" );
-	else
-		G_sprint( self, 2, " New Gren Effects: ÏÆÆ\n" );
-	
-	if( tf_data.new_gas & GAS_MASK_NEWGREN_TIMES)
-		G_sprint( self, 2, " New Gren Times: ÏÎ\n" );
-	else
-		G_sprint( self, 2, " New Gren Times: ÏÆÆ\n" );
-	
-	if( tf_data.new_gas & GAS_MASK_NEWGREN_DMG)
-		G_sprint( self, 2, " New Gren DMG: ÏÎ\n" );
-	else
-		G_sprint( self, 2, " New Gren DMG: ÏÆÆ\n" );
-	
-	if( !(tf_data.new_gas & GAS_MASK_DISABLE_ID))
-		G_sprint( self, 2, " ID: ÏÎ\n" );
-	else
-		G_sprint( self, 2, " ID: ÏÆÆ\n" );
-	
-	if ( tf_data.new_flash )
-		G_sprint( self, 2, "New Flash: ÏÎ\n" );
-	else
-		G_sprint( self, 2, "New Flash: ÏÆÆ\n" );
+    if( tf_data.sg_newfind )
+        G_sprint( self, 2, "Sentry New Find Target: %d ppl\n", tf_data.sgppl );
+    else
+        G_sprint( self, 2, "Sentry New Find Target: " _OFF "\n" );
 
-	if ( !tf_data.disable_powerups )
-		G_sprint( self, 2, "Powerups: ÏÎ\n" );
-	else
-		G_sprint( self, 2, "Powerups: ÏÆÆ\n" );
+    G_sprint( self, 2, "Sentry Shells Fire: " );
+    switch ( tf_data.sg_sfire )
+    {
+        case SG_SFIRE_281:
+            G_sprint( self, 3, "2.8.1\n" );
+            break;
+        case SG_SFIRE_MTFL1:
+            G_sprint( self, 3, "2.8.1 fixed(mtfl)\n" );
+            G_sprint( self, 3, "2.8.1 fixed(mtfl)\n" );
+            break;
+        case SG_SFIRE_MTFL2:
+            G_sprint( self, 3, "MTFL2\n" );
+            break;
+        case SG_SFIRE_NEW:
+            G_sprint( self, 3, "NEW\n" );
+            break;
+        default:
+            break;
 
-	if ( tf_data.flag_timer )
-		G_sprint( self, 2, "Flag Timer: ÏÎ\n" );
-	else
-		G_sprint( self, 2, "Flag Timer: ÏÆÆ\n" );
+    }
+    G_sprint( self, 2, "Sentry Rockets Fire: " );
+    if(tf_data.sg_rfire)
+        G_sprint( self, 3, "NEW\n" );
+    else
+        G_sprint( self, 3, "OLD\n" );
 
-	if ( tf_data.snip_fps )
+    G_sprint( self, 2, "New Gas Options %d:\n" ,tf_data.new_gas );
+    if( (tf_data.new_gas & GAS_MASK_COLOR) && !(tf_data.new_gas & GAS_MASK_ALLSPYS))
+    {
+        if( tf_data.new_gas & GAS_MASK_ALLCOLORS)
+            it = 16;
+        else
+        {
+            if( tf_data.new_gas & GAS_MASK_4COLORS)
+                it = 4;
+            else
+                it = number_of_teams;
+        }
+        G_sprint( self, 2, " Players Colors: %d\n", it );
+    }
+    if( tf_data.new_gas & GAS_MASK_ALLSPYS)
+        G_sprint( self, 2, " Players Skins: Spys\n" );
+    else
+    {
+        if( tf_data.new_gas & GAS_MASK_SKIN)
+            G_sprint( self, 2, " Players Skins: Random\n" );
+    }
 
-		G_sprint( self, 2, "Sniper FPS: %d\n", ( int ) tf_data.snip_fps );
-	else
-		G_sprint( self, 2, "Sniper FPS: ÏÆÆ\n" );
+    if( tf_data.new_gas & GAS_MASK_PALETTE)
+        G_sprint( self, 2, " Palette: " _ON "\n" );
+    else
+        G_sprint( self, 2, " Palette: " _OFF "\n" );
 
-	if ( tf_data.snip_range_fix )
-		G_sprint( self, 2, "Sniper Range Fix: ÏÎ\n" );
-	else
-		G_sprint( self, 2, "Sniper Range Fix: ÏÆÆ\n" );
+    if( tf_data.new_gas & GAS_MASK_NEWGREN_EFFECTS)
+        G_sprint( self, 2, " New Gren Effects: " _ON "\n" );
+    else
+        G_sprint( self, 2, " New Gren Effects: " _OFF "\n" );
 
-	
-	G_sprint( self, 2, "Sniper ammo cost: %d\n", ( int ) tf_data.snip_ammo );
-	G_sprint( self, 2, "Sniper Reload Time: %.1f\n", tf_data.snip_time );
+    if( tf_data.new_gas & GAS_MASK_NEWGREN_TIMES)
+        G_sprint( self, 2, " New Gren Times: " _ON "\n" );
+    else
+        G_sprint( self, 2, " New Gren Times: " _OFF "\n" );
 
-	if ( tf_data.random_tf_spawn )
-		G_sprint( self, 2, "Random Team Spawn: ÏÎ\n" );
-	else
-		G_sprint( self, 2, "Random Team Spawn: ÏÆÆ\n" );
+    if( tf_data.new_gas & GAS_MASK_NEWGREN_DMG)
+        G_sprint( self, 2, " New Gren DMG: " _ON "\n" );
+    else
+        G_sprint( self, 2, " New Gren DMG: " _OFF "\n" );
 
-	if ( tf_data.allow_drop_goal )
-		G_sprint( self, 2, "Drop Goals: ÏÎ\n" );
-	else
-		G_sprint( self, 2, "Drop Goals: ÏÆÆ\n" );
+    if( !(tf_data.new_gas & GAS_MASK_DISABLE_ID))
+        G_sprint( self, 2, " ID: " _ON "\n" );
+    else
+        G_sprint( self, 2, " ID: " _OFF "\n" );
 
-	if ( tf_data.add_pipe )
-		G_sprint( self, 2, "Additional pipebomb: ÏÎ\n" );
-	else
-		G_sprint( self, 2, "Additional pipebomb: ÏÆÆ\n" );
+    if ( tf_data.new_flash )
+        G_sprint( self, 2, "New Flash: " _ON "\n" );
+    else
+        G_sprint( self, 2, "New Flash: " _OFF "\n" );
 
-	if ( tf_data.gren2box )
-	{
-		G_sprint( self, 2, "Extended Backpack:\n" );
-		if ( tf_data.gren2box & BP_TYPE_HEALTH )
-			G_sprint( self, 2, " Drop Health   : ÏÎ\n" );
-		else
-			G_sprint( self, 2, " Drop Health   : ÏÆÆ\n" );
+    if ( !tf_data.disable_powerups )
+        G_sprint( self, 2, "Powerups: " _ON "\n" );
+    else
+        G_sprint( self, 2, "Powerups: " _OFF "\n" );
 
-		if ( tf_data.gren2box & BP_TYPE_ARMOR )
-			G_sprint( self, 2, " Drop Armor    : ÏÎ\n" );
-		else
-			G_sprint( self, 2, " Drop Armor    : ÏÆÆ\n" );
+    if ( tf_data.flag_timer )
+        G_sprint( self, 2, "Flag Timer: " _ON "\n" );
+    else
+        G_sprint( self, 2, "Flag Timer: " _OFF "\n" );
 
-		if ( tf_data.gren2box & BP_GREN_BYTYPE )
-			G_sprint( self, 2, " Drop Grenades : Type-depend\n" );
-		else
-		{
-			if ( tf_data.gren2box & BP_GREN_BYTYPE )
-				G_sprint( self, 2, " Drop Grenades : ÏÎ\n" );
+    if ( tf_data.snip_fps )
 
-			G_sprint( self, 2, " Drop Grenades : ÏÆÆ\n" );
-		}
-		if ( tf_data.gren2box & BP_TYPE_DETPACK )
-			G_sprint( self, 2, " Drop Detpack  : ÏÎ\n" );
-		else
-			G_sprint( self, 2, " Drop Detpack  : ÏÆÆ\n" );
-	} else
-	{
-		G_sprint( self, 2, "Extended Backpack: ÏÆÆ\n" );
-	}
-	if ( tf_data.disable_grens )
-	{
-		G_sprint( self, 2, "Disabled Grenade Types:\n" );
-		if ( tf_data.disable_grens & DG_TYPE_NORMAL )
-			G_sprint( self, 2, " Normal\n" );
-		if ( tf_data.disable_grens & DG_TYPE_CONCUSSION )
-			G_sprint( self, 2, " Concussion\n" );
-		if ( tf_data.disable_grens & DG_TYPE_NAIL )
-			G_sprint( self, 2, " Nail\n" );
-		if ( tf_data.disable_grens & DG_TYPE_MIRV )
-			G_sprint( self, 2, " Mirv\n" );
-		if ( tf_data.disable_grens & DG_TYPE_NAPALM )
-			G_sprint( self, 2, " Napalm\n" );
-		if ( tf_data.disable_grens & DG_TYPE_FLARE )
-			G_sprint( self, 2, " Flare\n" );
-		if ( tf_data.disable_grens & DG_TYPE_GAS )
-			G_sprint( self, 2, " Gas\n" );
-		if ( tf_data.disable_grens & DG_TYPE_EMP )
-			G_sprint( self, 2, " Emp\n" );
-		if ( tf_data.disable_grens & DG_TYPE_FLASH )
-			G_sprint( self, 2, " Flash\n" );
-		if ( tf_data.disable_grens & DG_TYPE_CALTROPS )
-			G_sprint( self, 2, " Caltrops\n" );
-		if ( tf_data.disable_grens & DG_TYPE_DETPACK )
-			G_sprint( self, 2, " Detpack\n" );
-	} else
-		G_sprint( self, 2, "All Grenades Enabled\n" );
-		
-	switch( tf_data.arena_mode )
-	{
-	       case ARENA_MODE_NONE:
-	                       G_sprint( self, 2, "Arena Mode: Off\n" );
-	                       break;
-	       case ARENA_MODE_FFA:
-                               G_sprint( self, 2, "Arena Mode: FFA\n" );
-	                       break;
-	       case ARENA_MODE_DUEL:
-	                       G_sprint( self, 2, "Arena Mode: Duel\n" );
-	                       break;
-	}
+        G_sprint( self, 2, "Sniper FPS: %d\n", ( int ) tf_data.snip_fps );
+    else
+        G_sprint( self, 2, "Sniper FPS: " _OFF "\n" );
 
-	if ( tf_data.mtfl )
-		G_sprint( self, 2, "ÍÔÆÌ Settings ÏÎ\n" );
+    if ( tf_data.snip_range_fix )
+        G_sprint( self, 2, "Sniper Range Fix: " _ON "\n" );
+    else
+        G_sprint( self, 2, "Sniper Range Fix: " _OFF "\n" );
 
-	G_sprint( self, 2, "TF2003 (build %d) by sd‘ angel for ÍÔÆÌ\n" ,build_number());
-	if( tf_data.enable_bot )
-	        G_sprint( self, 2, "Bot enabled\n" );
-	        
 
-        if( tg_data.tg_enabled )
-        	G_sprint( self, 2, "Training Ground enabled\n" );
+    G_sprint( self, 2, "Sniper ammo cost: %d\n", ( int ) tf_data.snip_ammo );
+    G_sprint( self, 2, "Sniper Reload Time: %.1f\n", tf_data.snip_time );
 
-        if( tf_data.lan_mode )
-        	G_sprint( self, 2, "Lan mode enabled\n" );
+    if ( tf_data.random_tf_spawn )
+        G_sprint( self, 2, "Random Team Spawn: " _ON "\n" );
+    else
+        G_sprint( self, 2, "Random Team Spawn: " _OFF "\n" );
 
-	G_sprint( self, 2,  "%s\n", ANGEL_VERSION);
-	
+    if ( tf_data.allow_drop_goal )
+        G_sprint( self, 2, "Drop Goals: " _ON "\n" );
+    else
+        G_sprint( self, 2, "Drop Goals: " _OFF "\n" );
+
+    if ( tf_data.add_pipe )
+        G_sprint( self, 2, "Additional pipebomb: " _ON "\n" );
+    else
+        G_sprint( self, 2, "Additional pipebomb: " _OFF "\n" );
+
+    if ( tf_data.gren2box )
+    {
+        G_sprint( self, 2, "Extended Backpack:\n" );
+        if ( tf_data.gren2box & BP_TYPE_HEALTH )
+            G_sprint( self, 2, " Drop Health   : " _ON "\n" );
+        else
+            G_sprint( self, 2, " Drop Health   : " _OFF "\n" );
+
+        if ( tf_data.gren2box & BP_TYPE_ARMOR )
+            G_sprint( self, 2, " Drop Armor    : " _ON "\n" );
+        else
+            G_sprint( self, 2, " Drop Armor    : " _OFF "\n" );
+
+        if ( tf_data.gren2box & BP_GREN_BYTYPE )
+            G_sprint( self, 2, " Drop Grenades : Type-depend\n" );
+        else
+        {
+            if ( tf_data.gren2box & BP_GREN_BYTYPE )
+                G_sprint( self, 2, " Drop Grenades : " _ON "\n" );
+
+            G_sprint( self, 2, " Drop Grenades : " _OFF "\n" );
+        }
+        if ( tf_data.gren2box & BP_TYPE_DETPACK )
+            G_sprint( self, 2, " Drop Detpack  : " _ON "\n" );
+        else
+            G_sprint( self, 2, " Drop Detpack  : " _OFF "\n" );
+    } else
+    {
+        G_sprint( self, 2, "Extended Backpack: " _OFF "\n" );
+    }
+    if ( tf_data.disable_grens )
+    {
+        G_sprint( self, 2, "Disabled Grenade Types:\n" );
+        if ( tf_data.disable_grens & DG_TYPE_NORMAL )
+            G_sprint( self, 2, " Normal\n" );
+        if ( tf_data.disable_grens & DG_TYPE_CONCUSSION )
+            G_sprint( self, 2, " Concussion\n" );
+        if ( tf_data.disable_grens & DG_TYPE_NAIL )
+            G_sprint( self, 2, " Nail\n" );
+        if ( tf_data.disable_grens & DG_TYPE_MIRV )
+            G_sprint( self, 2, " Mirv\n" );
+        if ( tf_data.disable_grens & DG_TYPE_NAPALM )
+            G_sprint( self, 2, " Napalm\n" );
+        if ( tf_data.disable_grens & DG_TYPE_FLARE )
+            G_sprint( self, 2, " Flare\n" );
+        if ( tf_data.disable_grens & DG_TYPE_GAS )
+            G_sprint( self, 2, " Gas\n" );
+        if ( tf_data.disable_grens & DG_TYPE_EMP )
+            G_sprint( self, 2, " Emp\n" );
+        if ( tf_data.disable_grens & DG_TYPE_FLASH )
+            G_sprint( self, 2, " Flash\n" );
+        if ( tf_data.disable_grens & DG_TYPE_CALTROPS )
+            G_sprint( self, 2, " Caltrops\n" );
+        if ( tf_data.disable_grens & DG_TYPE_DETPACK )
+            G_sprint( self, 2, " Detpack\n" );
+    } else
+        G_sprint( self, 2, "All Grenades Enabled\n" );
+
+    switch( tf_data.arena_mode )
+    {
+        case ARENA_MODE_NONE:
+            G_sprint( self, 2, "Arena Mode: " _OFF "\n" );
+            break;
+        case ARENA_MODE_FFA:
+            G_sprint( self, 2, "Arena Mode: " _F _F _A "\n" );
+            break;
+        case ARENA_MODE_DUEL:
+            G_sprint( self, 2, "Arena Mode: " _D _u _e _l "\n" );
+            break;
+    }
+
+    if ( tf_data.mtfl )
+        G_sprint( self, 2, _MTFL " Settings " _ON "\n" );
+
+    G_sprint( self, 2, _TF2003 " (build %d) " _BY_SD_ANGEL "\n" ,build_number());
+    if( tf_data.enable_bot )
+        G_sprint( self, 3, "Bot enabled\n" );
+
+
+    if( tg_data.tg_enabled )
+        G_sprint( self, 3, "Training Ground enabled\n" );
+
+    if( tf_data.lan_mode )
+        G_sprint( self, 3, "Lan mode enabled\n" );
+
+    G_sprint( self, 2,  "%s\n", ANGEL_VERSION);
+
 }
 
 
@@ -1794,12 +1797,12 @@ void TeamFortress_RemoveTimers(  )
 				tfgoalitem_RemoveFromPlayer( te, self, 0 );
 			if ( CTF_Map == 1 && te->goal_no == 1 )
 			{
-				G_bprint( 2, "%s ÌÏÓÔ the ÂÌÕÅ flag!\n", self->s.v.netname );
+				G_bprint( 2, "%s " _L _O _S _T " the " _B _L _U _E " flag!\n", self->s.v.netname );
 			} else
 			{
 				if ( CTF_Map == 1 && te->goal_no == 2 )
 				{
-					G_bprint( 2, "%s ÌÏÓÔ the ÒÅÄ flag!\n", self->s.v.netname );
+					G_bprint( 2, "%s " _L _O _S _T " the " _R _E _D " flag!\n", self->s.v.netname );
 				}
 			}
 		}

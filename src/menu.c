@@ -382,8 +382,8 @@ void Menu_Intro( menunum_t menu )
 		GetSVInfokeyString( "motd2", NULL, st2, sizeof( st2 ), "" );
 		CenterPrint( self, "%s\n%s", st1, st2 );
 	} else
-		CenterPrint( self, "Welcome to " _T _e _a _m _F _o _r _t _r _e _s _s  " " _2 _0 _0 _3 "\n"
-			     "by " _LSB "sd" _RSB " angel for " _M _T _F _L "\n"
+		CenterPrint( self, "Welcome to " _TF2003 "\n"
+			     _BY_SD_ANGEL "\n"
 			     "======================================\n"
 			     "http://mtfl.sd.ru\n" );
 }

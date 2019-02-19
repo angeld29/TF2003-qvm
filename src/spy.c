@@ -975,9 +975,9 @@ void TeamFortress_SpyFeignDeath( int issilent )
 			if ( CTF_Map == 1 )
 			{
 				if ( te->goal_no == 1 )
-					G_bprint( 2, "%s лост the блуе flag!\n", self->s.v.netname );
+                    G_bprint( 2, "%s " _L _O _S _T " the " _B _L _U _E " flag!\n", self->s.v.netname );
 				else
-					G_bprint( 2, "%s лост the ред flag!\n", self->s.v.netname );
+					G_bprint( 2, "%s " _L _O _S _T " the " _R _E _D " flag!\n", self->s.v.netname );
 			}
 		}
 		switch ( ( int ) ( g_random(  ) * 5 ) )

@@ -133,7 +133,7 @@ void RefreshStatusBar( gedict_t * pl )
 	sec = TeamFortress_TeamGetSecond(  );
 	clip = GetClipSize( pl );
 	if( clip >= 0)
-	        G_centerprint( pl, "%s%s\n%s%3d %s%3d  √Ã…–:%2d\n", status_size, status, 
+	        G_centerprint( pl, "%s%s\n%s%3d %s%3d  " _C _L _I _P ":%2d\n", status_size, status, 
 	        teamnames[win], TeamFortress_TeamGetScore( win ), teamnames[sec], TeamFortress_TeamGetScore( sec ),
 	        clip);
 	else
