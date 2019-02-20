@@ -1695,13 +1695,13 @@ void GibPlayer(  )
 	else
 		sound( self, 2, "player/udeath.wav", 1, 0 );
 }
-#define player_die(start,end) set_think( self, start, end, NULL, PlayerDead, NULL )
-void PlayerSetDieFrames()
+#define player_die(start,end, end_func) set_think( self, start, end, NULL, end_func, NULL )
+void PlayerSetDieFrames(int isdead)
 {
 	if ( self->current_weapon <= 16 )
 	{
 		//player_die_ax1(  );
-        player_die(41, 49);
+        player_die(41, 49, isdead ? PlayerDead: NULL);
 		return;
 	}
 	//i = 1 + (int)( g_random(  ) * 6 );
@@ -1709,22 +1709,22 @@ void PlayerSetDieFrames()
 	{
 		case 0:
 			//player_diea1(  );
-            player_die( 50, 60 );
+            player_die( 50, 60, isdead? PlayerDead: NULL);
 			break;
 		case 1:
 			//player_dieb1(  );
-            player_die(61, 69);
+            player_die(61, 69, isdead? PlayerDead: NULL);
 			break;
 		case 2:
-            player_die(70, 84);
+            player_die(70, 84, isdead? PlayerDead: NULL);
 			//player_diec1(  );
 			break;
 		case 3:
-            player_die(85, 93);
+            player_die(85, 93, isdead? PlayerDead: NULL);
 			//player_died1(  );
 			break;
 		default:
-            player_die(94, 102);
+            player_die(94, 102, isdead? PlayerDead: NULL);
 			//player_diee1(  );
 			break;
 	
@@ -1807,7 +1807,7 @@ void PlayerDie(  )
 	DeathSound(  );
 	self->s.v.angles[0] = 0;
 	self->s.v.angles[2] = 0;
-    PlayerSetDieFrames();
+    PlayerSetDieFrames(1);
 
 	TeamFortress_SetupRespawn( 0 );
 }

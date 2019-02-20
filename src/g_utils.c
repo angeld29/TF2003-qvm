@@ -625,7 +625,7 @@ int log2powerof2( unsigned int v )
 
 void _think_func(  )
 {
-	self->s.v.nextthink += 0.1;
+	self->s.v.nextthink = g_globalvars.time + 0.1;
     self->s.v.think = (func_t)_think_func;
     if( self->s.v.frame >= self->frame_info.end ){
         if( self->frame_info.last_func )
@@ -641,6 +641,7 @@ void _think_func(  )
 
 void set_think( gedict_t* e, int start, int end, th_die_func_t frame_func, th_die_func_t last_func, th_die_func_t last_think )
 {
+	e->s.v.nextthink = g_globalvars.time + 0.1;
     e->s.v.think = (func_t)_think_func;
     e->s.v.frame = start;
     e->frame_info.start = start;
@@ -649,5 +650,10 @@ void set_think( gedict_t* e, int start, int end, th_die_func_t frame_func, th_di
     e->frame_info.last_func = last_func;
     e->frame_info.last_think = last_think;
     if( e->frame_info.frame_func )
+    {
+        gedict_t*saveself = self;
+        self = e;
         e->frame_info.frame_func();
+        self = saveself;
+    }
 }

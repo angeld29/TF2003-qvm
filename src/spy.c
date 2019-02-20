@@ -35,7 +35,8 @@ void    T_TranqDartTouch(  );
 void    spawn_touchblood( float damage );
 
 // Spy Feign Death Frames
-/*void spy_diea1(  )
+/*
+void spy_diea1(  )
 {
 	self->s.v.frame = 50;
 	self->s.v.think = ( func_t ) spy_diea2;
@@ -842,12 +843,12 @@ void spy_upaxe9(  )
 	self->s.v.nextthink = g_globalvars.time + 0.1;
 
 	player_stand1(  );
-}
-*/
+}*/
+
 //=========================================================================
 // Function handling the Spy's feign death ability
 void TeamFortress_PlayerLostFlag(void);
-void PlayerSetDieFrames();
+void PlayerSetDieFrames(int isdead);
 void _spy_up(  )
 {
     self->s.v.nextthink += 0.1;
@@ -987,7 +988,7 @@ void TeamFortress_SpyFeignDeath( int issilent )
 		self->s.v.angles[0] = 0;
 		self->s.v.angles[2] = 0;
         TeamFortress_PlayerLostFlag();
-        PlayerSetDieFrames();
+        PlayerSetDieFrames(0);
 	}
 }
 
