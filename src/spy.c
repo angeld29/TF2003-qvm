@@ -35,7 +35,7 @@ void    T_TranqDartTouch(  );
 void    spawn_touchblood( float damage );
 
 // Spy Feign Death Frames
-void spy_diea1(  )
+/*void spy_diea1(  )
 {
 	self->s.v.frame = 50;
 	self->s.v.think = ( func_t ) spy_diea2;
@@ -843,9 +843,56 @@ void spy_upaxe9(  )
 
 	player_stand1(  );
 }
-
+*/
 //=========================================================================
 // Function handling the Spy's feign death ability
+void TeamFortress_PlayerLostFlag(void);
+void PlayerSetDieFrames();
+void _spy_up(  )
+{
+    self->s.v.nextthink += 0.1;
+    self->s.v.think = (func_t)_spy_up;
+    self->s.v.frame -= 1;
+    if( self->s.v.frame <= self->frame_info.end ){
+        self->s.v.think = (func_t) player_stand1;
+    }
+}
+
+void SpyUpFrames()
+{
+    int start, end;
+    self->s.v.think = ( func_t ) _spy_up;
+    self->s.v.nextthink = g_globalvars.time + 0.1;
+    // Check .weapon, because .current_weapon has been reset
+    if ( self->s.v.weapon <= 16 )
+    {
+        //	spy_upaxe1(  );
+        start = 49; end = 41;
+    }else{
+        switch ( ( int ) ( g_random(  ) * 4 ) )
+        {
+            case 0:
+                //spy_upb1(  );
+                start = 69; end = 61;
+                break;
+            case 1:
+                //spy_upc1(  );
+                start = 84; end = 70;
+                break;
+            case 2:
+                //spy_upd1(  );
+                start = 95; end = 85;
+                break;
+            default:
+                //spy_upe1(  );
+                start = 102; end = 94;
+                break;
+        }
+    }
+    self->frame_info.end = end;
+    self->frame_info.start = start;
+}
+
 void TeamFortress_SpyFeignDeath( int issilent )
 {
 	int     i, j;
@@ -893,27 +940,7 @@ void TeamFortress_SpyFeignDeath( int issilent )
 		W_SetCurrentAmmo(  );
 		self->tfstate = self->tfstate - ( self->tfstate & TFSTATE_CANT_MOVE );
 		TeamFortress_SetSpeed( self );
-		// Check .weapon, because .current_weapon has been reset
-		if ( self->s.v.weapon <= 16 )
-		{
-			spy_upaxe1(  );
-			return;
-		}
-		switch ( ( int ) ( g_random(  ) * 4 ) )
-		{
-		case 0:
-			spy_upb1(  );
-			break;
-		case 1:
-			spy_upc1(  );
-			break;
-		case 2:
-			spy_upd1(  );
-			break;
-		default:
-			spy_upe1(  );
-			break;
-		}
+        SpyUpFrames();
 		return;
 	} else  // !self->is_feigning
 	{
@@ -959,45 +986,8 @@ void TeamFortress_SpyFeignDeath( int issilent )
 			DeathSound(  );
 		self->s.v.angles[0] = 0;
 		self->s.v.angles[2] = 0;
-		if ( self->s.v.weapon <= 16 )
-		{
-			spy_die_ax1(  );
-			return;
-		}
-		te = world;
-		for( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" ) ) ;)
-		{
-			if ( te->s.v.owner != EDICT_TO_PROG( self ) )
-				continue;
-
-			if ( !( te->goal_activation & TFGI_KEEP ) || self->has_disconnected == 1 )
-				tfgoalitem_RemoveFromPlayer( te, self, 0 );
-			if ( CTF_Map == 1 )
-			{
-				if ( te->goal_no == 1 )
-                    G_bprint( 2, "%s " _L _O _S _T " the " _B _L _U _E " flag!\n", self->s.v.netname );
-				else
-					G_bprint( 2, "%s " _L _O _S _T " the " _R _E _D " flag!\n", self->s.v.netname );
-			}
-		}
-		switch ( ( int ) ( g_random(  ) * 5 ) )
-		{
-		case 0:
-			spy_diea1(  );
-			break;
-		case 1:
-			spy_dieb1(  );
-			break;
-		case 2:
-			spy_diec1(  );
-			break;
-		case 3:
-			spy_died1(  );
-			break;
-		default:
-			spy_diee1(  );
-			break;
-		}
+        TeamFortress_PlayerLostFlag();
+        PlayerSetDieFrames();
 	}
 }
 

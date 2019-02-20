@@ -1129,21 +1129,13 @@ ROCKETS
 ==============================================================================
 */
 
+/*
 void    s_explode1(  );
 void    s_explode2(  );
 void    s_explode3(  );
 void    s_explode4(  );
 void    s_explode5(  );
 void    s_explode6(  );
-
-void check_water()
-{
- traceline(PASSVEC3(self->s.v.origin), PASSVEC3(self->s.v.origin), 1, self);
- if (g_globalvars.trace_inwater) {
-   sound(self, 2, "misc/vapeur2.wav", 1, 1);
-   dremove(self);
-  }
-}
 
 void s_explode1(  )
 {
@@ -1192,6 +1184,7 @@ void s_explode6(  )
 	self->s.v.nextthink = g_globalvars.time + 0.1;
 	check_water();
 }
+*/
 
 void BecomeExplosion(  )
 {

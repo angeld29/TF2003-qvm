@@ -1743,6 +1743,29 @@ void TeamFortress_PrintClassName( gedict_t * Viewer, int pc, int rpc )
 }
 
 
+void TeamFortress_PlayerLostFlag()
+{
+	gedict_t *te;
+	for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" )); )
+	{
+		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
+		{
+			if ( !( te->goal_activation & TFGI_KEEP ) || self->has_disconnected == 1 )
+				tfgoalitem_RemoveFromPlayer( te, self, 0 );
+			if ( CTF_Map == 1 && te->goal_no == 1 )
+			{
+				G_bprint( 2, "%s " _L _O _S _T " the " _B _L _U _E " flag!\n", self->s.v.netname );
+			} else
+			{
+				if ( CTF_Map == 1 && te->goal_no == 2 )
+				{
+					G_bprint( 2, "%s " _L _O _S _T " the " _R _E _D " flag!\n", self->s.v.netname );
+				}
+			}
+		}
+	}
+}
+
 void TeamFortress_RemoveTimers(  )
 {
 	gedict_t *te;
@@ -1773,25 +1796,8 @@ void TeamFortress_RemoveTimers(  )
 			te = world;
 		}
 	}
+    TeamFortress_PlayerLostFlag();
 
-	for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" )); )
-	{
-		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
-		{
-			if ( !( te->goal_activation & TFGI_KEEP ) || self->has_disconnected == 1 )
-				tfgoalitem_RemoveFromPlayer( te, self, 0 );
-			if ( CTF_Map == 1 && te->goal_no == 1 )
-			{
-				G_bprint( 2, "%s " _L _O _S _T " the " _B _L _U _E " flag!\n", self->s.v.netname );
-			} else
-			{
-				if ( CTF_Map == 1 && te->goal_no == 2 )
-				{
-					G_bprint( 2, "%s " _L _O _S _T " the " _R _E _D " flag!\n", self->s.v.netname );
-				}
-			}
-		}
-	}
 	for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "detpack" ));)
 	{
 		if ( te->weaponmode == 1 && te->s.v.enemy == EDICT_TO_PROG( self ) )

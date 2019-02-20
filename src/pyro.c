@@ -702,12 +702,22 @@ void NewBubbles( float num_bubbles, vec3_t bub_origin )
 	return;
 }
 
-void    s_explode1(  );
+/*void    s_explode1(  );
 void    s_explode2(  );
 void    s_explode3(  );
 void    s_explode4(  );
 void    s_explode5(  );
-void    s_explode6(  );
+void    s_explode6(  );*/
+
+void check_water()
+{
+ traceline(PASSVEC3(self->s.v.origin), PASSVEC3(self->s.v.origin), 1, self);
+ if (g_globalvars.trace_inwater) {
+   sound(self, 2, "misc/vapeur2.wav", 1, 1);
+   dremove(self);
+  }
+}
+
 
 void W_FireFlame(  )
 {
@@ -744,7 +754,8 @@ void W_FireFlame(  )
 	VectorScale( flame->s.v.velocity, 600, flame->s.v.velocity );
 
 	flame->s.v.touch = ( func_t ) Flamer_stream_touch;
-	flame->s.v.think = ( func_t ) s_explode1;
+	//flame->s.v.think = ( func_t ) s_explode1;
+    set_think( flame, 0 , 5, check_water, check_water, SUB_Remove );
 	flame->s.v.effects = 8;
 	flame->s.v.nextthink = g_globalvars.time + 0.15;
 
