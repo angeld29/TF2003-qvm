@@ -1821,6 +1821,7 @@ void TeamFortress_RemoveTimers(  )
 	{
 		stuffcmd( self, "v_idlescale 0\n" );
 		stuffcmd( self, "v_cshift; wait; bf\n" );
+        self->eff_info.conc_idle = 0;
 		self->FlashTime = 0;
 		if ( tf_data.new_flash )
 			disableupdates( self, -1 );	/* server-side flash */

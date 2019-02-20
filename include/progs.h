@@ -37,10 +37,14 @@ struct thick_s {
     th_die_func_t frame_func, last_func, last_think;
     int start, end;
 };
+struct eff_info_s {
+    int conc_idle;
+};
 
 typedef struct gedict_s {
 	edict_t         s;
     struct thick_s frame_info;
+    struct eff_info_s eff_info;
 	//custom fields
 	float	items2;				   // using  ZQ_ITEMS2 extension in mvdsv we can use per client sigils for runes
 	int 	k_admin;         // if player is an admin, flags

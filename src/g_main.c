@@ -331,6 +331,7 @@ void G_EdictTouch()
 // self
 // other=world
 ///////////////
+void ClientThink();
 void G_EdictThink()
 {
     self = PROG_TO_EDICT( g_globalvars.self );
@@ -342,7 +343,9 @@ void G_EdictThink()
     {
         G_dprintf( "Null think func" );
     }
-
+    if( (int)self->s.v.flags & FL_CLIENT ){
+        ClientThink();
+    }
 }
 
 ////////////////

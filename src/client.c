@@ -1340,6 +1340,7 @@ void PutClientInServer()
     TeamFortress_SetSkin( self );
     stuffcmd( self, "v_idlescale 0\nfov 90\n" );
     stuffcmd( self, "v_cshift; wait; bf\n" );
+    self->eff_info.conc_idle = 0;
     SetTeamName( self );
     W_SetCurrentAmmo();
     self->attack_finished = g_globalvars.time + 0.3;
@@ -2089,6 +2090,9 @@ void PlayerPostThink()
     }
     self->jump_flag = self->s.v.velocity[2];
     CheckPowerups();
+    if( self->eff_info.conc_idle ){
+        ApplySvConc( self, self->eff_info.conc_idle );
+    }
     W_WeaponFrame();
     if ( self->motd <= 95 )
         TeamFortress_MOTD();
@@ -2590,6 +2594,13 @@ void ClientDisconnect()
     //vote
     if(self->k_voted) {
         _subVote();
+    }
+}
+void ApplySvConc( gedict_t* self, int conc_idle );
+void ClientThink()
+{
+    if( self->eff_info.conc_idle ){
+        ApplySvConc( self, self->eff_info.conc_idle );
     }
 }
 

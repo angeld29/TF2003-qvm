@@ -284,7 +284,10 @@ void TG_Eff_Remove( gedict_t * pl )
 		     te->s.v.think != ( func_t ) OldConcussionGrenadeTimer )
 			continue;
 		if ( tf_data.old_grens == 1 )
+        {
 			stuffcmd( pl, "v_idlescale 0\nfov 90\n" );
+            pl->eff_info.conc_idle = 0;
+        }
 		dremove( te );
 		break;
 	}

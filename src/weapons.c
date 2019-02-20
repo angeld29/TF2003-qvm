@@ -357,7 +357,10 @@ void W_FireMedikit(  )
 						te->s.v.think != ( func_t ) OldConcussionGrenadeTimer )
 						continue;
 					if ( tf_data.old_grens == 1 )
+                    {
 						stuffcmd( trace_ent, "v_idlescale 0\nfov 90\n" );
+                        trace_ent->eff_info.conc_idle = 0;
+                    }
 					SpawnBlood( org, 20 );
 					G_bprint( 1, "%s cured %s's concussion\n", self->s.v.netname, trace_ent->s.v.netname );
 					if ( !TeamFortress_isTeamsAllied(te->team_no , self->team_no) )

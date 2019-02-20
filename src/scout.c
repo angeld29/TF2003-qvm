@@ -302,6 +302,7 @@ void OldConcussionGrenadeTimer(  )
 	{
 
 		stuffcmd( owner, "v_idlescale 0; wait; fov 90\n" );
+        owner->eff_info.conc_idle = 0;
 		dremove( self );
 		return;
 	}
@@ -332,6 +333,7 @@ void OldConcussionGrenadeTimer(  )
 	stuffcmd( owner, "v_ipitch_cycle 1\n" );
 	stuffcmd( owner, "v_iyaw_cycle 2\n" );
 	stuffcmd( owner, "v_idlescale %.0f\n", self->s.v.health );
+    owner->eff_info.conc_idle = self->s.v.health;
 
 	stuffcmd( owner, "fov %.0f\n", 90 + self->s.v.health / 2 );
 	if ( !self->s.v.health )
@@ -482,6 +484,7 @@ void ConcPlayer( gedict_t*p, gedict_t*attacker )
        	{
      		stuffcmd( p, "v_idlescale 100\n" );
      		stuffcmd( p, "fov 130\n" );
+            p->eff_info.conc_idle = 130;
      		te->s.v.think = ( func_t ) OldConcussionGrenadeTimer;
      		te->s.v.health = 100;
      		te->s.v.nextthink = g_globalvars.time + 5;
@@ -781,4 +784,19 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 	W_SetCurrentAmmo(  );
 	return;
 }
+
+#define v_iroll_cycle  0.5
+#define v_ipitch_cycle  1
+#define v_iyaw_cycle 2
+
+void ApplySvConc( gedict_t* self, int conc_idle )
+{
+
+    G_sprint( self, PRINT_HIGH, "%f %f %f %d\n", conc_idle,self->s.v.v_angle[ROLL],self->s.v.v_angle[PITCH], self->s.v.v_angle[YAW] );
+    self->s.v.v_angle[ROLL]  += conc_idle * sin(g_globalvars.time * v_iroll_cycle) * 0.1;
+    self->s.v.v_angle[PITCH] += conc_idle * sin(g_globalvars.time * v_ipitch_cycle) * 0.3;
+    self->s.v.v_angle[YAW]   += conc_idle * sin(g_globalvars.time * v_iyaw_cycle) * 0.3;
+    G_sprint( self, PRINT_HIGH, "%f %f %f %d\n", conc_idle,self->s.v.v_angle[ROLL],self->s.v.v_angle[PITCH], self->s.v.v_angle[YAW] );
+}
+
 

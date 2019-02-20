@@ -235,3 +235,8 @@
 #define MULTICAST_ALL_R  3	// every client, reliable
 #define MULTICAST_PHS_R  4	// within hearing, reliable
 #define MULTICAST_PVS_R  5	// within sight, reliable
+
+#define PITCH   0 // up / down
+#define YAW     1 // left / right
+#define ROLL    2 // fall over
+
