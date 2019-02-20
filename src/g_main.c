@@ -336,15 +336,15 @@ void G_EdictThink()
 {
     self = PROG_TO_EDICT( g_globalvars.self );
     other = PROG_TO_EDICT( g_globalvars.other );
+    if( (int)self->s.v.flags & FL_CLIENT ){
+        ClientThink();
+    }
     if ( self->s.v.think )
     {
         ( ( void ( * )() ) ( self->s.v.think ) ) ();
     } else
     {
         G_dprintf( "Null think func" );
-    }
-    if( (int)self->s.v.flags & FL_CLIENT ){
-        ClientThink();
     }
 }
 

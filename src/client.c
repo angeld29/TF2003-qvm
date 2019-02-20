@@ -2033,6 +2033,7 @@ void CheckPowerups()
     }
 }
 
+void ApplySvConc( gedict_t* self, int conc_idle );
 ////////////////
 // GlobalParams:
 // time
@@ -2596,7 +2597,6 @@ void ClientDisconnect()
         _subVote();
     }
 }
-void ApplySvConc( gedict_t* self, int conc_idle );
 void ClientThink()
 {
     if( self->eff_info.conc_idle ){

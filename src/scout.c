@@ -792,11 +792,11 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 void ApplySvConc( gedict_t* self, int conc_idle )
 {
 
-    G_sprint( self, PRINT_HIGH, "%f %f %f %d\n", conc_idle,self->s.v.v_angle[ROLL],self->s.v.v_angle[PITCH], self->s.v.v_angle[YAW] );
+//    G_sprint( self, PRINT_HIGH, "%f %f %f %d\n", conc_idle,self->s.v.v_angle[ROLL],self->s.v.v_angle[PITCH], self->s.v.v_angle[YAW] );
     self->s.v.v_angle[ROLL]  += conc_idle * sin(g_globalvars.time * v_iroll_cycle) * 0.1;
     self->s.v.v_angle[PITCH] += conc_idle * sin(g_globalvars.time * v_ipitch_cycle) * 0.3;
     self->s.v.v_angle[YAW]   += conc_idle * sin(g_globalvars.time * v_iyaw_cycle) * 0.3;
-    G_sprint( self, PRINT_HIGH, "%f %f %f %d\n", conc_idle,self->s.v.v_angle[ROLL],self->s.v.v_angle[PITCH], self->s.v.v_angle[YAW] );
+ //   G_sprint( self, PRINT_HIGH, "%f %f %f %d\n", conc_idle,self->s.v.v_angle[ROLL],self->s.v.v_angle[PITCH], self->s.v.v_angle[YAW] );
 }
 
 
