@@ -22,7 +22,7 @@
  */
 #include "g_local.h"
 
-void player_diea1();
+/*void player_diea1();
 void player_diea2();
 void player_diea3();
 void player_diea4();
@@ -83,7 +83,7 @@ void player_die_ax5();
 void player_die_ax6();
 void player_die_ax7();
 void player_die_ax8();
-void player_die_ax9();
+void player_die_ax9();*/
 
 void player_touch(  )
 {
@@ -1259,7 +1259,7 @@ void player_rocket6(  )
 
 void    DeathBubbles( int num_bubbles );
 
-void PainSound(  )
+void static PainSound(  )
 {
 	float   rs;
 

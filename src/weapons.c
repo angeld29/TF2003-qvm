@@ -825,69 +825,69 @@ Go to the trouble of combining multiple pellets into a single damage call.
 */
 void FireBullets( float shotcount, vec3_t dir, float spread_x, float spread_y, float spread_z )
 {
-	vec3_t  direction;
-	vec3_t  src, tmp,end;
+    vec3_t  direction;
+    vec3_t  src, tmp,end;
 
-	trap_makevectors( self->s.v.v_angle );
-	VectorScale( g_globalvars.v_forward, 10, tmp );
-	VectorAdd( self->s.v.origin, tmp, src );
-	//src = self->s.v.origin + g_globalvars.v_forward*10;
-	src[2] = self->s.v.absmin[2] + self->s.v.size[2] * 0.7;
+    trap_makevectors( self->s.v.v_angle );
+    VectorScale( g_globalvars.v_forward, 10, tmp );
+    VectorAdd( self->s.v.origin, tmp, src );
+    //src = self->s.v.origin + g_globalvars.v_forward*10;
+    src[2] = self->s.v.absmin[2] + self->s.v.size[2] * 0.7;
 
-	ClearMultiDamage(  );
+    ClearMultiDamage(  );
 #ifdef NEWHWGUY
-	if (self->current_weapon != WEAP_ASSAULT_CANNON ) {
+    if (self->current_weapon != WEAP_ASSAULT_CANNON ) {
 #endif
         VectorScale( dir, 2048 ,end);
         VectorAdd( src, end ,end );
-	traceline( PASSVEC3( src ), PASSVEC3( end ), false, self );
-	VectorScale( dir, 4, tmp );
-	VectorSubtract( g_globalvars.trace_endpos, tmp, puff_org );	// puff_org = trace_endpos - dir*4;
+        traceline( PASSVEC3( src ), PASSVEC3( end ), false, self );
+        VectorScale( dir, 4, tmp );
+        VectorSubtract( g_globalvars.trace_endpos, tmp, puff_org );	// puff_org = trace_endpos - dir*4;
 #ifdef NEWHWGUY
-	}else{
+    }else{
 
-	VectorScale( g_globalvars.v_right, crandom(  ) * spread_x / 1.5 , tmp );
-	VectorAdd( dir, tmp, direction );
-	VectorScale( g_globalvars.v_up, crandom(  ) * spread_y /1.5 , tmp );
-	VectorAdd( direction, tmp, direction );
+        VectorScale( g_globalvars.v_right, crandom(  ) * spread_x / 1.5 , tmp );
+        VectorAdd( dir, tmp, direction );
+        VectorScale( g_globalvars.v_up, crandom(  ) * spread_y /1.5 , tmp );
+        VectorAdd( direction, tmp, direction );
 
         VectorScale( direction, 2048 ,end);
         VectorAdd( src, end ,end );
-        
+
         traceline( PASSVEC3( src ), PASSVEC3( end ), false, self );
 
-	normalize( dir, tmp );
-	VectorScale( tmp, 4, tmp );
-	VectorSubtract( g_globalvars.trace_endpos, tmp, puff_org );
-	}
+        normalize( dir, tmp );
+        VectorScale( tmp, 4, tmp );
+        VectorSubtract( g_globalvars.trace_endpos, tmp, puff_org );
+    }
 #endif
 
-	while ( shotcount > 0 )
-	{
-		VectorScale( g_globalvars.v_right, crandom(  ) * spread_x, tmp );
-		VectorAdd( dir, tmp, direction );
-		VectorScale( g_globalvars.v_up, crandom(  ) * spread_y, tmp );
-		VectorAdd( direction, tmp, direction );
+    while ( shotcount > 0 )
+    {
+        VectorScale( g_globalvars.v_right, crandom(  ) * spread_x, tmp );
+        VectorAdd( dir, tmp, direction );
+        VectorScale( g_globalvars.v_up, crandom(  ) * spread_y, tmp );
+        VectorAdd( direction, tmp, direction );
 
-		VectorScale( direction, 2048, tmp );
-		VectorAdd( src, tmp, tmp );
-		traceline( PASSVEC3( src ), PASSVEC3( tmp ), false, self );
-		if ( g_globalvars.trace_fraction != 1.0 )
-		{
+        VectorScale( direction, 2048, tmp );
+        VectorAdd( src, tmp, tmp );
+        traceline( PASSVEC3( src ), PASSVEC3( tmp ), false, self );
+        if ( g_globalvars.trace_fraction != 1.0 )
+        {
 #ifndef NEWHWGUYold
-			if ( self->s.v.weapon != WEAP_ASSAULT_CANNON )
+            if ( self->s.v.weapon != WEAP_ASSAULT_CANNON )
 #else
-			if ( self->current_weapon != WEAP_ASSAULT_CANNON )
+                if ( self->current_weapon != WEAP_ASSAULT_CANNON )
 #endif
-				TraceAttack( 4, direction );
-			else
-				TraceAttack( 12, direction );
-		}
-		shotcount = shotcount - 1;
-	}
+                    TraceAttack( 4, direction );
+                else
+                    TraceAttack( 12, direction );
+        }
+        shotcount = shotcount - 1;
+    }
 
-	ApplyMultiDamage(  );
-	Multi_Finish(  );
+    ApplyMultiDamage(  );
+    Multi_Finish(  );
 }
 
 /*
@@ -1095,32 +1095,33 @@ void W_FireAutoRifle(  )
 
 void W_FireAssaultCannon(  )
 {
-	vec3_t  dir;
+    vec3_t  dir;
 
 #ifdef 	NEWHWGUY
-	vec3_t  spread = { 0.04, 0.04, 0 };
+    vec3_t  spread = { 0.04, 0.04, 0 };
 
-	if ( self->heat < ( ( ASSAULT_SPREAD_TIME / 0.2 ) * 0.1 ) )
-	{
-		VectorScale( spread,
-			     ( 1 +
-			       ( self->heat / ( ( ASSAULT_SPREAD_TIME / 0.2 ) * 0.1 ) ) * ( ASSAULT_SPREAD_MULTIPLY -
-											    1 ) ), spread );
-		//spread=spread*(1+(self.heat/((ASSAULT_SPREAD_TIME/0.2)*0.1))*( ASSAULT_SPREAD_MULTIPLY - 1));
-	} else
-		VectorScale( spread, ASSAULT_SPREAD_MULTIPLY, spread );
+    if ( self->heat < ( ( ASSAULT_SPREAD_TIME / 0.2 ) * 0.1 ) )
+    {
+        VectorScale( spread,
+                ( 1 +
+                  ( self->heat / ( ( ASSAULT_SPREAD_TIME / 0.2 ) * 0.1 ) ) * ( ASSAULT_SPREAD_MULTIPLY -
+                      1 ) ), spread );
+        //spread=spread*(1+(self.heat/((ASSAULT_SPREAD_TIME/0.2)*0.1))*( ASSAULT_SPREAD_MULTIPLY - 1));
+    } else
+        VectorScale( spread, ASSAULT_SPREAD_MULTIPLY, spread );
 #endif
-	KickPlayer( -4, self );
+    KickPlayer( -4, self );
 
-		if ( !tg_data.unlimit_ammo )
-			self->s.v.currentammo = --( self->s.v.ammo_shells );
+    if ( !tg_data.unlimit_ammo )
+        self->s.v.currentammo = --( self->s.v.ammo_shells );
 
-	aim( dir );
-	tf_data.deathmsg = DMSG_ASSAULTCANNON;
+    trap_makevectors( self->s.v.v_angle);
+    aim( dir );
+    tf_data.deathmsg = DMSG_ASSAULTCANNON;
 
-	FireBullets( 5, dir, 0.04, 0.04, 0 );
+    FireBullets( 5, dir, 0.04, 0.04, 0 );
 #ifdef NEWHWGUY
-	FireBullets( 5, dir, PASSVEC3( spread ) );
+    FireBullets( 5, dir, PASSVEC3( spread ) );
 #endif
 }
 

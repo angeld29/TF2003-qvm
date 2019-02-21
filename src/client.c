@@ -354,6 +354,7 @@ void DecodeLevelParms()
         tf_data.old_grens = GetSVInfokeyBool( "og", "old_grens", true );
         tf_data.spy_off = !GetSVInfokeyBool( "spy", NULL, true );
         tf_data.invis_only = GetSVInfokeyBool( "s", "spyinvis", false );
+        tf_data.svconc = GetSVInfokeyBool( "svconc", NULL, true );
 
         tf_data.cheat_pause = GetSVInfokeyInt( "cp", NULL, 1 );
         if ( tf_data.cheat_pause <= 0 ) tf_data.cheat_pause = 1;
@@ -2033,7 +2034,8 @@ void CheckPowerups()
     }
 }
 
-void ApplySvConc( gedict_t* self, int conc_idle );
+void ApplySvConc( gedict_t* self );
+void ApplySvConcVelocity( gedict_t* self );
 ////////////////
 // GlobalParams:
 // time
@@ -2091,9 +2093,8 @@ void PlayerPostThink()
     }
     self->jump_flag = self->s.v.velocity[2];
     CheckPowerups();
-    if( self->eff_info.conc_idle ){
-        ApplySvConc( self, self->eff_info.conc_idle );
-    }
+
+    ApplySvConc( self );
     W_WeaponFrame();
     if ( self->motd <= 95 )
         TeamFortress_MOTD();
@@ -2599,9 +2600,8 @@ void ClientDisconnect()
 }
 void ClientThink()
 {
-    if( self->eff_info.conc_idle ){
-        ApplySvConc( self, self->eff_info.conc_idle );
-    }
+    ApplySvConc( self );
+    ApplySvConcVelocity( self );
 }
 
 /*

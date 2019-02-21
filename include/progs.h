@@ -401,6 +401,7 @@ typedef struct tf_server_data_s {
     int            last_id;
     int            spy_off;
     int            old_grens;
+    int            svconc;
     int            new_flash;
     int            invis_only;
     int            allow_hook;

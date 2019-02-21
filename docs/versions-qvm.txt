@@ -5,6 +5,8 @@ by [sd] angel for MTFL
 Внесенные изменения (на 16.02.2019 r1):
 [+] W_SetCurrentAmmo refactor
 [+] menu, classhelp refactor
+[+] server side old conc
+выключается localinfo svconc off
 ////////////////////////////////////////////////////
 Внесенные изменения (на 12.02.2019 r1):
 Енг:

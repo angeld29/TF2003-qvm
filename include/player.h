@@ -30,18 +30,18 @@ void player_touch();
 
 void player_naxe( int frame, int wframe, th_die_func_t f );
 void player_shot(int start);
-void player_shot1();
+/*void player_shot1();
 void player_shot2();
 void player_shot3();
 void player_shot4();
 void player_shot5();
-void player_shot6();
+void player_shot6();*/
 
 void player_autorifle1();
 void player_autorifle2();
 void player_autorifle3();
 
-void player_axe1();
+/*void player_axe1();
 void player_axe2();
 void player_axe3();
 void player_axe4();
@@ -56,7 +56,7 @@ void player_axec4();
 void player_axed1();
 void player_axed2();
 void player_axed3();
-void player_axed4();
+void player_axed4();*/
 
 void player_chain1();
 void player_chain1a();
@@ -66,7 +66,7 @@ void player_chain3();
 void player_chain4();
 void player_chain5();
 
-void player_medikit1();
+/*void player_medikit1();
 void player_medikit2();
 void player_medikit3();
 void player_medikit4();
@@ -98,7 +98,7 @@ void player_bioweaponc4();
 void player_bioweapond1();
 void player_bioweapond2();
 void player_bioweapond3();
-void player_bioweapond4();
+void player_bioweapond4();*/
 
 void player_nail1();
 void player_nail2();
@@ -112,7 +112,7 @@ void player_assaultcannondown1();
 void player_light1();
 void player_light2();
 
-void player_rocket1();
+/*void player_rocket1();
 void player_rocket2();
 void player_rocket3();
 void player_rocket4();
@@ -133,16 +133,16 @@ void player_axpain2();
 void player_axpain3();
 void player_axpain4();
 void player_axpain5();
-void player_axpain6();
+void player_axpain6();*/
 
 void player_pain( gedict_t * attacker, float take  );
 
-void player_diea1();
+/*void player_diea1();
 void player_dieb1();
 void player_diec1();
 void player_died1();
 void player_diee1();
-void player_die_ax1();
+void player_die_ax1();*/
 
 void DeathBubblesSpawn();
 void DeathSound();

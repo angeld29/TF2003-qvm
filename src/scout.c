@@ -789,14 +789,28 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 #define v_ipitch_cycle  1
 #define v_iyaw_cycle 2
 
-void ApplySvConc( gedict_t* self, int conc_idle )
+void ApplySvConcVelocity( gedict_t* self )
 {
+    int conc_idle = self->eff_info.conc_idle;
+    vec3_t v;
 
-//    G_sprint( self, PRINT_HIGH, "%f %f %f %d\n", conc_idle,self->s.v.v_angle[ROLL],self->s.v.v_angle[PITCH], self->s.v.v_angle[YAW] );
-    self->s.v.v_angle[ROLL]  += conc_idle * sin(g_globalvars.time * v_iroll_cycle) * 0.1;
-    self->s.v.v_angle[PITCH] += conc_idle * sin(g_globalvars.time * v_ipitch_cycle) * 0.3;
-    self->s.v.v_angle[YAW]   += conc_idle * sin(g_globalvars.time * v_iyaw_cycle) * 0.3;
- //   G_sprint( self, PRINT_HIGH, "%f %f %f %d\n", conc_idle,self->s.v.v_angle[ROLL],self->s.v.v_angle[PITCH], self->s.v.v_angle[YAW] );
+    if( !tf_data.svconc ) return;
+    if( !conc_idle ) return;
+    if( vlen( self->s.v.velocity) < 40 ) return;
+      trap_makevectors( self->s.v.velocity );
+      VectorScale( g_globalvars.v_right, conc_idle * sin(g_globalvars.time * 4) * 1, v );
+      VectorAdd( self->s.v.velocity, v, self->s.v.velocity );
+}
+
+void ApplySvConc( gedict_t* self )
+{
+    int conc_idle = self->eff_info.conc_idle;
+
+    if( !tf_data.svconc ) return;
+    if( !conc_idle ) return;
+    //self->s.v.v_angle[ROLL]  += conc_idle * sin(g_globalvars.time * v_iroll_cycle) * 0.1;
+    self->s.v.v_angle[PITCH] += conc_idle * sin(g_globalvars.time * v_ipitch_cycle) * 0.1;
+    self->s.v.v_angle[YAW]   += conc_idle * sin(g_globalvars.time * v_iyaw_cycle) * 0.1;
 }
 
 
