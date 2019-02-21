@@ -2337,6 +2337,7 @@ void W_Attack(  )
                 W_FireSniperRifle(  );
                 self->allow_snip_time = g_globalvars.time + tf_data.snip_time;
                 Attack_Finished( 1.5 );
+                self->eff_info.snip_idle_time = g_globalvars.time + 3;
             }
             break;
         case WEAP_AUTO_RIFLE:
