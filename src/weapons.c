@@ -1129,63 +1129,6 @@ ROCKETS
 ==============================================================================
 */
 
-/*
-void    s_explode1(  );
-void    s_explode2(  );
-void    s_explode3(  );
-void    s_explode4(  );
-void    s_explode5(  );
-void    s_explode6(  );
-
-void s_explode1(  )
-{
-	self->s.v.frame = 0;
-	self->s.v.think = ( func_t ) s_explode2;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-	check_water();
-}
-
-void s_explode2(  )
-{
-	self->s.v.frame = 1;
-	self->s.v.think = ( func_t ) s_explode3;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-	check_water();
-}
-
-void s_explode3(  )
-{
-	self->s.v.frame = 2;
-	self->s.v.think = ( func_t ) s_explode4;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-	check_water();
-}
-
-void s_explode4(  )
-{
-	self->s.v.frame = 3;
-	self->s.v.think = ( func_t ) s_explode5;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-	check_water();
-}
-
-void s_explode5(  )
-{
-	self->s.v.frame = 4;
-	self->s.v.think = ( func_t ) s_explode6;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-	check_water();
-}
-
-void s_explode6(  )
-{
-	self->s.v.frame = 5;
-	self->s.v.think = ( func_t ) SUB_Remove;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-	check_water();
-}
-*/
-
 void BecomeExplosion(  )
 {
 	dremove( self );
@@ -2204,33 +2147,6 @@ float CheckForReload(  )
 	}
 	return 0;
 }
-
-
-void    player_axe1(  );
-void    player_axeb1(  );
-void    player_axec1(  );
-void    player_axed1(  );
-void    player_shot1(  );
-void    player_nail1(  );
-void    player_light1(  );
-void    player_rocket1(  );
-void    player_autorifle1(  );
-void    player_assaultcannon1(  );
-void    player_assaultcannonup1(  );
-void    player_assaultcannondown1(  );
-void    player_medikit1(  );
-void    player_medikitb1(  );
-void    player_medikitc1(  );
-void    player_medikitd1(  );
-void    player_bioweapon1(  );
-void    player_bioweaponb1(  );
-void    player_bioweaponc1(  );
-void    player_bioweapond1(  );
-void    player_chain1(  );
-void    player_chain2(  );
-void    player_chain3(  );
-void    player_chain4(  );
-void    player_chain5(  );
 
 void W_Attack(  )
 {
