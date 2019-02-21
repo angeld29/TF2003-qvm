@@ -26,7 +26,7 @@ typedef enum
 {
     SET_HWGUY_SB,
     SET_SBAR_RES,
-    SET_SBAR_RES,
+    SET_SBAR_SIZE,
     SET_DISCARD_SHELLS,
     SET_DISCARD_NAILS,
     SET_DISCARD_ROCKETS,
@@ -46,6 +46,7 @@ typedef enum
     CS_T_INT,
     CS_T_STRING,
 }cl_settings_type_t;
+
 typedef struct cl_settings_s{
     const char* key1;
     const char* key2;
@@ -54,12 +55,31 @@ typedef struct cl_settings_s{
     cl_setting_id_t id;
     cl_settings_type_t type;
 }cl_settings_t;
+
 static cl_settings_t cl_set[] = {
-    {"mxs", "1","Discard shells", "", SET_DISCARD_SHELLS, CS_C_INT,}
-    {"mxn", "2","Discard nails", "", SET_DISCARD_SHELLS, CS_C_INT,}
-    {"mxr", "3","Discard rockets", "", SET_DISCARD_SHELLS, CS_C_INT,}
-    {"mxc", "4","Discard cells", "", SET_DISCARD_SHELLS, CS_C_INT,}
+    {"mxs",        "1",         "Discard shells",      "",  SET_DISCARD_SHELLS,   CS_T_INT,},
+    {"mxn",        "2",         "Discard nails",       "",  SET_DISCARD_NAILS,    CS_T_INT,},
+    {"mxr",        "3",         "Discard rockets",     "",  SET_DISCARD_ROCKETS,  CS_T_INT,},
+    {"mxc",        "4",         "Discard cells",       "",  SET_DISCARD_CELLS,    CS_T_INT,},
+    {"sbar_res",   "sbr",       "StatusBar Resolution",  "",  SET_SBAR_RES,         CS_T_INT,},
+    {"sbar_size",  "sbs",       "StatusBar Size",        "",  SET_SBAR_SIZE,        CS_T_INT,},
+    {"s",          "set_bits",  "Settings  Bits",        "",  SET_BITS,             CS_T_INT,},
+    {"multiscan",          "ms",  "Multiscan",        "",  SET_MULTISCAN,             CS_T_BOOL,},
+    {"classhelp",          "ch",  "Show Classhelp",        "",  SET_CLASSHELP,             CS_T_BOOL,},
+    {"exec_class",          "ec",  "Exec Class config",        "",  SET_EXEC_CLASS,             CS_T_BOOL,},
+    {"exec_map",          "em",  "Exec Map config",        "",  SET_EXEC_MAP,             CS_T_BOOL,},
+    {"take_sshot", NULL,  "Screenshot ScoreTable",        "",  SET_TAKE_SSHOT,             CS_T_BOOL,},
 };
+const int CL_SET_NUM = sizeof(cl_set)/sizeof(cl_set[0]);
+const cl_settings_t* get_set_info(char*key)
+{
+    int i;
+    for(i = 0; i < CL_SET_NUM; i++){
+        if(streq(cl_set[i].key1, key)) return cl_set + i;
+        if(streq(cl_set[i].key2, key)) return cl_set + i;
+    }
+    return NULL;
+}
 qboolean SetClientSetting( gedict_t * p, const char *key, const char *value )
 {
     unsigned int crc;
