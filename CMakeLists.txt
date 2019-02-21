@@ -59,6 +59,7 @@ set( SOURCE_LIB
     "${DIR_SRC}/scout.c"
     "${DIR_SRC}/sentry.c"
     "${DIR_SRC}/server.c"
+    "${DIR_SRC}/settings.c"
     "${DIR_SRC}/sniper.c"
     "${DIR_SRC}/spectate.c"
     "${DIR_SRC}/spy.c"

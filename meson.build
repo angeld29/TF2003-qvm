@@ -44,6 +44,7 @@ sources = [
     'src/qmd5.c',
     'src/scout.c',
     'src/sentry.c',
+    'src/settings.c',
     'src/server.c',
     'src/sniper.c',
     'src/spectate.c',
