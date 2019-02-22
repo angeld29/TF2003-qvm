@@ -22,7 +22,7 @@
  */
 #include "g_local.h"
 
-typedef enum
+/*typedef enum
 {
     SET_HWGUY_SB,
     SET_SBAR_RES,
@@ -38,49 +38,133 @@ typedef enum
     SET_EXEC_MAP,
     SET_TAKE_SSHOT,
     SET_GREN_SOUND,
-} cl_setting_id_t;
+    _SET_LAST,
+} cl_setting_id_t;*/
 
 typedef enum
 {
     CS_T_BOOL,
     CS_T_INT,
-    CS_T_STRING,
 }cl_settings_type_t;
 
 typedef struct cl_settings_s{
-    const char* key1;
+    const char* key;
     const char* key2;
     const char* name;
     const char* desc;
-    cl_setting_id_t id;
+    //cl_setting_id_t id;
     cl_settings_type_t type;
+    int bit;
+    int defval;
 }cl_settings_t;
 
-static cl_settings_t cl_set[] = {
-    {"mxs",        "1",         "Discard shells",      "",  SET_DISCARD_SHELLS,   CS_T_INT,},
-    {"mxn",        "2",         "Discard nails",       "",  SET_DISCARD_NAILS,    CS_T_INT,},
-    {"mxr",        "3",         "Discard rockets",     "",  SET_DISCARD_ROCKETS,  CS_T_INT,},
-    {"mxc",        "4",         "Discard cells",       "",  SET_DISCARD_CELLS,    CS_T_INT,},
-    {"sbar_res",   "sbr",       "StatusBar Resolution",  "",  SET_SBAR_RES,         CS_T_INT,},
-    {"sbar_size",  "sbs",       "StatusBar Size",        "",  SET_SBAR_SIZE,        CS_T_INT,},
-    {"s",          "set_bits",  "Settings  Bits",        "",  SET_BITS,             CS_T_INT,},
-    {"multiscan",          "ms",  "Multiscan",        "",  SET_MULTISCAN,             CS_T_BOOL,},
-    {"classhelp",          "ch",  "Show Classhelp",        "",  SET_CLASSHELP,             CS_T_BOOL,},
-    {"exec_class",          "ec",  "Exec Class config",        "",  SET_EXEC_CLASS,             CS_T_BOOL,},
-    {"exec_map",          "em",  "Exec Map config",        "",  SET_EXEC_MAP,             CS_T_BOOL,},
-    {"take_sshot", NULL,  "Screenshot ScoreTable",        "",  SET_TAKE_SSHOT,             CS_T_BOOL,},
+static const cl_settings_t cl_set[] = {
+    {"sb",         NULL, "HWGuy shells backup",      "",     CS_T_INT, FOFS( assault_min_shells ), DEFAULT_ASSAULT_MIN_SHELLS, },
+    {"sbar_res",   "sbr", "StatusBar Resolution",  "", CS_T_INT, FOFS( StatusBarRes ), 0, },
+    {"sbar_size",  "sbs", "StatusBar Size",        "", CS_T_INT, FOFS( StatusBarSize ), 0, },
+    {"mxs",        "1", "Discard shells",      "",     CS_T_INT, FOFS(discard_shells), -1, },
+    {"mxn",        "2", "Discard nails",       "",      CS_T_INT, FOFS(discard_nails), -1, },
+    {"mxr",        "3", "Discard rockets",     "",    CS_T_INT, FOFS(discard_rockets), -1, },
+    {"mxc",        "4", "Discard cells",       "",      CS_T_INT, FOFS(discard_cells), -1, },
+    {"set_bits",   "s", "Settings  Bits",        "",         CS_T_INT, FOFS(settings_bits), 0, },
+    {"classhelp",  "ch", "Show Classhelp",        "",        CS_T_BOOL, TF_CLASS_HELP_MASK, 1, },
+    {"multiscan",  "ms", "Multiscan",        "",             CS_T_BOOL, TF_MULTISCAN_MASK, 1, },
+    {"exec_class", "ec", "Exec Class config",        "",     CS_T_BOOL, TF_EXEC_CLASS_MASK, 0, },
+    {"exec_map",   "em", "Exec Map config",        "",       CS_T_BOOL, TF_EXEC_MAP_MASK, 0, },
+    {"take_sshot", NULL, "Screenshot ScoreTable",        "", CS_T_BOOL, TF_TAKE_SSHOT_MASK, 0, },
+    {"grensound",  NULL, "Play sound on grenade prime",        "",  CS_T_BOOL,  TF_INTERNAL_GRENSOUND, 0, },
 };
-const int CL_SET_NUM = sizeof(cl_set)/sizeof(cl_set[0]);
-const cl_settings_t* get_set_info(char*key)
+
+#define CL_SET_NUM  sizeof(cl_set)/sizeof(cl_set[0])
+
+typedef struct cl_set_map_s{
+    const char* key;
+    int idx;
+}cl_set_map_t;
+
+int comp (const void *i, const void *j)
 {
-    int i;
-    for(i = 0; i < CL_SET_NUM; i++){
-        if(streq(cl_set[i].key1, key)) return cl_set + i;
-        if(streq(cl_set[i].key2, key)) return cl_set + i;
+    return strcmp(((cl_set_map_t*)(i))->key, ((cl_set_map_t*)(j))->key);
+}
+
+static const cl_settings_t* get_set_info( const char* key )
+{
+    static cl_set_map_t key_map[CL_SET_NUM * 2];
+    cl_set_map_t* f = NULL;
+    static int num_set = 0;
+    cl_set_map_t key_s;
+    key_s.key = key;
+    if( !num_set ){
+        int i;
+        for( i = 0; i < CL_SET_NUM; i++){
+            key_map[num_set].key = cl_set[i].key;
+            key_map[num_set++].idx = i;
+            if( cl_set[i].key2 ){
+                key_map[num_set].key = cl_set[i].key2;
+                key_map[num_set++].idx = i;
+            }
+        }
+        qsort(key_map, num_set, sizeof(key_map[0]), comp);
     }
-    return NULL;
+    if( !key ) return NULL;
+    f = bsearch(&key_s, key_map, num_set, sizeof(key_map[0]), comp);
+
+    if(!f) return NULL;
+    return &cl_set[f->idx];
+}
+
+void PrintClientSettingNew( gedict_t * p, const char* key)
+{
+    
+    const cl_settings_t *s;
+    int val;
+
+    if( !key ) return;
+    s = get_set_info(key);
+    if( !s ){
+        G_sprint( p, 2, "Key '%s' not found\n", key );
+        return;
+    }
+    G_sprint( p, 2, "%s: ", s->name );
+    if( s->type == CS_T_INT ){
+        int val = *(int*)((byte*)p + s->bit);
+        G_sprint( p, PRINT_CHAT, "%d\n", val );
+    }else{
+        G_sprint( p, PRINT_CHAT, p->settings_bits & s->bit ? "On\n":"Off\n" );
+    }
+
+
 }
 qboolean SetClientSetting( gedict_t * p, const char *key, const char *value )
+{
+    const cl_settings_t *s;
+    int val;
+
+    s = get_set_info(key);
+    if( !s ) return 0;
+    
+    if( !value ||!value[0] ) val = s->defval;
+    else val = atoi(value);
+
+    if( s->type == CS_T_INT ){
+        *(int*)((byte*)p + s->bit) = val;
+    }else{
+        if( streq( value, "on" )){
+            p->settings_bits |= s->bit;
+        }else{
+            if( streq( value, "off" )){
+                p->settings_bits -= p->settings_bits & s->bit;
+            }else{
+                if( val )
+                    p->settings_bits |= s->bit;
+                else
+                    p->settings_bits -= p->settings_bits & s->bit;
+            }
+        }
+    }
+    return 1;
+}
+/*qboolean SetClientSetting_old( gedict_t * p, const char *key, const char *value )
 {
     unsigned int crc;
 
@@ -209,15 +293,15 @@ qboolean SetClientSetting( gedict_t * p, const char *key, const char *value )
             break;
         case 0xCAD67046:	//take_sshot
             if ( !value[0] )
-                p->take_sshot = 1;
+                p->settings_bits &= TF_TAKE_SSHOT_MASK;
             else
-                p->take_sshot = 0;
+                p->settings_bits -= p->settings_bits & TF_TAKE_SSHOT_MASK;
             break;
         case 0xE5A257DF:	//grensound
             if ( !strcmp( value, "on" ) )
-                p->internal_settings_bits |= TF_INTERNAL_GRENSOUND;
+                p->settings_bits |= TF_INTERNAL_GRENSOUND;
             else
-                p->internal_settings_bits -= p->settings_bits & TF_INTERNAL_GRENSOUND;
+                p->settings_bits -= p->settings_bits & TF_INTERNAL_GRENSOUND;
             break;
         default:
             return false;
@@ -301,13 +385,13 @@ qboolean PrintClientSetting( gedict_t * p, const char *key )
                 G_sprint( p, 2, "Exec map is " _OFF "\n" );
             break;
         case 0xCAD67046:	//take_sshot
-            if ( p->settings_bits & TF_EXEC_MAP_MASK )
+            if ( p->settings_bits & TF_TAKE_SSHOT_MASK )
                 G_sprint( p, 2, "Take screenshot is " _ON "\n" );
             else
                 G_sprint( p, 2, "Take screenshot is " _OFF "\n" );
             break;
         case 0xE5A257DF:	//grensound
-            if ( p->internal_settings_bits & TF_INTERNAL_GRENSOUND )
+            if ( p->settings_bits & TF_INTERNAL_GRENSOUND )
                 G_sprint( p, 2, "Grenade sound is " _ON "\n" );
             else
                 G_sprint( p, 2, "Grenade sound is " _OFF "\n" );
@@ -316,7 +400,7 @@ qboolean PrintClientSetting( gedict_t * p, const char *key )
             return false;
     }
     return true;
-}
+}*/
 
 void   Client_Set_Cmd(  )
 {
@@ -327,22 +411,31 @@ void   Client_Set_Cmd(  )
 
     argc = trap_CmdArgc();
     if(argc < 2)
+    {
+        int i;
+        G_sprint( self, 2, "Player settings\n" );
+        for( i = 0; i < CL_SET_NUM; i++){
+            G_sprint( self, 2, "%s: ", cl_set[i].key );
+            PrintClientSettingNew( self, cl_set[i].key );
+        }
         return;
+    }
     trap_CmdArgv( 1, key, sizeof( key ) );
     Q_strlwr( key );
     if(argc < 3)
     {
-        PrintClientSetting( self, key);
+        PrintClientSettingNew( self, key);
         return;
     }
     trap_CmdArgv( 2, value, sizeof( value ) );
     if( SetClientSetting( self, key, value) )
-        PrintClientSetting( self, key);
+        PrintClientSettingNew( self, key);
 }
 //=======================
 void ParseUserInfo()
 {
     char    value[100];
+    int i;
     self->assault_min_shells = DEFAULT_ASSAULT_MIN_SHELLS;
     self->StatusBarRes = 0;
     self->StatusBarSize = 0;
@@ -353,38 +446,8 @@ void ParseUserInfo()
     self->settings_bits = TF_CLASS_HELP_MASK;
     self->internal_settings_bits = 0;
     self->take_sshot = 0;
-    if( GetInfokeyString( self, "sbr", "sbar_res" , value, sizeof( value ), NULL))
-        SetClientSetting( self, "sbr", value);
-    if( GetInfokeyString( self, "sbs", "sbar_size" , value, sizeof( value ), NULL))
-        SetClientSetting( self, "sbs", value);
-
-    if( GetInfokeyString( self, "mxs", "1" , value, sizeof( value ), NULL))
-        SetClientSetting( self, "mxs", value);
-    if( GetInfokeyString( self, "mxn", "2" , value, sizeof( value ), NULL))
-        SetClientSetting( self, "mxn", value);
-    if( GetInfokeyString( self, "mxr", "3" , value, sizeof( value ), NULL))
-        SetClientSetting( self, "mxr", value);
-    if( GetInfokeyString( self, "mxc", "4" , value, sizeof( value ), NULL))
-        SetClientSetting( self, "mxc", value);
-
-    if( GetInfokeyString( self, "sb", NULL , value, sizeof( value ), NULL))
-        SetClientSetting( self, "sb", value);
-
-    if( GetInfokeyString( self, "s", NULL , value, sizeof( value ), NULL))
-        SetClientSetting( self, "s", value);
-
-    if( GetInfokeyString( self, "ch", "classhelp", value, sizeof( value ), NULL))
-        SetClientSetting( self, "ch", value);
-
-    if( GetInfokeyString( self, "ms", "multiscan", value, sizeof( value ), NULL))
-        SetClientSetting( self, "ms", value);
-
-    if( GetInfokeyString( self, "ec", "exec_class", value, sizeof( value ), NULL))
-        SetClientSetting( self, "ec", value);
-
-    if( GetInfokeyString( self, "em", "exec_map", value, sizeof( value ), NULL))
-        SetClientSetting( self, "em", value);
-
-    if( GetInfokeyString( self, "take_sshot", NULL, value, sizeof( value ), ""))
-        SetClientSetting( self, "take_sshot", value);
+    for(i = 0; i < CL_SET_NUM; i++){
+        if( GetInfokeyString( self, cl_set[i].key, cl_set[i].key2, value, sizeof( value ), NULL))
+            SetClientSetting( self, cl_set[i].key, value);
+    }
 }

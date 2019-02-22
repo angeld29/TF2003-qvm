@@ -275,7 +275,7 @@ void DumpClanScores(  )
 
 	for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
 	{
-		if ( te->take_sshot )
+		if ( te->settings_bits & TF_TAKE_SSHOT_MASK )
 		{
 			stuffcmd( te, "screenshot\n" );
 		}
