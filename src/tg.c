@@ -85,156 +85,156 @@ void TG_LoadSettings()
 
 void TG_Cmd()
 {
-        char    cmd_command[50];
-        char    st[50];
-        int argc;
+    char    cmd_command[50];
+    char    st[50];
+    int argc;
 
 
-	if( !tg_data.tg_enabled )
-	{
-		G_sprint(self, 2, "Training Ground mode not active\n");
-		return;
-	}
-	argc = trap_CmdArgc();
-	if(argc<2)
-		return;
+    if( !tg_data.tg_enabled )
+    {
+        G_sprint(self, 2, "Training Ground mode not active\n");
+        return;
+    }
+    argc = trap_CmdArgc();
+    if(argc<2)
+        return;
 
-        trap_CmdArgv( 1, cmd_command, sizeof( cmd_command ) );
-        if(!strcmp(cmd_command,"sgppl"))
+    trap_CmdArgv( 1, cmd_command, sizeof( cmd_command ) );
+    if(!strcmp(cmd_command,"sgppl"))
+    {
+        if(argc<3)
         {
-                if(argc<3)
-                {
-                	G_sprint(self, 2, "sgppl %d\n",tf_data.sgppl);
-                	return;
-                }
-                	
-                trap_CmdArgv( 2, st, sizeof( st ) );
-                tf_data.sgppl = atoi(st);
-                if( tf_data.sgppl < 0)
-                	tf_data.sgppl = 0;
-                return;
+            G_sprint(self, 2, "sgppl %d\n",tf_data.sgppl);
+            return;
         }
 
-        if(!strcmp(cmd_command,"sg_fire"))
+        trap_CmdArgv( 2, st, sizeof( st ) );
+        tf_data.sgppl = atoi(st);
+        if( tf_data.sgppl < 0)
+            tf_data.sgppl = 0;
+        return;
+    }
+
+    if(!strcmp(cmd_command,"sg_fire"))
+    {
+        if(argc<3)
         {
-                if(argc<3)
-                {
-                	G_sprint(self, 2, "SG_Fire %s\n",(!tg_data.sg_disable_fire)?"On":"Off");
-                	return;
-                }
-                	
-                trap_CmdArgv( 2, st, sizeof( st ) );
-          	if ( !strcmp( st, "off" ) )
-          		tg_data.sg_disable_fire = 1;
-          	else if( !strcmp( st, "toggle" ) )
-          	{
-          	        tg_data.sg_disable_fire = (tg_data.sg_disable_fire)?0:1;
-          	}else
-          	{
-          		tg_data.sg_disable_fire = 0;
-          	}
-                return;
-        }
-        if(!strcmp(cmd_command,"sg_find"))
-        {
-                if(argc<3)
-                {
-                	G_sprint(self, 2, "SG_Find \n");
-                	return;
-                }
-                	
-                trap_CmdArgv( 2, st, sizeof( st ) );
-          	if ( !strcmp( st, "all" ) )
-          		tg_data.sg_allow_find = TG_SG_FIND_IGNORE_OFF;
-          	else if( !strcmp( st, "self" ) )
-          		tg_data.sg_allow_find = TG_SG_FIND_IGNORE_OWNER;
-          		else if( !strcmp( st, "no" ) )
-          				tg_data.sg_allow_find = TG_SG_FIND_IGNORE_ALL;
-          			else
-          				tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
-                return;
+            G_sprint(self, 2, "SG_Fire %s\n",(!tg_data.sg_disable_fire)?"On":"Off");
+            return;
         }
 
-        if(!strcmp(cmd_command,"sg_fire_bullets"))
+        trap_CmdArgv( 2, st, sizeof( st ) );
+        if ( !strcmp( st, "off" ) )
+            tg_data.sg_disable_fire = 1;
+        else if( !strcmp( st, "toggle" ) )
         {
-                if(argc<3)
-                {
-                	G_sprint(self, 2, "sg_fire_bullets is %s\n", tg_data.sg_fire_bullets?"on":"off");
-                	return;
-                }
-                trap_CmdArgv( 2, st, sizeof( st ) );
-         	if( !strcmp(st,"off") )
-         	        tg_data.sg_fire_bullets = false;
-         	else
-         	        tg_data.sg_fire_bullets = true;
-         	return;
+            tg_data.sg_disable_fire = (tg_data.sg_disable_fire)?0:1;
+        }else
+        {
+            tg_data.sg_disable_fire = 0;
         }
-        if(!strcmp(cmd_command,"sg_fire_rockets"))
+        return;
+    }
+    if(!strcmp(cmd_command,"sg_find"))
+    {
+        if(argc<3)
         {
-                if(argc<3)
-                {
-                	G_sprint(self, 2, "sg_fire_rockets is %s\n", tg_data.sg_fire_rockets?"on":"off");
-                	return;
-                }
-                trap_CmdArgv( 2, st, sizeof( st ) );
-         	if( !strcmp(st,"off") )
-         	        tg_data.sg_fire_rockets = false;
-         	else
-         	        tg_data.sg_fire_rockets = true;
-         	return;
-        }
-        if(!strcmp(cmd_command,"sg_fire_lighting"))
-        {
-                if(argc<3)
-                {
-                	G_sprint(self, 2, "sg_fire_lighting is %s\n", tg_data.sg_fire_lighting?"on":"off");
-                	return;
-                }
-                trap_CmdArgv( 2, st, sizeof( st ) );
-         	if( strcmp(st,"on") )
-         	        tg_data.sg_fire_lighting = false;
-         	else
-         	        tg_data.sg_fire_lighting = true;
-         	return;
+            G_sprint(self, 2, "SG_Find \n");
+            return;
         }
 
-/*        if(!strcmp(cmd_command,"sg_fire_type"))
+        trap_CmdArgv( 2, st, sizeof( st ) );
+        if ( !strcmp( st, "all" ) )
+            tg_data.sg_allow_find = TG_SG_FIND_IGNORE_OFF;
+        else if( !strcmp( st, "self" ) )
+            tg_data.sg_allow_find = TG_SG_FIND_IGNORE_OWNER;
+        else if( !strcmp( st, "no" ) )
+            tg_data.sg_allow_find = TG_SG_FIND_IGNORE_ALL;
+        else
+            tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
+        return;
+    }
+
+    if(!strcmp(cmd_command,"sg_fire_bullets"))
+    {
+        if(argc<3)
         {
-                if(argc<3)
-                {
-                	G_sprint(self, 2, "sg_fire_type \n");
-                	return;
-                }
-                	
-                trap_CmdArgv( 2, st, sizeof( st ) );
-        	if ( !strcmp( st, "nodmg" ) )
-        		tg_data.sg_fire_type = TG_SG_FIRE_LIGHTING;
-        	else if( !strcmp( st, "bullets" ) )
-        			tg_data.sg_fire_type = TG_SG_FIRE_BULLETS;
-       		else
-        			tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;
-                return;
-        }*/
-	if ( !strcmp( cmd_command, "eff_conc" ) )
-	{
-	     TG_Eff_Conc(self);
-	     return;
-	}
+            G_sprint(self, 2, "sg_fire_bullets is %s\n", tg_data.sg_fire_bullets?"on":"off");
+            return;
+        }
+        trap_CmdArgv( 2, st, sizeof( st ) );
+        if( !strcmp(st,"off") )
+            tg_data.sg_fire_bullets = false;
+        else
+            tg_data.sg_fire_bullets = true;
+        return;
+    }
+    if(!strcmp(cmd_command,"sg_fire_rockets"))
+    {
+        if(argc<3)
+        {
+            G_sprint(self, 2, "sg_fire_rockets is %s\n", tg_data.sg_fire_rockets?"on":"off");
+            return;
+        }
+        trap_CmdArgv( 2, st, sizeof( st ) );
+        if( !strcmp(st,"off") )
+            tg_data.sg_fire_rockets = false;
+        else
+            tg_data.sg_fire_rockets = true;
+        return;
+    }
+    if(!strcmp(cmd_command,"sg_fire_lighting"))
+    {
+        if(argc<3)
+        {
+            G_sprint(self, 2, "sg_fire_lighting is %s\n", tg_data.sg_fire_lighting?"on":"off");
+            return;
+        }
+        trap_CmdArgv( 2, st, sizeof( st ) );
+        if( strcmp(st,"on") )
+            tg_data.sg_fire_lighting = false;
+        else
+            tg_data.sg_fire_lighting = true;
+        return;
+    }
 
-	if ( !strcmp( cmd_command, "god" ) )
-	{
+    /*        if(!strcmp(cmd_command,"sg_fire_type"))
+              {
+              if(argc<3)
+              {
+              G_sprint(self, 2, "sg_fire_type \n");
+              return;
+              }
 
-	     if ( ( int ) self->s.v.flags & FL_GODMODE )
-	     {
-	        G_sprint(self,2,"God mode off\n");
-	        self->s.v.flags = ( int ) self->s.v.flags - FL_GODMODE;
-	     }else
-	     {
-	        G_sprint(self,2,"God mode on\n");
-	        self->s.v.flags = ( int ) self->s.v.flags | FL_GODMODE;
-	     }
-	     return;
-	}
+              trap_CmdArgv( 2, st, sizeof( st ) );
+              if ( !strcmp( st, "nodmg" ) )
+              tg_data.sg_fire_type = TG_SG_FIRE_LIGHTING;
+              else if( !strcmp( st, "bullets" ) )
+              tg_data.sg_fire_type = TG_SG_FIRE_BULLETS;
+              else
+              tg_data.sg_fire_type = TG_SG_FIRE_NORMAL;
+              return;
+              }*/
+    if ( !strcmp( cmd_command, "eff_conc" ) )
+    {
+        TG_Eff_Conc(self);
+        return;
+    }
+
+    if ( !strcmp( cmd_command, "god" ) )
+    {
+
+        if ( ( int ) self->s.v.flags & FL_GODMODE )
+        {
+            G_sprint(self,2,"God mode off\n");
+            self->s.v.flags = ( int ) self->s.v.flags - FL_GODMODE;
+        }else
+        {
+            G_sprint(self,2,"God mode on\n");
+            self->s.v.flags = ( int ) self->s.v.flags | FL_GODMODE;
+        }
+        return;
+    }
 }
 
 
