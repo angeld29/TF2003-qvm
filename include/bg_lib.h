@@ -30,6 +30,8 @@ typedef char *  va_list;
 // Misc functions
 typedef int cmp_t(const void *, const void *);
 void qsort(void *a, size_t n, size_t es, cmp_t *cmp);
+void *bsearch(const void *key, const void *base, size_t num, size_t size,
+	      int (*cmp)(const void *key, const void *elt));
 void	srand( unsigned seed );
 int		rand( void );
 

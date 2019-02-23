@@ -1055,7 +1055,7 @@ void TeamFortress_PrimeGrenade(  )
 				break;
 			default:
 				G_sprint( self, 2, "%s primed, 3 seconds...\n", GrenadePrimeName[gtype] );
-				if ( self->internal_settings_bits & TF_INTERNAL_GRENSOUND )
+				if ( self->settings_bits & TF_INTERNAL_GRENSOUND )
 				        stuffcmd( self, "play count.wav\n" );
 				break;
 			}
@@ -1121,7 +1121,7 @@ void TeamFortress_PrimeGrenade(  )
 				break;
 			default:
 				G_sprint( self, 2, "%s primed, 3 seconds...\n", GrenadePrimeName[gtype] );
-				if ( self->internal_settings_bits & TF_INTERNAL_GRENSOUND )
+				if ( self->settings_bits & TF_INTERNAL_GRENSOUND )
 				        stuffcmd( self, "play count.wav\n" );
 				break;
 			}

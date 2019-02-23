@@ -7,6 +7,8 @@ by [sd] angel for MTFL
 [+] menu, classhelp refactor
 [+] server side old conc
 выключается localinfo svconc off
+[+] rewriten user settings system
+'cmd set' now print all user settings
 ////////////////////////////////////////////////////
 Внесенные изменения (на 12.02.2019 r1):
 Енг:
