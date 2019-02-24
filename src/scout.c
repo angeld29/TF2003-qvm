@@ -792,12 +792,16 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 void ApplySvConcVelocity( gedict_t* self )
 {
     int conc_idle = self->eff_info.conc_idle;
-    vec3_t v;
+    vec3_t v,va;
 
     if( !tf_data.svconc ) return;
     if( !conc_idle ) return;
-    if( vlen( self->s.v.velocity) < 40 ) return;
-      trap_makevectors( self->s.v.velocity );
+    VectorCopy( self->s.v.velocity, v );
+    v[2] = 0;
+    if( vlen( v ) < 40 ) return;
+      //trap_makevectors( self->s.v.velocity );
+      vectoangles( v, va );
+      trap_makevectors( va );
       VectorScale( g_globalvars.v_right, conc_idle * sin(g_globalvars.time * 4) * 1, v );
       VectorAdd( self->s.v.velocity, v, self->s.v.velocity );
 }
