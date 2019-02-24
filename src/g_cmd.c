@@ -229,7 +229,7 @@ void Test(  )
         G_sprint( self, 2, "timelimit %d %f %f\n", timelimit, tf_data.cb_prematch_time, g_globalvars.time );
         G_sprint( self, 2, "mapname %s %s\n", mapname, nextmap);
         G_sprint( self, 2, " intermission... %d %f %f\n", intermission_running, intermission_exittime, g_globalvars.time );
-#if 1
+#if 0
         if( self->eff_info.conc_idle == 0 ){
             self->eff_info.conc_idle = 130;
             G_sprint( self, 2, " conc enabled\n" );

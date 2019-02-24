@@ -802,7 +802,7 @@ void ApplySvConcVelocity( gedict_t* self )
       //trap_makevectors( self->s.v.velocity );
       vectoangles( v, va );
       trap_makevectors( va );
-      VectorScale( g_globalvars.v_right, conc_idle * sin(g_globalvars.time * 4) * ( ((int)self->s.v.flags & FL_ONGROUND) ? 1 : 0.2), v );
+      VectorScale( g_globalvars.v_right, conc_idle * sin(g_globalvars.time * 4) * ( ((int)self->s.v.flags & FL_ONGROUND) ? 1 : 0.4), v );
       VectorAdd( self->s.v.velocity, v, self->s.v.velocity );
 }
 
