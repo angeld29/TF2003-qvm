@@ -805,16 +805,16 @@ void ApplySvConcVelocity( gedict_t* self )
       VectorScale( g_globalvars.v_right, conc_idle * sin(g_globalvars.time * 4) * ( ((int)self->s.v.flags & FL_ONGROUND) ? 0.8 : 0.6), v );
       VectorAdd( self->s.v.velocity, v, self->s.v.velocity );
 }
-
+#define CONC_MULTIPLAY 0.05
 void ApplySvConc( gedict_t* self )
 {
     int conc_idle = self->eff_info.conc_idle;
 
     if( !tf_data.svconc ) return;
     if( !conc_idle ) return;
-    //self->s.v.v_angle[ROLL]  += conc_idle * sin(g_globalvars.time * v_iroll_cycle) * 0.1;
-    self->s.v.v_angle[PITCH] += conc_idle * sin(g_globalvars.time * v_ipitch_cycle) * 0.1;
-    self->s.v.v_angle[YAW]   += conc_idle * sin(g_globalvars.time * v_iyaw_cycle) * 0.1;
+    //self->s.v.v_angle[ROLL]  += conc_idle * sin(g_globalvars.time * v_iroll_cycle) * CONC_MULTIPLAY;
+    self->s.v.v_angle[PITCH] += conc_idle * sin(g_globalvars.time * v_ipitch_cycle) * CONC_MULTIPLAY;
+    self->s.v.v_angle[YAW]   += conc_idle * sin(g_globalvars.time * v_iyaw_cycle) * CONC_MULTIPLAY;
 }
 
 
