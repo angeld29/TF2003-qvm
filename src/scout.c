@@ -798,11 +798,11 @@ void ApplySvConcVelocity( gedict_t* self )
     if( !conc_idle ) return;
     VectorCopy( self->s.v.velocity, v );
     v[2] = 0;
-    if( vlen( v ) < 40 ) return;
+    if( vlen( v ) < 80 ) return;
       //trap_makevectors( self->s.v.velocity );
       vectoangles( v, va );
       trap_makevectors( va );
-      VectorScale( g_globalvars.v_right, conc_idle * sin(g_globalvars.time * 4) * ( ((int)self->s.v.flags & FL_ONGROUND) ? 1 : 0.4), v );
+      VectorScale( g_globalvars.v_right, conc_idle * sin(g_globalvars.time * 4) * ( ((int)self->s.v.flags & FL_ONGROUND) ? 0.8 : 0.6), v );
       VectorAdd( self->s.v.velocity, v, self->s.v.velocity );
 }
 

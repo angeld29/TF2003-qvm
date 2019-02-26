@@ -68,3 +68,6 @@ void PlayerDie();
 void set_suicide_frame();
 void ParseUserInfo();
 void Client_Set_Cmd();
+
+void ApplyDmgRoll( gedict_t* self );
+

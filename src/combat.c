@@ -163,6 +163,7 @@ void T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker, float
 
 //      char    attackerteam[10], targteam[10];
 
+    G_dprintf(  "dmg %f %f %f \n", self->eff_info.dmg_curr, self->eff_info.dmg, damage );
 	if ( !targ->s.v.takedamage )
 		return;
 
@@ -212,6 +213,8 @@ void T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker, float
 		targ->s.v.dmg_take += take;
 		targ->s.v.dmg_save += save;
 		targ->s.v.dmg_inflictor = EDICT_TO_PROG( inflictor );
+		targ->eff_info.dmg_curr += 0.5 * take + 0.5 * save;
+		targ->eff_info.dmg = targ->eff_info.dmg_curr;
 	}
 	damage_inflictor = inflictor;
 // figure momentum add
@@ -452,6 +455,8 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 		targ->s.v.dmg_take += take;
 		targ->s.v.dmg_save += save;
 		targ->s.v.dmg_inflictor = EDICT_TO_PROG( inflictor );
+		targ->eff_info.dmg_curr += 0.5 * take + 0.5 * save;
+		targ->eff_info.dmg = targ->eff_info.dmg_curr;
 	}
 	damage_inflictor = inflictor;
 
@@ -724,4 +729,18 @@ void T_BeamDamage( gedict_t * attacker, float damage )
 		}
 		head = trap_findradius( head, attacker->s.v.origin, damage + 40 );
 	}
+}
+
+
+void ApplyDmgRoll( gedict_t* self )
+{
+    int dmg = self->eff_info.dmg_curr;
+
+    if( dmg <= 0 ) return;
+    //self->s.v.v_angle[ROLL]  += conc_idle * sin(g_globalvars.time * v_iroll_cycle) * 0.1;
+
+//#define DMG_ROLL 0.2
+#define DMG_ROLL 0.2
+    self->s.v.v_angle[PITCH] += dmg * crandom() * DMG_ROLL;
+    self->s.v.v_angle[YAW]   += dmg * crandom() * DMG_ROLL;
 }

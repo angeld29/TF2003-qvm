@@ -39,6 +39,7 @@ struct thick_s {
 };
 struct eff_info_s {
     int conc_idle;
+    float dmg, dmg_curr;
 };
 
 typedef struct gedict_s {

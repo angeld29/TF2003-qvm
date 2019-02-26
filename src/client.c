@@ -2094,7 +2094,12 @@ void PlayerPostThink()
     self->jump_flag = self->s.v.velocity[2];
     CheckPowerups();
 
+    if( self->eff_info.dmg_curr > 0 ){
+        self->eff_info.dmg_curr -= self->eff_info.dmg * 0.2;
+    }
     ApplySvConc( self );
+    ApplyDmgRoll( self );
+
     W_WeaponFrame();
     if ( self->motd <= 95 )
         TeamFortress_MOTD();
@@ -2294,6 +2299,7 @@ void ClientThink()
 {
     ApplySvConc( self );
     ApplySvConcVelocity( self );
+    ApplyDmgRoll( self );
 }
 
 /*
