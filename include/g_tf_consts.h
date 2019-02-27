@@ -43,6 +43,7 @@
 #define TF_TD_IGNOREARMOUR 1  // Bypasses the armour of the target
 #define TF_TD_NOTTEAM  2  // Doesn't damage a team member (indicates direct fire weapon)
 #define TF_TD_NOTSELF  4  // Doesn't damage self
+#define TF_TD_MOREKICK  8  // Doesn't damage self
 
 #define TF_TD_OTHER   0  // Ignore armorclass
 #define TF_TD_SHOT   1  // Bullet damage

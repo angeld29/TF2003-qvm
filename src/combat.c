@@ -455,7 +455,7 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 		targ->s.v.dmg_take += take;
 		targ->s.v.dmg_save += save;
 		targ->s.v.dmg_inflictor = EDICT_TO_PROG( inflictor );
-		targ->eff_info.dmg_curr += 0.5 * take + 0.5 * save;
+		targ->eff_info.dmg_curr += ( 0.5 * take + 0.5 * save ) * ( T_flags & TF_TD_MOREKICK ? 4 : 1 );
 		targ->eff_info.dmg = targ->eff_info.dmg_curr;
 	}
 	damage_inflictor = inflictor;
@@ -741,8 +741,8 @@ void ApplyDmgRoll( gedict_t* self )
     //self->s.v.v_angle[ROLL]  += conc_idle * sin(g_globalvars.time * v_iroll_cycle) * 0.1;
 
 //#define DMG_ROLL 0.2
-#define DMG_ROLL 1.6
-    val = sqrt(dmg) * DMG_ROLL;
+#define DMG_ROLL 0.2
+    val = dmg * DMG_ROLL;
     self->s.v.v_angle[PITCH] += val * crandom();
     self->s.v.v_angle[YAW]   += val * crandom();
 }

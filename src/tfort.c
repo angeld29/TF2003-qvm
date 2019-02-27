@@ -1918,8 +1918,8 @@ void TeamFortress_CheckClassStats(  )
 		self->s.v.ammo_cells = TeamFortress_GetMaxAmmo( self, IT_CELLS );
 	if ( self->s.v.ammo_cells < 0 )
 		self->s.v.ammo_cells = 0;
-	if ( self->ammo_medikit > TeamFortress_GetMaxAmmo( self, WEAP_MEDIKIT )
-		self->ammo_medikit = TeamFortress_GetMaxAmmo( self, WEAP_MEDIKIT
+	if ( self->ammo_medikit > TeamFortress_GetMaxAmmo( self, WEAP_MEDIKIT ))
+		self->ammo_medikit = TeamFortress_GetMaxAmmo( self, WEAP_MEDIKIT );
 	if ( self->ammo_medikit < 0 )
 		self->ammo_medikit = 0;
 	if ( self->ammo_detpack > TeamFortress_GetMaxAmmo( self, WEAP_DETPACK ) )
@@ -2547,7 +2547,7 @@ void BioInfection_Decay(  )
 	}
 	self->s.v.nextthink = g_globalvars.time + 3;
 	tf_data.deathmsg = DMSG_BIOWEAPON;
-	TF_T_Damage( owner, self, enemy, 8, TF_TD_IGNOREARMOUR, 0 );
+	TF_T_Damage( owner, self, enemy, 8, TF_TD_IGNOREARMOUR | TF_TD_MOREKICK, 0 );
 	SpawnBlood( owner->s.v.origin, 30 );
 }
 
