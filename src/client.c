@@ -2095,7 +2095,7 @@ void PlayerPostThink()
     CheckPowerups();
 
     if( self->eff_info.dmg_curr > 0 ){
-        self->eff_info.dmg_curr -= self->eff_info.dmg * 0.2;
+        self->eff_info.dmg_curr -= self->eff_info.dmg * 0.1;
     }
     ApplySvConc( self );
     ApplyDmgRoll( self );
