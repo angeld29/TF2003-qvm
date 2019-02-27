@@ -1737,7 +1737,7 @@ PLAYER WEAPON USE
 ===============================================================================
 */
 
-void W_SetCurrentAmmo_old(  )
+/*void W_SetCurrentAmmo_old(  )
 {
 	int     items;
 
@@ -1936,7 +1936,7 @@ void W_SetCurrentAmmo_old(  )
 		break;
 	}
 	self->s.v.items = items;
-}
+}*/
 void W_SetCurrentAmmo(  )
 {
 	int     items;

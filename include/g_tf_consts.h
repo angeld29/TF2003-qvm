@@ -70,6 +70,17 @@
 #define TEAMPLAY_LESSPLAYERSHELP 32
 #define TEAMPLAY_LESSSCOREHELP	 64
 
+#define TEAMPLAY_HALFARMOR_DIRECT	    128	//Team-members only lose 1/2 armor from direct fire.
+#define TEAMPLAY_NOARMOR_DIRECT         256	//Team-members lose no armor from direct fire.
+#define TEAMPLAY_HALFARMOR_EXPLOSIVE    512 //Team-members only lose 1/2 armor from area-affect weaponry.
+#define TEAMPLAY_NOARMOR_EXPLOSIVE	    1024 //Team-members lose no armor from area-affect weaponry.
+#define TEAMPLAY_HALFMIRROR_DIRECT	    2048 //Team-members take 1/2 mirror damage from direct fire.
+#define TEAMPLAY_MIRROR_DIRECT	        4096 //Team-members take full mirror damage from direct fire.
+#define TEAMPLAY_HALFMIRROR_EXPLOSIVE   8192 //Team-members take 1/2 mirror damage from area-affect weaponry.
+#define TEAMPLAY_MIRROR_EXPLOSIVE	    16384//Team-members take full mirror damage from area-affect weaponry.
+
+
+
 // FortressMap stuff
 #define TEAM1_CIVILIANS 1 
 #define TEAM2_CIVILIANS 2

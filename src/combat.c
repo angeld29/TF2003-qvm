@@ -415,20 +415,20 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 		{
 			if ( T_AttackType & TF_TD_EXPLOSION )
 			{
-				if ( teamplay & 1024 )
+				if ( teamplay & TEAMPLAY_NOARMOR_EXPLOSIVE )
 					save = 0;
 				else
 				{
-					if ( teamplay & 512 )
+					if ( teamplay & TEAMPLAY_HALFARMOR_EXPLOSIVE )
 						save = save / 2;
 				}
 			} else
 			{
-				if ( teamplay & 256 )
+				if ( teamplay & TEAMPLAY_NOARMOR_DIRECT )
 					save = 0;
 				else
 				{
-					if ( teamplay & 128 )
+					if ( teamplay & TEAMPLAY_HALFARMOR_DIRECT )
 						save = save / 2;
 				}
 			}
@@ -599,21 +599,21 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 			if ( T_AttackType & TF_TD_EXPLOSION )
 			{
 				tf_data.deathmsg = DMSG_TEAMKILL;
-				if ( teamplay & 16384 )
+				if ( teamplay & TEAMPLAY_MIRROR_EXPLOSIVE )
 					TF_T_Damage( attacker, world, world, take, TF_TD_IGNOREARMOUR, 0 );
 				else
 				{
-					if ( teamplay & 8192 )
+					if ( teamplay & TEAMPLAY_HALFMIRROR_EXPLOSIVE )
 						TF_T_Damage( attacker, world, world, take / 2, TF_TD_IGNOREARMOUR, 0 );
 				}
 			} else
 			{
 				tf_data.deathmsg = DMSG_TEAMKILL;
-				if ( teamplay & 4096 )
+				if ( teamplay & TEAMPLAY_MIRROR_DIRECT )
 					TF_T_Damage( attacker, world, world, take, TF_TD_IGNOREARMOUR, 0 );
 				else
 				{
-					if ( teamplay & 2048 )
+					if ( teamplay & TEAMPLAY_HALFMIRROR_DIRECT )
 						TF_T_Damage( attacker, world, world, take / 2, TF_TD_IGNOREARMOUR, 0 );
 				}
 			}
