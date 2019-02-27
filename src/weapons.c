@@ -155,7 +155,7 @@ void W_FireAxe(  )
 		     || strneq( PROG_TO_EDICT( g_globalvars.trace_ent )->s.v.classname, "player" ) )
 		{
 			tf_data.deathmsg = DMSG_AXE;
-			TF_T_Damage( PROG_TO_EDICT( g_globalvars.trace_ent ), self, self, 20, 2, 0 );
+			TF_T_Damage( PROG_TO_EDICT( g_globalvars.trace_ent ), self, self, 20, TF_TD_NOTTEAM, 0 );
 		} else
 		{
 			self->weaponmode = 1;
@@ -167,11 +167,11 @@ void W_FireAxe(  )
 			if ( crossproduct( def, g_globalvars.v_forward ) > 0 )
 			{
 				tf_data.deathmsg = DMSG_BACKSTAB;
-				TF_T_Damage( PROG_TO_EDICT( g_globalvars.trace_ent ), self, self, 120, 2, 0 );
+				TF_T_Damage( PROG_TO_EDICT( g_globalvars.trace_ent ), self, self, 120, TF_TD_NOTTEAM, 0 );
 			} else
 			{
 				tf_data.deathmsg = DMSG_AXE;
-				TF_T_Damage( PROG_TO_EDICT( g_globalvars.trace_ent ), self, self, 40, 2, 0 );
+				TF_T_Damage( PROG_TO_EDICT( g_globalvars.trace_ent ), self, self, 40, TF_TD_NOTTEAM, 0 );
 			}
 		}
 	} else
@@ -303,7 +303,7 @@ void W_FireSpanner(  )
 					trace_ent->axhitme = 1;
 					SpawnBlood( org, 20 );
 					tf_data.deathmsg = DMSG_SPANNER;
-					TF_T_Damage( trace_ent, self, self, 20, 2, 0 );
+					TF_T_Damage( trace_ent, self, self, 20, TF_TD_NOTTEAM, 0 );
 				}
 			}
 		}
@@ -744,7 +744,7 @@ void ApplyMultiDamage(  )
 {
 	if ( multi_ent == world || !multi_ent )
 		return;
-	TF_T_Damage( multi_ent, self, self, multi_damage, 2, 1 );
+	TF_T_Damage( multi_ent, self, self, multi_damage, TF_TD_NOTTEAM, TF_TD_SHOT );
 }
 
 void AddMultiDamage( gedict_t * hit, float damage )
@@ -1034,7 +1034,7 @@ void W_FireSniperRifle(  )
 				trace_ent->leg_damage = trace_ent->leg_damage + 1;
 				TeamFortress_SetSpeed( trace_ent );
 				tf_data.deathmsg = DMSG_SNIPERLEGSHOT;
-				TF_T_Damage( trace_ent, self, self, self->heat * dam_mult, 2, 1 );
+				TF_T_Damage( trace_ent, self, self, self->heat * dam_mult, TF_TD_NOTTEAM, TF_TD_SHOT );
 				if ( trace_ent->s.v.health > 0 )
 				{
 					G_sprint( trace_ent, 0, "Leg injury!\n" );
@@ -1051,7 +1051,7 @@ void W_FireSniperRifle(  )
 							trace_ent->head_shot_vector );
 					//trace_ent->head_shot_vector = trace_ent->s.v.origin - self->s.v.origin;
 					tf_data.deathmsg = DMSG_SNIPERHEADSHOT;
-					TF_T_Damage( trace_ent, self, self, self->heat * dam_mult, 2, 1 );
+					TF_T_Damage( trace_ent, self, self, self->heat * dam_mult, TF_TD_NOTTEAM, TF_TD_SHOT );
 					if ( trace_ent->s.v.health > 0 )
 					{
 						G_sprint( trace_ent, 0, "Head injury!\n" );
@@ -1156,7 +1156,7 @@ void T_MissileTouch(  )
 	damg = 92 + g_random(  ) * 20;
 	tf_data.deathmsg = self->s.v.weapon;
 	if ( other->s.v.health )
-		TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), damg, 2, 0 );
+		TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), damg, TF_TD_NOTTEAM, 0 );
 	if ( streq( PROG_TO_EDICT( self->s.v.owner )->s.v.classname, "building_sentrygun" ) )
 		T_RadiusDamage( self, PROG_TO_EDICT( self->s.v.owner ), 150, other );
 	else
@@ -1223,7 +1223,7 @@ void LightningHit( gedict_t * from, float damage )
 	trap_WriteCoord( MSG_MULTICAST, g_globalvars.trace_endpos[2] );
 	trap_multicast( PASSVEC3( g_globalvars.trace_endpos ), MULTICAST_PVS );
 
-	TF_T_Damage( PROG_TO_EDICT( g_globalvars.trace_ent ), from, from, damage, 2, 8 );
+	TF_T_Damage( PROG_TO_EDICT( g_globalvars.trace_ent ), from, from, damage, TF_TD_NOTTEAM, TF_TD_ELECTRICITY );
 }
 
 /*
@@ -1665,9 +1665,9 @@ void spike_touch(  )
 		spawn_touchblood( 9 );
 		tf_data.deathmsg = self->s.v.weapon;
 		if ( streq( PROG_TO_EDICT( self->s.v.owner )->s.v.classname, "grenade" ) )
-			TF_T_Damage( other, self, PROG_TO_EDICT( PROG_TO_EDICT( self->s.v.owner )->s.v.owner ), 9, 2, 2 );
+			TF_T_Damage( other, self, PROG_TO_EDICT( PROG_TO_EDICT( self->s.v.owner )->s.v.owner ), 9, TF_TD_NOTTEAM, TF_TD_NAIL );
 		else
-			TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 18, 2, 2 );
+			TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 18, TF_TD_NOTTEAM, TF_TD_NAIL );
 	} else
 	{
 		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
@@ -1714,9 +1714,9 @@ void superspike_touch(  )
 		else
 			ndmg = 26;
 		if ( streq( PROG_TO_EDICT( self->s.v.owner )->s.v.classname, "grenade" ) )
-			TF_T_Damage( other, self, PROG_TO_EDICT( PROG_TO_EDICT( self->s.v.owner )->s.v.owner ), ndmg, 2, 2 );
+			TF_T_Damage( other, self, PROG_TO_EDICT( PROG_TO_EDICT( self->s.v.owner )->s.v.owner ), ndmg, TF_TD_NOTTEAM, TF_TD_NAIL );
 		else
-			TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), ndmg, 2, 2 );
+			TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), ndmg, TF_TD_NOTTEAM, TF_TD_NAIL );
 	} else
 	{
 		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );

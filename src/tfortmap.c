@@ -575,9 +575,9 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 			if ( Goal->s.v.health < 0 )
 			{
 				if ( 0 - Player->s.v.health > Goal->s.v.health )
-					TF_T_Damage( Player, Goal, Goal, Player->s.v.health + 1, 1, 0 );
+					TF_T_Damage( Player, Goal, Goal, Player->s.v.health + 1, TF_TD_IGNOREARMOUR, 0 );
 				else
-					TF_T_Damage( Player, Goal, Goal, 0 - Goal->s.v.health, 1, 0 );
+					TF_T_Damage( Player, Goal, Goal, 0 - Goal->s.v.health, TF_TD_IGNOREARMOUR, 0 );
 			}
 		}
 		if ( Player->s.v.health > 0 )
@@ -777,7 +777,7 @@ void RemoveResults( gedict_t * Goal, gedict_t * Player )
 		Player->item_list = Player->item_list - ( Player->item_list & Goal->item_list );
 	}
 	if ( Goal->s.v.health > 0 )
-		TF_T_Damage( Player, Goal, Goal, Goal->s.v.health, 1, 0 );
+		TF_T_Damage( Player, Goal, Goal, Goal->s.v.health, TF_TD_IGNOREARMOUR, 0 );
 	if ( Goal->s.v.health < 0 )
 		T_Heal( Player, 0 - Goal->s.v.health, 0 );
 	Player->lives = Player->lives - Goal->lives;

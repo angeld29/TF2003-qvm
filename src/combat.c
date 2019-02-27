@@ -600,21 +600,21 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 			{
 				tf_data.deathmsg = DMSG_TEAMKILL;
 				if ( teamplay & 16384 )
-					TF_T_Damage( attacker, world, world, take, 1, 0 );
+					TF_T_Damage( attacker, world, world, take, TF_TD_IGNOREARMOUR, 0 );
 				else
 				{
 					if ( teamplay & 8192 )
-						TF_T_Damage( attacker, world, world, take / 2, 1, 0 );
+						TF_T_Damage( attacker, world, world, take / 2, TF_TD_IGNOREARMOUR, 0 );
 				}
 			} else
 			{
 				tf_data.deathmsg = DMSG_TEAMKILL;
 				if ( teamplay & 4096 )
-					TF_T_Damage( attacker, world, world, take, 1, 0 );
+					TF_T_Damage( attacker, world, world, take, TF_TD_IGNOREARMOUR, 0 );
 				else
 				{
 					if ( teamplay & 2048 )
-						TF_T_Damage( attacker, world, world, take / 2, 1, 0 );
+						TF_T_Damage( attacker, world, world, take / 2, TF_TD_IGNOREARMOUR, 0 );
 				}
 			}
 			tf_data.deathmsg = olddmsg;
@@ -690,7 +690,7 @@ void T_RadiusDamage( gedict_t * inflictor, gedict_t * attacker, float damage, ge
 						if ( streq( head->s.v.classname, "monster_shambler" ) )
 							T_Damage( head, inflictor, attacker, points * 0.5 );
 						else
-							TF_T_Damage( head, inflictor, attacker, points, 2, 4 );
+							TF_T_Damage( head, inflictor, attacker, points, TF_TD_NOTTEAM, TF_TD_EXPLOSION );
 					}
 				}
 			}

@@ -1272,7 +1272,7 @@ void GasGrenadeMakeGas(  )
 		if ( streq( te->s.v.classname, "player" ) && !te->s.v.deadflag && te->has_disconnected != 1 )
 		{
 			tf_data.deathmsg = DMSG_GREN_GAS;
-			TF_T_Damage( te, world, PROG_TO_EDICT( self->s.v.owner ), 10, 1 | 2, 0 );
+			TF_T_Damage( te, world, PROG_TO_EDICT( self->s.v.owner ), 10, TF_TD_IGNOREARMOUR | TF_TD_NOTTEAM, 0 );
 			if ( te->tfstate & TFSTATE_HALLUCINATING )
 			{
 				for ( timer = world; (timer = trap_find( timer, FOFS( s.v.classname ), "timer" )); )
@@ -1563,7 +1563,7 @@ void T_TranqDartTouch(  )
 	{
 		spawn_touchblood( 9 );
 		tf_data.deathmsg = DMSG_TRANQ;
-		TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 20, 2, 2 );
+		TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 20, TF_TD_NOTTEAM, TF_TD_NAIL );
 		if ( streq( other->s.v.classname, "player" ) &&
 		     !( other->team_no == PROG_TO_EDICT( self->s.v.owner )->team_no && ( teamplay & ( 2 | 4 ) ) ) )
 		{

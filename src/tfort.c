@@ -2547,7 +2547,7 @@ void BioInfection_Decay(  )
 	}
 	self->s.v.nextthink = g_globalvars.time + 3;
 	tf_data.deathmsg = DMSG_BIOWEAPON;
-	TF_T_Damage( owner, self, enemy, 8, 1, 0 );
+	TF_T_Damage( owner, self, enemy, 8, TF_TD_IGNOREARMOUR, 0 );
 	SpawnBlood( owner->s.v.origin, 30 );
 }
 

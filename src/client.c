@@ -1648,7 +1648,7 @@ void WaterMove()
             if ( self->dmg > 15 )
                 self->dmg = 10;
 
-            TF_T_Damage( self, world, world, self->dmg, 1, 0 );
+            TF_T_Damage( self, world, world, self->dmg, TF_TD_IGNOREARMOUR, 0 );
             self->pain_finished = g_globalvars.time + 1;
         }
     }
@@ -1672,7 +1672,7 @@ void WaterMove()
             else
                 self->dmgtime = g_globalvars.time + 0.2;
 
-            TF_T_Damage( self, world, world, 10 * self->s.v.waterlevel, 0, 16 );
+            TF_T_Damage( self, world, world, 10 * self->s.v.waterlevel, 0, TF_TD_FIRE );
         }
 
     } else
@@ -2085,7 +2085,7 @@ void PlayerPostThink()
                 }
                 fdmg = Q_rint( fdmg );
                 self->deathtype = "falling";
-                TF_T_Damage( self, world, world, fdmg, 1, 0 );
+                TF_T_Damage( self, world, world, fdmg, TF_TD_IGNOREARMOUR, 0 );
                 sound( self, 2, "player/land2.wav", 1, 1 );
             } else
                 sound( self, 2, "player/land.wav", 1, 1 );

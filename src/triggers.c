@@ -677,7 +677,7 @@ void hurt_touch(  )
 		}
 		self->s.v.solid = SOLID_NOT;
 		tf_data.deathmsg = DMSG_TRIGGER;
-		TF_T_Damage( other, self, self, self->dmg, 1, 0 );
+		TF_T_Damage( other, self, self, self->dmg, TF_TD_IGNOREARMOUR, 0 );
 		self->s.v.think = ( func_t ) hurt_on;
 		self->s.v.nextthink = g_globalvars.time + 1;
 	}

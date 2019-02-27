@@ -81,7 +81,7 @@ void LaserBolt_Touch(  )
     {
         SpawnBlood( org, 15 );
         tf_data.deathmsg = DMSG_LASERBOLT;
-        TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.enemy ), 25, 2, TF_TD_ELECTRICITY );
+        TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.enemy ), 25, TF_TD_NOTTEAM, TF_TD_ELECTRICITY );
         VectorCopy( self->s.v.oldorigin, self->s.v.velocity );
         self->s.v.owner = EDICT_TO_PROG( other );
         setmodel( self, "" );
@@ -245,7 +245,7 @@ void EMPGrenadeExplode(  )
             if ( !
                     ( ( teamplay & TEAMPLAY_NOEXPLOSIVE ) && te->team_no > 0
                       && te->team_no == PROG_TO_EDICT( self->s.v.owner )->team_no ) )
-                TF_T_Damage( te, self, PROG_TO_EDICT( self->s.v.owner ), 200, 0, 4 );
+                TF_T_Damage( te, self, PROG_TO_EDICT( self->s.v.owner ), 200, 0, TF_TD_EXPLOSION );
             continue;
         }
         if ( streq( te->s.v.classname, "ammobox" ) )
@@ -285,7 +285,7 @@ void EMPGrenadeExplode(  )
                     T_RadiusDamage( te, PROG_TO_EDICT( self->s.v.owner ), expsize, te );
                     if ( te->s.v.touch != ( func_t ) BackpackTouch )
                     {
-                        TF_T_Damage( te, self, PROG_TO_EDICT( self->s.v.owner ), expsize, 2, 4 );
+                        TF_T_Damage( te, self, PROG_TO_EDICT( self->s.v.owner ), expsize, TF_TD_NOTTEAM, TF_TD_EXPLOSION );
                         te->s.v.ammo_shells = ceil( te->s.v.ammo_shells * 0.25 );
                         te->s.v.ammo_rockets = ceil( te->s.v.ammo_rockets * 0.25 );
                         if ( te->playerclass != PC_ENGINEER )

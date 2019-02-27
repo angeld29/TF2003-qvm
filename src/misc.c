@@ -263,7 +263,7 @@ void fire_fly(  )
 void fire_touch(  )
 {
 	if ( other->s.v.takedamage )
-		TF_T_Damage( other, self, self, 20, 0, 16 );
+		TF_T_Damage( other, self, self, 20, 0, TF_TD_FIRE );
 	dremove( self );
 }
 
@@ -392,7 +392,7 @@ void Laser_Touch(  )
 	if ( other->s.v.health )
 	{
 		SpawnBlood( org, 15 );
-		TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 15, 0, 8 );
+		TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 15, 0, TF_TD_ELECTRICITY );
 	} else
 	{
 		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );

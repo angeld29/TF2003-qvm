@@ -445,7 +445,7 @@ void TeamFortress_DetpackExplode(  )
 					if ( points )
 					{
 						if ( CanDamage( head, self ) )
-							TF_T_Damage( head, self, self->real_owner, points * 2, 2, 4 );
+							TF_T_Damage( head, self, self->real_owner, points * 2, TF_TD_NOTTEAM, TF_TD_EXPLOSION );
 					}
 				}
 			}

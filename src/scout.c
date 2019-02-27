@@ -259,7 +259,7 @@ void FlashGrenadeExplode(  )
 		if ( vlen( tmp ) <= 200 )
 		{
 			tf_data.deathmsg = DMSG_GREN_FLASH;
-			TF_T_Damage( te, self, owner, 60, 2, 16 | 4 );
+            TF_T_Damage( te, self, owner, 60, TF_TD_NOTTEAM, TF_TD_FIRE | TF_TD_EXPLOSION );
 		}
 		if ( te->s.v.health <= 0 )
 			continue;
