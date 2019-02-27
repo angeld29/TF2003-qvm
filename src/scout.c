@@ -805,7 +805,7 @@ void ApplySvConcVelocity( gedict_t* self )
       VectorScale( g_globalvars.v_right, conc_idle * sin(g_globalvars.time * 4) * ( ((int)self->s.v.flags & FL_ONGROUND) ? 0.8 : 0.6), v );
       VectorAdd( self->s.v.velocity, v, self->s.v.velocity );
 }
-#define CONC_MULTIPLAY 0.05
+#define CONC_MULTIPLAY 0.07
 void ApplySvConc( gedict_t* self )
 {
     int conc_idle = self->eff_info.conc_idle;
