@@ -169,7 +169,7 @@ void NapalmGrenadeNetThink(  )
 		if ( head->s.v.takedamage )
 		{
 			tf_data.deathmsg = DMSG_FLAME;
-			TF_T_Damage( head, self, PROG_TO_EDICT( self->s.v.owner ), 20, 2, 16 );
+			TF_T_Damage( head, self, PROG_TO_EDICT( self->s.v.owner ), 20, 2, TF_TD_FIRE );
 			other = head;
 			Napalm_touch(  );
 			if ( streq( other->s.v.classname, "player" ) )
@@ -215,7 +215,7 @@ void NapalmGrenadeExplode(  )
         		if ( head->s.v.takedamage )
         		{
         			tf_data.deathmsg = DMSG_FLAME;
-        			TF_T_Damage( head, self, PROG_TO_EDICT( self->s.v.owner ), 40, 2, 16 );
+        			TF_T_Damage( head, self, PROG_TO_EDICT( self->s.v.owner ), 40, 2, TF_TD_FIRE );
         			// set 'em on fire
         			other = head;// i can't believe this works!
         			Napalm_touch(  );
@@ -388,7 +388,7 @@ void FlameFollow(  )
 			damage = 1;
 		self->heat = 1;
 		tf_data.deathmsg = DMSG_FLAME;
-		TF_T_Damage( enemy, self, PROG_TO_EDICT( self->s.v.owner ), damage, 2, 16 );
+		TF_T_Damage( enemy, self, PROG_TO_EDICT( self->s.v.owner ), damage, 2, TF_TD_FIRE );
 	} else
 	{
 		if ( self->s.v.effects == EF_DIMLIGHT )
@@ -461,7 +461,7 @@ void WorldFlame_touch(  )
 	vec3_t  vtemp;
 
 	tf_data.deathmsg = DMSG_FLAME;
-	TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.enemy ), 10, 2, 16 );
+	TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.enemy ), 10, 2, TF_TD_FIRE );
 	self->s.v.touch = ( func_t ) SUB_Null;
 	if ( self->heat > g_globalvars.time + 1 )
 	{
@@ -616,7 +616,7 @@ void Napalm_touch(  )
 		if ( other->s.v.takedamage == 2 && other->s.v.health > 0 )
 		{
 			tf_data.deathmsg = DMSG_FLAME;
-			TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 6, 2, 16 );
+			TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 6, 2, TF_TD_FIRE );
 			if ( tf_data.cb_prematch_time > g_globalvars.time )
 				return;
 			if ( other->numflames >= 4 )
@@ -795,7 +795,7 @@ void T_IncendiaryTouch(  )
 	if ( other->s.v.health )
 	{
 		tf_data.deathmsg = DMSG_FLAME;
-		TF_T_Damage( other, self, owner, damg, 2, 16 );
+		TF_T_Damage( other, self, owner, damg, 2, TF_TD_FIRE );
 	}
 
 	// don't do radius damage to the other, because all the damage
@@ -810,7 +810,7 @@ void T_IncendiaryTouch(  )
 			     || ( g_globalvars.trace_fraction != 1 && vlen( vtemp ) <= 64 ) )
 			{
 				tf_data.deathmsg = DMSG_FLAME;
-				TF_T_Damage( head, self, owner, 10, 2, 16 );
+				TF_T_Damage( head, self, owner, 10, 2, TF_TD_FIRE );
 				other = head;
 				if( !g_globalvars.trace_inwater)
 					Napalm_touch(  );

@@ -734,13 +734,15 @@ void T_BeamDamage( gedict_t * attacker, float damage )
 
 void ApplyDmgRoll( gedict_t* self )
 {
-    int dmg = self->eff_info.dmg_curr;
+    float dmg = self->eff_info.dmg_curr;
+    float val;
 
     if( dmg <= 0 ) return;
     //self->s.v.v_angle[ROLL]  += conc_idle * sin(g_globalvars.time * v_iroll_cycle) * 0.1;
 
 //#define DMG_ROLL 0.2
-#define DMG_ROLL 0.2
-    self->s.v.v_angle[PITCH] += dmg * crandom() * DMG_ROLL;
-    self->s.v.v_angle[YAW]   += dmg * crandom() * DMG_ROLL;
+#define DMG_ROLL 1.6
+    val = sqrt(dmg) * DMG_ROLL;
+    self->s.v.v_angle[PITCH] += val * crandom();
+    self->s.v.v_angle[YAW]   += val * crandom();
 }
