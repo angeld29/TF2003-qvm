@@ -1902,28 +1902,28 @@ void TeamFortress_CheckClassStats(  )
 		self->s.v.armortype = 0;
 	if ( self->s.v.armorvalue < 0 )
 		self->s.v.armorvalue = 0;
-	if ( self->s.v.ammo_shells > TeamFortress_GetMaxAmmo( self, 256 ) )
-		self->s.v.ammo_shells = TeamFortress_GetMaxAmmo( self, 256 );
+	if ( self->s.v.ammo_shells > TeamFortress_GetMaxAmmo( self, IT_SHELLS ) )
+		self->s.v.ammo_shells = TeamFortress_GetMaxAmmo( self, IT_SHELLS );
 	if ( self->s.v.ammo_shells < 0 )
 		self->s.v.ammo_shells = 0;
-	if ( self->s.v.ammo_nails > TeamFortress_GetMaxAmmo( self, 512 ) )
-		self->s.v.ammo_nails = TeamFortress_GetMaxAmmo( self, 512 );
+	if ( self->s.v.ammo_nails > TeamFortress_GetMaxAmmo( self, IT_NAILS ) )
+		self->s.v.ammo_nails = TeamFortress_GetMaxAmmo( self, IT_NAILS );
 	if ( self->s.v.ammo_nails < 0 )
 		self->s.v.ammo_nails = 0;
-	if ( self->s.v.ammo_rockets > TeamFortress_GetMaxAmmo( self, 1024 ) )
-		self->s.v.ammo_rockets = TeamFortress_GetMaxAmmo( self, 1024 );
+	if ( self->s.v.ammo_rockets > TeamFortress_GetMaxAmmo( self, IT_ROCKETS ) )
+		self->s.v.ammo_rockets = TeamFortress_GetMaxAmmo( self, IT_ROCKETS );
 	if ( self->s.v.ammo_rockets < 0 )
 		self->s.v.ammo_rockets = 0;
-	if ( self->s.v.ammo_cells > TeamFortress_GetMaxAmmo( self, 2048 ) )
-		self->s.v.ammo_cells = TeamFortress_GetMaxAmmo( self, 2048 );
+	if ( self->s.v.ammo_cells > TeamFortress_GetMaxAmmo( self, IT_CELLS ) )
+		self->s.v.ammo_cells = TeamFortress_GetMaxAmmo( self, IT_CELLS );
 	if ( self->s.v.ammo_cells < 0 )
 		self->s.v.ammo_cells = 0;
-	if ( self->ammo_medikit > TeamFortress_GetMaxAmmo( self, 4 ) )
-		self->ammo_medikit = TeamFortress_GetMaxAmmo( self, 4 );
+	if ( self->ammo_medikit > TeamFortress_GetMaxAmmo( self, WEAP_MEDIKIT )
+		self->ammo_medikit = TeamFortress_GetMaxAmmo( self, WEAP_MEDIKIT
 	if ( self->ammo_medikit < 0 )
 		self->ammo_medikit = 0;
-	if ( self->ammo_detpack > TeamFortress_GetMaxAmmo( self, 131072 ) )
-		self->ammo_detpack = TeamFortress_GetMaxAmmo( self, 131072 );
+	if ( self->ammo_detpack > TeamFortress_GetMaxAmmo( self, WEAP_DETPACK ) )
+		self->ammo_detpack = TeamFortress_GetMaxAmmo( self, WEAP_DETPACK );
 	if ( self->ammo_detpack < 0 )
 		self->ammo_detpack = 0;
 	if ( self->no_grenades_1 < 0 )
