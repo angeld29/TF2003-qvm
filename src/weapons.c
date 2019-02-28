@@ -1962,10 +1962,13 @@ void W_SetCurrentAmmo(  )
         wi = WEAPON_BY_BIT( self->current_weapon );
         if( wi->w == self->current_weapon ){
             self->s.v.currentammo = 0;
-            if( wi->have_mode && self->weaponmode == 1 ){
-                self->s.v.weaponmodel = wi->model_mode;
-            }else{
-                self->s.v.weaponmodel = wi->model;
+
+            if ( !( self->tfstate & TFSTATE_RELOADING ) ){
+                if( wi->have_mode && self->weaponmode == 1 ){
+                    self->s.v.weaponmodel = wi->model_mode;
+                }else{
+                    self->s.v.weaponmodel = wi->model;
+                }
             }
             if( wi->ammo_ofs){
                 if(wi->ammo_type == F_INT ){
