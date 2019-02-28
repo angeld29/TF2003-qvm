@@ -1617,7 +1617,7 @@ void TeamFortress_SetEquipment(  )
 	self->items_allowed = class_set[pc].items_allowed;
 	self->s.v.items = ( int ) self->s.v.items | class_set[pc].items;
 
-	if ( pc == 1 )
+	if ( pc == PC_SCOUT )
 	{
 		if ( self->ScannerOn )
 		{
@@ -1627,7 +1627,7 @@ void TeamFortress_SetEquipment(  )
 		if ( self->ScanRange == 0 )
 			self->ScanRange = DEFAULT_AUTOSCAN_RANGE;
 	}
-	if ( pc == 5 )
+	if ( pc == PC_MEDIC )
 	{
 		te = spawn(  );
 		te->s.v.nextthink = g_globalvars.time + PC_MEDIC_REGEN_TIME;
@@ -1635,7 +1635,7 @@ void TeamFortress_SetEquipment(  )
 		te->s.v.owner = EDICT_TO_PROG( self );
 		te->s.v.classname = "timer";
 	}
-	if ( pc == 5 && tf_data.invis_only == 1 )
+	if ( pc == PC_SPY && tf_data.invis_only == 1 )
 	{
 		te = spawn(  );
 		te->s.v.nextthink = g_globalvars.time + PC_SPY_CELL_REGEN_TIME;
