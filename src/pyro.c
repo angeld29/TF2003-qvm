@@ -758,7 +758,7 @@ void W_FireFlame(  )
 
 	flame->s.v.touch = ( func_t ) Flamer_stream_touch;
 	flame->s.v.think = ( func_t ) s_explode;
-	flame->s.v.effects = 8;
+	flame->s.v.effects = EF_DIMLIGHT;
 	flame->s.v.nextthink = g_globalvars.time + 0.15;
 
 	setmodel( flame, "progs/s_explod.spr" );
