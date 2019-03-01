@@ -718,7 +718,10 @@ void check_water()
   }
 }
 
-
+void s_explode()
+{
+    set_think( self, 0 , 5, check_water, check_water, SUB_Remove );
+}
 void W_FireFlame(  )
 {
 	gedict_t *flame;
@@ -754,8 +757,7 @@ void W_FireFlame(  )
 	VectorScale( flame->s.v.velocity, 600, flame->s.v.velocity );
 
 	flame->s.v.touch = ( func_t ) Flamer_stream_touch;
-	//flame->s.v.think = ( func_t ) s_explode1;
-    set_think( flame, 0 , 5, check_water, check_water, SUB_Remove );
+	flame->s.v.think = ( func_t ) s_explode;
 	flame->s.v.effects = 8;
 	flame->s.v.nextthink = g_globalvars.time + 0.15;
 
