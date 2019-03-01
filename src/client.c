@@ -594,6 +594,7 @@ void DecodeLevelParms()
         if( tg_data.tg_enabled )
             TG_LoadSettings();
 
+        localcmd( "exec maps/%s.cfg\n", mapname );
         if( tf_data.enable_bot )
             localcmd( "exec maps/%s.wps\n", mapname );
     }
@@ -1219,17 +1220,8 @@ void PutClientInServer()
         GotoNextMap();
 
     if( self->isBot )
-    {
-        ClearAllWaypoints(  );
-        ClearAllTargets(  );
-        self->obs_time = 0;
-        self->action = BOT_IDLE;
-        self->s.v.button0 = 0;
-        self->s.v.button1 = 0;
-        self->s.v.button2 = 0;
-        self->keys = 0;
-        self->fBotMessageTime = 0;
-    }
+        botPutInServer();
+
     self->s.v.touch = ( func_t ) player_touch;
     self->s.v.classname = "player";
     self->s.v.health = 100;

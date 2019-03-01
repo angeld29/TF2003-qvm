@@ -58,43 +58,44 @@ void Bot_CL_KeyMove(  )
 			PASSVEC3(self->s.v.v_angle),
 			forwardmove, sidemove, upmove, buttons, self->s.v.impulse );
 }
-void BotFrame( void )
+void botFrame( void )
 {
-	gedict_t *te, *oself;
+    gedict_t *te, *oself;
 
-	oself = self;
-	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "player" ) ); )
-	{
-		if ( te->has_disconnected )
-			continue;
+    bot_frametime = g_globalvars.frametime;
+    oself = self;
+    for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "player" ) ); )
+    {
+        if ( te->has_disconnected )
+            continue;
 
-		if ( !te->isBot )
-			continue;
+        if ( !te->isBot )
+            continue;
 
-		self = te;
-		if( !tf_data.enable_bot )
-		{
-		        botDisconnect( self );
-		        continue;
-		}
-		self->old_button0 = self->s.v.button0;
-		self->old_button2 = self->s.v.button2;
-		self->old_keys = self->keys;
+        self = te;
+        if( !tf_data.enable_bot )
+        {
+            botDisconnect( self );
+            continue;
+        }
+        self->old_button0 = self->s.v.button0;
+        self->old_button2 = self->s.v.button2;
+        self->old_keys = self->keys;
 
-               	self->s.v.button0 = 0;
-       		self->s.v.button2 = 0;
-       		self->s.v.impulse = 0;
-       		self->keys = 0;
-       		if( self->team_no && self->team_no != 1)
-       		{
-       		        G_bprint(3,"%s: i'm dont know how to play for team 2\n",self->s.v.netname);
-       		        botDisconnect(self);
-       		        continue;
-       		}
-       		Bot_AI(  );
-		Bot_CL_KeyMove(  );
-	}
-	self = oself;
+        self->s.v.button0 = 0;
+        self->s.v.button2 = 0;
+        self->s.v.impulse = 0;
+        self->keys = 0;
+        if( self->team_no && self->team_no != 1)
+        {
+            G_bprint(3,"%s: i'm dont know how to play for team 2\n",self->s.v.netname);
+            botDisconnect(self);
+            continue;
+        }
+        Bot_AI(  );
+        Bot_CL_KeyMove(  );
+    }
+    self = oself;
 
 }
 
@@ -139,4 +140,17 @@ void botDisconnect( gedict_t * te )
 	self = te;
 	trap_RemoveBot( NUM_FOR_EDICT( te ) );
 	self = oself;
+}
+
+void botPutInServer()
+{
+    ClearAllWaypoints( );
+    ClearAllTargets( );
+    self->obs_time = 0;
+    self->action = BOT_IDLE;
+    self->s.v.button0 = 0;
+    self->s.v.button1 = 0;
+    self->s.v.button2 = 0;
+    self->keys = 0;
+    self->fBotMessageTime = 0;
 }

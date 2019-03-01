@@ -119,6 +119,9 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 
         case GAME_START_FRAME:
             StartFrame( arg0 );
+            if( arg1 ){
+                botFrame();
+            }
             RestoreGlobals();
             return 1;
 

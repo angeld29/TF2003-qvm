@@ -156,45 +156,45 @@ void ResupplySetBot()
 
 void Bot()
 {
-        
-        char    cmd_command[50];
-        int argc,i;
-        bot_cmd_t*ucmd;
 
-        if( api_ver < 7 )
+    char    cmd_command[50];
+    int argc,i;
+    bot_cmd_t*ucmd;
+
+    if( api_ver < 7 )
+    {
+        G_sprint( self, 2, "Bots disabled (API version %d)\n",api_ver );
+        return;
+    }
+
+    if ( !tf_data.enable_bot )
+    {
+        G_sprint( self, 2, "Bots disabled\n" );
+        //FIXME!!!!
+        return;
+    }
+
+    argc = trap_CmdArgc();
+
+    if( argc == 1 )
+    {
+        G_sprint( self, 2, "Avaliable commands\n");
+        for ( ucmd = bot_cmds ; ucmd->command  ; ucmd++ )
         {
-                G_sprint( self, 2, "Bots disabled (API version %d)\n",api_ver );
-                return;
+            G_sprint( self, 2, "%s\n",ucmd->command);
         }
+        return;
+    }
 
-	if ( !tf_data.enable_bot )
-	{
-		G_sprint( self, 2, "Bots disabled\n" );
-//FIXME!!!!
-                return;
-	}
-
-	argc = trap_CmdArgc();
-	
-	if( argc == 1 )
-	{
-	        G_sprint( self, 2, "Avaliable commands\n");
-		for ( ucmd = bot_cmds ; ucmd->command  ; ucmd++ )
-		{
-			G_sprint( self, 2, "%s\n",ucmd->command);
-		}
-		return;
-	}
-
-	trap_CmdArgv( 1, cmd_command, sizeof( cmd_command ) );
-	for ( ucmd = bot_cmds,i=0 ; ucmd->command  ; ucmd++,i++ )
-	{
-		if( !strcmp(cmd_command,ucmd->command) )
-		{
-			ucmd->func();
-			return;
-		}
-	}
+    trap_CmdArgv( 1, cmd_command, sizeof( cmd_command ) );
+    for ( ucmd = bot_cmds,i=0 ; ucmd->command  ; ucmd++,i++ )
+    {
+        if( !strcmp(cmd_command,ucmd->command) )
+        {
+            ucmd->func();
+            return;
+        }
+    }
 }
 
 extern float max_yaw_per_sek;

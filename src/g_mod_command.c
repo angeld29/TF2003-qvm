@@ -28,8 +28,17 @@ typedef struct mod_s{
 void WP_command( int argc );
 void Red_Def_command( int argc );
 
+void enable_bot( int argc )
+{
+    G_dprintf( "enable Bots \n" );
+    if( tf_data.enable_bot  ) return;
+    tf_data.enable_bot = 1;
+    localcmd( "exec maps/%s.wps\n", mapname );
+}
+
 const static mod_t   mod_cmds[] = {
 	{"wp", WP_command},
+	{"enable_bot", enable_bot},
 	{"red_def", Red_Def_command},
 	{NULL, NULL}
 };

@@ -369,8 +369,8 @@ void StartFrame( int time )
 	deathmatch = trap_cvar( "deathmatch" );
 
 	framecount = framecount + 1;
-	bot_frametime = g_globalvars.time - old_time;
-	old_time = g_globalvars.time;
-	BotFrame();
+//	bot_frametime = g_globalvars.time - old_time;
+//	old_time = g_globalvars.time;
+//	botFrame();
 	MatchTimer( false );
 }

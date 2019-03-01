@@ -59,7 +59,7 @@
 #define BOT_AI_SCOUT            10
 */
 
-void BotFrame();
+void botFrame();
 void botConnect(int whichteam, int whichClass, char* name);
 void botDisconnect(gedict_t* te);
 void Bot_AI();
@@ -97,4 +97,5 @@ void GoForResupply();
 int BotImpulse();
 int BotImpulseMenu();
 
+void botPutInServer();
 extern float bot_frametime;
