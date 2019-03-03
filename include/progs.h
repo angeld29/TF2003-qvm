@@ -392,26 +392,20 @@ typedef enum arena_modes_e
 typedef struct tf_server_data_s {
     int            toggleflags;
     float          respawn_delay_time;
-    int            live_camera;
-    int            already_chosen_map;
+    //int            live_camera;
     int            clanbattle;
-    float          clan_scores_dumped;
     float          cb_prematch_time;
     float          cb_ceasefire_time;
     int            game_locked;
-    int            last_id;
     int            spy_off;
     int            old_grens;
     int            svconc;
     int            new_flash;
     int            invis_only;
     int            allow_hook;
-    int            flagem_checked;
-    int            cease_fire;
     int            allow_drop_goal;
     float          autokick_time;
     int            autokick_kills;
-    int            deathmsg;
     int            birthday;
     int            cheat_pause;
     int            disable_grens;
@@ -432,7 +426,13 @@ typedef struct tf_server_data_s {
     int            lan_mode;
     //bot
     int            enable_bot;
-    int            botResupplyBetweenKills;
     arena_modes_t  arena_mode;
 
+    float          clan_scores_dumped;
+    int            deathmsg;
+    int            already_chosen_map;
+    int            last_id;
+    int            flagem_checked;
+    int            cease_fire;
+    int            botResupplyBetweenKills;
 } tf_server_data_t;

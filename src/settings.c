@@ -18,7 +18,6 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *  $Id: client.c,v 1.61 2006-11-29 23:19:23 AngelD Exp $
  */
 #include "g_local.h"
 

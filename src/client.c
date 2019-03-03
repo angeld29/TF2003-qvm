@@ -451,7 +451,7 @@ void DecodeLevelParms()
             tf_data.sgppl = 0;
 
         tf_data.old_spanner = GetSVInfokeyBool( "old_spanner", NULL, false );
-        tf_data.disable_grens = GetSVInfokeyBool( "dg", "disable_grens", false );
+        tf_data.disable_grens = GetSVInfokeyInt( "dg", "disable_grens", 0 );
 
         if ( GetSVInfokeyBool( "dtpb", NULL, true )  )
             tf_data.detpack_block = 1;
