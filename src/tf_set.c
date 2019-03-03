@@ -20,22 +20,13 @@
  */
 
 #include "g_local.h"
-
-typedef struct set_bits_s
-{
-    const char* name;
-    const char* key;
-    const char* key2;
-    unsigned int bit;
-    qboolean    default_val;
-}set_bits_t;
-
+#include "tf_set.h"
 
 const set_bits_t sv_settings_bits[] = {
   { "Clan Battle", "clan", "c", svsb_clanbattle         , false },
   { "Locked Game", "locked_game", "lg", svsb_game_locked        , false },
   { "Disable Spy", "spy_off", "", svsb_spy_off            , false },
-  { "Grapple", "g", "grapple", svsb_allow_hook         , false },
+  { "Grapple", "grapple", "g", svsb_allow_hook         , false },
   { "Old grenades", "old_grens", "og", svsb_old_grens          , true },
   { "Spy invis", "spyinvis", "s", svsb_invis_only         , false },
   { "Server conc grenade", "svconc", "", svsb_svconc             , true },
@@ -56,3 +47,52 @@ const set_bits_t sv_settings_bits[] = {
   { "Sentry Gun New Find", "sg_newfind", "", svsb_sg_new_find        , true  },
   { NULL, },
 };
+
+static set_item_t tf_settings[] = {
+    { "", "", "",  TFS_INT_BITS, 0, &sv_settings_bits[0], 0 },
+    { NULL } 
+};
+
+static void   tf_set( const char* name, const char*val  )
+{
+    set_item_t* si = &tf_settings[0];
+    for(; si->name; si++ ){
+        if( si->type == TFS_INT_BITS ){
+            const set_bits_t* sb = si->bitsdesc;
+            for(; sb->name; sb++ ){
+                if( streq( sb->key, name ) || streq( sb->key2, name ) ){
+                    qboolean bit_set = sb->default_val;
+                    if( streq( val, "on" ) || streq( val, "1" ) ){
+                        bit_set = true;
+                    }else if( streq( val, "off" ) || streq( val, "0" ) ){
+                        bit_set = false;
+                    }
+                    if( bit_set ){
+                        si->val._uint |= sb->bit;
+                    }else{
+                        si->val._uint -= si->val._uint & sb->bit;
+                    }
+                    G_conprintf( "%s: %s %d\n", sb->name, bit_set? _ON: _OFF, si->val._uint );
+                    return;
+                }
+            }
+        }
+    }
+}
+
+void   TF_Set_Cmd( int argc  )
+{
+    char    cmd_command[64];
+    char    val[64];
+
+    if( argc < 3 ) return;
+
+    trap_CmdArgv( 2, cmd_command, sizeof( cmd_command ) );
+    if( argc == 3 ){
+        //tf_print( cmd_command );
+    }else{
+        trap_CmdArgv( 3, val, sizeof( val ) );
+        tf_set( cmd_command, val );
+    }
+
+}

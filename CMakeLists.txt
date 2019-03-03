@@ -76,6 +76,7 @@ set( SOURCE_LIB
     "${DIR_SRC}/vote.c"
     "${DIR_SRC}/weapons.c"
     "${DIR_SRC}/world.c"
+    "${DIR_SRC}/tf_set.c"
     )		
 
 # Включение экспорта всех символов для создания динамической библиотеки

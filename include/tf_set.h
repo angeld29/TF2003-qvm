@@ -30,18 +30,19 @@ typedef enum set_id_s
 {
     set_toggleflags,
     set_respawn_delay,
+    set_server_settings,
 }set_id_t;
 
-typedef enum set_item_s
+typedef struct set_item_s
 {
-    set_id_t id;
+//    set_id_t id;
     const char* key;
     const char* key2;
     const char* name;
     set_types_t type;
     set_val_t   val;
-    set_val_t   default_val;
     const set_bits_t *bitsdesc;
+    set_val_t   default_val;
 }set_item_t;
 
 #define svsb_clanbattle         1<<0
