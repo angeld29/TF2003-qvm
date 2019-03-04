@@ -391,11 +391,8 @@ typedef enum arena_modes_e
 
 typedef struct tf_server_data_s {
     int            toggleflags;
-    float          respawn_delay_time;
     //int            live_camera;
     int            clanbattle;
-    float          cb_prematch_time;
-    float          cb_ceasefire_time;
     int            game_locked;
     int            spy_off;
     int            old_grens;
@@ -404,26 +401,32 @@ typedef struct tf_server_data_s {
     int            invis_only;
     int            allow_hook;
     int            allow_drop_goal;
-    float          autokick_time;
-    int            autokick_kills;
     int            birthday;
-    int            cheat_pause;
-    int            disable_grens;
     int            topcolor_check;
     //             sentry_types_t                                                       sentry_type;
     qboolean       sg_newfind;
-    sg_sfire_t     sg_sfire;
     qboolean       sg_rfire;
     qboolean       old_spanner;
-    int            sgppl;
-    int            snip_range_fix,snip_fps,snip_ammo;
-    float          snip_time;
+    int            snip_range_fix;
     int            add_pipe;
-    int            new_gas;
     int            pyrotype;
-    int            gren2box,random_tf_spawn,disable_powerups,flag_timer,detpack_block;
+    int            random_tf_spawn,disable_powerups,flag_timer,detpack_block;
     int            mtfl;
     int            lan_mode;
+   //not bool settings 
+    float          respawn_delay_time;
+    float          cb_prematch_time;
+    float          cb_ceasefire_time;
+    float          autokick_time;
+    int            autokick_kills;
+    int            disable_grens;
+    int            cheat_pause;
+    sg_sfire_t     sg_sfire;
+    int            sgppl;
+    int            snip_fps,snip_ammo;
+    float          snip_time;
+    int            new_gas;
+    int            gren2box;
     //bot
     int            enable_bot;
     arena_modes_t  arena_mode;
