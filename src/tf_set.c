@@ -51,53 +51,171 @@ const set_bits_t sv_settings_bits[] = {
 };
 
 static set_item_t tf_settings[] = {
-    { "Settings bits", "", "",  TFS_INT_BITS, 0, &sv_settings_bits[0], 0 },
+    { "Settings bits", "", "",  TFS_INT_BITS, 0, &sv_settings_bits[0], "0" },
+    { "Respawn delay", "respawn_delay", "rd",  TFS_FLOAT, 0, NULL, "0"  },
+    { "Prematch time", "prematch", "pm",  TFS_FLOAT, 0, NULL, "0"  },
+    { "CeaseFire time", "ceasefire_time", "cft",  TFS_FLOAT, 0, NULL, "0"  },
+    { "Autokick time", "autokick_time", "akt",  TFS_FLOAT, 0, NULL, "0"  },
+    { "Autokick kills", "autokick_kills", "akk",  TFS_FLOAT, 0, NULL, "0"  },
+    { "Cheat Pause", "cheat_pause", "cp",  TFS_INT, 0, NULL, "1"  },
+    { "Disable Grenades", "disable_grens", "dg",  TFS_INT, 0, NULL, "0"  },
+    { "Sentry ppl emulation", "sgppl", "",  TFS_INT, 12, NULL, "12"  },
+    { "Sentry shells fire", "sg_sfire", "",  TFS_INT, 0, NULL, "0"  },
+    { "Sniper fps", "snip_fps", "sf",  TFS_INT, 0, NULL, "72"  },
+    { "Sniper ammo on shot", "snip_ammo", "",  TFS_INT, 0, NULL, "1"  },
+    { "Sniper reload time", "snip_time", "",  TFS_FLOAT, 0, NULL, "1.5" },
+    { "Gas grenade effects", "new_gas", "",  TFS_INT, 131, NULL, "131"  },
+    { "Grenades in backpack", "gren2box", "g2b",  TFS_INT, 0, NULL, "0"  },
+    { "Arena Mode", "arena", "",  TFS_INT, 0, NULL, "0"  },
     { NULL } 
 };
 
-static void   tf_set( const char* name, const char*val, qboolean noprint  )
+char           *G_NewString( const char *string );
+static void _tfset_print_bits( byte val, const set_bits_t* sb )
 {
+    for(; sb->name; sb++ ){
+        G_conprintf( "%s:%s: %s\n", sb->key, sb->name, val & sb->bit ? _ON: _OFF );
+    }
+}
+
+static qboolean _tfset_getby_key( const char* key, set_item_t** outsi, int*idx){
     set_item_t* si = &tf_settings[0];
 
     for(; si->name; si++ ){
+        if( streq( si->key, key ) || streq( si->key2, key ) ){
+            *outsi = si;
+            *idx = -1;
+            return true;
+        }
         if( si->type == TFS_INT_BITS ){
             const set_bits_t* sb = si->bitsdesc;
-            for(; sb->name; sb++ ){
-                if( streq( sb->key, name ) || streq( sb->key2, name ) ){
-                    qboolean bit_set = si->val._uint & sb->bit;
-                    if( val && val[0] ){
-                        bit_set = sb->default_val;
-                        if( streq( val, "on" ) || streq( val, "1" ) ){
-                            bit_set = true;
-                        }else if( streq( val, "off" ) || streq( val, "0" ) ){
-                            bit_set = false;
-                        }
-                        if( bit_set ){
-                            si->val._uint |= sb->bit;
-                        }else{
-                            si->val._uint -= si->val._uint & sb->bit;
-                        }
-                    }
-                    if( ! noprint )
-                        G_conprintf( "%s: %s %d\n", sb->name, bit_set? _ON: _OFF, si->val._uint );
-                    return;
+            int i = 0;
+            for(; sb->name; sb++, i++ ){
+                if( streq( sb->key, key ) || streq( sb->key2, key ) ){
+                    *outsi = si;
+                    *idx = i;
+                    return true;
                 }
             }
         }
     }
+    return false;
+}
+
+static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oninit  )
+{
+    switch( si->type ){
+        case TFS_INT_BITS:
+            if( idx < 0 ){
+                if( val && val[0] ){
+                    si->val._int = atoi(val);
+                }
+                if( !oninit ){
+                    G_conprintf( "%s:%s:\n", si->key, si->name );
+                    _tfset_print_bits( si->val._int, si->bitsdesc );
+                }
+            }else{
+                const set_bits_t* sb = si->bitsdesc + idx;
+                qboolean bit_set = si->val._uint & sb->bit;
+                if( val && val[0] ){
+                    bit_set = sb->default_val;
+                    if( streq( val, "on" ) || streq( val, "1" ) ){
+                        bit_set = true;
+                    }else if( streq( val, "off" ) || streq( val, "0" ) ){
+                        bit_set = false;
+                    }
+                    if( bit_set ){
+                        si->val._uint |= sb->bit;
+                    }else{
+                        si->val._uint -= si->val._uint & sb->bit;
+                    }
+                }
+                if( !oninit )
+                    G_conprintf( "%s:%s: %s %d\n", sb->key, sb->name, bit_set? _ON: _OFF, si->val._uint );
+            }
+            break;
+        case TFS_INT:
+            if( val && val[0] ) si->val._int = atoi( val );
+            if( !oninit ) G_conprintf( "%s:%s: %d\n", si->key, si->name, si->val._int );
+            break;
+        case TFS_FLOAT:
+            if( val && val[0] ) si->val._int = atof( val );
+            if( !oninit ) G_conprintf( "%s:%s: %.2f\n", si->key, si->name, si->val._float );
+            break;
+        case TFS_STRING:
+            if( val && val[0] ){
+                if( oninit ) {
+                    si->val._str = G_NewString( val );
+                }else{
+                    G_conprintf( "Changing string settings allowed only by localinfo\n"
+                            "%s:%s: %.2f\n", si->key, si->name, si->val._float );
+                }
+            }
+            break;
+        case TFS_BOOL:
+            if( val && val[0] ){
+                si->val._int = atoi(si->default_val);
+                if( streq( val, "on" ) || streq( val, "1" ) ){
+                    si->val._int = 1;
+                }else if( streq( val, "off" ) || streq( val, "0" ) ){
+                    si->val._int = 0;
+                }
+            }
+            if( !oninit ) G_conprintf( "%s:%s: %s\n", si->key, si->name, si->val._int? _ON : _OFF );
+            break;
+        case TFS_INT_SET:
+            break;
+        default: 
+            break;
+    }
+}
+static void   tf_set( const char* name, const char*val, qboolean oninit  )
+{
+    set_item_t* si;
+    int idx;
+    if( !_tfset_getby_key( name, &si, &idx ))
+        return;
+    tf_set_val( si, idx, val, oninit );
 }
 
 void   TF_Set_Cmd( int argc  )
 {
-    char    cmd_command[64];
+    char    name[64];
     char    val[64] = "";
 
-    if( argc < 3 ) return;
+    if( argc == 2 ) {
+        set_item_t* si = &tf_settings[0];
+        for(; si->name; si++ ){
+            tf_set_val( si, -1, NULL, 0 );
+        }
+        return;
+    }
 
-    trap_CmdArgv( 2, cmd_command, sizeof( cmd_command ) );
+    trap_CmdArgv( 2, name, sizeof( name ) );
     if( argc == 4 ){
         trap_CmdArgv( 3, val, sizeof( val ) );
     }
-    tf_set( cmd_command, val, 0 );
+    tf_set( name, val, 0 );
 
+}
+
+void   TF_LocalinfoSettings( )
+{
+    char    value[100];
+    set_item_t* si = &tf_settings[0];
+    for(; si->name; si++ ){
+        if( si->key && si->key[0] ){
+            GetSVInfokeyString( si->key, si->key2, value, sizeof( value ), si->default_val);
+            if( value[0] ) tf_set( si->key, value, 1);
+        }
+        if( si->type == TFS_INT_BITS ){
+            const set_bits_t* sb = si->bitsdesc;
+            for(; sb->name; sb++ ){
+                if( sb->key && sb->key[0] ){
+                    GetSVInfokeyString( sb->key, sb->key2, value, sizeof( value ), sb->default_val? "1":"0");
+                    if( value[0] ) tf_set( sb->key, value, 1);
+                }
+            }
+        }
+    }
 }

@@ -139,6 +139,7 @@ void autokick_think()
 //-----------------------------------------------------------------------------------------------------
 extern int     team_top_colors[5];
 void UpdateServerinfoScores();
+void   TF_LocalinfoSettings( );
 void DecodeLevelParms()
 {
     char    st[10];
@@ -184,6 +185,7 @@ void DecodeLevelParms()
 
     if ( !( tf_data.toggleflags & TFLAG_FIRSTENTRY ) )
     {
+        TF_LocalinfoSettings();
 
         if( !first_decode )
         {

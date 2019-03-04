@@ -1,9 +1,9 @@
 
 typedef union set_val_s
 {
-	float		_float;
     int	        _int;
-    char*       _pstr;
+	float		_float;
+    char*       _str;
     unsigned int _uint;
 } set_val_t;	
 
@@ -42,7 +42,7 @@ typedef struct set_item_s
     set_types_t type;
     set_val_t   val;
     const set_bits_t *bitsdesc;
-    set_val_t   default_val;
+    const char* default_val;
 }set_item_t;
 
 #define svsb_clanbattle         1<<0

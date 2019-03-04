@@ -27,7 +27,7 @@ qboolean GetInfokeyString( gedict_t * pl, const char *key, const char *key2, cha
 	infokey( pl, key, value, size );
 	if ( value[0] )
 		return true;
-	if ( key2 )
+	if ( key2 && key2[0] )
 	{
 		infokey( pl, key2, value, size );
 		if ( value[0] )
@@ -47,7 +47,7 @@ int GetInfokeyInt( gedict_t * pl, const char *key, const char *key2, int default
 	if ( buff[0] )
 		return atoi( buff );
 
-	if ( key2 )
+	if ( key2 && key2[0] )
 	{
 		infokey( pl, key2, buff, sizeof( buff ) );
 		if ( buff[0] )
@@ -62,7 +62,7 @@ qboolean GetSVInfokeyString( const char *key, const char *key2, char *value, int
 	infokey( world, key, value, size );
 	if ( value[0] )
 		return true;
-	if ( key2 )
+	if ( key2 && key2[0] )
 	{
 		infokey( world, key2, value, size );
 		if ( value[0] )
@@ -93,7 +93,7 @@ int GetSVInfokeyInt( const char *key, const char *key2, int defaultval )
 	if ( buff[0] )
 		return atoi( buff );
 
-	if ( key2 )
+	if ( key2 && key2[0] )
 	{
 		infokey( world, key2, buff, sizeof( buff ) );
 		if ( buff[0] )
@@ -111,7 +111,7 @@ float GetSVInfokeyFloat( const char *key, const char *key2, float defaultval )
 	if ( buff[0] )
 		return atof( buff );
 
-	if ( key2 )
+	if ( key2 && key2[0] )
 	{
 		infokey( world, key2, buff, sizeof( buff ) );
 		if ( buff[0] )
