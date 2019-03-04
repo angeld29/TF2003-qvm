@@ -22,7 +22,7 @@
 #include "g_local.h"
 #include "tf_set.h"
 
-const set_bits_t sv_settings_bits[] = {
+static const set_bits_t sv_settings_bits[] = {
   { "Clan Battle", "clan", "c", svsb_clanbattle         , false },
   { "Locked Game", "locked_game", "lg", svsb_game_locked        , false },
   { "Disable Spy", "spy_off", "", svsb_spy_off            , false },
@@ -43,30 +43,69 @@ const set_bits_t sv_settings_bits[] = {
   { "Lan Mode", "lan", "", svsb_lan_mode           , false },
   { "MTFL settings", "mtfl", "", svsb_mtfl               , false },
   { "Bots", "enable_bot", "", svsb_enable_bot         , false },
-  { "Training ground mode", "tg", "", svsb_tg_enabled         , false },
-  { "Sentry Gun New Find", "sg_newfind", "", svsb_sg_new_find        , true  },
-  { "Sentry Gun New Rockets", "sg_rfire", "", svsb_sg_rfire        , true  },
+  { "Training ground", "tg", "", svsb_tg_enabled         , false },
+  { "SG New Find", "sg_newfind", "", svsb_sg_new_find        , true  },
+  { "SG New Rockets", "sg_rfire", "", svsb_sg_rfire        , true  },
   { "Pyro flame walls", "pyrotype", "", svsb_pyrotype        , false  },
   { NULL, },
 };
+static const set_bits_t toggleflags_bits[] = {
+  { "Autoteam", "", "", TFLAG_AUTOTEAM         , false },
+  { "Teamfrags", "teamfrags", "t", TFLAG_TEAMFRAGS         , false },
+  { "Fullteamscore", "fullteamscore", "fts", TFLAG_FULLTEAMSCORE         , false },
+  { "Respawn delay", "", "", TFLAG_RESPAWNDELAY         , false },
+  { NULL, },
+};
+static const set_bits_t tf_set_gren2box[] = {
+  { "Drop Health          ", "", "", BP_TYPE_HEALTH , false },
+  { "Drop Armor           ", "", "", BP_TYPE_ARMOR , false },
+  { "Drop Detpack         ", "", "", BP_TYPE_DETPACK , false },
+  { "Drop Grenades        ", "", "", BP_GREN , false },
+  { "Drop Grenades by type", "", "", BP_GREN_BYTYPE , false },
+  { NULL, },
+};
+
+static const set_bits_t tf_set_disablegren[] = {
+    { "Normal    ", "", "", DG_TYPE_NORMAL  , false },
+    { "Concussion", "", "", DG_TYPE_CONCUSSION , false },
+    { "Nail      ", "", "", DG_TYPE_NAIL, false },
+    { "Mirv      ", "", "", DG_TYPE_MIRV , false },
+    { "Napalm    ", "", "", DG_TYPE_NAPALM, false },
+    { "Flare     ", "", "", DG_TYPE_FLARE  , false },
+    { "Gas       ", "", "", DG_TYPE_GAS  , false },
+    { "Emp       ", "", "", DG_TYPE_EMP   , false },
+    { "Flash     ", "", "", DG_TYPE_FLASH  , false },
+    { "Caltrops  ", "", "", DG_TYPE_CALTROPS, false },
+    { "Detpack   ", "", "", DG_TYPE_DETPACK  , false },
+    { NULL, },
+};
+static const set_set_t set_sg_sfire[] = {
+    { "", "new", SG_SFIRE_NEW,},
+	{ "", "old", SG_SFIRE_281,},
+	{ "", "mtfl1", SG_SFIRE_MTFL1,},
+	{ "", "mtfl2", SG_SFIRE_MTFL2,},
+    { NULL, },
+};
 
 static set_item_t tf_settings[] = {
-    { "Settings bits", "", "",  TFS_INT_BITS, 0, &sv_settings_bits[0], "0" },
-    { "Respawn delay", "respawn_delay", "rd",  TFS_FLOAT, 0, NULL, "0"  },
-    { "Prematch time", "prematch", "pm",  TFS_FLOAT, 0, NULL, "0"  },
-    { "CeaseFire time", "ceasefire_time", "cft",  TFS_FLOAT, 0, NULL, "0"  },
-    { "Autokick time", "autokick_time", "akt",  TFS_FLOAT, 0, NULL, "0"  },
-    { "Autokick kills", "autokick_kills", "akk",  TFS_FLOAT, 0, NULL, "0"  },
-    { "Cheat Pause", "cheat_pause", "cp",  TFS_INT, 0, NULL, "1"  },
-    { "Disable Grenades", "disable_grens", "dg",  TFS_INT, 0, NULL, "0"  },
-    { "Sentry ppl emulation", "sgppl", "",  TFS_INT, 12, NULL, "12"  },
-    { "Sentry shells fire", "sg_sfire", "",  TFS_INT, 0, NULL, "0"  },
-    { "Sniper fps", "snip_fps", "sf",  TFS_INT, 0, NULL, "72"  },
-    { "Sniper ammo on shot", "snip_ammo", "",  TFS_INT, 0, NULL, "1"  },
-    { "Sniper reload time", "snip_time", "",  TFS_FLOAT, 0, NULL, "1.5" },
-    { "Gas grenade effects", "new_gas", "",  TFS_INT, 131, NULL, "131"  },
-    { "Grenades in backpack", "gren2box", "g2b",  TFS_INT, 0, NULL, "0"  },
-    { "Arena Mode", "arena", "",  TFS_INT, 0, NULL, "0"  },
+    { "Settings bits", "", "",  TFS_INT_BITS, 0, sv_settings_bits, NULL, "0" },
+    { "Toggle flags", "", "",  TFS_INT_BITS, 0, toggleflags_bits, NULL, "0" },
+    { "Autoteam time", "autoteam", "a",  TFS_FLOAT, 0, NULL, NULL, "0"  },
+    { "Respawn delay", "respawn_delay", "rd",  TFS_FLOAT, 0, NULL, NULL, "0"  },
+    { "Prematch time", "prematch", "pm",  TFS_FLOAT, 0, NULL, NULL, "0"  },
+    { "CeaseFire time", "ceasefire_time", "cft",  TFS_FLOAT, 0, NULL, NULL, "0"  },
+    { "Autokick time", "autokick_time", "akt",  TFS_FLOAT, 0, NULL, NULL, "0"  },
+    { "Autokick kills", "autokick_kills", "akk",  TFS_FLOAT, 0, NULL, NULL, "0"  },
+    { "Cheat Pause", "cheat_pause", "cp",  TFS_INT, 0, NULL, NULL, "1"  },
+    { "Disable Grenades", "disable_grens", "dg",  TFS_INT_BITS, 0, tf_set_disablegren, NULL, "0"  },
+    { "Sentry ppl emulation", "sgppl", "",  TFS_INT, 12, NULL, NULL, "12"  },
+    { "Sentry shells fire", "sg_sfire", "",  TFS_INT_SET, SG_SFIRE_NEW, NULL, set_sg_sfire, "0"  },
+    { "Sniper fps", "snip_fps", "sf",  TFS_INT, 0, NULL, NULL, "72"  },
+    { "Sniper ammo on shot", "snip_ammo", "",  TFS_INT, 0, NULL, NULL, "1"  },
+    { "Sniper reload time", "snip_time", "",  TFS_FLOAT, 0, NULL, NULL, "1.5" },
+    { "Gas grenade effects", "new_gas", "",  TFS_INT, 131, NULL, NULL, "131"  },
+    { "Extended backpack", "gren2box", "g2b",  TFS_INT_BITS, 0, tf_set_gren2box, NULL, "0"  },
+    { "Arena Mode", "arena", "",  TFS_INT, 0, NULL, NULL, "0"  },
     { NULL } 
 };
 
@@ -100,6 +139,25 @@ static qboolean _tfset_getby_key( const char* key, set_item_t** outsi, int*idx){
         }
     }
     return false;
+}
+
+static int _tf_get_setval_by_name( const char* name, const set_set_t* ss, int default_val )
+{
+    for(; ss->key; ss++ ){
+        if( streq( ss->key, name ) ){
+            return ss->val;
+        }
+    }
+    return default_val;
+}
+static const char*_tf_get_setname_by_val( int val, const set_set_t* ss )
+{
+    for(; ss->key; ss++ ){
+        if( val == ss->val ){
+            return ss->key;
+        }
+    }
+    return "unknown";
 }
 
 static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oninit  )
@@ -164,6 +222,10 @@ static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oni
             if( !oninit ) G_conprintf( "%s:%s: %s\n", si->key, si->name, si->val._int? _ON : _OFF );
             break;
         case TFS_INT_SET:
+            if( val && val[0] ){
+                si->val._int = _tf_get_setval_by_name( val, si->setdesc, atoi( si->default_val ));
+            }
+            if( !oninit ) G_conprintf( "%s:%s: %s\n", si->key, si->name, _tf_get_setname_by_val(si->val._int, si->setdesc ) );
             break;
         default: 
             break;

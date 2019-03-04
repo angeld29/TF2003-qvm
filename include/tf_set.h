@@ -33,15 +33,24 @@ typedef enum set_id_s
     set_server_settings,
 }set_id_t;
 
+typedef struct set_set_s
+{
+//    set_id_t id;
+    const char* name;
+    const char* key;
+    int         val;
+}set_set_t;
+
 typedef struct set_item_s
 {
 //    set_id_t id;
+    const char* name;
     const char* key;
     const char* key2;
-    const char* name;
     set_types_t type;
     set_val_t   val;
     const set_bits_t *bitsdesc;
+    const set_set_t *setdesc;
     const char* default_val;
 }set_item_t;
 
