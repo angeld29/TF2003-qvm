@@ -87,7 +87,7 @@ static const set_set_t set_sg_sfire[] = {
     { NULL, },
 };
 
-static set_item_t tf_settings[] = {
+set_item_t tf_settings[] = {
     { "Settings bits", "", "",  TFS_INT_BITS, 0, sv_settings_bits, NULL, "0" },
     { "Toggle flags", "", "",  TFS_INT_BITS, 0, toggleflags_bits, NULL, "0" },
     { "Autoteam time", "autoteam", "a",  TFS_FLOAT, 0, NULL, NULL, "0"  },
@@ -95,7 +95,7 @@ static set_item_t tf_settings[] = {
     { "Prematch time", "prematch", "pm",  TFS_FLOAT, 0, NULL, NULL, "0"  },
     { "CeaseFire time", "ceasefire_time", "cft",  TFS_FLOAT, 0, NULL, NULL, "0"  },
     { "Autokick time", "autokick_time", "akt",  TFS_FLOAT, 0, NULL, NULL, "0"  },
-    { "Autokick kills", "autokick_kills", "akk",  TFS_FLOAT, 0, NULL, NULL, "0"  },
+    { "Autokick kills", "autokick_kills", "akk",  TFS_INT, 0, NULL, NULL, "0"  },
     { "Cheat Pause", "cheat_pause", "cp",  TFS_INT, 0, NULL, NULL, "1"  },
     { "Disable Grenades", "disable_grens", "dg",  TFS_INT_BITS, 0, tf_set_disablegren, NULL, "0"  },
     { "Sentry ppl emulation", "sgppl", "",  TFS_INT, 12, NULL, NULL, "12"  },
@@ -245,6 +245,7 @@ void   TF_Set_Cmd( int argc  )
     char    name[64];
     char    val[64] = "";
 
+    
     if( argc == 2 ) {
         set_item_t* si = &tf_settings[0];
         for(; si->name; si++ ){

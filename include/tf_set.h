@@ -53,6 +53,27 @@ typedef struct set_item_s
     const set_set_t *setdesc;
     const char* default_val;
 }set_item_t;
+extern set_item_t tf_settings[];
+
+#define tfset(name) (tf_settings[0].val._uint & svsb_ ## name )
+
+#define tfset_toggleflags 		(tf_settings[1].val._int)
+#define tfset_autoteam 			(tf_settings[2].val._float)
+#define tfset_respawn_delay		(tf_settings[3].val._float)
+#define tfset_prematch_time		(tf_settings[4].val._float)
+#define tfset_ceasefire_time	(tf_settings[6].val._float)
+#define tfset_autokick_time		(tf_settings[7].val._float)
+#define tfset_autokick_kills	(tf_settings[8].val._int)
+#define tfset_cheat_pause		(tf_settings[9].val._int)
+#define tfset_disable_grens		(tf_settings[10].val._int)
+#define tfset_sgppl			    (tf_settings[11].val._int)
+#define tfset_sg_sfire			(tf_settings[12].val._int)
+#define tfset_snip_fps			(tf_settings[13].val._int)
+#define tfset_snip_ammo			(tf_settings[14].val._int)
+#define tfset_snip_time			(tf_settings[15].val._float)
+#define tfset_new_gas			(tf_settings[16].val._int)
+#define tfset_gren2box			(tf_settings[17].val._int)
+#define tfset_arenamode         (tf_settings[18].val._int)
 
 #define svsb_clanbattle         1<<0
 #define svsb_game_locked        1<<1
