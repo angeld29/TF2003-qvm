@@ -45,6 +45,7 @@ const set_bits_t sv_settings_bits[] = {
   { "Bots", "enable_bot", "", svsb_enable_bot         , false },
   { "Training ground mode", "tg", "", svsb_tg_enabled         , false },
   { "Sentry Gun New Find", "sg_newfind", "", svsb_sg_new_find        , true  },
+  { "Sentry Gun New Rockets", "sg_rfire", "", svsb_sg_rfire        , true  },
   { "Pyro flame walls", "pyrotype", "", svsb_pyrotype        , false  },
   { NULL, },
 };

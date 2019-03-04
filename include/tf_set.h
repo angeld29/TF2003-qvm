@@ -67,5 +67,6 @@ typedef struct set_item_s
 #define svsb_enable_bot         1<<19
 #define svsb_tg_enabled         1<<20
 #define svsb_sg_new_find        1<<21
-#define svsb_pyrotype           1<<22
+#define svsb_sg_rfire           1<<22
+#define svsb_pyrotype           1<<23
 
