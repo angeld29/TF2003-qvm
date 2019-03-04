@@ -53,26 +53,31 @@ static set_item_t tf_settings[] = {
     { NULL } 
 };
 
-static void   tf_set( const char* name, const char*val  )
+static void   tf_set( const char* name, const char*val, qboolean noprint  )
 {
     set_item_t* si = &tf_settings[0];
+
     for(; si->name; si++ ){
         if( si->type == TFS_INT_BITS ){
             const set_bits_t* sb = si->bitsdesc;
             for(; sb->name; sb++ ){
                 if( streq( sb->key, name ) || streq( sb->key2, name ) ){
-                    qboolean bit_set = sb->default_val;
-                    if( streq( val, "on" ) || streq( val, "1" ) ){
-                        bit_set = true;
-                    }else if( streq( val, "off" ) || streq( val, "0" ) ){
-                        bit_set = false;
+                    qboolean bit_set = si->val._uint & sb->bit;
+                    if( val && val[0] ){
+                        bit_set = sb->default_val;
+                        if( streq( val, "on" ) || streq( val, "1" ) ){
+                            bit_set = true;
+                        }else if( streq( val, "off" ) || streq( val, "0" ) ){
+                            bit_set = false;
+                        }
+                        if( bit_set ){
+                            si->val._uint |= sb->bit;
+                        }else{
+                            si->val._uint -= si->val._uint & sb->bit;
+                        }
                     }
-                    if( bit_set ){
-                        si->val._uint |= sb->bit;
-                    }else{
-                        si->val._uint -= si->val._uint & sb->bit;
-                    }
-                    G_conprintf( "%s: %s %d\n", sb->name, bit_set? _ON: _OFF, si->val._uint );
+                    if( ! noprint )
+                        G_conprintf( "%s: %s %d\n", sb->name, bit_set? _ON: _OFF, si->val._uint );
                     return;
                 }
             }
@@ -83,16 +88,14 @@ static void   tf_set( const char* name, const char*val  )
 void   TF_Set_Cmd( int argc  )
 {
     char    cmd_command[64];
-    char    val[64];
+    char    val[64] = "";
 
     if( argc < 3 ) return;
 
     trap_CmdArgv( 2, cmd_command, sizeof( cmd_command ) );
-    if( argc == 3 ){
-        //tf_print( cmd_command );
-    }else{
+    if( argc == 4 ){
         trap_CmdArgv( 3, val, sizeof( val ) );
-        tf_set( cmd_command, val );
     }
+    tf_set( cmd_command, val, 0 );
 
 }
