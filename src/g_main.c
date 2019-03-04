@@ -76,6 +76,7 @@ void initialise_spawned_ent(gedict_t* ent);
    ================
    */
 
+void   TF_LocalinfoSettings( );
 #define RestoreGlobals()  \
     damage_attacker = damage_attacker;\
     damage_inflictor = damage_inflictor_; \
@@ -114,6 +115,7 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
         case GAME_LOADENTS:
             infokey( world, "mapname", mapname, sizeof(mapname) );
             G_SpawnEntitiesFromString();
+            TF_LocalinfoSettings();
             RestoreGlobals();
             return 1;
 

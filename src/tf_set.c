@@ -71,7 +71,7 @@ static set_item_t tf_settings[] = {
 };
 
 char           *G_NewString( const char *string );
-static void _tfset_print_bits( byte val, const set_bits_t* sb )
+static void _tfset_print_bits( unsigned int  val, const set_bits_t* sb )
 {
     for(; sb->name; sb++ ){
         G_conprintf( "%s:%s: %s\n", sb->key, sb->name, val & sb->bit ? _ON: _OFF );
@@ -111,8 +111,8 @@ static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oni
                     si->val._int = atoi(val);
                 }
                 if( !oninit ){
-                    G_conprintf( "%s:%s:\n", si->key, si->name );
-                    _tfset_print_bits( si->val._int, si->bitsdesc );
+                    G_conprintf( "%s:%s: %d\n", si->key, si->name, si->val._uint );
+                    _tfset_print_bits( si->val._uint, si->bitsdesc );
                 }
             }else{
                 const set_bits_t* sb = si->bitsdesc + idx;
@@ -131,7 +131,7 @@ static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oni
                     }
                 }
                 if( !oninit )
-                    G_conprintf( "%s:%s: %s %d\n", sb->key, sb->name, bit_set? _ON: _OFF, si->val._uint );
+                    G_conprintf( "%s:%s: %s\n", sb->key, sb->name, bit_set? _ON: _OFF );
             }
             break;
         case TFS_INT:
