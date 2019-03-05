@@ -32,18 +32,6 @@ void UpdateAbbreviations( gedict_t * Goal )
 	{
 		char    st[10];
 
-		if ( !tf_data.flagem_checked )
-		{
-
-			GetSVInfokeyString( "fe", "flag_emu", st, sizeof( st ), "off" );
-			if ( !strcmp( st, "on" ) )
-				tfset_toggleflags |= TFLAG_FLAG_EMULATION;
-			GetSVInfokeyString( "ws", "use_standard", st, sizeof( st ), "off" );
-
-			if ( !strcmp( st, "on" ) )
-				tfset_toggleflags |= TFLAG_USE_WAR_STD;
-			tf_data.flagem_checked = 1;
-		}
 		if ( ( tfset_toggleflags & TFLAG_FLAG_EMULATION ) && !( tfset_toggleflags & TFLAG_USE_WAR_STD ) )
 		{
 			if ( streq( Goal->mdl, "progs/b_s_key.mdl" ) || streq( Goal->mdl, "progs/m_s_key.mdl" )

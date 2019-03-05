@@ -611,15 +611,15 @@
 #define TFLAG_CLASS_PERSIST	1  		// Persistent Classes Bit
 #define TFLAG_CHEATCHECK	2 		// Cheatchecking Bit
 #define TFLAG_RESPAWNDELAY	4 		// RespawnDelay bit
-#define TFLAG_UN			8		// NOT USED ANYMORE
-#define TFLAG_UN2			16		// NOT USED ANYMORE
-#define TFLAG_UN3			32		// NOT USED ANYMORE
+//#define TFLAG_UN			8		// NOT USED ANYMORE
+//#define TFLAG_UN2			16		// NOT USED ANYMORE
+//#define TFLAG_UN3			32		// NOT USED ANYMORE
 #define TFLAG_AUTOTEAM		64		// sets whether players are automatically placed in teams
 #define TFLAG_TEAMFRAGS		128		// Individual Frags, or Frags = TeamScore
 #define TFLAG_FIRSTENTRY	256		// Used to determine the first time toggleflags is set
 									// In a map. Cannot be toggled by players.
-#define TFLAG_SPYINVIS		512		// Spy invisible only
-#define TFLAG_GRAPPLE		1024	// Grapple on/off
+//#define TFLAG_SPYINVIS		512		// Spy invisible only
+//#define TFLAG_GRAPPLE		1024	// Grapple on/off
 #define TFLAG_FULLTEAMSCORE	2048		
 #define TFLAG_FLAG_EMULATION	4096		
 #define TFLAG_USE_WAR_STD	8192

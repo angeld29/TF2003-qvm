@@ -126,11 +126,11 @@ void SetChangeParms()
 }
 //-----------------------------------------------------------------------------------------------------
 
-void autoteam_think()
+/*void autoteam_think()
 {
-    tf_data.toggleflags |= TFLAG_AUTOTEAM;
+    tfset_toggleflags |= TFLAG_AUTOTEAM;
     dremove( self );
-}
+}*/
 void autokick_think()
 {
     PROG_TO_EDICT( self->s.v.owner )->teamkills = 0;

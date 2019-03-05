@@ -144,7 +144,7 @@ int TeamFortress_TeamSet( int tno )
 		G_bprint( 2, "%s has started Team No %d.\n", self->s.v.netname, tno );
 
 		self->immune_to_check = g_globalvars.time + 10;
-		if ( ( tf_data.toggleflags & TFLAG_TEAMFRAGS ) || ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
+		if ( ( tfset_toggleflags & TFLAG_TEAMFRAGS ) || ( tfset_toggleflags & TFLAG_FULLTEAMSCORE ) )
 			self->s.v.frags = TeamFortress_TeamGetScore( tno );
 		TeamFortress_SetColor( self, TeamFortress_TeamGetTopColor( tno ), 
 		                      TeamFortress_TeamGetColor( tno ) - 1 );
@@ -169,7 +169,7 @@ int TeamFortress_TeamSet( int tno )
 	self->team_no = tno;
 	self->immune_to_check = g_globalvars.time + 10;
 	self->lives = TeamFortress_TeamGetLives( tno );
-	if ( ( tf_data.toggleflags & TFLAG_TEAMFRAGS ) || ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
+	if ( ( tfset_toggleflags & TFLAG_TEAMFRAGS ) || ( tfset_toggleflags & TFLAG_FULLTEAMSCORE ) )
 		self->s.v.frags = TeamFortress_TeamGetScore( tno );
 
 	TeamFortress_TeamShowMemberClasses( self );
@@ -315,7 +315,7 @@ void TeamFortress_TeamIncreaseScore( int tno, int scoretoadd )
 		return;
 	teamscores[tno] += scoretoadd;
 
-	if ( ( tf_data.toggleflags & TFLAG_TEAMFRAGS ) || ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
+	if ( ( tfset_toggleflags & TFLAG_TEAMFRAGS ) || ( tfset_toggleflags & TFLAG_FULLTEAMSCORE ) )
 	{
 		
 		for ( e = world; ( e = trap_find( e, FOFS( s.v.classname ), "player" ) ) ; )
@@ -333,7 +333,7 @@ int TeamFortress_TeamGetScoreFrags( int tno )
 	if ( tno <= 0 || tno > 4 )
 		return 0;
 
-	if ( ( tf_data.toggleflags & TFLAG_TEAMFRAGS ) || ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
+	if ( ( tfset_toggleflags & TFLAG_TEAMFRAGS ) || ( tfset_toggleflags & TFLAG_FULLTEAMSCORE ) )
 		return teamscores[tno];
 	else
 		return teamfrags[tno];

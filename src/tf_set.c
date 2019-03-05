@@ -50,10 +50,14 @@ static const set_bits_t sv_settings_bits[] = {
   { NULL, },
 };
 static const set_bits_t toggleflags_bits[] = {
+  { "Class Persistence", "", "", TFLAG_CLASS_PERSIST         , false },
+  { "Cheat checking", "", "", TFLAG_CHEATCHECK         , false },
+  { "Respawn delay", "", "", TFLAG_RESPAWNDELAY         , false },
   { "Autoteam", "", "", TFLAG_AUTOTEAM         , false },
   { "Teamfrags", "teamfrags", "t", TFLAG_TEAMFRAGS         , false },
   { "Fullteamscore", "fullteamscore", "fts", TFLAG_FULLTEAMSCORE         , false },
-  { "Respawn delay", "", "", TFLAG_RESPAWNDELAY         , false },
+  { "Flag emulation", "flag_emu", "fe", TFLAG_FLAG_EMULATION        , false  },
+  { "Use War Standart", "use_standard", "ws", TFLAG_USE_WAR_STD        , false  },
   { NULL, },
 };
 static const set_bits_t tf_set_gren2box[] = {
@@ -350,9 +354,6 @@ void   TF_LocalinfoSettings( )
           first_decode = 0;*/
     memset( &tf_data, 0, sizeof(tf_data));
     tfset_toggleflags = 0; //g_globalvars.parm10;
-    tf_data.flagem_checked = 0;
-    //tf_data.allow_hook = 0;
-    //tf_data.invis_only = 0;
     if ( coop || !deathmatch )
         tfset_toggleflags |= TFLAG_CLASS_PERSIST;
     strncpy( nextmap, mapname, sizeof(nextmap) );
@@ -480,7 +481,7 @@ void   TF_LocalinfoSettings( )
     {
         tfset_toggleflags |= TFLAG_AUTOTEAM;
     }else{
-        tfset_toggleflags -= ( tf_data.toggleflags & TFLAG_AUTOTEAM );
+        tfset_toggleflags -= ( tfset_toggleflags & TFLAG_AUTOTEAM );
     }
 
     /*GetSVInfokeyString( "a", "autoteam", st, sizeof( st ), "" );
