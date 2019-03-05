@@ -105,6 +105,13 @@ static const set_set_t set_sg_sfire[] = {
     { NULL, },
 };
 
+static const set_set_t set_arena_mode[] = {
+    { "", "off", ARENA_MODE_NONE,},
+	{ "", "ffa", ARENA_MODE_FFA,},
+	{ "", "duel", ARENA_MODE_DUEL,},
+    { NULL, },
+};
+
 set_item_t tf_settings[] = {
 /*0 */    { "Settings bits", "", "",  TFS_INT_BITS, 0, sv_settings_bits, NULL, "0" },
 /*1 */    { "Toggle flags", "", "",  TFS_INT_BITS, 0, toggleflags_bits, NULL, "0" },
@@ -123,7 +130,7 @@ set_item_t tf_settings[] = {
 /*14*/    { "Sniper reload time", "snip_time", "",  TFS_FLOAT, 0, NULL, NULL, "1.5" },
 /*15*/    { "Gas grenade effects", "new_gas", "",  TFS_INT_BITS, 131, tf_set_gas, NULL, "131"  },
 /*16*/    { "Extended backpack", "gren2box", "g2b",  TFS_INT_BITS, 0, tf_set_gren2box, NULL, "0"  },
-/*17*/    { "Arena Mode", "arena", "",  TFS_INT, 0, NULL, NULL, "0"  },
+/*17*/    { "Arena Mode", "arena", "",  TFS_INT_SET, 0, NULL, set_arena_mode, "0"  },
 /*  */    { NULL } 
 };
 
