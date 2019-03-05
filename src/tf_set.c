@@ -65,6 +65,20 @@ static const set_bits_t tf_set_gren2box[] = {
   { NULL, },
 };
 
+static const set_bits_t tf_set_gas[] = {
+    { "Players Colors by team", "", "", GAS_MASK_COLOR           ,true },
+    { "Players Skins Random  ", "", "", GAS_MASK_SKIN            ,true },
+    { "Players Colors  4     ", "", "", GAS_MASK_4COLORS         ,false},
+    { "Players Colors 16     ", "", "", GAS_MASK_ALLCOLORS       ,false},
+    { "Palette               ", "", "", GAS_MASK_PALETTE         ,false},
+    { "New Gren Effects      ", "", "", GAS_MASK_NEWGREN_EFFECTS ,false},
+    { "Players Skins Spys    ", "", "", GAS_MASK_ALLSPYS         ,false},
+    { "Disable ID            ", "", "", GAS_MASK_DISABLE_ID      ,true },
+    { "New Gren Times        ", "", "", GAS_MASK_NEWGREN_TIMES   ,false},
+    { "New Gren DMG          ", "", "", GAS_MASK_NEWGREN_DMG     ,false},
+  { NULL, },
+};
+
 static const set_bits_t tf_set_disablegren[] = {
     { "Normal    ", "", "", DG_TYPE_NORMAL  , false },
     { "Concussion", "", "", DG_TYPE_CONCUSSION , false },
@@ -103,7 +117,7 @@ set_item_t tf_settings[] = {
     { "Sniper fps", "snip_fps", "sf",  TFS_INT, 0, NULL, NULL, "72"  },
     { "Sniper ammo on shot", "snip_ammo", "",  TFS_INT, 0, NULL, NULL, "1"  },
     { "Sniper reload time", "snip_time", "",  TFS_FLOAT, 0, NULL, NULL, "1.5" },
-    { "Gas grenade effects", "new_gas", "",  TFS_INT, 131, NULL, NULL, "131"  },
+    { "Gas grenade effects", "new_gas", "",  TFS_INT_BITS, 131, tf_set_gas, NULL, "131"  },
     { "Extended backpack", "gren2box", "g2b",  TFS_INT_BITS, 0, tf_set_gren2box, NULL, "0"  },
     { "Arena Mode", "arena", "",  TFS_INT, 0, NULL, NULL, "0"  },
     { NULL } 

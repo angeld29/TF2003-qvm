@@ -1004,7 +1004,7 @@ void TeamFortress_PrimeGrenade(  )
 
 	gedict_t *tGrenade;
 
-	if ( ( self->tfstate & 1 ) || ( self->tfstate & 1024 ) )
+	if ( ( self->tfstate & TFSTATE_GRENPRIMED ) || ( self->tfstate & TFSTATE_GRENTHROWING ) )
 		return;
 	if ( self->s.v.impulse == TF_GRENADE_1 )
 	{
