@@ -1014,10 +1014,7 @@ void TeamFortress_PrimeGrenade(  )
 			gtype = 0;
 
 		if ( tfset_disable_grens & ( 1 << gtype ) )
-        {
-            G_sprint( self, 2, "gren disabled %d %d\n", tfset_disable_grens, gtype );
 			return;
-        }
 
 		if ( self->no_grenades_1 > 0 || tg_data.unlimit_grens )
 		{
