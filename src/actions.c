@@ -605,10 +605,10 @@ void TeamFortress_ID(  )
 {
 	vec3_t  src, end;
 	gedict_t *te, *trace_ent;
-	if ( tf_data.new_flash && ( self->FlashTime >= ( 24 - NEW_FLASH_START_TIME ) ) )
+	if ( tfset(new_flash) && ( self->FlashTime >= ( 24 - NEW_FLASH_START_TIME ) ) )
 		return;
 
-	if((self->tfstate & TFSTATE_HALLUCINATING) && (tf_data.new_gas & GAS_MASK_DISABLE_ID) )
+	if((self->tfstate & TFSTATE_HALLUCINATING) && (tfset_new_gas & GAS_MASK_DISABLE_ID) )
 		return;
 
 	if( self->current_menu > MENU_DEFAULT)

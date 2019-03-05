@@ -152,7 +152,7 @@ void DecodeLevelParms()
     // local "info_player_team1"
     // local "Mapname: "
     // local "temp1"
-    float   autoteam_time;
+    //  float   autoteam_time;
 
     if ( g_globalvars.serverflags )
     {
@@ -181,25 +181,25 @@ void DecodeLevelParms()
         {
         self->is_admin = g_globalvars.parm15;
         }*/
-
-    if ( !( tf_data.toggleflags & TFLAG_FIRSTENTRY ) )
+/*
+    if ( !( tfset_toggleflags & TFLAG_FIRSTENTRY ) )
     {
 
         if( !first_decode )
         {
-            G_bprint(2,"!!!BUG BUG BUG!!!\nfirst_decode != 0 %d %s\n!!!BUG BUG BUG!!!\n", tf_data.toggleflags, self->s.v.netname);
-            tf_data.toggleflags |= TFLAG_FIRSTENTRY;
-            G_bprint(2,"toggleflags %d\n", tf_data.toggleflags );
+            G_bprint(2,"!!!BUG BUG BUG!!!\nfirst_decode != 0 %d %s\n!!!BUG BUG BUG!!!\n", tfset_toggleflags, self->s.v.netname);
+            tfset_toggleflags |= TFLAG_FIRSTENTRY;
+            G_bprint(2,"toggleflags %d\n", tfset_toggleflags );
             return;
         }
         first_decode = 0;
         memset( &tf_data, 0, sizeof(tf_data));
-        tf_data.toggleflags = g_globalvars.parm10;
+        tfset_toggleflags = g_globalvars.parm10;
         tf_data.flagem_checked = 0;
-        tf_data.allow_hook = 0;
-        tf_data.invis_only = 0;
+        //tf_data.allow_hook = 0;
+        //tf_data.invis_only = 0;
         if ( coop || !deathmatch )
-            tf_data.toggleflags |= TFLAG_CLASS_PERSIST;
+            tfset_toggleflags |= TFLAG_CLASS_PERSIST;
         strncpy( nextmap, mapname, sizeof(nextmap) );
 
         ent = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
@@ -243,34 +243,34 @@ void DecodeLevelParms()
             teamscores[i] = 0;
         }
         UpdateServerinfoScores();
-        tf_data.autokick_kills = 0;
-        tf_data.autokick_time = 0;
+        tfset_autokick_kills = 0;
+        tfset_autokick_time = 0;
         tf_data.cease_fire = 0;
 
-        tf_data.toggleflags -= ( tf_data.toggleflags & TFLAG_TEAMFRAGS );
+        tfset_toggleflags -= ( tfset_toggleflags & TFLAG_TEAMFRAGS );
 
-        tf_data.toggleflags -= ( tf_data.toggleflags & TFLAG_CHEATCHECK );
+        tfset_toggleflags -= ( tfset_toggleflags & TFLAG_CHEATCHECK );
 
-        tf_data.toggleflags |= GetSVInfokeyInt( "temp1", NULL, 0 );
-        tf_data.toggleflags |= TFLAG_FIRSTENTRY;
+        tfset_toggleflags |= GetSVInfokeyInt( "temp1", NULL, 0 );
+        tfset_toggleflags |= TFLAG_FIRSTENTRY;
 
         autoteam_time = 30;
 
-        tf_data.birthday = GetSVInfokeyBool( "bd", "birthday", false );
-        if( tf_data.birthday )
+        //tf_data.birthday = GetSVInfokeyBool( "bd", "birthday", false );
+        if( tfset(birthday) )
         {
             te = spawn();
             te->s.v.weapon = 10;
             te->s.v.nextthink = g_globalvars.time + 60;
             te->s.v.think = ( func_t ) BirthdayTimer;
         }
-        tf_data.clanbattle = GetSVInfokeyBool( "c", "clan", false );
-        if (tf_data.clanbattle)
+        //tf_data.clanbattle = GetSVInfokeyBool( "c", "clan", false );
+        if (tfset(clanbattle))
         {
             tf_data.clan_scores_dumped = 0;
-            tf_data.game_locked = 0;
+            //tf_data.game_locked = 0;
 
-            tf_data.game_locked = GetSVInfokeyBool( "lg", "locked_game", false );
+            //tf_data.game_locked = GetSVInfokeyBool( "lg", "locked_game", false );
         } 
 
         fvar = GetSVInfokeyFloat( "pm", "prematch", 0 );
@@ -597,7 +597,7 @@ void DecodeLevelParms()
         localcmd( "exec maps/%s.cfg\n", mapname );
         if( tf_data.enable_bot )
             localcmd( "exec maps/%s.wps\n", mapname );
-    }
+    }*/
 }
 
 /*
@@ -1164,7 +1164,7 @@ gedict_t *SelectSpawnPoint()
 
     if ( self->team_no )
     {
-        if ( tf_data.random_tf_spawn )
+        if ( tfset(random_tf_spawn) )
             spot = FindRandomTeamSpawnPoint( self->team_no );
         else
             spot = FindTeamSpawnPoint( self->team_no );
@@ -1243,7 +1243,7 @@ void PutClientInServer()
     self->reload_super_shotgun = 0;
     self->reload_grenade_launcher = 0;
     self->reload_rocket_launcher = 0;
-    self->immune_to_check = g_globalvars.time + tf_data.cheat_pause;
+    self->immune_to_check = g_globalvars.time + tfset_cheat_pause;
     self->on_hook = 0;
     self->hook_out = 0;
     self->fire_held_down = 0;
@@ -1845,7 +1845,7 @@ void CheckPowerups()
         self->s.v.modelindex = modelindex_null;
     else
     {
-        if ( self->is_undercover == 1 && tf_data.invis_only == 1 )
+        if ( self->is_undercover == 1 && tfset(invis_only) == 1 )
         {
             self->s.v.frame = 0;
             self->s.v.modelindex = modelindex_eyes;
@@ -2162,7 +2162,7 @@ void ClientConnect()
 
 
     self->is_admin = 0;
-    if ( tf_data.clanbattle && self->has_disconnected != 1 )
+    if ( tfset(clanbattle) && self->has_disconnected != 1 )
     {
         got_one = 0;
 
@@ -2179,7 +2179,7 @@ void ClientConnect()
                     TeamFortress_TeamSet( te->team_no );
                     self->s.v.frags = te->s.v.frags;
                     self->real_frags = te->real_frags;
-                    if ( !( tf_data.toggleflags & TFLAG_TEAMFRAGS ) && !( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
+                    if ( !( tfset_toggleflags & TFLAG_TEAMFRAGS ) && !( tfset_toggleflags & TFLAG_FULLTEAMSCORE ) )
                         self->s.v.frags = self->real_frags;
                     self->playerclass = te->playerclass;
                     self->tfstate = te->tfstate;
@@ -2191,7 +2191,7 @@ void ClientConnect()
         }
         if ( !got_one )
         {
-            if ( tf_data.game_locked && tf_data.cb_prematch_time < g_globalvars.time )
+            if ( tfset(game_locked) && tf_data.cb_prematch_time < g_globalvars.time )
             {
                 G_sprint( self, 2, "Closed Server. Clan Battle in progress.\n" );
                 KickCheater( self );
@@ -2264,7 +2264,7 @@ void ClientDisconnect()
         }
         te = trap_find( te, FOFS( s.v.classname ), "detpack" );
     }
-    if ( tf_data.clanbattle && self->tf_id )
+    if ( tfset(clanbattle) && self->tf_id )
     {
         te = spawn();
         te->s.v.classname = "ghost";
@@ -2394,7 +2394,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
         if ( targ == attacker )
         {
             TF_AddFrags( attacker, -1 );
-            if ( tf_data.birthday == 1 && g_random() < 0.3 )
+            if ( tfset(birthday) == 1 && g_random() < 0.3 )
             {
                 if ( g_random() < 0.1 )
                 {
@@ -2523,7 +2523,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
                 TF_AddFrags( attacker, -1 );
                 if ( !targ->undercover_team )
                     attacker->teamkills = attacker->teamkills + 1;
-                if ( tf_data.birthday == 1 && g_random() < 0.3 )
+                if ( tfset(birthday) && g_random() < 0.3 )
                 {
                     if ( g_random() < 0.3 )
                         G_bprint( 1, "%s is a party-pooper!\n", targ->s.v.netname );
@@ -2560,7 +2560,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
             {
                 TF_AddFrags( attacker, 1 );
                 logfrag( attacker, targ );
-                if ( tf_data.birthday == 1 && g_random() < 0.5 )
+                if ( tfset(birthday) && g_random() < 0.5 )
                 {
                     switch ( tf_data.deathmsg )
                     {
@@ -2983,7 +2983,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
             switch ( ( int ) targ->s.v.watertype )
             {
                 case -3:
-                    if ( tf_data.birthday == 1 )
+                    if ( tfset(birthday) )
                     {
                         if ( g_random() < 0.5 )
                             deathstring = "%s bobs for apples\n";

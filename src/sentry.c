@@ -209,7 +209,7 @@ void Sentry_Rotate(  )
 
     self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & EF_DIMLIGHT );
     CheckSentry( self );
-    if ( tf_data.sg_newfind)
+    if ( tfset(sg_newfind))
     {
         if ( Sentry_FindTarget_Angel(  ) )
             return;
@@ -324,7 +324,7 @@ int Sentry_FindTarget_Angel(  )
         if ( CheckTarget( client ) )
         {
             self->s.v.enemy = EDICT_TO_PROG( client );
-            self->height = g_globalvars.time + 0.1 * ( int ) ( g_random(  ) * tf_data.sgppl );
+            self->height = g_globalvars.time + 0.1 * ( int ) ( g_random(  ) * tfset_sgppl );
             //     self.height = g_globalvars.time + 0.1 * Q_rint(sgppl);
             if ( self->height == g_globalvars.time )
             {
@@ -586,7 +586,7 @@ void    FireSentryLighting( gedict_t * targ )
     vec3_t  dir, end,direction, tmp,norm_dir;
     gedict_t*trace_ent;
 
-    switch( tf_data.sg_sfire )
+    switch( tfset_sg_sfire )
     {
         case SG_SFIRE_NEW:
             VectorCopy( self->s.v.angles, self->s.v.v_angle );
@@ -871,9 +871,9 @@ int Sentry_Fire(  )
         Sentry_MuzzleFlash(  );
         sound( self, 1, "weapons/rocket1i.wav", 1, 1 );
 
-        LaunchSGRocketNEW(enemy, tf_data.sg_rfire ? 1 : 0);
+        LaunchSGRocketNEW(enemy, tfset(sg_rfire) ? 1 : 0);
 
-        self->super_damage_finished = g_globalvars.time + (tf_data.sg_rfire ? SENTRY_ROCKET_TIME: SENTRY_ROCKET_TIME_OLD);
+        self->super_damage_finished = g_globalvars.time + (tfset(sg_rfire) ? SENTRY_ROCKET_TIME: SENTRY_ROCKET_TIME_OLD);
         if( !tg_data.sg_unlimit_ammo ) 
             self->s.v.ammo_rockets = self->s.v.ammo_rockets - 1;
 
@@ -901,7 +901,7 @@ int Sentry_Fire(  )
         Sentry_MuzzleFlash(  );
         sound( self, 1, "weapons/sniper.wav", 1, 1 );
 
-        switch(tf_data.sg_sfire)
+        switch(tfset_sg_sfire)
         {
 
             case SG_SFIRE_MTFL1:
@@ -918,7 +918,7 @@ int Sentry_Fire(  )
                 FireSentryBulletsNEW( 4, enemy, 0.1, 0.1, 0 );
                 break;
             default:
-                G_Error("Unknown SG TYPE %d\n",tf_data.sg_sfire);
+                G_Error("Unknown SG TYPE %d\n",tfset_sg_sfire);
 
         }
     }

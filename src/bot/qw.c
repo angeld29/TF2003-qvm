@@ -73,7 +73,7 @@ void botFrame( void )
             continue;
 
         self = te;
-        if( !tf_data.enable_bot )
+        if( !tfset(enable_bot) )
         {
             botDisconnect( self );
             continue;

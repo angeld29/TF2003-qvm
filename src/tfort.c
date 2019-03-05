@@ -405,7 +405,7 @@ void TeamFortress_ChangeClass(  )
 			TeamFortress_DisplayLegalClasses(  );
 			return;
 		}
-		if ( tf_data.spy_off == 1 && self->s.v.impulse - TF_CHANGEPC == 8 )
+		if ( tfset(spy_off) == 1 && self->s.v.impulse - TF_CHANGEPC == 8 )
 		{
 			G_sprint( self, 2, "The spy class has been disabled on the server by the administrator.\n" );
 			return;
@@ -424,7 +424,7 @@ void TeamFortress_ChangeClass(  )
 	}
 	if ( teamplay && !self->team_no )
 	{
-		if ( tf_data.toggleflags & TFLAG_AUTOTEAM )
+		if ( tfset_toggleflags & TFLAG_AUTOTEAM )
 		{
 			if ( !TeamFortress_TeamPutPlayerInTeam(  ) )
 				return;
@@ -445,7 +445,7 @@ void TeamFortress_ChangeClass(  )
 		TeamFortress_DisplayLegalClasses(  );
 		return;
 	}
-	if ( tf_data.spy_off == 1 && self->s.v.impulse - TF_CHANGEPC == 8 )
+	if ( tfset(spy_off) == 1 && self->s.v.impulse - TF_CHANGEPC == 8 )
 	{
 		G_sprint( self, 2, "The spy class has been disabled on the server by the administrator.\n" );
 		return;
@@ -691,9 +691,9 @@ void TeamFortress_Inventory(  )
 	if ( self->s.v.armorvalue > 0 )
 		TeamFortress_DescribeArmor( self, self->armorclass );
 
-	if ( !tf_data.invis_only )
+	if ( !tfset(invis_only) )
 	{
-		if ( self->playerclass == PC_SPY && !tf_data.invis_only )
+		if ( self->playerclass == PC_SPY && !tfset(invis_only) )
 		{
 			G_sprint( self, 2, "Skin : " );
 			if ( self->undercover_skin )
@@ -716,47 +716,47 @@ void TeamFortress_Inventory(  )
 
 }
 
-void TeamFortress_ShowTF(  )
+/*void TeamFortress_ShowTF(  )
 {
     float fl;
     int	it,i;
 
-    if ( tf_data.toggleflags & TFLAG_CLASS_PERSIST )
+    if ( tfset_toggleflags & TFLAG_CLASS_PERSIST )
         G_sprint( self, 2, "Class Persistence On.\n" );
     else
         G_sprint( self, 2, "Class Persistence Off.\n" );
 
-    if ( tf_data.toggleflags & TFLAG_CHEATCHECK )
+    if ( tfset_toggleflags & TFLAG_CHEATCHECK )
         G_sprint( self, 2, "Cheat Checking On.\n" );
     else
         G_sprint( self, 2, "Cheat Checking Off.\n" );
 
-    if ( tf_data.toggleflags & TFLAG_AUTOTEAM )
+    if ( tfset_toggleflags & TFLAG_AUTOTEAM )
         G_sprint( self, 2, "AutoTeam On.\n" );
     else
         G_sprint( self, 2, "AutoTeam Off.\n" );
 
-    if ( tf_data.toggleflags & TFLAG_RESPAWNDELAY )
-        G_sprint( self, 2, "%.0f second Respawn Delay.\n", tf_data.respawn_delay_time );
+    if ( tfset_toggleflags & TFLAG_RESPAWNDELAY )
+        G_sprint( self, 2, "%.0f second Respawn Delay.\n", tfset_respawn_delay_time );
     else
         G_sprint( self, 2, "No Respawn Delay.\n" );
 
-    if ( tf_data.toggleflags & TFLAG_TEAMFRAGS )
+    if ( tfset_toggleflags & TFLAG_TEAMFRAGS )
         G_sprint( self, 2, "TeamFrags On.\n" );
     else
         G_sprint( self, 2, "TeamFrags Off.\n" );
 
-    if ( tf_data.allow_hook )
+    if ( tfset(allow_hook) )
         G_sprint( self, 2, "Grapple On.\n" );
     else
         G_sprint( self, 2, "Grapple Off.\n" );
 
-    if ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE )
+    if ( tfset_toggleflags & TFLAG_FULLTEAMSCORE )
         G_sprint( self, 2, "Full TeamScore On.\n" );
     else
         G_sprint( self, 2, "Full TeamScore Off.\n" );
 
-    if ( tf_data.clanbattle == 1 )
+    if ( tfset(clanbattle) )
     {
         fl = GetSVInfokeyFloat( "pm", "prematch", 0 ) * 60;
         G_sprint( self, 2, "Clan battle: " _ON "\nPrematch: %d seconds\n", (int)fl );
@@ -764,9 +764,9 @@ void TeamFortress_ShowTF(  )
         G_sprint( self, 2, "Cease fire: %d seconds\n", (int)fl );
     } else
         G_sprint( self, 2, "Clan battle: " _OFF "\n" );
-    G_sprint( self, 2, "Cheat pause: %d\n", ( int ) tf_data.cheat_pause );
+    G_sprint( self, 2, "Cheat pause: %d\n", ( int ) tfset_cheat_pause );
 
-    if ( tf_data.old_grens )
+    if ( tfset(old_grens) )
         G_sprint( self, 2, _O _L _D " grenades\n" );
     else
         G_sprint( self, 2, _N _E _W " grenades\n" );
@@ -782,13 +782,13 @@ void TeamFortress_ShowTF(  )
     }else
         G_sprint( self, 2, "Topcolor checking disabled\n" );
 
-    if( tf_data.sg_newfind )
-        G_sprint( self, 2, "Sentry New Find Target: %d ppl\n", tf_data.sgppl );
+    if( tfset(sg_newfind) )
+        G_sprint( self, 2, "Sentry New Find Target: %d ppl\n", tfset_sgppl );
     else
         G_sprint( self, 2, "Sentry New Find Target: " _OFF "\n" );
 
     G_sprint( self, 2, "Sentry Shells Fire: " );
-    switch ( tf_data.sg_sfire )
+    switch ( tfset_sg_sfire )
     {
         case SG_SFIRE_281:
             G_sprint( self, 3, "2.8.1\n" );
@@ -808,126 +808,126 @@ void TeamFortress_ShowTF(  )
 
     }
     G_sprint( self, 2, "Sentry Rockets Fire: " );
-    G_sprint( self, 3, tf_data.sg_rfire ? "NEW\n" : "OLD\n" );
+    G_sprint( self, 3, tfset(sg_rfire) ? "NEW\n" : "OLD\n" );
 
     G_sprint( self, 2, "Spanner mode: " );
-    G_sprint( self, 3, tf_data.old_spanner ? "OLD\n" : "NEW\n" );
+    G_sprint( self, 3, tfset(old_spanner) ? "OLD\n" : "NEW\n" );
     
-    G_sprint( self, 2, "New Gas Options %d:\n" ,tf_data.new_gas );
-    if( (tf_data.new_gas & GAS_MASK_COLOR) && !(tf_data.new_gas & GAS_MASK_ALLSPYS))
+    G_sprint( self, 2, "New Gas Options %d:\n" ,tfset_new_gas );
+    if( (tfset_new_gas & GAS_MASK_COLOR) && !(tfset_new_gas & GAS_MASK_ALLSPYS))
     {
-        if( tf_data.new_gas & GAS_MASK_ALLCOLORS)
+        if( tfset_new_gas & GAS_MASK_ALLCOLORS)
             it = 16;
         else
         {
-            if( tf_data.new_gas & GAS_MASK_4COLORS)
+            if( tfset_new_gas & GAS_MASK_4COLORS)
                 it = 4;
             else
                 it = number_of_teams;
         }
         G_sprint( self, 2, " Players Colors: %d\n", it );
     }
-    if( tf_data.new_gas & GAS_MASK_ALLSPYS)
+    if( tfset_new_gas & GAS_MASK_ALLSPYS)
         G_sprint( self, 2, " Players Skins: Spys\n" );
     else
     {
-        if( tf_data.new_gas & GAS_MASK_SKIN)
+        if( tfset_new_gas & GAS_MASK_SKIN)
             G_sprint( self, 2, " Players Skins: Random\n" );
     }
 
-    if( tf_data.new_gas & GAS_MASK_PALETTE)
+    if( tfset_new_gas & GAS_MASK_PALETTE)
         G_sprint( self, 2, " Palette: " _ON "\n" );
     else
         G_sprint( self, 2, " Palette: " _OFF "\n" );
 
-    if( tf_data.new_gas & GAS_MASK_NEWGREN_EFFECTS)
+    if( tfset_new_gas & GAS_MASK_NEWGREN_EFFECTS)
         G_sprint( self, 2, " New Gren Effects: " _ON "\n" );
     else
         G_sprint( self, 2, " New Gren Effects: " _OFF "\n" );
 
-    if( tf_data.new_gas & GAS_MASK_NEWGREN_TIMES)
+    if( tfset_new_gas & GAS_MASK_NEWGREN_TIMES)
         G_sprint( self, 2, " New Gren Times: " _ON "\n" );
     else
         G_sprint( self, 2, " New Gren Times: " _OFF "\n" );
 
-    if( tf_data.new_gas & GAS_MASK_NEWGREN_DMG)
+    if( tfset_new_gas & GAS_MASK_NEWGREN_DMG)
         G_sprint( self, 2, " New Gren DMG: " _ON "\n" );
     else
         G_sprint( self, 2, " New Gren DMG: " _OFF "\n" );
 
-    if( !(tf_data.new_gas & GAS_MASK_DISABLE_ID))
+    if( !(tfset_new_gas & GAS_MASK_DISABLE_ID))
         G_sprint( self, 2, " ID: " _ON "\n" );
     else
         G_sprint( self, 2, " ID: " _OFF "\n" );
 
-    if ( tf_data.new_flash )
+    if ( tfset(new_flash) )
         G_sprint( self, 2, "New Flash: " _ON "\n" );
     else
         G_sprint( self, 2, "New Flash: " _OFF "\n" );
 
-    if ( !tf_data.disable_powerups )
+    if ( !tfset(disable_powerups) )
         G_sprint( self, 2, "Powerups: " _ON "\n" );
     else
         G_sprint( self, 2, "Powerups: " _OFF "\n" );
 
-    if ( tf_data.flag_timer )
+    if ( tfset(flag_timer) )
         G_sprint( self, 2, "Flag Timer: " _ON "\n" );
     else
         G_sprint( self, 2, "Flag Timer: " _OFF "\n" );
 
-    if ( tf_data.snip_fps )
+    if ( tfset_snip_fps )
 
-        G_sprint( self, 2, "Sniper FPS: %d\n", ( int ) tf_data.snip_fps );
+        G_sprint( self, 2, "Sniper FPS: %d\n", ( int ) tfset_snip_fps );
     else
         G_sprint( self, 2, "Sniper FPS: " _OFF "\n" );
 
-    if ( tf_data.snip_range_fix )
+    if ( tfset(snip_range_fix) )
         G_sprint( self, 2, "Sniper Range Fix: " _ON "\n" );
     else
         G_sprint( self, 2, "Sniper Range Fix: " _OFF "\n" );
 
 
-    G_sprint( self, 2, "Sniper ammo cost: %d\n", ( int ) tf_data.snip_ammo );
-    G_sprint( self, 2, "Sniper Reload Time: %.1f\n", tf_data.snip_time );
+    G_sprint( self, 2, "Sniper ammo cost: %d\n", ( int ) tfset_snip_ammo );
+    G_sprint( self, 2, "Sniper Reload Time: %.1f\n", tfset_snip_time );
 
-    if ( tf_data.random_tf_spawn )
+    if ( tfset(random_tf_spawn) )
         G_sprint( self, 2, "Random Team Spawn: " _ON "\n" );
     else
         G_sprint( self, 2, "Random Team Spawn: " _OFF "\n" );
 
-    if ( tf_data.allow_drop_goal )
+    if ( tfset(allow_drop_goal) )
         G_sprint( self, 2, "Drop Goals: " _ON "\n" );
     else
         G_sprint( self, 2, "Drop Goals: " _OFF "\n" );
 
-    if ( tf_data.add_pipe )
+    if ( tfset(add_pipe) )
         G_sprint( self, 2, "Additional pipebomb: " _ON "\n" );
     else
         G_sprint( self, 2, "Additional pipebomb: " _OFF "\n" );
 
-    if ( tf_data.gren2box )
+    if ( tfset_gren2box )
     {
         G_sprint( self, 2, "Extended Backpack:\n" );
-        if ( tf_data.gren2box & BP_TYPE_HEALTH )
+        if ( tfset_gren2box & BP_TYPE_HEALTH )
             G_sprint( self, 2, " Drop Health   : " _ON "\n" );
         else
             G_sprint( self, 2, " Drop Health   : " _OFF "\n" );
 
-        if ( tf_data.gren2box & BP_TYPE_ARMOR )
+        if ( tfset_gren2box & BP_TYPE_ARMOR )
             G_sprint( self, 2, " Drop Armor    : " _ON "\n" );
         else
             G_sprint( self, 2, " Drop Armor    : " _OFF "\n" );
 
-        if ( tf_data.gren2box & BP_GREN_BYTYPE )
+        if ( tfset_gren2box & BP_GREN_BYTYPE )
             G_sprint( self, 2, " Drop Grenades : Type-depend\n" );
         else
         {
-            if ( tf_data.gren2box & BP_GREN_BYTYPE )
+            if ( tfset_gren2box & BP_GREN_BYTYPE )
                 G_sprint( self, 2, " Drop Grenades : " _ON "\n" );
 
             G_sprint( self, 2, " Drop Grenades : " _OFF "\n" );
         }
-        if ( tf_data.gren2box & BP_TYPE_DETPACK )
+        if ( tfset_gren2box & BP_TYPE_DETPACK )
             G_sprint( self, 2, " Drop Detpack  : " _ON "\n" );
         else
             G_sprint( self, 2, " Drop Detpack  : " _OFF "\n" );
@@ -935,35 +935,35 @@ void TeamFortress_ShowTF(  )
     {
         G_sprint( self, 2, "Extended Backpack: " _OFF "\n" );
     }
-    if ( tf_data.disable_grens )
+    if ( tfset_disable_grens )
     {
         G_sprint( self, 2, "Disabled Grenade Types:\n" );
-        if ( tf_data.disable_grens & DG_TYPE_NORMAL )
+        if ( tfset_disable_grens & DG_TYPE_NORMAL )
             G_sprint( self, 2, " Normal\n" );
-        if ( tf_data.disable_grens & DG_TYPE_CONCUSSION )
+        if ( tfset_disable_grens & DG_TYPE_CONCUSSION )
             G_sprint( self, 2, " Concussion\n" );
-        if ( tf_data.disable_grens & DG_TYPE_NAIL )
+        if ( tfset_disable_grens & DG_TYPE_NAIL )
             G_sprint( self, 2, " Nail\n" );
-        if ( tf_data.disable_grens & DG_TYPE_MIRV )
+        if ( tfset_disable_grens & DG_TYPE_MIRV )
             G_sprint( self, 2, " Mirv\n" );
-        if ( tf_data.disable_grens & DG_TYPE_NAPALM )
+        if ( tfset_disable_grens & DG_TYPE_NAPALM )
             G_sprint( self, 2, " Napalm\n" );
-        if ( tf_data.disable_grens & DG_TYPE_FLARE )
+        if ( tfset_disable_grens & DG_TYPE_FLARE )
             G_sprint( self, 2, " Flare\n" );
-        if ( tf_data.disable_grens & DG_TYPE_GAS )
+        if ( tfset_disable_grens & DG_TYPE_GAS )
             G_sprint( self, 2, " Gas\n" );
-        if ( tf_data.disable_grens & DG_TYPE_EMP )
+        if ( tfset_disable_grens & DG_TYPE_EMP )
             G_sprint( self, 2, " Emp\n" );
-        if ( tf_data.disable_grens & DG_TYPE_FLASH )
+        if ( tfset_disable_grens & DG_TYPE_FLASH )
             G_sprint( self, 2, " Flash\n" );
-        if ( tf_data.disable_grens & DG_TYPE_CALTROPS )
+        if ( tfset_disable_grens & DG_TYPE_CALTROPS )
             G_sprint( self, 2, " Caltrops\n" );
-        if ( tf_data.disable_grens & DG_TYPE_DETPACK )
+        if ( tfset_disable_grens & DG_TYPE_DETPACK )
             G_sprint( self, 2, " Detpack\n" );
     } else
         G_sprint( self, 2, "All Grenades Enabled\n" );
 
-    switch( tf_data.arena_mode )
+    switch( tfset_arena_mode )
     {
         case ARENA_MODE_NONE:
             G_sprint( self, 2, "Arena Mode: " _OFF "\n" );
@@ -976,23 +976,23 @@ void TeamFortress_ShowTF(  )
             break;
     }
 
-    if ( tf_data.mtfl )
+    if ( tfset(mtfl) )
         G_sprint( self, 2, _MTFL " Settings " _ON "\n" );
 
     G_sprint( self, 2, _TF2003 " (build %d) " _BY_SD_ANGEL "\n" ,build_number());
-    if( tf_data.enable_bot )
+    if( tfset(enable_bot) )
         G_sprint( self, 3, "Bot enabled\n" );
 
 
     if( tg_data.tg_enabled )
         G_sprint( self, 3, "Training Ground enabled\n" );
 
-    if( tf_data.lan_mode )
+    if( tfset(lan_mode) )
         G_sprint( self, 3, "Lan mode enabled\n" );
 
     G_sprint( self, 2,  "%s\n", ANGEL_VERSION);
 
-}
+}*/
 
 
 void    TeamFortress_GrenadePrimed(  );
@@ -1013,7 +1013,7 @@ void TeamFortress_PrimeGrenade(  )
 		if ( gtype < 0 || gtype > 10 )
 			gtype = 0;
 
-		if ( tf_data.disable_grens & ( 1 << gtype ) )
+		if ( tfset_disable_grens & ( 1 << gtype ) )
 			return;
 
 		if ( self->no_grenades_1 > 0 || tg_data.unlimit_grens )
@@ -1073,7 +1073,7 @@ void TeamFortress_PrimeGrenade(  )
 		if ( gtype < 0 || gtype > 10 )
 			gtype = 0;
 
-		if ( tf_data.disable_grens & ( 1 << gtype ) )
+		if ( tfset_disable_grens & ( 1 << gtype ) )
 			return;
 
 		if ( self->no_grenades_2 > 0 || tg_data.unlimit_grens )
@@ -1212,7 +1212,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) NormalGrenadeExplode;
 		newmis->s.v.skin = 0;
 		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tf_data.birthday == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/hgren2.mdl" );
@@ -1222,7 +1222,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) ConcussionGrenadeExplode;
 		newmis->s.v.skin = 1;
 		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tf_data.birthday == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/hgren2.mdl" );
@@ -1233,7 +1233,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) NailGrenadeExplode;
 		newmis->s.v.skin = 1;
 		SetVector( newmis->s.v.avelocity, 0, 300, 0 );
-		if ( tf_data.birthday == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/biggren.mdl" );
@@ -1244,7 +1244,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) MirvGrenadeExplode;
 		newmis->s.v.skin = 0;
 		SetVector( newmis->s.v.avelocity, 0, 300, 0 );
-		if ( tf_data.birthday == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/biggren.mdl" );
@@ -1255,7 +1255,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) NapalmGrenadeExplode;
 		newmis->s.v.skin = 2;
 		SetVector( newmis->s.v.avelocity, 0, 300, 0 );
-		if ( tf_data.birthday == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/biggren.mdl" );
@@ -1267,7 +1267,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) FlareGrenadeExplode;
 		newmis->s.v.skin = 1;
 		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tf_data.birthday == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			newmis->mdl = "flare";
@@ -1280,7 +1280,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) GasGrenadeExplode;
 		newmis->s.v.skin = 3;
 		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tf_data.birthday == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/grenade2.mdl" );
@@ -1291,7 +1291,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) EMPGrenadeExplode;
 		newmis->s.v.skin = 4;
 		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tf_data.birthday == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/grenade2.mdl" );
@@ -1302,7 +1302,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) FlashGrenadeExplode;
 		newmis->s.v.skin = 2;
 		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tf_data.birthday == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/hgren2.mdl" );
@@ -1351,7 +1351,7 @@ int IsLegalClass( int pc )
 	int     bit;
 
 
-	if ( tf_data.spy_off == 1 && pc == 8 )
+	if ( tfset(spy_off) == 1 && pc == 8 )
 		return 0;
 	bit = classbits[pc];
 	if ( ( illegalclasses[0] & bit ) || ( TeamFortress_TeamGetIllegalClasses( self->team_no ) & bit ) )
@@ -1472,7 +1472,7 @@ const char* TeamFortress_GetSkin( gedict_t * p )
 void TeamFortress_SetSkin( gedict_t * p )
 {
 
-	p->immune_to_check = g_globalvars.time + tf_data.cheat_pause;	//10;
+	p->immune_to_check = g_globalvars.time + tfset_cheat_pause;	//10;
 	if ( p->playerclass == PC_SPY && p->undercover_skin )
 		p->s.v.skin = p->undercover_skin;
 	else
@@ -1533,7 +1533,7 @@ void TeamFortress_SetEquipment(  )
 	self->undercover_skin = 0;
 	if ( self->undercover_team )
 	{
-		self->immune_to_check = g_globalvars.time + tf_data.cheat_pause;	//10;
+		self->immune_to_check = g_globalvars.time + tfset_cheat_pause;	//10;
 		self->undercover_team = 0;
 		TeamFortress_SetColor( self, TeamFortress_TeamGetTopColor( self->team_no ),
 			  TeamFortress_TeamGetColor( self->team_no ) - 1 );
@@ -1596,7 +1596,7 @@ void TeamFortress_SetEquipment(  )
 
 	self->no_grenades_1 = class_set[pc].no_grenades_1;
 	self->no_grenades_2 = class_set[pc].no_grenades_2;
-	if ( tf_data.old_grens == 1 )
+	if ( tfset(old_grens) )
 	{
 		self->tp_grenades_1 = class_set[pc].og_tp_grenades_1;
 		self->tp_grenades_2 = class_set[pc].og_tp_grenades_2;
@@ -1635,7 +1635,7 @@ void TeamFortress_SetEquipment(  )
 		te->s.v.owner = EDICT_TO_PROG( self );
 		te->s.v.classname = "timer";
 	}
-	if ( pc == PC_SPY && tf_data.invis_only == 1 )
+	if ( pc == PC_SPY && tfset(invis_only) == 1 )
 	{
 		te = spawn(  );
 		te->s.v.nextthink = g_globalvars.time + PC_SPY_CELL_REGEN_TIME;
@@ -1672,7 +1672,7 @@ void TeamFortress_SetEquipment(  )
 				self->s.v.items = ( int ) self->s.v.items | IT_ARMOR1;
 		}
 	}
-	if ( tf_data.allow_hook && self->playerclass )
+	if ( tfset(allow_hook) && self->playerclass )
 		self->weapons_carried |= WEAP_HOOK;
 	W_SetCurrentAmmo(  );
 }
@@ -1817,13 +1817,13 @@ void TeamFortress_RemoveTimers(  )
 			}
 		}
 	}
-	if ( (tf_data.old_grens == 1) || (tf_data.new_gas & GAS_MASK_PALETTE) )
+	if ( (tfset(old_grens) ) || (tfset_new_gas & GAS_MASK_PALETTE) )
 	{
 		stuffcmd( self, "v_idlescale 0\n" );
 		stuffcmd( self, "v_cshift; wait; bf\n" );
         self->eff_info.conc_idle = 0;
 		self->FlashTime = 0;
-		if ( tf_data.new_flash )
+		if ( tfset(new_flash) )
 			disableupdates( self, -1 );	/* server-side flash */
 	}
 	self->item_list = 0;
@@ -1839,8 +1839,8 @@ void TeamFortress_SetupRespawn( int Suicided )
 
 	if ( self->respawn_time > g_globalvars.time )
 		return;
-	if ( tf_data.toggleflags & TFLAG_RESPAWNDELAY )
-		restime = tf_data.respawn_delay_time;
+	if ( tfset_toggleflags & TFLAG_RESPAWNDELAY )
+		restime = tfset_respawn_delay_time;
 	else
 		restime = 0;
 
@@ -2084,7 +2084,7 @@ void TeamFortress_DropAmmo( int type )
 	newmis->s.v.think = ( func_t ) TeamFortress_AmmoboxRemove;//SUB_Remove;
 	newmis->s.v.touch = ( func_t ) TeamFortress_AmmoboxTouch;
 	newmis->s.v.skin = type - 1;
-	if ( tf_data.birthday == 1 && g_random(  ) < 0.6 )
+	if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
 		setmodel( newmis, "progs/grenade3.mdl" );
 	else
 		setmodel( newmis, "progs/ammobox.mdl" );
@@ -2393,7 +2393,7 @@ void TeamFortress_ExplodePerson(  )
 	}
 	setsize( newmis, 0, 0, 0, 0, 0, 0 );
 	setorigin( newmis, PASSVEC3( owner->s.v.origin ) );
-	if ( tf_data.birthday == 1 )
+	if ( tfset(birthday) == 1 )
 		G_bprint( 1, explode_msgs[0], owner->s.v.netname );
 	else
 	{
@@ -2685,13 +2685,13 @@ void TF_AddFrags( gedict_t * pl, int fr )
 	if ( !pl->team_no || pl->team_no > 4 )
 		return;
 
-	if ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE )
+	if ( tfset_toggleflags & TFLAG_FULLTEAMSCORE )
 	{
 		teamscores[pl->team_no] += fr;
 	}
 	teamfrags[pl->team_no] += fr;
 
-	if ( tf_data.toggleflags & TFLAG_FULLTEAMSCORE )
+	if ( tfset_toggleflags & TFLAG_FULLTEAMSCORE )
 	{
 		e = trap_find( world, FOFS( s.v.classname ), "player" );
 		while ( e )
@@ -2702,7 +2702,7 @@ void TF_AddFrags( gedict_t * pl, int fr )
 		}
 	} else
 	{
-		if ( !( tf_data.toggleflags & TFLAG_TEAMFRAGS ) )
+		if ( !( tfset_toggleflags & TFLAG_TEAMFRAGS ) )
 			pl->s.v.frags = pl->real_frags;
 	}
 }
@@ -2762,7 +2762,7 @@ void KickCheater( gedict_t * p )
 
 void TeamFortress_PrepareForArenaRespawn(  )
 {
-        if( !tf_data.arena_mode )
+        if( !tfset_arena_mode )
                 return;
 
 	self->s.v.ammo_rockets = self->maxammo_rockets;

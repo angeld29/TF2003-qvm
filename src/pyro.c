@@ -41,7 +41,7 @@ gedict_t *FlameSpawn( int type, gedict_t * p_owner )
 	if ( tf_data.cb_prematch_time > g_globalvars.time )
 		return world;
 
-	if ( type != 1 && !tf_data.lan_mode )
+	if ( type != 1 && !tfset(lan_mode) )
 		return world;
 
 	num_world_flames = num_world_flames + 1;
@@ -196,7 +196,7 @@ void NapalmGrenadeExplode(  )
 	gedict_t *head;
 	float   i;
 	vec3_t  tmp;
-	if( !tf_data.lan_mode )
+	if( !tfset(lan_mode) )
 	{
         	sound( self, 0, "weapons/flmgrexp.wav", 1, 1 );
         	traceline( PASSVEC3( self->s.v.origin ), PASSVEC3( self->s.v.origin ), 1, self );
@@ -597,7 +597,7 @@ void Flamer_stream_touch(  )
 			flame->s.v.think = ( func_t ) Remove;
 			flame->s.v.enemy = self->s.v.owner;
 		}
-		if(!tf_data.pyrotype)
+		if(!tfset(pyrotype))
 			ent_remove( self );
 	}
 }

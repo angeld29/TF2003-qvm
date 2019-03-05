@@ -224,7 +224,7 @@ const char* GetSpySbar( gedict_t * pl )
                 else
                         return "        going undercover                       ";
         }
-        if ( tf_data.invis_only )
+        if ( tfset(invis_only) )
         {
                 if ( pl->is_feigning )
                         return "feigned undercover                             ";

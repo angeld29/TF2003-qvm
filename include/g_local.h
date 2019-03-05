@@ -39,9 +39,9 @@
 #include "bot.h"
 #include "qchars.h"
 
-
 #include "menu.h"
 #include "vote.h"
+#include "tf_set.h"
 
 #define NEWHWGUY
 #define HAS_SENTRY_CHECK

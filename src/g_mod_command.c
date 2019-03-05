@@ -31,8 +31,8 @@ void Red_Def_command( int argc );
 void enable_bot( int argc )
 {
     G_dprintf( "enable Bots \n" );
-    if( tf_data.enable_bot  ) return;
-    tf_data.enable_bot = 1;
+    if( tfset(enable_bot)  ) return;
+    tfset_flagon( enable_bot );
     localcmd( "exec maps/%s.wps\n", mapname );
 }
 
@@ -221,7 +221,7 @@ void Red_Def_command( int argc )
     gedict_t *Goal,*saveself;
     gedict_t *te,*owner;
 
-    if( tf_data.mtfl )
+    if( tfset(mtfl) )
     {
         if( self != world )
             G_sprint(self,2,"Not allowed for mtfl.\n" );

@@ -30,7 +30,7 @@ void player_touch(  )
 
 	float   found;
 
-	if ( !tf_data.invis_only && ( self->playerclass == PC_SPY || other->playerclass == PC_SPY ) )
+	if ( !tfset(invis_only) && ( self->playerclass == PC_SPY || other->playerclass == PC_SPY ) )
 	{
 		if ( streq( other->s.v.classname, "player" ) )
 		{
@@ -894,7 +894,7 @@ void ThrowGib( char *gibname, float dm )
 {
 	newmis = spawn(  );
 	VectorCopy( self->s.v.origin, newmis->s.v.origin );
-	if ( tf_data.birthday == 1 && g_random(  ) < 0.3 )
+	if ( tfset(birthday) == 1 && g_random(  ) < 0.3 )
 	{
 		setmodel( newmis, "progs/grenade3.mdl" );
 		newmis->s.v.skin = g_random(  ) * 4;

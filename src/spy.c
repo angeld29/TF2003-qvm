@@ -911,7 +911,7 @@ void TeamFortress_SpyFeignDeath( int issilent )
 		{
 			if ( streq( at_spot->mdl, "progs/detpack.mdl" ) )
 				j = 1;
-			if ( streq( at_spot->mdl, "progs/detpack2.mdl" ) && tf_data.birthday == 1 )
+			if ( streq( at_spot->mdl, "progs/detpack2.mdl" ) && tfset(birthday) == 1 )
 				j = 1;
 			if ( streq( at_spot->mdl, "progs/turrbase.mdl" ) )
 				j = 1;
@@ -1000,7 +1000,7 @@ void TeamFortress_SpyGoUndercover(  )
 	gedict_t *te;
 
 
-	if ( tf_data.invis_only == 1 )
+	if ( tfset(invis_only) == 1 )
 	{
 	        // If the spy is already invisible, become visible
 		if ( ( int ) self->s.v.effects & ( EF_DIMLIGHT | EF_BRIGHTLIGHT ) )
@@ -1099,7 +1099,7 @@ void TeamFortress_SpyUndercoverThink(  )
 		return;
 	if ( owner->is_undercover == 2 )
 	{
-		if ( tf_data.invis_only == 1 )
+		if ( tfset(invis_only) == 1 )
 		{
 			owner->s.v.items = ( int ) owner->s.v.items | IT_INVISIBILITY;
 			owner->s.v.frame = 0;
@@ -1107,7 +1107,7 @@ void TeamFortress_SpyUndercoverThink(  )
 			owner->is_undercover = 1;
 		} else
 		{
-			owner->immune_to_check = g_globalvars.time + tf_data.cheat_pause;	//10;
+			owner->immune_to_check = g_globalvars.time + tfset_cheat_pause;	//10;
 			if ( self->s.v.skin )
 			{
 				owner->undercover_skin = self->s.v.skin;
@@ -1185,7 +1185,7 @@ void TeamFortress_SpyChangeColor( int teamno )
 			return;
 		}
 		G_sprint( self, 2, "Colors reset.\n" );
-		self->immune_to_check = g_globalvars.time + tf_data.cheat_pause;	//10;
+		self->immune_to_check = g_globalvars.time + tfset_cheat_pause;	//10;
 		self->undercover_team = 0;
 		TeamFortress_SetColor( self, TeamFortress_TeamGetTopColor( self->team_no ),
 			  TeamFortress_TeamGetColor( self->team_no ) - 1 );
@@ -1285,7 +1285,7 @@ void GasGrenadeMakeGas(  )
 				if ( timer )
 				{
 					timer->s.v.health = timer->s.v.health + 25;
-					if(!( tf_data.new_gas & GAS_MASK_NEWGREN_TIMES))
+					if(!( tfset_new_gas & GAS_MASK_NEWGREN_TIMES))
 					{
 						if ( timer->s.v.health < 100 )
 							timer->s.v.health = 100;
@@ -1297,12 +1297,12 @@ void GasGrenadeMakeGas(  )
 						timer->s.v.nextthink = g_globalvars.time + 0.3;
 					}
 					    
-					if( !( tf_data.new_gas & GAS_MASK_ALLSPYS ) && (g_random() < SETGAS_IN_GAS_TIME))
+					if( !( tfset_new_gas & GAS_MASK_ALLSPYS ) && (g_random() < SETGAS_IN_GAS_TIME))
 						SetGasSkins(te);
 				}
 			} else
 			{
-				if ( tf_data.new_gas & GAS_MASK_PALETTE)
+				if ( tfset_new_gas & GAS_MASK_PALETTE)
 				{
 					stuffcmd( te, "v_cshift 50 25 50 -50\n" );
 					G_sprint( te, 2, "Far out man!\n" );
@@ -1310,7 +1310,7 @@ void GasGrenadeMakeGas(  )
 					G_sprint( te, 2, "Run for cover! They're everywhere!\n" );
 				te->tfstate = te->tfstate | TFSTATE_HALLUCINATING;
 				timer = spawn(  );
-				if( !(tf_data.new_gas & GAS_MASK_NEWGREN_TIMES))
+				if( !(tfset_new_gas & GAS_MASK_NEWGREN_TIMES))
 					timer->s.v.nextthink = g_globalvars.time + 0.5;
 				else
 					timer->s.v.nextthink = g_globalvars.time + 0.3;
@@ -1320,7 +1320,7 @@ void GasGrenadeMakeGas(  )
 
 				timer->s.v.classname = "timer";
 				timer->s.v.owner = EDICT_TO_PROG( te );
-				if( !(tf_data.new_gas & GAS_MASK_NEWGREN_TIMES))
+				if( !(tfset_new_gas & GAS_MASK_NEWGREN_TIMES))
 					timer->s.v.health = 100;
 				else
 					timer->s.v.health = 150;
@@ -1380,7 +1380,7 @@ void GasEffect1( gedict_t * owner )	//Random Temp Entites
 	trap_WriteCoord( MSG_ONE, owner->s.v.origin[0] + g_random(  ) * 800 - 400 );
 	trap_WriteCoord( MSG_ONE, owner->s.v.origin[1] + g_random(  ) * 800 - 400 );
 	trap_WriteCoord( MSG_ONE, owner->s.v.origin[2] );
-	if( tf_data.new_gas & GAS_MASK_NEWGREN_DMG)
+	if( tfset_new_gas & GAS_MASK_NEWGREN_DMG)
 		T_Damage( owner, owner, owner, 0 );
 }
 
@@ -1416,7 +1416,7 @@ void GasEffect2( gedict_t * owner )	//sounds
 	trap_WriteCoord( MSG_ONE, owner->s.v.origin[1] + g_random(  ) * 800 - 400 );
 	trap_WriteCoord( MSG_ONE, owner->s.v.origin[2] );
 
-	if ( !(tf_data.new_gas & GAS_MASK_NEWGREN_EFFECTS))
+	if ( !(tfset_new_gas & GAS_MASK_NEWGREN_EFFECTS))
 		return;
 	i = g_random(  ) * ( sizeof( gas_sounds ) / sizeof( gas_sounds[0] )  );
 	stuffcmd( owner, gas_sounds[i] );
@@ -1456,7 +1456,7 @@ void GasEffect3( gedict_t * owner )
 	trap_WriteCoord( MSG_ONE, owner->s.v.origin[2] );
 	dremove( te );
 
-	if ( !(tf_data.new_gas & GAS_MASK_NEWGREN_EFFECTS))
+	if ( !(tfset_new_gas & GAS_MASK_NEWGREN_EFFECTS))
 		return;
 	i = g_random(  ) * ( sizeof( gas_sounds ) / sizeof( gas_sounds[0] ) );
 	stuffcmd( owner, gas_sounds[i] );
@@ -1481,25 +1481,25 @@ void HallucinationTimer(  )
 	{
 	        ResetGasSkins( owner );
 
-		if ( tf_data.new_gas & GAS_MASK_PALETTE) 
+		if ( tfset_new_gas & GAS_MASK_PALETTE) 
 			stuffcmd( owner, "v_cshift; wait; bf\n" );
 		G_sprint( owner, 2, "You feel a little better now.\n" );
 		dremove( self );
 		return;
 	}
-	if( !(tf_data.new_gas & GAS_MASK_NEWGREN_TIMES))
+	if( !(tfset_new_gas & GAS_MASK_NEWGREN_TIMES))
 		self->s.v.nextthink = g_globalvars.time + 0.5;
 	else
 		self->s.v.nextthink = g_globalvars.time + 0.3;
 
-	if(!( tf_data.new_gas & GAS_MASK_ALLSPYS ) && g_random()< SETGAS_TIMER_THINK)
+	if(!( tfset_new_gas & GAS_MASK_ALLSPYS ) && g_random()< SETGAS_TIMER_THINK)
 		SetGasSkins(owner);
 //?????
 //        	self->s.v.nextthink = g_globalvars.time + 0.5;
 
 	if ( g_random(  ) < 0.5 )
 		KickPlayer( -10, owner );
-	if ( tf_data.new_gas & GAS_MASK_PALETTE)
+	if ( tfset_new_gas & GAS_MASK_PALETTE)
 	{
 		stuffcmd( owner, "v_cshift %d %d %d -75\n", ( int ) ( g_random(  ) * 100 ),
 			  ( int ) ( g_random(  ) * 100 ), ( int ) ( g_random(  ) * 100 ) );
@@ -1629,13 +1629,13 @@ void TranquiliserTimer(  )
 void Spy_RemoveDisguise( gedict_t * spy )
 {
 
-	if ( tf_data.invis_only != 1 )
+	if ( tfset(invis_only) != 1 )
 	{
 		if ( spy->playerclass == PC_SPY )
 		{
 			if ( spy->undercover_team )
 			{
-				spy->immune_to_check = g_globalvars.time + tf_data.cheat_pause;	//10;
+				spy->immune_to_check = g_globalvars.time + tfset_cheat_pause;	//10;
 				spy->undercover_team = 0;
 				TeamFortress_SetColor( spy, TeamFortress_TeamGetTopColor( spy->team_no ),
 					  TeamFortress_TeamGetColor( spy->team_no ) - 1 );
@@ -1643,7 +1643,7 @@ void Spy_RemoveDisguise( gedict_t * spy )
 			}
 			if ( spy->undercover_skin )
 			{
-				spy->immune_to_check = g_globalvars.time + tf_data.cheat_pause;	//10;
+				spy->immune_to_check = g_globalvars.time + tfset_cheat_pause;	//10;
 				spy->undercover_skin = 0;
 				spy->s.v.skin = 0;
 			}
@@ -1676,7 +1676,7 @@ void ResetGasSkins( gedict_t*pl)
 	int		entnum;
 	char	st[20];
 
-	if( !(tf_data.new_gas & (GAS_MASK_COLOR | GAS_MASK_SKIN | GAS_MASK_ALLSPYS)) )
+	if( !(tfset_new_gas & (GAS_MASK_COLOR | GAS_MASK_SKIN | GAS_MASK_ALLSPYS)) )
 		return;
 
 	if( pl->has_disconnected )
@@ -1700,7 +1700,7 @@ void ResetGasSkins( gedict_t*pl)
 
 		g_globalvars.msg_entity = EDICT_TO_PROG( pl );
 
-		if( tf_data.new_gas & (GAS_MASK_COLOR|GAS_MASK_ALLSPYS) )
+		if( tfset_new_gas & (GAS_MASK_COLOR|GAS_MASK_ALLSPYS) )
 		{
 			GetInfokeyString( te, "topcolor", NULL, st, sizeof(st), "");
 
@@ -1717,7 +1717,7 @@ void ResetGasSkins( gedict_t*pl)
 			trap_WriteString(MSG_ONE, st);
 		}
 
-		if( tf_data.new_gas & (GAS_MASK_SKIN|GAS_MASK_ALLSPYS) )
+		if( tfset_new_gas & (GAS_MASK_SKIN|GAS_MASK_ALLSPYS) )
 		{
 			GetInfokeyString( te, "skin", NULL, st, sizeof(st), "");
 
@@ -1737,7 +1737,7 @@ void SetGasSkins( gedict_t*pl)
 	int		rskin,rteam,rcol;
 	char	st[20];
 
-	if( !(tf_data.new_gas & (GAS_MASK_COLOR | GAS_MASK_SKIN | GAS_MASK_ALLSPYS)) )
+	if( !(tfset_new_gas & (GAS_MASK_COLOR | GAS_MASK_SKIN | GAS_MASK_ALLSPYS)) )
 		return;
 
 	if( pl->has_disconnected )
@@ -1759,7 +1759,7 @@ void SetGasSkins( gedict_t*pl)
 		}
 
 		g_globalvars.msg_entity = EDICT_TO_PROG( pl );
-		if( tf_data.new_gas & GAS_MASK_ALLSPYS)
+		if( tfset_new_gas & GAS_MASK_ALLSPYS)
 		{
 			rteam = pl->team_no%2 + 1;
 
@@ -1787,14 +1787,14 @@ void SetGasSkins( gedict_t*pl)
 		{
 			rteam = pl->team_no;
 
-			if( ( tf_data.new_gas & GAS_MASK_COLOR ) && g_random()< SETGAS_SETCOLOR)
+			if( ( tfset_new_gas & GAS_MASK_COLOR ) && g_random()< SETGAS_SETCOLOR)
 			{
-				if( tf_data.new_gas & GAS_MASK_ALLCOLORS)
+				if( tfset_new_gas & GAS_MASK_ALLCOLORS)
 				{
 					rcol = g_random() * 16;
 				}else
 				{
-					if( tf_data.new_gas & GAS_MASK_4COLORS)
+					if( tfset_new_gas & GAS_MASK_4COLORS)
 						rteam = g_random() * 4;
 					else
 						rteam = g_random() * number_of_teams;
@@ -1808,7 +1808,7 @@ void SetGasSkins( gedict_t*pl)
 				trap_WriteString(MSG_ONE,"topcolor" );
 				trap_WriteString(MSG_ONE, st);
 
-				if( !(tf_data.new_gas & GAS_MASK_ALLCOLORS))
+				if( !(tfset_new_gas & GAS_MASK_ALLCOLORS))
 				{
 					rcol = TeamFortress_TeamGetColor(rteam) - 1;
 					_snprintf(st, sizeof(st), "%d",rcol);
@@ -1819,7 +1819,7 @@ void SetGasSkins( gedict_t*pl)
 				trap_WriteString(MSG_ONE, st);
 			}
 
-			if( (tf_data.new_gas & GAS_MASK_SKIN ) && g_random()<SETGAS_SETSKIN)
+			if( (tfset_new_gas & GAS_MASK_SKIN ) && g_random()<SETGAS_SETSKIN)
 			{
 				rskin = g_random() *9 +1;
 

@@ -845,7 +845,7 @@ void Engineer_UseDispenser( gedict_t * disp )
 
     if( !tg_data.tg_enabled  && (self->playerclass != PC_ENGINEER ))
         return;
-    if (!tf_data.old_spanner) {
+    if (!tfset(old_spanner)) {
         if( self->team_no && TeamFortress_isTeamsAllied( self->team_no , disp->real_owner->team_no) ){
             if(Engineer_Dispenser_Repair(disp)) return;
         }else{
@@ -986,7 +986,7 @@ void Engineer_UseSentryGun( gedict_t * gun )
     if( !tg_data.tg_enabled  && (self->playerclass != PC_ENGINEER ))
         return;
     // automate tasks if old_spanner setting is disabled
-    if (!tf_data.old_spanner) {
+    if (!tfset(old_spanner)) {
         if( self->team_no && TeamFortress_isTeamsAllied( self->team_no , gun->real_owner->team_no) ){
             status += Engineer_SentryGun_Upgrade(gun);
             status += Engineer_SentryGun_Repair(gun);

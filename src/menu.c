@@ -210,7 +210,7 @@ const char *team_menu_strings[] = {
 
 void Menu_Team( menunum_t menu )
 {
-	if ( ( tf_data.toggleflags & TFLAG_AUTOTEAM ) && teamplay )
+	if ( ( tfset_toggleflags & TFLAG_AUTOTEAM ) && teamplay )
 	{
 		if ( TeamFortress_TeamPutPlayerInTeam(  ) )
 			return;
@@ -324,7 +324,7 @@ void Menu_Class( menunum_t menu )
 		CenterPrint( self, "Your team can only be Civilians.\n" );
 		return;
 	}
-    CenterPrint( self, class_str, tf_data.spy_off? "": class_spy, tf_data.birthday ? class_bd: class_rpc);
+    CenterPrint( self, class_str, tfset(spy_off)? "": class_spy, tfset(birthday) ? class_bd: class_rpc);
 }
 
 void Menu_Class_Input( int imp )
@@ -729,7 +729,7 @@ void Menu_EngineerFix_SentryGun( menunum_t menu )
         else
             s_static = menu_eng_fixsg_static;
     }
-    if( tf_data.old_spanner ){
+    if( tfset(old_spanner) ){
         if ( self->building->s.v.weapon < 3
                 && ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.tg_enabled ) )
             s_upgrade = menu_eng_fixsg_upgrade;
@@ -1209,7 +1209,7 @@ void Menu_BirthDay_Input( int inp )
 		self->s.v.impulse = 0;
 		if ( inp != 96 )
 			break;
-		tf_data.birthday = 1;
+		tfset_setbits |= svsb_birthday;
 		localcmd( "localinfo birthday on\n" );
 		G_bprint( 2, "IT'S PARTY TIME\n" );
 		for ( te = world;
@@ -1291,17 +1291,17 @@ void TG_SGOptions_Menu( menunum_t menu )
 	char    s_sgppl[80];
 	const char *s_sg_rfire;
 
-	if ( tf_data.sg_newfind )
+	if ( tfset(sg_newfind) )
 	{
 		s_sg_newfind = _M1 LED_B "Sentry New Find Target ON  \n";
 		_snprintf( s_sgppl, sizeof( s_sgppl ), "       %3d ppl emulation      \n",
-			   tf_data.sgppl );
+			   tfset_sgppl );
 	} else
 	{
 		s_sg_newfind = _M1 LED_R "Sentry New Find Target OFF \n";
 		_snprintf( s_sgppl, sizeof( s_sgppl ), "\n" );
 	}
-	if ( tf_data.sg_rfire )
+	if ( tfset(sg_rfire) )
 		s_sg_rfire = _M3 LED_B "Sentry Rocket Fire: NEW    \n";
 	else
 		s_sg_rfire = _M3 LED_R "Sentry Rocket Fire: OLD    \n";
@@ -1312,9 +1312,9 @@ void TG_SGOptions_Menu( menunum_t menu )
 		s_sg_unlimit_ammo = _M5 LED_R "Unlimited ammo OFF         \n";
 
 
-	if ( tf_data.sg_sfire >= SG_SFIRE_NUM )
-		tf_data.sg_sfire = 0;
-	s_sg_sfire = sentry_sfire_names[tf_data.sg_sfire];
+	if ( tfset_sg_sfire >= SG_SFIRE_NUM )
+		tfset_sg_sfire = 0;
+	s_sg_sfire = sentry_sfire_names[tfset_sg_sfire];
 
 	if ( tg_data.sg_allow_find >= TG_SG_FIND_IGNORE_NUM )
 		tg_data.sg_allow_find = TG_SG_FIND_IGNORE_TEAM;
@@ -1343,26 +1343,14 @@ void TG_SGOptions_Menu_Input( int inp )
 	switch ( inp )
 	{
 	case 1:
-		tf_data.sg_newfind = ( tf_data.sg_newfind ) ? 0 : 1;
+        tfset_flagtoggle( sg_newfind );
 		break;
-/*REMOVE!!!
-		case 3:
-			if( tf_data.sg_newfind )
-				tf_data.sgppl++;
-			break;	
-		case 2:
-			if( tf_data.sg_newfind )
-			{
-				 if(tf_data.sgppl)
-				 	tf_data.sgppl--;
-			}
-			break;	*/
 	case 3:
-		tf_data.sg_rfire = ( tf_data.sg_rfire ) ? 0 : 1;
+        tfset_flagtoggle( sg_rfire );
 		break;
 	case 4:
-		if ( ++( tf_data.sg_sfire ) >= SG_SFIRE_NUM )
-			tf_data.sg_sfire = 0;
+		if ( ++( tfset_sg_sfire ) >= SG_SFIRE_NUM )
+			tfset_sg_sfire = 0;
 		break;
 	case 5:
 	        tg_data.sg_unlimit_ammo = ( tg_data.sg_unlimit_ammo ) ? false : true;
@@ -1474,7 +1462,7 @@ void TG_Detpack_Menu( menunum_t menu )
 	else
 		s_drop = _M3 LED_R "don't drop detpacks        \n";
 
-	if ( tf_data.detpack_block )
+	if ( tfset(detpack_block) )
 		s_block = _M4 LED_R "Stack detpacks: TF2003     \n";
 	else
 		s_block = _M4 LED_B "Stack detpacks: TF 2.8.1   \n";
@@ -1502,7 +1490,7 @@ void TG_Detpack_Menu_Input( int inp )
 		tg_data.detpack_drop = ( tg_data.detpack_drop ) ? 0 : 1;
 		break;
 	case 4:
-		tf_data.detpack_block = ( tf_data.detpack_block ) ? 0 : 1;
+        tfset_flagtoggle( detpack_block );
 		break;
 	case 5:
 		ResetMenu(  );

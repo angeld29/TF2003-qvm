@@ -356,7 +356,7 @@ void W_FireMedikit(  )
 					if ( te->s.v.think != ( func_t ) ConcussionGrenadeTimer &&
 						te->s.v.think != ( func_t ) OldConcussionGrenadeTimer )
 						continue;
-					if ( tf_data.old_grens == 1 )
+					if ( tfset(old_grens) == 1 )
                     {
 						stuffcmd( trace_ent, "v_idlescale 0\nfov 90\n" );
                         trace_ent->eff_info.conc_idle = 0;
@@ -383,7 +383,7 @@ void W_FireMedikit(  )
 							  self->s.v.netname, trace_ent->s.v.netname );
 						
 						ResetGasSkins(trace_ent);
-						if ( tf_data.new_gas & GAS_MASK_PALETTE) 
+						if ( tfset_new_gas & GAS_MASK_PALETTE) 
 							stuffcmd( trace_ent, "v_cshift; wait; bf\n" );
 						if ( !TeamFortress_isTeamsAllied(te->team_no , self->team_no) )
 							TF_AddFrags( self, 1 );
@@ -430,7 +430,7 @@ void W_FireMedikit(  )
 							  self->s.v.netname, trace_ent->s.v.netname );
 						if ( !TeamFortress_isTeamsAllied(te->team_no , self->team_no) )
 							TF_AddFrags( self, 1 );
-						if ( tf_data.new_flash )
+						if ( tfset(new_flash) )
 							disableupdates( trace_ent, -1 );	/* server-side flash */
 						break;
 					}
@@ -976,9 +976,9 @@ void W_FireSniperRifle(  )
 	vec3_t  h, tmp;
 	gedict_t *trace_ent;
 
-	if ( tf_data.snip_fps )
+	if ( tfset_snip_fps )
 	{
-		self->heat = ( g_globalvars.time - self->heat ) * tf_data.snip_fps * 3 + SR_INITDAMAGE;
+		self->heat = ( g_globalvars.time - self->heat ) * tfset_snip_fps * 3 + SR_INITDAMAGE;
 
 		if ( self->heat > SR_MAXDAMAGE )
 			self->heat = SR_MAXDAMAGE;
@@ -987,7 +987,7 @@ void W_FireSniperRifle(  )
 	sound( self, 1, "weapons/sniper.wav", 1, 1 );
 	KickPlayer( -2, self );
 	if ( !tg_data.unlimit_ammo )
-		self->s.v.currentammo = ( self->s.v.ammo_shells -= tf_data.snip_ammo);
+		self->s.v.currentammo = ( self->s.v.ammo_shells -= tfset_snip_ammo);
 	trap_makevectors( self->s.v.v_angle );
 	VectorCopy( g_globalvars.v_forward, dir );
 
@@ -995,7 +995,7 @@ void W_FireSniperRifle(  )
 	src[1] = self->s.v.origin[1] + g_globalvars.v_forward[1] * 10;
 	src[2] = self->s.v.absmin[2] + self->s.v.size[2] * 0.7;
 
-	if ( tf_data.snip_range_fix )
+	if ( tfset(snip_range_fix) )
 	       traceline( PASSVEC3( src ), src[0] + dir[0] * 8092, src[1] + dir[1] * 8092,
 	       	       src[2] + dir[2] * 8092, false, self );
 	else
@@ -1492,7 +1492,7 @@ void W_FireGrenade(  )
 			increment_team_pipebombs( self->team_no );
 			num_team_pipes = num_team_pipebombs[self->team_no];
 
-			if ( num_pipes == 0  && tf_data.add_pipe == 1)
+			if ( num_pipes == 0  && tfset(add_pipe) == 1)
 			{
 				if ( num_team_pipes > MAX_WORLD_PIPEBOMBS / number_of_teams + 1 )
 					ExplodeOldPipebomb( self->team_no, 1 );
@@ -1504,7 +1504,7 @@ void W_FireGrenade(  )
 		} else
 		{
 			increment_team_pipebombs( self->team_no );
-			if ( num_pipes == 0 && tf_data.add_pipe == 1)
+			if ( num_pipes == 0 && tfset(add_pipe) == 1)
 			{
 				if ( num_team_pipebombs[0] > MAX_WORLD_PIPEBOMBS + 1 )
 					ExplodeOldPipebomb( 0, 1 );
@@ -1542,7 +1542,7 @@ void W_FireGrenade(  )
 	SetVector( newmis->s.v.avelocity, 300, 300, 300 );
 	vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
 	newmis->s.v.think = ( func_t ) GrenadeExplode;
-	if ( tf_data.birthday == 1 && g_random(  ) < 0.2 )
+	if ( tfset(birthday) == 1 && g_random(  ) < 0.2 )
 		setmodel( newmis, "progs/grenade3.mdl" );
 	else
 		setmodel( newmis, "progs/grenade2.mdl" );
@@ -2027,7 +2027,7 @@ int W_CheckNoAmmo(  )
         return 1;
     if ( it == WEAP_INCENDIARY && ( self->s.v.currentammo >= 3 ))
         return 1;
-    if( it == WEAP_SNIPER_RIFLE && ( self->s.v.currentammo >= tf_data.snip_ammo ))
+    if( it == WEAP_SNIPER_RIFLE && ( self->s.v.currentammo >= tfset_snip_ammo ))
         return 1;
     if ( self->s.v.currentammo > 0 )
         return 1;
@@ -2254,7 +2254,7 @@ void W_Attack(  )
             {
                 player_shot(113);
                 W_FireSniperRifle(  );
-                self->allow_snip_time = g_globalvars.time + tf_data.snip_time;
+                self->allow_snip_time = g_globalvars.time + tfset_snip_time;
                 Attack_Finished( 1.5 );
             }
             break;
@@ -2350,7 +2350,7 @@ void W_PrintWeaponMessage(  )
 	switch ( self->current_weapon )
 	{
 	case WEAP_AXE:
-		if ( tf_data.allow_hook )
+		if ( tfset(allow_hook) )
 			if ( self->playerclass != PC_SPY )
 				G_sprint( self, 1, "Axe selected\n" );
 		break;
@@ -2398,12 +2398,12 @@ int W_CanUseWeapon( int weapon )
     switch( weapon )
     {
         case WEAP_HOOK:
-            if ( !tf_data.allow_hook ) return 0;
+            if ( !tfset(allow_hook) ) return 0;
             if ( self->hook_out )
                 Reset_Grapple( self->hook );
             break;
         case WEAP_SNIPER_RIFLE: 
-            if ( self->s.v.ammo_shells < tf_data.snip_ammo ) return 1;
+            if ( self->s.v.ammo_shells < tfset_snip_ammo ) return 1;
             break;
         case WEAP_SHOTGUN://   128
         case WEAP_TRANQ://    262144
@@ -2665,7 +2665,7 @@ void ImpulseCommands(  )
 		self->menu_displaytime = 0;
 	}
 
-	if ( self->s.v.impulse == 242 && !tf_data.birthday )
+	if ( self->s.v.impulse == 242 && !tfset(birthday) )
 	{
 		GetSVInfokeyString( "bd", "birthday", st, sizeof( st ), "" );
 		if ( strneq( st, "off" ) )
@@ -2748,7 +2748,7 @@ void ImpulseCommands(  )
 			break;
 		case TF_HOOK_IMP1:
 		case TF_HOOK_IMP2:
-			if ( tf_data.allow_hook )
+			if ( tfset(allow_hook) )
 				W_ChangeWeapon(  );
 			break;
 		case TF_WEAPLAST:
@@ -2899,7 +2899,7 @@ void PreMatchImpulses(  )
 		break;
 	case TF_HOOK_IMP1:
 	case TF_HOOK_IMP2:
-		if ( tf_data.allow_hook )
+		if ( tfset(allow_hook) )
 			W_ChangeWeapon(  );
 		break;
     case TF_WEAPLAST:
@@ -3196,7 +3196,7 @@ void W_WeaponFrame(  )
 			case WEAP_SNIPER_RIFLE:
 				if ( self->tfstate & TFSTATE_AIMING )
 				{
-					if ( !tf_data.snip_fps && self->heat < 400 )
+					if ( !tfset_snip_fps && self->heat < 400 )
 						self->heat += 3;
 					if ( self->height > 30 )
 					{
@@ -3212,7 +3212,7 @@ void W_WeaponFrame(  )
 						if ( vlen( tv ) <= WEAP_SNIPER_RIFLE_MAX_MOVE )
 						{
 							SniperSight_Create(  );
-							if ( tf_data.snip_fps )
+							if ( tfset_snip_fps )
 								self->heat = g_globalvars.time;
 							else
 								self->heat = 50;

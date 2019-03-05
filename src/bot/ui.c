@@ -136,7 +136,7 @@ void ResupplySetBot()
 		return;
         }
 
-        if( tf_data.arena_mode )
+        if( tfset_arena_mode )
         {
                 tf_data.botResupplyBetweenKills = 0;
         }else
@@ -167,7 +167,7 @@ void Bot()
         return;
     }
 
-    if ( !tf_data.enable_bot )
+    if ( !tfset(enable_bot) )
     {
         G_sprint( self, 2, "Bots disabled\n" );
         //FIXME!!!!

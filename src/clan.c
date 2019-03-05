@@ -73,7 +73,7 @@ void PreMatch_Think(  )
 	}*/
 	G_bprint( 2, "MATCH BEGINS NOW\n" );
 	MatchTimer( true );
-	if ( tf_data.game_locked )
+	if ( tfset(game_locked) )
 		G_bprint( 2, "GAME IS NOW LOCKED\n" );
 	teamscores[0] = teamscores[1] = teamscores[2] = teamscores[3] = teamscores[4] = 0;
 	teamfrags[0] = teamfrags[1] = teamfrags[2] = teamfrags[3] = teamfrags[4] = 0;
@@ -181,7 +181,7 @@ void DumpClanScores(  )
 
 	if ( no_teams < 2 )
 		return;
-	teamfrags_q = tf_data.toggleflags & ( TFLAG_TEAMFRAGS | TFLAG_FULLTEAMSCORE );
+	teamfrags_q = tfset_toggleflags & ( TFLAG_TEAMFRAGS | TFLAG_FULLTEAMSCORE );
 	for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
 	{
 		if ( te->team_no <= 0 || te->team_no > 4 )
@@ -288,7 +288,7 @@ void MatchTimer( qboolean force )
         static float lasttime = 0;
         int     time_left;
 
-        if ( !( tf_data.toggleflags & TFLAG_FIRSTENTRY ) )
+        if ( !( tfset_toggleflags & TFLAG_FIRSTENTRY ) )
                 return;
 
         if( !force && lasttime && ( ( g_globalvars.time - lasttime ) < 60 ))

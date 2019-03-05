@@ -1384,7 +1384,7 @@ void sigil_touch(  )
 	if ( tf_data.cb_prematch_time > g_globalvars.time )
 		return;
 
-        if( tf_data.lan_mode )
+        if( tfset(lan_mode) )
 		G_centerprint( other, "You got the rune!" );
 
 	sound( other, CHAN_ITEM, self->s.v.noise, 1, ATTN_NORM );
@@ -1463,7 +1463,7 @@ void powerup_touch(  )
 		return;
 	if ( tf_data.cb_prematch_time > g_globalvars.time )
 		return;
-	if ( tf_data.disable_powerups )
+	if ( tfset(disable_powerups) )
 		return;
 	G_sprint( other, PRINT_LOW, "You got the %s\n", self->s.v.netname );
 
@@ -1649,7 +1649,7 @@ void BackpackTouch(  )
 	other->s.v.ammo_nails = other->s.v.ammo_nails + self->s.v.ammo_nails;
 	other->s.v.ammo_rockets = other->s.v.ammo_rockets + self->s.v.ammo_rockets;
 	other->s.v.ammo_cells = other->s.v.ammo_cells + self->s.v.ammo_cells;
-	if ( tf_data.gren2box & BP_TYPE_HEALTH )
+	if ( tfset_gren2box & BP_TYPE_HEALTH )
 		if ( self->ammo_medikit > 0 )
 		{
 
@@ -1670,13 +1670,13 @@ void BackpackTouch(  )
 			if ( self->ammo_medikit > 0 && other->playerclass == PC_MEDIC )
 				other->ammo_medikit = other->ammo_medikit + self->ammo_medikit;
 		}
-	if ( tf_data.gren2box & BP_TYPE_ARMOR )
+	if ( tfset_gren2box & BP_TYPE_ARMOR )
 		if ( other->s.v.armorvalue * other->s.v.armortype < self->s.v.armorvalue * self->s.v.armortype )
 		{
 			other->s.v.armorvalue = self->s.v.armorvalue;
 			other->s.v.armortype = self->s.v.armortype;
 		}
-	if ( tf_data.gren2box & BP_GREN_BYTYPE )
+	if ( tfset_gren2box & BP_GREN_BYTYPE )
 	{
 		if ( self->tp_grenades_1 == other->tp_grenades_1 )
 		{
@@ -1688,14 +1688,14 @@ void BackpackTouch(  )
 			other->no_grenades_2 = other->no_grenades_2 + self->no_grenades_2;
 			gotgren2 = 1;
 		}
-	} else if ( tf_data.gren2box & BP_GREN )
+	} else if ( tfset_gren2box & BP_GREN )
 	{
 		other->no_grenades_1 = other->no_grenades_1 + self->no_grenades_1;
 		other->no_grenades_2 = other->no_grenades_2 + self->no_grenades_2;
 		gotgren1 = 1;
 		gotgren2 = 1;
 	}
-	if ( tf_data.gren2box & BP_TYPE_DETPACK )
+	if ( tfset_gren2box & BP_TYPE_DETPACK )
 	{
 		if ( self->ammo_detpack > 0 && other->playerclass == PC_DEMOMAN )
 			other->ammo_detpack += self->ammo_detpack;

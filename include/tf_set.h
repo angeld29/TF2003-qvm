@@ -1,3 +1,30 @@
+/*
+ *  QWProgs-TF2003
+ *  Copyright (C) 2004  [sd] angel
+ *
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *
+ *  $Id: g_local.h,v 1.26 2005-11-26 14:44:38 AngelD Exp $
+ */
+//
+// g_local.h -- local definitions for game module
+
+#ifndef __tf_set
+#define __tf_set
 
 typedef union set_val_s
 {
@@ -57,12 +84,18 @@ extern set_item_t tf_settings[];
 
 #define tfset(name) (tf_settings[0].val._uint & svsb_ ## name )
 
-#define tfset_toggleflags 		(tf_settings[1].val._int)
-#define tfset_autoteam 			(tf_settings[2].val._float)
-#define tfset_respawn_delay		(tf_settings[3].val._float)
+#define tfset_flagon(name) (tf_settings[0].val._uint |=  svsb_ ## name )
+#define tfset_flagoff(name) (tf_settings[0].val._uint -=  tf_settings[0].val._uint & svsb_ ## name )
+
+#define tfset_flagtoggle(name) ( tfset(name) ? tfset_flagoff(name): tfset_flagon( name ))
+
+#define tfset_setbits 		    (tf_settings[0].val._uint)
+#define tfset_toggleflags 		(tf_settings[1].val._uint)
+#define tfset_autoteam_time 	(tf_settings[2].val._float)
+#define tfset_respawn_delay_time (tf_settings[3].val._float)
 #define tfset_prematch_time		(tf_settings[4].val._float)
 #define tfset_ceasefire_time	(tf_settings[6].val._float)
-#define tfset_autokick_time		(tf_settings[7].val._float)
+#define tfset_autokick_time		(tf_settings[7].val._int)
 #define tfset_autokick_kills	(tf_settings[8].val._int)
 #define tfset_cheat_pause		(tf_settings[9].val._int)
 #define tfset_disable_grens		(tf_settings[10].val._int)
@@ -73,7 +106,7 @@ extern set_item_t tf_settings[];
 #define tfset_snip_time			(tf_settings[15].val._float)
 #define tfset_new_gas			(tf_settings[16].val._int)
 #define tfset_gren2box			(tf_settings[17].val._int)
-#define tfset_arenamode         (tf_settings[18].val._int)
+#define tfset_arena_mode         (tf_settings[18].val._int)
 
 #define svsb_clanbattle         1<<0
 #define svsb_game_locked        1<<1
@@ -96,7 +129,8 @@ extern set_item_t tf_settings[];
 #define svsb_mtfl               1<<18
 #define svsb_enable_bot         1<<19
 #define svsb_tg_enabled         1<<20
-#define svsb_sg_new_find        1<<21
+#define svsb_sg_newfind         1<<21
 #define svsb_sg_rfire           1<<22
 #define svsb_pyrotype           1<<23
 
+#endif 

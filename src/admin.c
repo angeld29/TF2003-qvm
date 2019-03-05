@@ -150,16 +150,16 @@ void CheckAutoKick( gedict_t * p )
 	float   rnum;
 	gedict_t *te;
 
-	if ( p->teamkills >= tf_data.autokick_kills && tf_data.autokick_kills )
+	if ( p->teamkills >= tfset_autokick_kills && tfset_autokick_kills )
 	{
 		G_bprint( 2, "%s was kicked for killing teammates.\n", p->s.v.netname );
 		G_sprint( p, 2, "You were kicked for killing teammates.\n" );
 		KickCheater( p );
 	} else
 	{
-		if ( tf_data.autokick_kills )
+		if ( tfset_autokick_kills )
 		{
-			if ( p->teamkills == tf_data.autokick_kills - 1 )
+			if ( p->teamkills == tfset_autokick_kills - 1 )
 				G_sprint( p, 2, "Kill one more teammate, and you're outta here.\n" );
 			rnum = 0;
 			for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "ak_timer" )); )
@@ -176,7 +176,7 @@ void CheckAutoKick( gedict_t * p )
 				te->s.v.classname = "ak_timer";
 				te->s.v.owner = EDICT_TO_PROG( p );
 				te->s.v.think = ( func_t ) autokick_think;
-				te->s.v.nextthink = g_globalvars.time + tf_data.autokick_time;
+				te->s.v.nextthink = g_globalvars.time + tfset_autokick_time;
 			}
 		}
 	}

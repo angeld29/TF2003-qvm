@@ -200,7 +200,7 @@ void FlashPlayer( gedict_t*p, gedict_t*attacker )
        		te->gren_eff_time = g_globalvars.time + tg_data.gren_time;
 
        	
-       	if ( tf_data.new_flash )
+       	if ( tfset(new_flash) )
        	{
        	        te->s.v.think = ( func_t ) FlashTimerNew;
        	        te->s.v.nextthink = g_globalvars.time + NEW_FLASH_START_TIME;
@@ -477,10 +477,10 @@ void ConcPlayer( gedict_t*p, gedict_t*attacker )
        	        te->s.v.classname = "timer";
        	        te->s.v.owner = EDICT_TO_PROG( p );
        	        te->team_no = (attacker)?attacker->team_no:p->team_no;
-       	        if ( tf_data.old_grens == 1 )
+       	        if ( tfset(old_grens) )
                	        stuffcmd( p, "bf\n" );
        	}
-       	if ( tf_data.old_grens == 1 )
+       	if ( tfset(old_grens) )
        	{
      		stuffcmd( p, "v_idlescale 100\n" );
      		stuffcmd( p, "fov 130\n" );
@@ -794,7 +794,7 @@ void ApplySvConcVelocity( gedict_t* self )
     int conc_idle = self->eff_info.conc_idle;
     vec3_t v,va;
 
-    if( !tf_data.svconc ) return;
+    if( !tfset(svconc) ) return;
     if( !conc_idle ) return;
     VectorCopy( self->s.v.velocity, v );
     v[2] = 0;
@@ -810,7 +810,7 @@ void ApplySvConc( gedict_t* self )
 {
     int conc_idle = self->eff_info.conc_idle;
 
-    if( !tf_data.svconc ) return;
+    if( !tfset(svconc) ) return;
     if( !conc_idle ) return;
     //self->s.v.v_angle[ROLL]  += conc_idle * sin(g_globalvars.time * v_iroll_cycle) * CONC_MULTIPLAY;
     self->s.v.v_angle[PITCH] += conc_idle * sin(g_globalvars.time * v_ipitch_cycle) * CONC_MULTIPLAY;

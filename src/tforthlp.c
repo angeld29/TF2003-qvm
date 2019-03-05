@@ -46,7 +46,7 @@ void TeamFortress_MOTD(  )
 		G_sprint( self, 2, "Type help for more info.\n" );
 		G_sprint( self, 3, "QuakeWorld TeamFortress 2003\n" );
 
-		if( tf_data.enable_bot )
+		if( tfset(enable_bot) )
 		{
 		      G_sprint( self, 2, "Bots Enabled\n" );
 		}

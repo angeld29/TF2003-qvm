@@ -37,14 +37,14 @@ void UpdateAbbreviations( gedict_t * Goal )
 
 			GetSVInfokeyString( "fe", "flag_emu", st, sizeof( st ), "off" );
 			if ( !strcmp( st, "on" ) )
-				tf_data.toggleflags |= TFLAG_FLAG_EMULATION;
+				tfset_toggleflags |= TFLAG_FLAG_EMULATION;
 			GetSVInfokeyString( "ws", "use_standard", st, sizeof( st ), "off" );
 
 			if ( !strcmp( st, "on" ) )
-				tf_data.toggleflags |= TFLAG_USE_WAR_STD;
+				tfset_toggleflags |= TFLAG_USE_WAR_STD;
 			tf_data.flagem_checked = 1;
 		}
-		if ( ( tf_data.toggleflags & TFLAG_FLAG_EMULATION ) && !( tf_data.toggleflags & TFLAG_USE_WAR_STD ) )
+		if ( ( tfset_toggleflags & TFLAG_FLAG_EMULATION ) && !( tfset_toggleflags & TFLAG_USE_WAR_STD ) )
 		{
 			if ( streq( Goal->mdl, "progs/b_s_key.mdl" ) || streq( Goal->mdl, "progs/m_s_key.mdl" )
 			     || streq( Goal->mdl, "progs/w_s_key.mdl" ) )
@@ -61,7 +61,7 @@ void UpdateAbbreviations( gedict_t * Goal )
 				}
 			}
 		}
-		if ( tf_data.toggleflags & TFLAG_USE_WAR_STD )
+		if ( tfset_toggleflags & TFLAG_USE_WAR_STD )
 		{
 			if ( streq( Goal->mdl, "progs/b_s_key.mdl" ) || streq( Goal->mdl, "progs/m_s_key.mdl" )
 			     || streq( Goal->mdl, "progs/w_s_key.mdl" ) )
@@ -368,7 +368,7 @@ void ParseTFDetect( gedict_t * AD )
 	if ( !teamlives[4] )
 		teamlives[4] = -1;
 	if ( AD->hook_out == 1 )
-		tf_data.allow_hook = 0;
+		tfset_setbits -= tfset_setbits & svsb_allow_hook;
 	teammaxplayers[1] = AD->ammo_medikit;
 	teammaxplayers[2] = AD->ammo_detpack;
 	teammaxplayers[3] = AD->maxammo_medikit;
@@ -635,7 +635,7 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 						te = trap_find( te, FOFS( s.v.classname ), "primer" );
 				}
 			}
-			if ( !tf_data.disable_powerups && ( Goal->invincible_finished > 0 ) )
+			if ( !tfset(disable_powerups) && ( Goal->invincible_finished > 0 ) )
 			{
 				Player->s.v.items = ( int ) Player->s.v.items | IT_INVULNERABILITY;
 				Player->invincible_time = 1;
@@ -646,7 +646,7 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 					Player->invincible_finished = g_globalvars.time + 666;
 				}
 			}
-			if ( !tf_data.disable_powerups && ( Goal->invisible_finished > 0 ) )
+			if ( !tfset(disable_powerups) && ( Goal->invisible_finished > 0 ) )
 			{
 				Player->s.v.items = ( int ) Player->s.v.items | IT_INVISIBILITY;
 				Player->invisible_time = 1;
@@ -657,7 +657,7 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 					Player->invisible_finished = g_globalvars.time + 666;
 				}
 			}
-			if ( !tf_data.disable_powerups && ( Goal->super_damage_finished > 0 ) )
+			if ( !tfset(disable_powerups) && ( Goal->super_damage_finished > 0 ) )
 			{
 				Player->s.v.items = ( int ) Player->s.v.items | IT_QUAD;
 				Player->super_time = 1;
@@ -668,7 +668,7 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 					Player->super_damage_finished = g_globalvars.time + 666;
 				}
 			}
-			if ( !tf_data.disable_powerups && ( Goal->radsuit_finished > 0 ) )
+			if ( !tfset(disable_powerups) && ( Goal->radsuit_finished > 0 ) )
 			{
 				Player->s.v.items = ( int ) Player->s.v.items | IT_SUIT;
 				Player->rad_time = 1;
@@ -683,7 +683,7 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 		Player->lives = Player->lives + Goal->lives;
 		if ( Goal->s.v.frags )
 		{
-			if ( Goal->goal_effects == TFGE_AP || !( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
+			if ( Goal->goal_effects == TFGE_AP || !( tfset_toggleflags & TFLAG_FULLTEAMSCORE ) )
 				TF_AddFrags( Player, Goal->s.v.frags );
 		}
 		oldself = self;
@@ -694,7 +694,7 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 	}
 	if ( Player->playerclass == PC_SPY && ( Goal->goal_result & TFGR_REMOVE_DISGUISE ) )
 	{
-		self->immune_to_check = g_globalvars.time + tf_data.cheat_pause;	//10;
+		self->immune_to_check = g_globalvars.time + tfset_cheat_pause;	//10;
 		Spy_RemoveDisguise( Player );
 	}
 	if ( Goal->s.v.items && strneq( Goal->s.v.classname, "item_tfgoal" ) )
@@ -786,7 +786,7 @@ void RemoveResults( gedict_t * Goal, gedict_t * Player )
 	Player->armorclass = Player->armorclass - ( Player->armorclass & Goal->armorclass );
 	if ( Goal->s.v.frags )
 	{
-		if ( Goal->goal_effects == TFGE_AP || !( tf_data.toggleflags & TFLAG_FULLTEAMSCORE ) )
+		if ( Goal->goal_effects == TFGE_AP || !( tfset_toggleflags & TFLAG_FULLTEAMSCORE ) )
 			TF_AddFrags( Player, Goal->s.v.frags );
 	}
 	Player->s.v.ammo_shells = Player->s.v.ammo_shells - Goal->s.v.ammo_shells;
@@ -846,28 +846,28 @@ void RemoveResults( gedict_t * Goal, gedict_t * Player )
 		}
 		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 	}
-	if ( !tf_data.disable_powerups && Goal->invincible_finished > 0 && !puinvin )
+	if ( !tfset(disable_powerups) && Goal->invincible_finished > 0 && !puinvin )
 	{
 		Player->tfstate = Player->tfstate - ( Player->tfstate & TFSTATE_INVINCIBLE );
 		Player->s.v.items = ( int ) Player->s.v.items | IT_INVULNERABILITY;
 		Player->invincible_time = 1;
 		Player->invincible_finished = g_globalvars.time + Goal->invincible_finished;
 	}
-	if ( !tf_data.disable_powerups && Goal->invisible_finished > 0 && !puinvis )
+	if ( !tfset(disable_powerups) && Goal->invisible_finished > 0 && !puinvis )
 	{
 		Player->tfstate = Player->tfstate - ( Player->tfstate & TFSTATE_INVISIBLE );
 		Player->s.v.items = ( int ) Player->s.v.items | IT_INVISIBILITY;
 		Player->invisible_time = 1;
 		Player->invisible_finished = g_globalvars.time + Goal->invisible_finished;
 	}
-	if ( !tf_data.disable_powerups && Goal->super_damage_finished > 0 && !puquad )
+	if ( !tfset(disable_powerups) && Goal->super_damage_finished > 0 && !puquad )
 	{
 		Player->tfstate = Player->tfstate - ( Player->tfstate & TFSTATE_QUAD );
 		Player->s.v.items = ( int ) Player->s.v.items | IT_QUAD;
 		Player->super_time = 1;
 		Player->super_damage_finished = g_globalvars.time + Goal->super_damage_finished;
 	}
-	if ( !tf_data.disable_powerups && Goal->radsuit_finished > 0 && !purad )
+	if ( !tfset(disable_powerups) && Goal->radsuit_finished > 0 && !purad )
 	{
 		Player->tfstate = Player->tfstate - ( Player->tfstate & TFSTATE_RADSUIT );
 		Player->s.v.items = ( int ) Player->s.v.items | IT_SUIT;
@@ -1621,7 +1621,7 @@ void tfgoal_touch(  )
 {
 	gedict_t *te;
 
-	if( tf_data.arena_mode )
+	if( tfset_arena_mode )
 	        return;
 
 	if ( !( self->goal_activation & TFGA_TOUCH ) )
@@ -1674,7 +1674,7 @@ void item_tfgoal_touch(  )
 {
 	gedict_t *te;
 
-	if( tf_data.arena_mode )
+	if( tfset_arena_mode )
 	        return;
 
 	if ( strneq( other->s.v.classname, "player" ) )
@@ -1957,7 +1957,7 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 		{
 			if ( Item->goal_activation & TFGI_DROP )
 			{
-				if ( method == 2 && ( ( Item->goal_activation & TFGI_ALLOW_DROP ) || tf_data.allow_drop_goal ) )
+				if ( method == 2 && ( ( Item->goal_activation & TFGI_ALLOW_DROP ) || tfset(allow_drop_goal) ) )
 					tfgoalitem_drop( Item, 1, AP );
 				else
 					tfgoalitem_drop( Item, 0, AP );
@@ -2172,7 +2172,7 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 				else
 					G_sprint( Player, 2, "%s", Goal->non_team_str_moved );
 
-				if ( tf_data.flag_timer )
+				if ( tfset(flag_timer) )
 				{
 					if ( Item->s.v.think == ( func_t ) tfgoalitem_remove )
 					{
@@ -2231,7 +2231,7 @@ void SP_item_flag_team2(  )
 	self->broadcast = " " _G _O _T " the enemy team's flag!\n";
 	self->deathtype = "You've got the enemy flag!\n";
 	self->s.v.noise = "ogre/ogwake.wav";
-	if ( tf_data.toggleflags & TFLAG_USE_WAR_STD )
+	if ( tfset_toggleflags & TFLAG_USE_WAR_STD )
 		self->mdl = "progs/tf_stan.mdl";
 	else
 		self->mdl = "progs/tf_flag.mdl";
@@ -2302,7 +2302,7 @@ void SP_item_flag_team1(  )
 	self->broadcast = " " _G _O _T " the enemy team's flag!\n";
 	self->deathtype = "You've got the enemy flag!\n";
 	self->s.v.noise = "ogre/ogwake.wav";
-	if ( tf_data.toggleflags & TFLAG_USE_WAR_STD )
+	if ( tfset_toggleflags & TFLAG_USE_WAR_STD )
 		self->mdl = "progs/tf_stan.mdl";
 	else
 		self->mdl = "progs/tf_flag.mdl";
@@ -2477,7 +2477,7 @@ void DropGoalItems(  )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
-			if ( ( te->goal_activation & TFGI_ALLOW_DROP ) || tf_data.allow_drop_goal )
+			if ( ( te->goal_activation & TFGI_ALLOW_DROP ) || tfset(allow_drop_goal) )
 				tfgoalitem_RemoveFromPlayer( te, self, 2 );
 		}
 		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );

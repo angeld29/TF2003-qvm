@@ -110,7 +110,7 @@ void MirvGrenadeLaunch( vec3_t org, gedict_t * shooter )
 	newmis->s.v.solid = SOLID_BBOX;
 	newmis->s.v.classname = "grenade";
 	newmis->s.v.weapon = 10;
-	if( tf_data.lan_mode )
+	if( tfset(lan_mode) )
 	{
 		newmis->s.v.touch = ( func_t ) GrenadeTouch;
 		newmis->s.v.think = ( func_t ) GrenadeExplode;
@@ -125,7 +125,7 @@ void MirvGrenadeLaunch( vec3_t org, gedict_t * shooter )
 	newmis->s.v.velocity[1] = ydir * 2;
 	newmis->s.v.velocity[2] = zdir * 15 + 1;
 	SetVector( newmis->s.v.avelocity, 250, 300, 400 );
-	if ( tf_data.birthday == 1 && g_random(  ) < 0.3 )
+	if ( tfset(birthday) && g_random(  ) < 0.3 )
 		setmodel( newmis, "progs/grenade3.mdl" );
 	else
 		setmodel( newmis, "progs/grenade2.mdl" );
@@ -195,7 +195,7 @@ void TeamFortress_SetDetpack( float timer )
 
 	if ( !( self->weapons_carried & WEAP_DETPACK ) && !tg_data.tg_enabled )
 		return;
-	if ( (tf_data.disable_grens & DG_TYPE_DETPACK) && !tg_data.tg_enabled )
+	if ( (tfset_disable_grens & DG_TYPE_DETPACK) && !tg_data.tg_enabled )
 		return;
 	if ( self->ammo_detpack <= 0 && !tg_data.tg_enabled )
 		return;
@@ -217,7 +217,7 @@ void TeamFortress_SetDetpack( float timer )
 			G_sprint( self, 2, "You can't set a detpack on a dispenser!\n" );
 			return;
 		}
-		if ( tf_data.birthday == 1 && streq( at_spot->mdl, "progs/detpack2.mdl" ) )
+		if ( tfset(birthday) && streq( at_spot->mdl, "progs/detpack2.mdl" ) )
 		{
 			G_sprint( self, 2, "Detpacks can't be stacked!\n" );
 			return;
@@ -228,11 +228,11 @@ void TeamFortress_SetDetpack( float timer )
 			return;
 		}
 	}
-	if ( tf_data.detpack_block )
+	if ( tfset(detpack_block) )
 	{
 		for ( at_spot = world; (at_spot = trap_findradius( at_spot, self->s.v.origin, 100 )); )
 		{
-			if ( tf_data.birthday == 1 && streq( at_spot->mdl, "progs/detpack2.mdl" ) )
+			if ( tfset(birthday) && streq( at_spot->mdl, "progs/detpack2.mdl" ) )
 			{
 				G_sprint( self, 2, "Detpacks can't be stacked!\n" );
 				return;
@@ -353,7 +353,7 @@ void TeamFortress_DetpackSet(  )
 	newmis->weaponmode = 0;        // Detpack weaponmode = 1 when disarming
 	newmis->s.v.touch = ( func_t ) TeamFortress_DetpackTouch;
 
-	if ( tf_data.birthday == 1 )
+	if ( tfset(birthday) )
 		setmodel( newmis, "progs/detpack2.mdl" );
 	else
 		setmodel( newmis, "progs/detpack.mdl" );
@@ -397,7 +397,7 @@ void TeamFortress_DetpackExplode(  )
 	G_bprint( 1, "FIRE IN THE HOLE!\n" );
 
 	sound( self, 1, "weapons/detpack.wav", 1, 0 );
-	if ( tf_data.birthday == 1 )
+	if ( tfset(birthday) )
 		G_bprint( 1, "%s spreads good cheer!\n", self->real_owner->s.v.netname );
 
 	// Check the pointcontents to prevent detpack outside the world
@@ -534,7 +534,7 @@ void TeamFortress_DetpackDisarm(  )
 		dremove( self );
 		return;
 	}
-	if ( tf_data.birthday == 1 )
+	if ( tfset(birthday) )
 	{
 		G_bprint( 1, "%s stole %s's birthday present!\n", owner->s.v.netname, enemy->real_owner->s.v.netname );
 	} else

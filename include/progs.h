@@ -392,7 +392,7 @@ typedef enum arena_modes_e
 typedef struct tf_server_data_s {
     int            toggleflags;
     //int            live_camera;
-    int            clanbattle;
+    /*int            clanbattle;
     int            game_locked;
     int            spy_off;
     int            old_grens;
@@ -402,7 +402,6 @@ typedef struct tf_server_data_s {
     int            allow_hook;
     int            allow_drop_goal;
     int            birthday;
-    int            topcolor_check;
     //             sentry_types_t                                                       sentry_type;
     qboolean       sg_newfind;
     qboolean       sg_rfire;
@@ -415,8 +414,6 @@ typedef struct tf_server_data_s {
     int            lan_mode;
    //not bool settings 
     float          respawn_delay_time;
-    float          cb_prematch_time;
-    float          cb_ceasefire_time;
     float          autokick_time;
     int            autokick_kills;
     int            disable_grens;
@@ -428,8 +425,13 @@ typedef struct tf_server_data_s {
     int            new_gas;
     int            gren2box;
     //bot
-    int            enable_bot;
+    int            enable_bot;*/
     arena_modes_t  arena_mode;
+
+    int            topcolor_check;
+
+    float          cb_prematch_time;
+    float          cb_ceasefire_time;
 
     float          clan_scores_dumped;
     int            deathmsg;

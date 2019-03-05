@@ -104,14 +104,14 @@ void TG_Cmd()
     {
         if(argc<3)
         {
-            G_sprint(self, 2, "sgppl %d\n",tf_data.sgppl);
+            G_sprint(self, 2, "sgppl %d\n",tfset_sgppl);
             return;
         }
 
         trap_CmdArgv( 2, st, sizeof( st ) );
-        tf_data.sgppl = atoi(st);
-        if( tf_data.sgppl < 0)
-            tf_data.sgppl = 0;
+        tfset_sgppl = atoi(st);
+        if( tfset_sgppl < 0)
+            tfset_sgppl = 0;
         return;
     }
 
@@ -283,7 +283,7 @@ void TG_Eff_Remove( gedict_t * pl )
 		if ( te->s.v.think != ( func_t ) ConcussionGrenadeTimer &&
 		     te->s.v.think != ( func_t ) OldConcussionGrenadeTimer )
 			continue;
-		if ( tf_data.old_grens == 1 )
+		if ( tfset(old_grens) == 1 )
         {
 			stuffcmd( pl, "v_idlescale 0\nfov 90\n" );
             pl->eff_info.conc_idle = 0;
@@ -304,7 +304,7 @@ void TG_Eff_Remove( gedict_t * pl )
 
 			ResetGasSkins( pl );
 
-			if ( tf_data.new_gas & GAS_MASK_PALETTE )
+			if ( tfset_new_gas & GAS_MASK_PALETTE )
 				stuffcmd( pl, "v_cshift; wait; bf\n" );
 			dremove( te );
 			break;
@@ -339,7 +339,7 @@ void TG_Eff_Remove( gedict_t * pl )
 				continue;
 
 			pl->FlashTime = 0;
-			if ( tf_data.new_flash )
+			if ( tfset(new_flash) )
 				disableupdates( pl, -1 );	/* server-side flash */
 			break;
 		}
