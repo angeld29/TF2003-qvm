@@ -405,7 +405,7 @@ void TeamFortress_ChangeClass(  )
 			TeamFortress_DisplayLegalClasses(  );
 			return;
 		}
-		if ( tfset(spy_off) == 1 && self->s.v.impulse - TF_CHANGEPC == 8 )
+		if ( tfset(spy_off) && self->s.v.impulse - TF_CHANGEPC == 8 )
 		{
 			G_sprint( self, 2, "The spy class has been disabled on the server by the administrator.\n" );
 			return;
@@ -445,7 +445,7 @@ void TeamFortress_ChangeClass(  )
 		TeamFortress_DisplayLegalClasses(  );
 		return;
 	}
-	if ( tfset(spy_off) == 1 && self->s.v.impulse - TF_CHANGEPC == 8 )
+	if ( tfset(spy_off) && self->s.v.impulse - TF_CHANGEPC == 8 )
 	{
 		G_sprint( self, 2, "The spy class has been disabled on the server by the administrator.\n" );
 		return;
@@ -1212,7 +1212,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) NormalGrenadeExplode;
 		newmis->s.v.skin = 0;
 		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/hgren2.mdl" );
@@ -1222,7 +1222,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) ConcussionGrenadeExplode;
 		newmis->s.v.skin = 1;
 		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/hgren2.mdl" );
@@ -1233,7 +1233,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) NailGrenadeExplode;
 		newmis->s.v.skin = 1;
 		SetVector( newmis->s.v.avelocity, 0, 300, 0 );
-		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/biggren.mdl" );
@@ -1244,7 +1244,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) MirvGrenadeExplode;
 		newmis->s.v.skin = 0;
 		SetVector( newmis->s.v.avelocity, 0, 300, 0 );
-		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/biggren.mdl" );
@@ -1255,7 +1255,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) NapalmGrenadeExplode;
 		newmis->s.v.skin = 2;
 		SetVector( newmis->s.v.avelocity, 0, 300, 0 );
-		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/biggren.mdl" );
@@ -1267,7 +1267,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) FlareGrenadeExplode;
 		newmis->s.v.skin = 1;
 		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			newmis->mdl = "flare";
@@ -1280,7 +1280,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) GasGrenadeExplode;
 		newmis->s.v.skin = 3;
 		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/grenade2.mdl" );
@@ -1291,7 +1291,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) EMPGrenadeExplode;
 		newmis->s.v.skin = 4;
 		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/grenade2.mdl" );
@@ -1302,7 +1302,7 @@ void TeamFortress_GrenadePrimed(  )
 		newmis->s.v.think = ( func_t ) FlashGrenadeExplode;
 		newmis->s.v.skin = 2;
 		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
+		if ( tfset(birthday) && g_random(  ) < 0.6 )
 			setmodel( newmis, "progs/grenade3.mdl" );
 		else
 			setmodel( newmis, "progs/hgren2.mdl" );
@@ -1351,7 +1351,7 @@ int IsLegalClass( int pc )
 	int     bit;
 
 
-	if ( tfset(spy_off) == 1 && pc == 8 )
+	if ( tfset(spy_off) && pc == 8 )
 		return 0;
 	bit = classbits[pc];
 	if ( ( illegalclasses[0] & bit ) || ( TeamFortress_TeamGetIllegalClasses( self->team_no ) & bit ) )
@@ -1635,7 +1635,7 @@ void TeamFortress_SetEquipment(  )
 		te->s.v.owner = EDICT_TO_PROG( self );
 		te->s.v.classname = "timer";
 	}
-	if ( pc == PC_SPY && tfset(invis_only) == 1 )
+	if ( pc == PC_SPY && tfset(invis_only) )
 	{
 		te = spawn(  );
 		te->s.v.nextthink = g_globalvars.time + PC_SPY_CELL_REGEN_TIME;
@@ -2084,7 +2084,7 @@ void TeamFortress_DropAmmo( int type )
 	newmis->s.v.think = ( func_t ) TeamFortress_AmmoboxRemove;//SUB_Remove;
 	newmis->s.v.touch = ( func_t ) TeamFortress_AmmoboxTouch;
 	newmis->s.v.skin = type - 1;
-	if ( tfset(birthday) == 1 && g_random(  ) < 0.6 )
+	if ( tfset(birthday) && g_random(  ) < 0.6 )
 		setmodel( newmis, "progs/grenade3.mdl" );
 	else
 		setmodel( newmis, "progs/ammobox.mdl" );
@@ -2393,7 +2393,7 @@ void TeamFortress_ExplodePerson(  )
 	}
 	setsize( newmis, 0, 0, 0, 0, 0, 0 );
 	setorigin( newmis, PASSVEC3( owner->s.v.origin ) );
-	if ( tfset(birthday) == 1 )
+	if ( tfset(birthday) )
 		G_bprint( 1, explode_msgs[0], owner->s.v.netname );
 	else
 	{

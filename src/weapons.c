@@ -356,7 +356,7 @@ void W_FireMedikit(  )
 					if ( te->s.v.think != ( func_t ) ConcussionGrenadeTimer &&
 						te->s.v.think != ( func_t ) OldConcussionGrenadeTimer )
 						continue;
-					if ( tfset(old_grens) == 1 )
+					if ( tfset(old_grens) )
                     {
 						stuffcmd( trace_ent, "v_idlescale 0\nfov 90\n" );
                         trace_ent->eff_info.conc_idle = 0;
@@ -1492,7 +1492,7 @@ void W_FireGrenade(  )
 			increment_team_pipebombs( self->team_no );
 			num_team_pipes = num_team_pipebombs[self->team_no];
 
-			if ( num_pipes == 0  && tfset(add_pipe) == 1)
+			if ( num_pipes == 0  && tfset(add_pipe))
 			{
 				if ( num_team_pipes > MAX_WORLD_PIPEBOMBS / number_of_teams + 1 )
 					ExplodeOldPipebomb( self->team_no, 1 );
@@ -1504,7 +1504,7 @@ void W_FireGrenade(  )
 		} else
 		{
 			increment_team_pipebombs( self->team_no );
-			if ( num_pipes == 0 && tfset(add_pipe) == 1)
+			if ( num_pipes == 0 && tfset(add_pipe) )
 			{
 				if ( num_team_pipebombs[0] > MAX_WORLD_PIPEBOMBS + 1 )
 					ExplodeOldPipebomb( 0, 1 );
@@ -1542,7 +1542,7 @@ void W_FireGrenade(  )
 	SetVector( newmis->s.v.avelocity, 300, 300, 300 );
 	vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
 	newmis->s.v.think = ( func_t ) GrenadeExplode;
-	if ( tfset(birthday) == 1 && g_random(  ) < 0.2 )
+    if ( tfset(birthday) && g_random(  ) < 0.2 )
 		setmodel( newmis, "progs/grenade3.mdl" );
 	else
 		setmodel( newmis, "progs/grenade2.mdl" );

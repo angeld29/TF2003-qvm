@@ -1845,7 +1845,7 @@ void CheckPowerups()
         self->s.v.modelindex = modelindex_null;
     else
     {
-        if ( self->is_undercover == 1 && tfset(invis_only) == 1 )
+        if ( self->is_undercover == 1 && tfset(invis_only) )
         {
             self->s.v.frame = 0;
             self->s.v.modelindex = modelindex_eyes;
@@ -2394,7 +2394,7 @@ void ClientObituary( gedict_t * targ, gedict_t * attacker )
         if ( targ == attacker )
         {
             TF_AddFrags( attacker, -1 );
-            if ( tfset(birthday) == 1 && g_random() < 0.3 )
+            if ( tfset(birthday) && g_random() < 0.3 )
             {
                 if ( g_random() < 0.1 )
                 {

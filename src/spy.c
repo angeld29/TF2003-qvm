@@ -911,7 +911,7 @@ void TeamFortress_SpyFeignDeath( int issilent )
 		{
 			if ( streq( at_spot->mdl, "progs/detpack.mdl" ) )
 				j = 1;
-			if ( streq( at_spot->mdl, "progs/detpack2.mdl" ) && tfset(birthday) == 1 )
+			if ( streq( at_spot->mdl, "progs/detpack2.mdl" ) && tfset(birthday) )
 				j = 1;
 			if ( streq( at_spot->mdl, "progs/turrbase.mdl" ) )
 				j = 1;
@@ -1000,7 +1000,7 @@ void TeamFortress_SpyGoUndercover(  )
 	gedict_t *te;
 
 
-	if ( tfset(invis_only) == 1 )
+	if ( tfset(invis_only) )
 	{
 	        // If the spy is already invisible, become visible
 		if ( ( int ) self->s.v.effects & ( EF_DIMLIGHT | EF_BRIGHTLIGHT ) )
@@ -1099,7 +1099,7 @@ void TeamFortress_SpyUndercoverThink(  )
 		return;
 	if ( owner->is_undercover == 2 )
 	{
-		if ( tfset(invis_only) == 1 )
+		if ( tfset(invis_only) )
 		{
 			owner->s.v.items = ( int ) owner->s.v.items | IT_INVISIBILITY;
 			owner->s.v.frame = 0;

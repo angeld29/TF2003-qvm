@@ -894,7 +894,7 @@ void ThrowGib( char *gibname, float dm )
 {
 	newmis = spawn(  );
 	VectorCopy( self->s.v.origin, newmis->s.v.origin );
-	if ( tfset(birthday) == 1 && g_random(  ) < 0.3 )
+	if ( tfset(birthday) && g_random(  ) < 0.3 )
 	{
 		setmodel( newmis, "progs/grenade3.mdl" );
 		newmis->s.v.skin = g_random(  ) * 4;
