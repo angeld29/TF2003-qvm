@@ -1437,73 +1437,73 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 	if ( winners == 1 )
 		TeamFortress_TeamShowScores( 2 );
 	if ( CTF_Map == 1 && AP && AP != world )
-	{
-                switch( Goal->goal_no ) 
+    {
+        switch( Goal->goal_no ) 
+        {
+            case 1:
+                for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
                 {
-                      case 1:
-  			for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
-  			{
-  				if ( te->team_no == 2 )
-  				{
-  					if ( te == AP )
-  					{
-  					        CenterPrint( te, ctf_msgs_you_take_flag[(int)g_random()*num_ctf_msgs]);
-  					} else
-  						CenterPrint( te, ctf_msg_your_team_gotflag );
-  				} else
-  					CenterPrint( te, ctf_msg_your_flag_taken );
-  			}
-  			G_bprint( 2, "%s " _G _O _T " the " _B _L _U _E " flag!\n", AP->s.v.netname );
-  			AP->s.v.items = ( int ) AP->s.v.items | IT_KEY1;
-                        break;
-                      case 2:
-  			for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
-  			{
-  				if ( te->team_no == 1 )
-  				{
-  					if ( te == AP )
-  					{
-  					        CenterPrint( te, ctf_msgs_you_take_flag[(int)g_random()*num_ctf_msgs]);
-  					} else
-  						CenterPrint( te, ctf_msg_your_team_gotflag );
-  				} else
-  					CenterPrint( te, ctf_msg_your_flag_taken );
-  			}
-  			G_bprint( 2, "%s " _G _O _T " the " _R _E _D " flag!\n", AP->s.v.netname );
-  			AP->s.v.items = ( int ) AP->s.v.items | IT_KEY2;
-                        break;
-                      case 3:
-  			for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
-  			{
-       				if ( te->team_no == 2 )
-       				{
-       					if ( te == AP )
-       						CenterPrint( te,"\n\n\nYou " _C _A _P _T _U _R _E _D " the flag!!" );
-       					else
-       						CenterPrint( te,"\n\n\nYour flag was " _C _A _P _T _U _R _E _D "!!" );
-       				} else
-       					CenterPrint( te, "\n\n\nYour team " _C _A _P _T _U _R _E _D " the flag!!" );
-       			}
-       			G_bprint( 2, "%s " _C _A _P _T _U _R _E _D " the " _R _E _D " flag!\n", AP->s.v.netname );
-       			AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY2 );
-                        break;
-                      case 4:
-  			for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
-  			{
-       				if ( te->team_no == 1 )
-       				{
-       					if ( te == AP )
-       						CenterPrint( te,"\n\n\nYou " _C _A _P _T _U _R _E _D " the flag!!" );
-       					else
-       						CenterPrint( te,"\n\n\nYour flag was " _C _A _P _T _U _R _E _D "!!" );
-       				} else
-       					CenterPrint( te, "\n\n\nYour team " _C _A _P _T _U _R _E _D " the flag!!" );
-       			}
-       			G_bprint( 2, "%s " _C _A _P _T _U _R _E _D " the " _B _L _U _E " flag!\n", AP->s.v.netname );
-       			AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY1 );
-                        break;
+                    if ( te->team_no == 2 )
+                    {
+                        if ( te == AP )
+                        {
+                            CenterPrint( te, ctf_msgs_you_take_flag[(int)g_random()*num_ctf_msgs]);
+                        } else
+                            CenterPrint( te, ctf_msg_your_team_gotflag );
+                    } else
+                        CenterPrint( te, ctf_msg_your_flag_taken );
                 }
-	}
+                G_bprint( 2, "%s " _G _O _T " the " _B _L _U _E " flag!\n", AP->s.v.netname );
+                AP->s.v.items = ( int ) AP->s.v.items | IT_KEY1;
+                break;
+            case 2:
+                for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
+                {
+                    if ( te->team_no == 1 )
+                    {
+                        if ( te == AP )
+                        {
+                            CenterPrint( te, ctf_msgs_you_take_flag[(int)g_random()*num_ctf_msgs]);
+                        } else
+                            CenterPrint( te, ctf_msg_your_team_gotflag );
+                    } else
+                        CenterPrint( te, ctf_msg_your_flag_taken );
+                }
+                G_bprint( 2, "%s " _G _O _T " the " _R _E _D " flag!\n", AP->s.v.netname );
+                AP->s.v.items = ( int ) AP->s.v.items | IT_KEY2;
+                break;
+            case 3:
+                for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
+                {
+                    if ( te->team_no == 2 )
+                    {
+                        if ( te == AP )
+                            CenterPrint( te,"\n\n\nYou " _C _A _P _T _U _R _E _D " the flag!!" );
+                        else
+                            CenterPrint( te,"\n\n\nYour flag was " _C _A _P _T _U _R _E _D "!!" );
+                    } else
+                        CenterPrint( te, "\n\n\nYour team " _C _A _P _T _U _R _E _D " the flag!!" );
+                }
+                G_bprint( 2, "%s " _C _A _P _T _U _R _E _D " the " _R _E _D " flag!\n", AP->s.v.netname );
+                AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY2 );
+                break;
+            case 4:
+                for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
+                {
+                    if ( te->team_no == 1 )
+                    {
+                        if ( te == AP )
+                            CenterPrint( te,"\n\n\nYou " _C _A _P _T _U _R _E _D " the flag!!" );
+                        else
+                            CenterPrint( te,"\n\n\nYour flag was " _C _A _P _T _U _R _E _D "!!" );
+                    } else
+                        CenterPrint( te, "\n\n\nYour team " _C _A _P _T _U _R _E _D " the flag!!" );
+                }
+                G_bprint( 2, "%s " _C _A _P _T _U _R _E _D " the " _B _L _U _E " flag!\n", AP->s.v.netname );
+                AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY1 );
+                break;
+        }
+    }
 //	gotone = 0;
 	for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )        
 	{

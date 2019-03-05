@@ -60,7 +60,7 @@ int CountPlayers()
 	int 		num = 0;
 
 	while((p = trap_find(p, FOFS(s.v.classname), "player"))) 
-		if(p->s.v.netname[0]) 
+		if(p->s.v.netname[0] && !p->isBot) 
 			num++;
 
 	return num;

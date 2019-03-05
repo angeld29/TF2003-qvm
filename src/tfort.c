@@ -501,6 +501,13 @@ void TeamFortress_ChangeClass(  )
 		self->tfstate |= 8;
 		self->playerclass = 1 + (int)( g_random(  ) * ( 10 - 1 ) );
 	}
+	TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & 8 );
+	TeamFortress_SetEquipment(  );
+	TeamFortress_SetHealth(  );
+	TeamFortress_PrepareForArenaRespawn();
+	TeamFortress_SetSpeed( self );
+	TeamFortress_SetSkin( self );
+	TeamFortress_ExecClassScript( self );
 	if ( streq( spot->s.v.classname, "info_player_teamspawn" ) && tf_data.cb_prematch_time < g_globalvars.time )
 	{
 		if ( spot->s.v.items )
@@ -540,13 +547,6 @@ void TeamFortress_ChangeClass(  )
 			TeamFortress_PrintClassName( spot, self->playerclass, self->tfstate & 8 );
 		}
 	}
-	TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & 8 );
-	TeamFortress_SetEquipment(  );
-	TeamFortress_SetHealth(  );
-	TeamFortress_PrepareForArenaRespawn();
-	TeamFortress_SetSpeed( self );
-	TeamFortress_SetSkin( self );
-	TeamFortress_ExecClassScript( self );
 	if ( tf_data.cease_fire )
 	{
 		G_sprint( self, 2, "\n\nCEASE FIRE MODE\n" );
