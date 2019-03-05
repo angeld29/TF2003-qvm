@@ -1014,7 +1014,10 @@ void TeamFortress_PrimeGrenade(  )
 			gtype = 0;
 
 		if ( tfset_disable_grens & ( 1 << gtype ) )
+        {
+            G_sprint( self, 2, "gren disabled %d %d\n", tfset_disable_grens, gtype );
 			return;
+        }
 
 		if ( self->no_grenades_1 > 0 || tg_data.unlimit_grens )
 		{
@@ -1135,7 +1138,7 @@ void TeamFortress_PrimeGrenade(  )
 	if( gtype < 0 )
 		return;
 
-	self->tfstate |= 1;
+	self->tfstate |= TFSTATE_GRENPRIMED;
 	tGrenade = spawn(  );
 	tGrenade->s.v.owner = EDICT_TO_PROG( self );
 	tGrenade->s.v.weapon = gtype;

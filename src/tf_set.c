@@ -102,25 +102,25 @@ static const set_set_t set_sg_sfire[] = {
 };
 
 set_item_t tf_settings[] = {
-    { "Settings bits", "", "",  TFS_INT_BITS, 0, sv_settings_bits, NULL, "0" },
-    { "Toggle flags", "", "",  TFS_INT_BITS, 0, toggleflags_bits, NULL, "0" },
-    { "Autoteam time", "autoteam", "a",  TFS_FLOAT, 0, NULL, NULL, "0"  },
-    { "Respawn delay", "respawn_delay", "rd",  TFS_FLOAT, 0, NULL, NULL, "0"  },
-    { "Prematch time", "prematch", "pm",  TFS_FLOAT, 0, NULL, NULL, "0"  },
-    { "CeaseFire time", "ceasefire_time", "cft",  TFS_FLOAT, 0, NULL, NULL, "0"  },
-    { "Autokick time", "autokick_time", "akt",  TFS_INT, 0, NULL, NULL, "0"  },
-    { "Autokick kills", "autokick_kills", "akk",  TFS_INT, 0, NULL, NULL, "0"  },
-    { "Cheat Pause", "cheat_pause", "cp",  TFS_INT, 0, NULL, NULL, "1"  },
-    { "Disable Grenades", "disable_grens", "dg",  TFS_INT_BITS, 0, tf_set_disablegren, NULL, "0"  },
-    { "Sentry ppl emulation", "sgppl", "",  TFS_INT, 12, NULL, NULL, "12"  },
-    { "Sentry shells fire", "sg_sfire", "",  TFS_INT_SET, SG_SFIRE_NEW, NULL, set_sg_sfire, "0"  },
-    { "Sniper fps", "snip_fps", "sf",  TFS_INT, 0, NULL, NULL, "72"  },
-    { "Sniper ammo on shot", "snip_ammo", "",  TFS_INT, 0, NULL, NULL, "1"  },
-    { "Sniper reload time", "snip_time", "",  TFS_FLOAT, 0, NULL, NULL, "1.5" },
-    { "Gas grenade effects", "new_gas", "",  TFS_INT_BITS, 131, tf_set_gas, NULL, "131"  },
-    { "Extended backpack", "gren2box", "g2b",  TFS_INT_BITS, 0, tf_set_gren2box, NULL, "0"  },
-    { "Arena Mode", "arena", "",  TFS_INT, 0, NULL, NULL, "0"  },
-    { NULL } 
+/*0 */    { "Settings bits", "", "",  TFS_INT_BITS, 0, sv_settings_bits, NULL, "0" },
+/*1 */    { "Toggle flags", "", "",  TFS_INT_BITS, 0, toggleflags_bits, NULL, "0" },
+/*2 */    { "Autoteam time", "autoteam", "a",  TFS_FLOAT, 0, NULL, NULL, "0"  },
+/*3 */    { "Respawn delay", "respawn_delay", "rd",  TFS_FLOAT, 0, NULL, NULL, "0"  },
+/*4 */    { "Prematch time", "prematch", "pm",  TFS_FLOAT, 0, NULL, NULL, "0"  },
+/*5 */    { "CeaseFire time", "ceasefire_time", "cft",  TFS_FLOAT, 0, NULL, NULL, "0"  },
+/*6 */    { "Autokick time", "autokick_time", "akt",  TFS_INT, 0, NULL, NULL, "0"  },
+/*7 */    { "Autokick kills", "autokick_kills", "akk",  TFS_INT, 0, NULL, NULL, "0"  },
+/*8 */    { "Cheat Pause", "cheat_pause", "cp",  TFS_INT, 0, NULL, NULL, "1"  },
+/*9 */    { "Disable Grenades", "disable_grens", "dg",  TFS_INT_BITS, 0, tf_set_disablegren, NULL, "0"  },
+/*10*/    { "Sentry ppl emulation", "sgppl", "",  TFS_INT, 12, NULL, NULL, "12"  },
+/*11*/    { "Sentry shells fire", "sg_sfire", "",  TFS_INT_SET, SG_SFIRE_NEW, NULL, set_sg_sfire, "0"  },
+/*12*/    { "Sniper fps", "snip_fps", "sf",  TFS_INT, 0, NULL, NULL, "72"  },
+/*13*/    { "Sniper ammo on shot", "snip_ammo", "",  TFS_INT, 0, NULL, NULL, "1"  },
+/*14*/    { "Sniper reload time", "snip_time", "",  TFS_FLOAT, 0, NULL, NULL, "1.5" },
+/*15*/    { "Gas grenade effects", "new_gas", "",  TFS_INT_BITS, 131, tf_set_gas, NULL, "131"  },
+/*16*/    { "Extended backpack", "gren2box", "g2b",  TFS_INT_BITS, 0, tf_set_gren2box, NULL, "0"  },
+/*17*/    { "Arena Mode", "arena", "",  TFS_INT, 0, NULL, NULL, "0"  },
+/*  */    { NULL } 
 };
 
 char           *G_NewString( const char *string );
