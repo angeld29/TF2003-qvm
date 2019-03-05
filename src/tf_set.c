@@ -186,7 +186,7 @@ static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oni
                 if( val && val[0] ){
                     si->val._int = atoi(val);
                 }
-                if( !oninit ){
+                if( oninit != TFSET_LOCALINFO ){
                     G_conprintf( "%s:%s: %d\n", si->key, si->name, si->val._uint );
                     _tfset_print_bits( si->val._uint, si->bitsdesc );
                 }
@@ -206,17 +206,17 @@ static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oni
                         si->val._uint -= si->val._uint & sb->bit;
                     }
                 }
-                if( !oninit )
+                if( oninit != TFSET_LOCALINFO )
                     G_conprintf( "%s:%s: %s\n", sb->key, sb->name, bit_set? _ON: _OFF );
             }
             break;
         case TFS_INT:
             if( val && val[0] ) si->val._int = atoi( val );
-            if( !oninit ) G_conprintf( "%s:%s: %d\n", si->key, si->name, si->val._int );
+            if( oninit != TFSET_LOCALINFO ) G_conprintf( "%s:%s: %d\n", si->key, si->name, si->val._int );
             break;
         case TFS_FLOAT:
             if( val && val[0] ) si->val._int = atof( val );
-            if( !oninit ) G_conprintf( "%s:%s: %.2f\n", si->key, si->name, si->val._float );
+            if( oninit != TFSET_LOCALINFO ) G_conprintf( "%s:%s: %.2f\n", si->key, si->name, si->val._float );
             break;
         case TFS_STRING:
             if( val && val[0] ){
@@ -237,13 +237,13 @@ static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oni
                     si->val._int = 0;
                 }
             }
-            if( !oninit ) G_conprintf( "%s:%s: %s\n", si->key, si->name, si->val._int? _ON : _OFF );
+            if( oninit != TFSET_LOCALINFO ) G_conprintf( "%s:%s: %s\n", si->key, si->name, si->val._int? _ON : _OFF );
             break;
         case TFS_INT_SET:
             if( val && val[0] ){
                 si->val._int = _tf_get_setval_by_name( val, si->setdesc, atoi( si->default_val ));
             }
-            if( !oninit ) G_conprintf( "%s:%s: %s\n", si->key, si->name, _tf_get_setname_by_val(si->val._int, si->setdesc ) );
+            if( oninit != TFSET_LOCALINFO ) G_conprintf( "%s:%s: %s\n", si->key, si->name, _tf_get_setname_by_val(si->val._int, si->setdesc ) );
             break;
         default: 
             break;
@@ -298,12 +298,13 @@ void   TF_Set_Cmd( int argc  )
 {
     char    name[64];
     char    val[64] = "";
+    int is_init = g_globalvars.self == 0 ? TFSET_MOD_CONSOLE  : 0;
 
     
     if( argc == 2 ) {
         set_item_t* si = &tf_settings[0];
         for(; si->name; si++ ){
-            tf_set_val( si, -1, NULL, 0 );
+            tf_set_val( si, -1, NULL, is_init );
         }
         return;
     }
@@ -312,7 +313,7 @@ void   TF_Set_Cmd( int argc  )
     if( argc == 4 ){
         trap_CmdArgv( 3, val, sizeof( val ) );
     }
-    tf_set( name, val, 0 );
+    tf_set( name, val, is_init );
 
 }
 
@@ -331,14 +332,14 @@ void   TF_LocalinfoSettings( )
     for(; si->name; si++ ){
         if( si->key && si->key[0] ){
             GetSVInfokeyString( si->key, si->key2, value, sizeof( value ), si->default_val);
-            if( value[0] ) tf_set( si->key, value, 1);
+            if( value[0] ) tf_set( si->key, value, TFSET_LOCALINFO);
         }
         if( si->type == TFS_INT_BITS ){
             const set_bits_t* sb = si->bitsdesc;
             for(; sb->name; sb++ ){
                 if( sb->key && sb->key[0] ){
                     GetSVInfokeyString( sb->key, sb->key2, value, sizeof( value ), sb->default_val? "1":"0");
-                    if( value[0] ) tf_set( sb->key, value, 1);
+                    if( value[0] ) tf_set( sb->key, value, TFSET_LOCALINFO);
                 }
             }
         }
