@@ -327,7 +327,7 @@ void TeamFortress_EngineerBuild(  )
     // Pop up the menu
     if ( !self->is_building )
     {
-        if(!tg_data.tg_enabled)
+        if(!tfset(tg_enabled))
         {
             if ( self->s.v.ammo_cells < 100 && !self->has_dispenser && !self->has_sentry )
             {
@@ -459,7 +459,7 @@ void TeamFortress_Build( int objtobuild )
 
     if ( objtobuild == BUILD_DISPENSER )
     {
-        if( self->has_dispenser && !tg_data.tg_enabled)
+        if( self->has_dispenser && !tfset(tg_enabled))
         {
             G_sprint( self, 2, "You can only have one dispenser.\nTry dismantling your old one.\n" );
             return;
@@ -469,13 +469,13 @@ void TeamFortress_Build( int objtobuild )
         newmis->mdl = "progs/disp.mdl";
         newmis->s.v.netname = "dispenser";
         btime = g_globalvars.time + BUILD_TIME_DISPENSER;
-        if( tg_data.tg_enabled )
+        if( tfset(tg_enabled) )
             btime = g_globalvars.time;
     } else
     {
         if ( objtobuild == BUILD_SENTRYGUN )
         {
-            if( self->has_sentry && !tg_data.tg_enabled)
+            if( self->has_sentry && !tfset(tg_enabled))
             {
                 G_sprint( self, 2, "You can only have one sentry gun.\nTry dismantling your old one.\n" );
                 return;
@@ -485,7 +485,7 @@ void TeamFortress_Build( int objtobuild )
             newmis->mdl = "progs/turrbase.mdl";
             newmis->s.v.netname = "sentrygun";
             btime = g_globalvars.time + BUILD_TIME_SENTRYGUN;
-            if( tg_data.tg_enabled )
+            if( tfset(tg_enabled) )
                 btime = g_globalvars.time;
         }else
         {
@@ -592,7 +592,7 @@ void TeamFortress_FinishedBuilding(  )
     if ( owner->is_building != 1 )
         return;
 
-    if ( self->s.v.weapon == BUILD_SENTRYGUN && tg_data.tg_enabled )
+    if ( self->s.v.weapon == BUILD_SENTRYGUN && tfset(tg_enabled) )
     {
 
         VectorCopy( self->s.v.origin, end );
@@ -618,7 +618,7 @@ void TeamFortress_FinishedBuilding(  )
         teamsprint( self->team_no, self, self->s.v.netname );
         teamsprint( self->team_no, self, " has built a Dispenser.\n" );
 
-        if( !tg_data.tg_enabled )
+        if( !tfset(tg_enabled) )
             self->s.v.ammo_cells = self->s.v.ammo_cells - 100;
 
         // Create the dispenser
@@ -678,7 +678,7 @@ void TeamFortress_FinishedBuilding(  )
             oldself->s.v.takedamage = 0;
             oldself->th_die = Sentry_Die;
             oldself->team_no = self->team_no;
-            if( !tg_data.tg_enabled )
+            if( !tfset(tg_enabled) )
                 self->s.v.ammo_cells = self->s.v.ammo_cells - 130;
 
             setsize( oldself, -16, -16, 0, 16, 16, 4 );
@@ -806,7 +806,7 @@ void Dispenser_Die(  )
 int Engineer_Dispenser_Repair( gedict_t* disp)
 {
     float metalcost;
-    if( !tg_data.tg_enabled  && (self->playerclass != PC_ENGINEER ))
+    if( !tfset(tg_enabled)  && (self->playerclass != PC_ENGINEER ))
         return 0;
     if (disp->s.v.health >= disp->s.v.max_health ) return 0;
 
@@ -821,7 +821,7 @@ int Engineer_Dispenser_Repair( gedict_t* disp)
 
 int Engineer_Dispenser_Dismantle( gedict_t* disp )
 {
-    if( !tg_data.tg_enabled  && (self->playerclass != PC_ENGINEER ))
+    if( !tfset(tg_enabled)  && (self->playerclass != PC_ENGINEER ))
         return 0;
     G_sprint( self, 2, "You dismantle the Dispenser.\n" );
     self->s.v.ammo_cells = self->s.v.ammo_cells + BUILD_COST_DISPENSER / 2;
@@ -843,7 +843,7 @@ void Engineer_UseDispenser( gedict_t * disp )
 {
     gedict_t *dist_checker;
 
-    if( !tg_data.tg_enabled  && (self->playerclass != PC_ENGINEER ))
+    if( !tfset(tg_enabled)  && (self->playerclass != PC_ENGINEER ))
         return;
     if (!tfset(old_spanner)) {
         if( self->team_no && TeamFortress_isTeamsAllied( self->team_no , disp->real_owner->team_no) ){
@@ -877,11 +877,11 @@ void Engineer_UseDispenser( gedict_t * disp )
 // Sentry stuff
 int Engineer_SentryGun_Upgrade( gedict_t* gun )
 {
-    if( !tg_data.tg_enabled  && (self->playerclass != PC_ENGINEER ))
+    if( !tfset(tg_enabled)  && (self->playerclass != PC_ENGINEER ))
         return 0;
-    if ( gun->s.v.weapon < 3 && ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.tg_enabled ) )
+    if ( gun->s.v.weapon < 3 && ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tfset(tg_enabled) ) )
     {
-        if ( !tg_data.tg_enabled )
+        if ( !tfset(tg_enabled) )
             self->s.v.ammo_cells = self->s.v.ammo_cells - BUILD_COST_SENTRYGUN;
 
         gun->s.v.weapon = gun->s.v.weapon + 1;
@@ -906,7 +906,7 @@ int Engineer_SentryGun_Upgrade( gedict_t* gun )
 int Engineer_SentryGun_Repair( gedict_t* gun )
 {
     float metalcost;
-    if( !tg_data.tg_enabled  && (self->playerclass != PC_ENGINEER ))
+    if( !tfset(tg_enabled)  && (self->playerclass != PC_ENGINEER ))
         return 0;
     if( !(gun->s.v.health < gun->s.v.max_health && self->s.v.ammo_cells > 0)) return 0;
     metalcost = ( gun->s.v.max_health - gun->s.v.health ) / 5.0;
@@ -926,7 +926,7 @@ int Engineer_SentryGun_Repair( gedict_t* gun )
 int Engineer_SentryGun_InsertAmmo( gedict_t* gun )
 {
     int am = 20 * 2;
-    if( !tg_data.tg_enabled  && (self->playerclass != PC_ENGINEER ))
+    if( !tfset(tg_enabled)  && (self->playerclass != PC_ENGINEER ))
         return 0;
     if (!( (gun->s.v.ammo_shells < gun->maxammo_shells 
                     && self->s.v.ammo_shells > 0)
@@ -960,7 +960,7 @@ int Engineer_SentryGun_InsertAmmo( gedict_t* gun )
 
 int Engineer_SentryGun_Dismantle( gedict_t* gun )
 {
-    if( !tg_data.tg_enabled  && (self->playerclass != PC_ENGINEER ))
+    if( !tfset(tg_enabled)  && (self->playerclass != PC_ENGINEER ))
         return 0;
     G_sprint( self, 2, "You dismantle the Sentry Gun.\n" );
     self->s.v.ammo_cells = self->s.v.ammo_cells + 130 / 2;
@@ -983,7 +983,7 @@ void Engineer_UseSentryGun( gedict_t * gun )
 {
     gedict_t *dist_checker;
     int status = 0;
-    if( !tg_data.tg_enabled  && (self->playerclass != PC_ENGINEER ))
+    if( !tfset(tg_enabled)  && (self->playerclass != PC_ENGINEER ))
         return;
     // automate tasks if old_spanner setting is disabled
     if (!tfset(old_spanner)) {
@@ -1005,7 +1005,7 @@ void Engineer_UseSentryGun( gedict_t * gun )
         G_sprint( self, 2, ", %.0f rockets", gun->s.v.ammo_rockets );
     }
 
-    if ( gun->has_sentry &&  tg_data.tg_enabled )
+    if ( gun->has_sentry &&  tfset(tg_enabled) )
         G_sprint( self, 2, ", static" );
 
     G_sprint( self, 2, "\n" );
@@ -1025,7 +1025,7 @@ void 	Engineer_RotateSG(  )
     int angle;
     char    value[1024];
 
-    if( !tg_data.tg_enabled  && (self->playerclass != PC_ENGINEER ))
+    if( !tfset(tg_enabled)  && (self->playerclass != PC_ENGINEER ))
         return;
 
     if( self->current_menu != MENU_ENGINEER_FIX_SENTRYGUN )
@@ -1121,7 +1121,7 @@ void DestroyBuilding( gedict_t * eng, char *bld )
                 te->real_owner->current_menu = MENU_DEFAULT;
                 te->real_owner->building = world;
             }
-            if( tg_data.tg_enabled )
+            if( tfset(tg_enabled) )
                 te->has_sentry = 0;
             TF_T_Damage( te, world, world, 500, 0, 0 );
         }
@@ -1145,7 +1145,7 @@ void Engineer_RemoveBuildings( gedict_t * eng )
 void Eng_SGUp(  )
 {
     gedict_t *sg;
-    if(!tg_data.tg_enabled) return;
+    if(!tfset(tg_enabled)) return;
     //    int numupg = 0;
 
     for ( sg = world; (sg = trap_find( sg, FOFS( s.v.classname ), "building_sentrygun" )); )
@@ -1160,7 +1160,7 @@ void Eng_DispLoad(  )
 {
     gedict_t *disp;
     float power;
-    if(!tg_data.tg_enabled) return;
+    if(!tfset(tg_enabled)) return;
 
     for ( disp = world; (disp = trap_find( disp, FOFS( s.v.classname ), "building_dispenser" )); )
     {
@@ -1184,7 +1184,7 @@ void Eng_DispUnload(  )
 {
     gedict_t *disp;
     float power;
-    if(!tg_data.tg_enabled) return;
+    if(!tfset(tg_enabled)) return;
 
     for ( disp = world; (disp = trap_find( disp, FOFS( s.v.classname ), "building_dispenser" )); )
     {
@@ -1207,7 +1207,7 @@ void Eng_DispUnload(  )
 void Eng_SGReload(  )
 {
     gedict_t *sg;
-    if(!tg_data.tg_enabled) return;
+    if(!tfset(tg_enabled)) return;
 
     for ( sg = world; (sg = trap_find( sg, FOFS( s.v.classname ), "building_sentrygun" )); )
     {

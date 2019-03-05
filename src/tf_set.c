@@ -303,6 +303,7 @@ extern char    nextmap[64];
 void   TF_LocalinfoSettings( )
 {
     char    value[100];
+    char    st[10];
     gedict_t *ent;
     gedict_t *te;
     int i;
@@ -527,62 +528,41 @@ void   TF_LocalinfoSettings( )
 
 
 
-    /*        tf_data.sg_newfind = true;
-              tf_data.sg_sfire   = SG_SFIRE_NEW;
-              GetSVInfokeyString( "sg", NULL, st, sizeof( st ), "new" );
-              if ( !strcmp( st, "old" ) )
-              {
-              tf_data.sg_newfind = false;
-              tf_data.sg_sfire   = SG_SFIRE_281;
-              }
+    GetSVInfokeyString( "sg", NULL, st, sizeof( st ), "new" );
+    if ( !strcmp( st, "old" ) )
+    {
+        tfset_flagoff( sg_newfind );
+        tfset_sg_sfire   = SG_SFIRE_281;
+    }
 
-              if ( !strcmp( st, "fix" ) )
-              {
-              tf_data.sg_newfind = false;
-              tf_data.sg_sfire   = SG_SFIRE_MTFL2;
-              }
+    if ( !strcmp( st, "fix" ) )
+    {
+        tfset_flagoff( sg_newfind );
+        tfset_sg_sfire   = SG_SFIRE_MTFL2;
+    }
 
-              if ( !strcmp( st, "oldmtfl" ) )
-              {
-              tf_data.sg_newfind = false;
-              tf_data.sg_sfire   = SG_SFIRE_MTFL1;
-              }
-              if ( !strcmp( st, "mtflf" ) )
-              {
-              tf_data.sg_newfind = true;
-              tf_data.sg_sfire   = SG_SFIRE_MTFL1;
-              }
+    if ( !strcmp( st, "oldmtfl" ) )
+    {
+        tfset_flagoff( sg_newfind );
+        tfset_sg_sfire   = SG_SFIRE_MTFL1;
+    }
+    if ( !strcmp( st, "mtflf" ) )
+    {
+        tfset_flagon( sg_newfind );
+        tfset_sg_sfire   = SG_SFIRE_MTFL1;
+    }
 
-              if ( !strcmp( st, "oldf" ) )
-              {
-              tf_data.sg_newfind = true;
-              tf_data.sg_sfire   = SG_SFIRE_281;
-              }
+    if ( !strcmp( st, "oldf" ) )
+    {
+        tfset_flagon( sg_newfind );
+        tfset_sg_sfire   = SG_SFIRE_281;
+    }
 
-              tf_data.sg_newfind = GetSVInfokeyBool( "sg_newfind", NULL, true );
-
-              GetSVInfokeyString( "sg_sfire", NULL, st, sizeof( st ), "new" );
-
-              if( !strcmp(st, "old"))
-              tf_data.sg_sfire = SG_SFIRE_281;
-
-              if( !strcmp(st, "mtfl1"))
-              tf_data.sg_sfire = SG_SFIRE_MTFL1;
-
-              if( !strcmp(st, "mtfl2"))
-              tf_data.sg_sfire = SG_SFIRE_MTFL2;
-
-
-              GetSVInfokeyString( "sg_rfire", NULL, st, sizeof( st ), "new" );
-
-              if( !strcmp(st, "new"))
-              tf_data.sg_rfire = true;
-              else
-              tf_data.sg_rfire = false;
-
-              tf_data.sgppl = GetSVInfokeyInt( "sgppl", NULL, 12 );
-              if ( tf_data.sgppl < 0 )
-              tf_data.sgppl = 0;*/
+    if ( !strcmp( st, "new" ) )
+    {
+        tfset_flagon( sg_newfind );
+        tfset_sg_sfire   = SG_SFIRE_NEW;
+    }
 
 
     memset( &tg_data, 0, sizeof(tg_data));

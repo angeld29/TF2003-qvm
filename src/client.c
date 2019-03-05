@@ -1321,7 +1321,7 @@ void PutClientInServer()
 
     if ( iszoom == 1 )
         self->tfstate |= TFSTATE_ZOOMOFF;
-    if ( self->playerclass != PC_ENGINEER && !tg_data.tg_enabled )
+    if ( self->playerclass != PC_ENGINEER && !tfset(tg_enabled) )
         Engineer_RemoveBuildings( self );
 
     self->s.v.takedamage = 2;
@@ -2205,7 +2205,7 @@ void ClientConnect()
     }
     if ( tf_data.cb_prematch_time > g_globalvars.time )
         G_sprint( self, 2, "CURRENTLY IN PREMATCH TIME\n" );
-    if( tg_data.tg_enabled )
+    if( tfset(tg_enabled) )
         stuffcmd( self, "exec tg.cfg\n" );
 }
 

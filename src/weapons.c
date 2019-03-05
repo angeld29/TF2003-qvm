@@ -2687,7 +2687,7 @@ void ImpulseCommands(  )
 	if ( self->s.v.impulse == TF_SPECIAL_SKILL )
 		UseSpecialSkill(  );
 
-        if( tg_data.tg_enabled )
+        if( tfset(tg_enabled) )
         {
          	switch ( ( int ) self->s.v.impulse )
          	{
@@ -2824,19 +2824,19 @@ void ImpulseCommands(  )
 		TeamFortress_DetpackStop(  );
 		break;
 	case TF_ENGINEER_DETSENTRY:
-		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
+		if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
 			DestroyBuilding( self, "building_sentrygun" );
 		break;
 	case TF_ENGINEER_DETDISP:
-		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
+		if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
 			DestroyBuilding( self, "building_dispenser" );
 		break;
 	/*case 196:
-		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
+		if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
 			DestroyBuilding( self, "building_teleporter_exit" );
 		break;
 	case 197:
-		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
+		if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
 			DestroyBuilding( self, "building_teleporter_entrance" );
 		break;*/
 	case TF_SPY_SPY:
@@ -2852,7 +2852,7 @@ void ImpulseCommands(  )
 			TeamFortress_SpyFeignDeath( 1 );
 		break;
 	case TF_ENGINEER_BUILD:
-		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )			
+		if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
 			TeamFortress_EngineerBuild(  );
 		break;
 	case AUTOSCAN_IMPULSE:

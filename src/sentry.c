@@ -449,7 +449,7 @@ void SG_Static(  )
 void Sentry_Die(  )
 {
     G_sprint( self->real_owner, 2, "Your sentry gun was destroyed.\n" );
-    if ( self->has_sentry && tg_data.tg_enabled )
+    if ( self->has_sentry && tfset(tg_enabled) )
     {
         self->s.v.health = 0;
         setmodel( self, "" );
@@ -476,7 +476,7 @@ void Sentry_Die(  )
     {
         self->real_owner->has_sentry -= 1;
 #ifdef HAS_SENTRY_CHECK
-        if(!tg_data.tg_enabled && self->real_owner->has_sentry)
+        if(!tfset(tg_enabled) && self->real_owner->has_sentry)
         {
             G_dprintf("Error SentryDie owner->has_sentry !=0 %d\n",self->real_owner->has_sentry);
             G_sprint(self->real_owner,2,"Error SentryDie owner->has_sentry !=0 %d\n",self->real_owner->has_sentry);

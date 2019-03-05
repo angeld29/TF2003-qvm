@@ -90,7 +90,7 @@ void TG_Cmd()
     int argc;
 
 
-    if( !tg_data.tg_enabled )
+    if( !tfset(tg_enabled) )
     {
         G_sprint(self, 2, "Training Ground mode not active\n");
         return;

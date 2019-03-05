@@ -94,7 +94,7 @@ void RefreshStatusBar( gedict_t * pl )
 
 	if ( pl->playerclass == 9 || ( (pl->playerclass == 2 ||
 	     pl->playerclass == 3 || pl->playerclass == 5 || 
-	     pl->playerclass == 6 || pl->playerclass == 7 || tg_data.tg_sbar) && tg_data.tg_enabled) )
+	     pl->playerclass == 6 || pl->playerclass == 7 || tg_data.tg_sbar) && tfset(tg_enabled)) )
 	{			/// eng sbar
 	        status = GetEngSbar( pl );
 	} else
@@ -279,7 +279,7 @@ const char* GetEngSbar( gedict_t * pl )
         	{
         		if ( te->real_owner != pl )
         			continue;
-        		if ( (te->has_sentry && te->s.v.health <= 0 ) && tg_data.tg_enabled )
+        		if ( (te->has_sentry && te->s.v.health <= 0 ) && tfset(tg_enabled) )
         		{
         			strcat( strp, "SENTRY:dead " );
         			break;

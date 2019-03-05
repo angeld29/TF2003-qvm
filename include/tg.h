@@ -67,7 +67,7 @@ typedef enum tg_gren_effect_e
 
 
 typedef struct tf_tg_server_data_s{
- int                    tg_enabled;
+// int                    tg_enabled;
  int                    godmode;
  int                    unlimit_ammo,unlimit_grens;
  int                    disable_reload;

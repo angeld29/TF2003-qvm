@@ -527,7 +527,7 @@ void Menu_Engineer( menunum_t menu )
 	if ( self->has_dispenser )
 	{
 		s_detdisp = menu_eng_detdisp;
-		if ( tg_data.tg_enabled )
+		if ( tfset(tg_enabled) )
 			s_bdisp = menu_eng_builddisp;
 		else
 			s_bdisp = "";
@@ -535,7 +535,7 @@ void Menu_Engineer( menunum_t menu )
 	{
 
 		if ( ( self->s.v.ammo_cells < BUILD_COST_DISPENSER )
-		     && !tg_data.tg_enabled )
+		     && !tfset(tg_enabled) )
 			s_bdisp = "\n";
 		else
 			s_bdisp = menu_eng_builddisp;
@@ -546,14 +546,14 @@ void Menu_Engineer( menunum_t menu )
 	if ( self->has_sentry )
 	{
 		s_detsentry = menu_eng_detsentry;
-		if ( tg_data.tg_enabled )
+		if ( tfset(tg_enabled) )
 			s_bsentry = menu_eng_buildsentry;
 		else
 			s_bsentry = "";
 	} else
 	{
 		if ( ( self->s.v.ammo_cells < BUILD_COST_SENTRYGUN )
-		     && !tg_data.tg_enabled )
+		     && !tfset(tg_enabled) )
 			s_bsentry = "\n";
 		else
 			s_bsentry = menu_eng_buildsentry;
@@ -578,7 +578,7 @@ void Menu_Engineer_Input( int inp )
 			return;
 		}
 		if ( ( self->s.v.ammo_cells >= BUILD_COST_DISPENSER
-		       && self->has_dispenser == 0 ) || tg_data.tg_enabled )
+		       && self->has_dispenser == 0 ) || tfset(tg_enabled) )
 		{
 			TeamFortress_Build( 1 );
 			ResetMenu(  );
@@ -594,7 +594,7 @@ void Menu_Engineer_Input( int inp )
 			return;
 		}
 		if ( ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN
-		       && self->has_sentry == 0 ) || tg_data.tg_enabled )
+		       && self->has_sentry == 0 ) || tfset(tg_enabled) )
 		{
 			TeamFortress_Build( 2 );
 			ResetMenu(  );
@@ -722,7 +722,7 @@ void Menu_EngineerFix_SentryGun( menunum_t menu )
 {
     const char *s_upgrade = "\n", *s_static = "";
 
-    if ( tg_data.tg_enabled )
+    if ( tfset(tg_enabled) )
     {
         if ( self->building->has_sentry )
             s_static = menu_eng_fixsg_nostatic;
@@ -731,7 +731,7 @@ void Menu_EngineerFix_SentryGun( menunum_t menu )
     }
     if( tfset(old_spanner) ){
         if ( self->building->s.v.weapon < 3
-                && ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tg_data.tg_enabled ) )
+                && ( self->s.v.ammo_cells >= BUILD_COST_SENTRYGUN || tfset(tg_enabled) ) )
             s_upgrade = menu_eng_fixsg_upgrade;
 
         CenterPrint( self, "Action:                            \n"
@@ -786,7 +786,7 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 		self->building->waitmax = anglemod( self->building->waitmax + 45 );
 		break;
 	case 7:
-		if ( !tg_data.tg_enabled )
+		if ( !tfset(tg_enabled) )
 			return;
 		self->s.v.impulse = 0;
 		if ( self->building->has_sentry )
@@ -1209,8 +1209,8 @@ void Menu_BirthDay_Input( int inp )
 		self->s.v.impulse = 0;
 		if ( inp != 96 )
 			break;
-		tfset_setbits |= svsb_birthday;
-		localcmd( "localinfo birthday on\n" );
+        tfset_flagon( birthday );
+		//localcmd( "localinfo birthday on\n" );
 		G_bprint( 2, "IT'S PARTY TIME\n" );
 		for ( te = world;
 		      ( te = trap_find( te, FOFS( s.v.classname ), "player" ) ); )

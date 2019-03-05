@@ -984,7 +984,7 @@ void TeamFortress_Inventory(  )
         G_sprint( self, 3, "Bot enabled\n" );
 
 
-    if( tg_data.tg_enabled )
+    if( tfset(tg_enabled) )
         G_sprint( self, 3, "Training Ground enabled\n" );
 
     if( tfset(lan_mode) )
@@ -1574,11 +1574,11 @@ void TeamFortress_SetEquipment(  )
 		pc = 0;
 	self->weapons_carried |= class_set[pc].weapons_carried;
 
-        if( tg_data.tg_enabled )
-        {
-		self->weapons_carried |= WEAP_SPANNER;
-		self->weapons_carried -= self->weapons_carried & WEAP_AXE;
-        }
+    if( tfset(tg_enabled) )
+    {
+        self->weapons_carried |= WEAP_SPANNER;
+        self->weapons_carried -= self->weapons_carried & WEAP_AXE;
+    }
 
 	self->s.v.ammo_rockets = class_set[pc].ammo_rockets;
 	self->s.v.ammo_nails = class_set[pc].ammo_nails;

@@ -554,51 +554,51 @@ void TeamFortress_ID_Player( gedict_t * trace_ent )
 void TeamFortress_ID_Sentry( gedict_t * te )
 {
 
-	if ( self == te->real_owner )
-	{
-		if ( self->playerclass == PC_ENGINEER || tg_data.tg_enabled )
-		{
-			if ( te->s.v.weapon != 3 )
-				G_centerprint( self, "\n\n\nYour SentryGun Level %.0f\nHealth: %.0f\nShells: %.0f\n",
-					       te->s.v.weapon, te->s.v.health, te->s.v.ammo_shells );
-			else
-				G_centerprint( self,
-					       "\n\n\nYour SentryGun Level %.0f\nHealth: %.0f\nShells: %.0f Rockets: %.0f\n",
-					       te->s.v.weapon, te->s.v.health, te->s.v.ammo_shells,
-					       te->s.v.ammo_rockets );
-		} else
-			G_centerprint( self, "\n\n\n\nYour SentryGun\n" );
-	} else
-	{
-		if ( !teamplay )
-			G_centerprint( self, "\n\n\n\nSentrygun made by\n%s\n", te->real_owner->s.v.netname );
-		else
-		{
-			if ( self->team_no && TeamFortress_isTeamsAllied(self->team_no , te->team_no) )
-			{
-				if ( self->playerclass == PC_ENGINEER )
-				{
-					if ( te->s.v.weapon != 3 )
-						G_centerprint( self,
-							       "\n\n\nFriendly Sentrygun Level %.0f made by\n%s\nHealth: %.0f\nShells: %.0f\n",
-							       te->s.v.weapon, te->real_owner->s.v.netname,
-							       te->s.v.health, te->s.v.ammo_shells );
-					else
-					{
-						G_centerprint( self,
-							       "\n\n\nFriendly Sentrygun Level %.0f made by\n%s\nHealth: %.0f\nShells: %.0f Rockets: %.0f\n",
-							       te->s.v.weapon, te->real_owner->s.v.netname,
-							       te->s.v.health, te->s.v.ammo_shells,
-							       te->s.v.ammo_rockets );
-					}
-				} else
-					G_centerprint( self, "\n\n\n\nFriendly Sentrygun made by\n%s\n",
-						       te->real_owner->s.v.netname );
-			} else
-				G_centerprint( self, "\n\n\n\nEnemy Sentrygun made by\n%s\n",
-					       te->real_owner->s.v.netname );
-		}
-	}
+    if ( self == te->real_owner )
+    {
+        if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )
+        {
+            if ( te->s.v.weapon != 3 )
+                G_centerprint( self, "\n\n\nYour SentryGun Level %.0f\nHealth: %.0f\nShells: %.0f\n",
+                        te->s.v.weapon, te->s.v.health, te->s.v.ammo_shells );
+            else
+                G_centerprint( self,
+                        "\n\n\nYour SentryGun Level %.0f\nHealth: %.0f\nShells: %.0f Rockets: %.0f\n",
+                        te->s.v.weapon, te->s.v.health, te->s.v.ammo_shells,
+                        te->s.v.ammo_rockets );
+        } else
+            G_centerprint( self, "\n\n\n\nYour SentryGun\n" );
+    } else
+    {
+        if ( !teamplay )
+            G_centerprint( self, "\n\n\n\nSentrygun made by\n%s\n", te->real_owner->s.v.netname );
+        else
+        {
+            if ( self->team_no && TeamFortress_isTeamsAllied(self->team_no , te->team_no) )
+            {
+                if ( self->playerclass == PC_ENGINEER )
+                {
+                    if ( te->s.v.weapon != 3 )
+                        G_centerprint( self,
+                                "\n\n\nFriendly Sentrygun Level %.0f made by\n%s\nHealth: %.0f\nShells: %.0f\n",
+                                te->s.v.weapon, te->real_owner->s.v.netname,
+                                te->s.v.health, te->s.v.ammo_shells );
+                    else
+                    {
+                        G_centerprint( self,
+                                "\n\n\nFriendly Sentrygun Level %.0f made by\n%s\nHealth: %.0f\nShells: %.0f Rockets: %.0f\n",
+                                te->s.v.weapon, te->real_owner->s.v.netname,
+                                te->s.v.health, te->s.v.ammo_shells,
+                                te->s.v.ammo_rockets );
+                    }
+                } else
+                    G_centerprint( self, "\n\n\n\nFriendly Sentrygun made by\n%s\n",
+                            te->real_owner->s.v.netname );
+            } else
+                G_centerprint( self, "\n\n\n\nEnemy Sentrygun made by\n%s\n",
+                        te->real_owner->s.v.netname );
+        }
+    }
 
 }
 void TeamFortress_ID(  )

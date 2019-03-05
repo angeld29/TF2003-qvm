@@ -368,7 +368,8 @@ void ParseTFDetect( gedict_t * AD )
 	if ( !teamlives[4] )
 		teamlives[4] = -1;
 	if ( AD->hook_out == 1 )
-		tfset_setbits -= tfset_setbits & svsb_allow_hook;
+        tfset_flagoff( allow_hook );
+
 	teammaxplayers[1] = AD->ammo_medikit;
 	teammaxplayers[2] = AD->ammo_detpack;
 	teammaxplayers[3] = AD->maxammo_medikit;

@@ -65,7 +65,7 @@ void NailGrenadeExplode(  )
 	neworigin[1] = 0;
 	neworigin[2] = 32;
 
-	if(!tg_data.tg_enabled)
+	if(!tfset(tg_enabled))
 	{
         	traceline( PASSVEC3( self->s.v.origin ), self->s.v.origin[0] + neworigin[0],
         		   self->s.v.origin[1] + neworigin[1], self->s.v.origin[2] + neworigin[2], 1, self );

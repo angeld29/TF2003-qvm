@@ -193,11 +193,11 @@ void TeamFortress_SetDetpack( float timer )
 	self->s.v.impulse = 0;
 	self->last_impulse = 0;
 
-	if ( !( self->weapons_carried & WEAP_DETPACK ) && !tg_data.tg_enabled )
+	if ( !( self->weapons_carried & WEAP_DETPACK ) && !tfset(tg_enabled) )
 		return;
-	if ( (tfset_disable_grens & DG_TYPE_DETPACK) && !tg_data.tg_enabled )
+	if ( (tfset_disable_grens & DG_TYPE_DETPACK) && !tfset(tg_enabled) )
 		return;
-	if ( self->ammo_detpack <= 0 && !tg_data.tg_enabled )
+	if ( self->ammo_detpack <= 0 && !tfset(tg_enabled) )
 		return;
 
 	for ( at_spot = world; (at_spot = trap_findradius( at_spot, self->s.v.origin, 65 )); )
@@ -250,7 +250,7 @@ void TeamFortress_SetDetpack( float timer )
 		G_sprint( self, PRINT_HIGH, "You can't set detpacks in the air!\n" );
 		return;
 	}
-        if( !tg_data.tg_enabled )
+        if( !tfset(tg_enabled) )
         {
         	for ( te = world; (te = trap_find( te, FOFS( s.v.classname ), "detpack" )); )
         	{
@@ -492,7 +492,7 @@ void TeamFortress_DetpackTouch(  )
 		return;
 	owner = PROG_TO_EDICT( self->s.v.owner );
 
-	if ( (owner->team_no && TeamFortress_isTeamsAllied (other->team_no , owner->team_no)) && !tg_data.tg_enabled )
+	if ( (owner->team_no && TeamFortress_isTeamsAllied (other->team_no , owner->team_no)) && !tfset(tg_enabled) )
 		return;
 
 	trap_makevectors( other->s.v.v_angle );
