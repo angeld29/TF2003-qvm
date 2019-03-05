@@ -318,7 +318,11 @@ void   TF_Set_Cmd( int argc  )
 
     trap_CmdArgv( 2, name, sizeof( name ) );
     if( argc == 4 ){
-        trap_CmdArgv( 3, val, sizeof( val ) );
+        if( is_init == TFSET_MOD_CONSOLE )
+            trap_CmdArgv( 3, val, sizeof( val ) );
+        else
+            G_sprint( self, 2,  "Remote change settings resticted\n" );
+
     }
     tf_set( name, val, is_init );
 
