@@ -152,7 +152,7 @@ char           *G_NewString( const char *string );
 static void _tfset_print_bits( unsigned int  val, const set_bits_t* sb )
 {
     for(; sb->name; sb++ ){
-        G_conprintf( "%s:%s: %s\n", sb->key, sb->name, val & sb->bit ? _ON: _OFF );
+        G_conprintf( " %s:%s: %s\n", sb->key, sb->name, val & sb->bit ? _ON: _OFF );
     }
 }
 
@@ -195,6 +195,13 @@ static const char*_tf_get_setname_by_val( int val, const set_set_t* ss )
         if( val == ss->val ){
             return ss->key;
         }
+    }
+    return "unknown";
+}
+static const char*_tf_get_print_allsetname( const set_set_t* ss )
+{
+    for(; ss->key; ss++ ){
+       G_conprintf( "%s ", ss->key );
     }
     return "unknown";
 }
@@ -265,7 +272,11 @@ static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oni
             if( val && val[0] ){
                 si->val._int = _tf_get_setval_by_name( val, si->setdesc, atoi( si->default_val ));
             }
-            if( oninit != TFSET_LOCALINFO ) G_conprintf( "%s:%s: %s\n", si->key, si->name, _tf_get_setname_by_val(si->val._int, si->setdesc ) );
+            if( oninit != TFSET_LOCALINFO ) {
+                G_conprintf( "%s:%s: %s ( ", si->key, si->name, _tf_get_setname_by_val(si->val._int, si->setdesc ) );
+                _tf_get_print_allsetname( si->setdesc );
+                G_conprintf( ")\n");
+            }
             break;
         default: 
             break;
