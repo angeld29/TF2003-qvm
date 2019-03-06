@@ -301,7 +301,7 @@ void TeamFortress_ShowTF(  )
                     const set_bits_t* sb = si->bitsdesc;
                     G_sprint( self, PRINT_HIGH,  "%s:\n", si->name);
                     for(; sb->name; sb++ ){
-                        G_sprint( self, PRINT_HIGH,  "%s: %s\n", sb->name, si->val._uint & sb->bit ? _ON: _OFF );
+                        G_sprint( self, PRINT_HIGH,  " %s: %s\n", sb->name, si->val._uint & sb->bit ? _ON: _OFF );
                     }
                 }
                 break;
