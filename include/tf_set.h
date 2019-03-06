@@ -108,6 +108,9 @@ extern set_item_t tf_settings[];
 #define tfset_gren2box			(tf_settings[16].val._uint)
 #define tfset_arena_mode         (tf_settings[17].val._int)
 
+#define tfset_team_name(tno)    tf_settings[18 + (tno) -1 ].val._str
+#define tfset_classrestricted(pc)    (tf_settings[22 + (pc) -1 ].val._int)
+
 #define svsb_clanbattle         1<<0
 #define svsb_game_locked        1<<1
 #define svsb_spy_off            1<<2

@@ -131,6 +131,20 @@ set_item_t tf_settings[] = {
 /*15*/    { "Gas grenade effects", "new_gas", "",  TFS_INT_BITS, 131, tf_set_gas, NULL, "131"  },
 /*16*/    { "Extended backpack", "gren2box", "g2b",  TFS_INT_BITS, 0, tf_set_gren2box, NULL, "0"  },
 /*17*/    { "Arena Mode", "arena", "",  TFS_INT_SET, 0, NULL, set_arena_mode, "0"  },
+/*18*/    { "Team 1 name", "team1", "t1", TFS_STRING, 0, NULL, NULL, "blue" },
+/*19*/    { "Team 2 name", "team2", "t2", TFS_STRING, 0, NULL, NULL, "red"  },
+/*20*/    { "Team 3 name", "team3", "t3", TFS_STRING, 0, NULL, NULL, "yell" },
+/*21*/    { "Team 4 name", "team4", "t4", TFS_STRING, 0, NULL, NULL, "gren" },
+/*22*/    {"Limit scout",   "cr_sc", "cr_scout", TFS_INT, 0, NULL, NULL, "0" },
+/*23*/    {"Limit sniper",  "cr_sn", "cr_sniper", TFS_INT, 0, NULL, NULL, "0" },
+/*24*/    {"Limit soldier", "cr_so", "cr_soldier", TFS_INT, 0, NULL, NULL, "0" },
+/*25*/    {"Limit demoman", "cr_de", "cr_demoman", TFS_INT, 0, NULL, NULL, "0" },
+/*26*/    {"Limit medic",   "cr_me", "cr_medic", TFS_INT, 0, NULL, NULL, "0" },
+/*27*/    {"Limit hwguy",   "cr_hw", "cr_hwguy", TFS_INT, 0, NULL, NULL, "0" },
+/*28*/    {"Limit pyro",    "cr_py", "cr_pyro", TFS_INT, 0, NULL, NULL, "0" },
+/*29*/    {"Limit spy",     "cr_sp", "cr_spy", TFS_INT, 0, NULL, NULL, "0" },
+/*30*/    {"Limit engineer","cr_en", "cr_engineer", TFS_INT, 0, NULL, NULL, "0" },
+/*31*/    {"Limit random",  "cr_ra", "cr_random", TFS_INT, 0, NULL, NULL, "0" },
 /*  */    { NULL } 
 };
 
@@ -234,6 +248,7 @@ static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oni
                             "%s:%s: %.2f\n", si->key, si->name, si->val._float );
                 }
             }
+			if( oninit != TFSET_LOCALINFO ) G_conprintf( "%s:%s: %s\n", si->key, si->name, si->val._str );
             break;
         case TFS_BOOL:
             if( val && val[0] ){
@@ -318,7 +333,7 @@ void   TF_Set_Cmd( int argc  )
 
     trap_CmdArgv( 2, name, sizeof( name ) );
     if( argc == 4 ){
-        if( is_init == TFSET_MOD_CONSOLE )
+        if( is_init == TFSET_MOD_CONSOLE || tfset( tg_enabled ) )
             trap_CmdArgv( 3, val, sizeof( val ) );
         else
             G_sprint( self, 2,  "Remote change settings resticted\n" );

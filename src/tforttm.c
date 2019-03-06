@@ -75,7 +75,7 @@ int TeamFortress_TeamGetTopColor( int tno )
 		return 0;
 }
 
-static char    team_names[4][10] = { "blue", "red", "yell", "gren" };
+/*static char    team_names[4][10] = { "blue", "red", "yell", "gren" };
 
 void LoadTeamNames(  )
 {
@@ -83,13 +83,14 @@ void LoadTeamNames(  )
 	GetSVInfokeyString( "team2", "t2", team_names[1], 10, "red" );
 	GetSVInfokeyString( "team3", "t3", team_names[2], 10, "yell" );
 	GetSVInfokeyString( "team4", "t4", team_names[3], 10, "gren" );
-}
+}*/
 
 const char  *GetTeamName( int tno )
 {
-	LoadTeamNames();
+//	LoadTeamNames();
 	if ( tno > 0 && tno <= 4 )
-		return team_names[tno - 1];
+		//return team_names[tno - 1];
+		return tfset_team_name(tno);
 	else
 		return "\"\"";
 }
@@ -99,7 +100,7 @@ void SetTeamName( gedict_t * p )
         if ( p->isBot )
         {
                 if( p->team_no >0 && p->team_no <=4)
-                        trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"team",team_names[p->team_no-1 ],0);
+                        trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"team",tfset_team_name( p->team_no ),0);
                 else
                         trap_SetBotUserInfo(NUM_FOR_EDICT( p ),"team","",0);
         }else
@@ -791,7 +792,7 @@ qboolean TeamFortress_TeamIsCivilian( int tno )
 }
 
 //////////////
-const static char   *li_classrestricted[10][2] = {
+/*const static char   *li_classrestricted[10][2] = {
 	{"cr_sc", "cr_scout"},
 	{"cr_sn", "cr_sniper"},
 	{"cr_so", "cr_soldier"},
@@ -802,7 +803,7 @@ const static char   *li_classrestricted[10][2] = {
 	{"cr_sp", "cr_spy"},
 	{"cr_en", "cr_engineer"},
 	{"cr_ra", "cr_random"}
-};
+};*/
 int ClassIsRestricted( int tno, int pc )
 {
 	int     max, num = 0;
@@ -813,7 +814,8 @@ int ClassIsRestricted( int tno, int pc )
 	if ( !tno )
 		return 0;
 
-	max = GetSVInfokeyInt( li_classrestricted[pc-1][0], li_classrestricted[pc-1][1], 0 );
+    max = tfset_classrestricted( pc );
+	//max = GetSVInfokeyInt( li_classrestricted[pc-1][0], li_classrestricted[pc-1][1], 0 );
 
 	if ( max > 0 )
 	{
