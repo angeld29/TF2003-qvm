@@ -2646,239 +2646,196 @@ void CycleWeaponCommand( int prev )
 
 void ImpulseCommands(  )
 {
-        char st[20];
+    char st[20];
 
-	if ( self->last_impulse == TF_DETPACK && self->s.v.impulse )
-		TeamFortress_SetDetpack( self->s.v.impulse );
-	else
-	{
-		if ( self->last_impulse == TF_SCAN && self->s.v.impulse )
-			TeamFortress_Scan_Angel( self->s.v.impulse, 0 );
-		if ( self->s.v.impulse == TF_SCAN_ENEMY || self->s.v.impulse == TF_SCAN_FRIENDLY )
-			TeamFortress_Scan_Angel( self->s.v.impulse, 0 );
-	}
+    if ( self->last_impulse == TF_DETPACK && self->s.v.impulse )
+        TeamFortress_SetDetpack( self->s.v.impulse );
+    else if ( self->last_impulse == TF_SCAN && self->s.v.impulse )
+        TeamFortress_ScannerSet( self->s.v.impulse );
+    else if ( self->s.v.impulse == TF_SCAN_ENEMY || self->s.v.impulse == TF_SCAN_FRIENDLY )
+        TeamFortress_ScannerSet( self->s.v.impulse );
 
-	if ( self->s.v.impulse == 8 && self->current_menu != MENU_CLASSHELP )
-	{
-		self->current_menu = MENU_CLASSHELP;
-		self->menu_count = MENU_REFRESH_RATE;
-		self->menu_displaytime = 0;
-	}
+    if ( self->s.v.impulse == 8 && self->current_menu != MENU_CLASSHELP )
+    {
+        self->current_menu = MENU_CLASSHELP;
+        self->menu_count = MENU_REFRESH_RATE;
+        self->menu_displaytime = 0;
+    }
 
-	if ( self->s.v.impulse == 242 && !tfset(birthday) )
-	{
-		GetSVInfokeyString( "bd", "birthday", st, sizeof( st ), "" );
-		if ( strneq( st, "off" ) )
-		{
-			self->current_menu = MENU_BIRTHDAY1;
-			self->menu_count = MENU_REFRESH_RATE;
-			self->menu_displaytime = 0;
-			self->s.v.impulse = 0;
-			return;
-		}
-	}
-	if ( ( tf_data.cb_prematch_time > g_globalvars.time ) || tf_data.cease_fire )
-	{
-		PreMatchImpulses(  );
-		DeadImpulses(  );
-		self->s.v.impulse = 0;
-		return;
-	}
-	if ( self->s.v.impulse == TF_SPECIAL_SKILL )
-		UseSpecialSkill(  );
-
-        if( tfset(tg_enabled) )
+    if ( self->s.v.impulse == 242 && !tfset(birthday) )
+    {
+        GetSVInfokeyString( "bd", "birthday", st, sizeof( st ), "" );
+        if ( strneq( st, "off" ) )
         {
-         	switch ( ( int ) self->s.v.impulse )
-         	{
-         	case TG_MAINMENU_IMPULSE:
-         		self->current_menu = TG_MENU_MAIN;
-         		self->s.v.impulse = 0;
-         		break;
-         	case TG_SG_REBUILD_IMPULSE:
-         		Eng_StaticSG_Activate(  );
-         		self->s.v.impulse = 0;
-         		break;
-         	case TG_SG_RELOAD_IMPULSE:
-         		Eng_SGReload(  );
-         		self->s.v.impulse = 0;
-         		break;
-         	case TG_SG_UPGRADE_IMPULSE:
-         		Eng_SGUp(  );
-         		self->s.v.impulse = 0;
-         		break;
-         	case TG_DISP_LOAD_IMPULSE:
-         		Eng_DispLoad(  );
-         		self->s.v.impulse = 0;
-         		break;
-         	case TG_DISP_UNLOAD_IMPULSE:
-         		Eng_DispUnload(  );
-         		self->s.v.impulse = 0;
-         		break;
-         	case TG_CONC_IMPULSE:
-         		TG_Eff_Conc( self );
-         		self->s.v.impulse = 0;
-         		break;
-         	case TG_FLASH_IMPULSE:
-         		TG_Eff_Flash( self );
-         		self->s.v.impulse = 0;
-         		break;
-         	case TG_EFF_REMOVE_IMPULSE:
-         		TG_Eff_Remove(self);
-         		self->s.v.impulse = 0;
-         		break;
-         	}
+            self->current_menu = MENU_BIRTHDAY1;
+            self->menu_count = MENU_REFRESH_RATE;
+            self->menu_displaytime = 0;
+            self->s.v.impulse = 0;
+            return;
         }
+    }
+    if ( ( tf_data.cb_prematch_time > g_globalvars.time ) || tf_data.cease_fire )
+    {
+        PreMatchImpulses(  );
+        DeadImpulses(  );
+        self->s.v.impulse = 0;
+        return;
+    }
+    if ( self->s.v.impulse == TF_SPECIAL_SKILL )
+        UseSpecialSkill(  );
 
-	if ( !self->is_building && !self->is_detpacking && !self->is_feigning )
-	{
-		switch ( ( int ) self->s.v.impulse )
-		{
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-        case TF_MEDIKIT:
-		case AXE_IMP:
-			W_ChangeWeapon(  );
-			break;
-		case TF_HOOK_IMP1:
-		case TF_HOOK_IMP2:
-			if ( tfset(allow_hook) )
-				W_ChangeWeapon(  );
-			break;
-		case TF_WEAPLAST:
-			if ( self->last_weapon )
-				W_ChangeWeapon(  );
-			break;
-		case TF_WEAPNEXT:
-			CycleWeaponCommand( 0 );
+    if( tfset(tg_enabled) )
+        TgImpulses();
+
+    if ( !self->is_building && !self->is_detpacking && !self->is_feigning )
+    {
+        switch ( ( int ) self->s.v.impulse )
+        {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case TF_MEDIKIT:
+            case AXE_IMP:
+                W_ChangeWeapon(  );
+                break;
+            case TF_HOOK_IMP1:
+            case TF_HOOK_IMP2:
+                if ( tfset(allow_hook) )
+                    W_ChangeWeapon(  );
+                break;
+            case TF_WEAPLAST:
+                if ( self->last_weapon )
+                    W_ChangeWeapon(  );
+                break;
+            case TF_WEAPNEXT:
+                CycleWeaponCommand( 0 );
+                break;
+            case TF_WEAPPREV:
+                CycleWeaponCommand( 1 );
+                break;
+            case TF_GRENADE_1:
+            case TF_GRENADE_2:
+                TeamFortress_PrimeGrenade(  );
+                break;
+            case TF_SCAN_10:
+                TeamFortress_Scan_Angel( 10, 0 );
+                break;
+            case TF_SCAN_30:
+                TeamFortress_Scan_Angel( 30, 0 );
+                break;
+            case TF_SCAN_100:
+                TeamFortress_Scan_Angel( 100, 0 );
+                break;
+            case TF_DETPACK_5:
+                TeamFortress_SetDetpack( 5 );
+                break;
+            case TF_DETPACK_20:
+                TeamFortress_SetDetpack( 20 );
+                break;
+            case TF_DETPACK_50:
+                TeamFortress_SetDetpack( 50 );
+                break;
+            case TF_DROP_AMMO:
+                self->current_menu = MENU_DROP;
+                self->menu_count = MENU_REFRESH_RATE - 5;
+                break;
+            case TF_RELOAD:
+                TeamFortress_ReloadCurrentWeapon(  );
+                break;
+            case TF_DISCARD:
+                TeamFortress_Discard(  );
+                break;
+        }
+    }
+    switch ( ( int ) self->s.v.impulse )
+    {
+        case TF_INVENTORY:
+            TeamFortress_Inventory(  );
             break;
-		case TF_WEAPPREV:
-			CycleWeaponCommand( 1 );
-			break;
-		case TF_GRENADE_1:
-		case TF_GRENADE_2:
-			TeamFortress_PrimeGrenade(  );
-			break;
-		case TF_SCAN_10:
-			TeamFortress_Scan_Angel( 10, 0 );
-			break;
-		case TF_SCAN_30:
-			TeamFortress_Scan_Angel( 30, 0 );
-			break;
-		case TF_SCAN_100:
-			TeamFortress_Scan_Angel( 100, 0 );
-			break;
-		case TF_DETPACK_5:
-			TeamFortress_SetDetpack( 5 );
-			break;
-		case TF_DETPACK_20:
-			TeamFortress_SetDetpack( 20 );
-			break;
-        case TF_DETPACK_50:
-			TeamFortress_SetDetpack( 50 );
-			break;
-		case TF_DROP_AMMO:
-			self->current_menu = MENU_DROP;
-			self->menu_count = MENU_REFRESH_RATE - 5;
-			break;
-		case TF_RELOAD:
-			TeamFortress_ReloadCurrentWeapon(  );
-			break;
-		case TF_DISCARD:
-			TeamFortress_Discard(  );
-			break;
-		}
-	}
-	switch ( ( int ) self->s.v.impulse )
-	{
-	case TF_INVENTORY:
-		TeamFortress_Inventory(  );
-		break;
-	case TF_MEDIC_HELPME:
-		if ( self->playerclass )
-			TeamFortress_SaveMe(  );
-		break;
-	case TF_ID:
-		TeamFortress_ID(  );
-		break;
-	case TF_SHOWIDS:
-		TeamFortress_ShowIDs(  );
-		break;
-	case TF_GRENADE_T:
-		TeamFortress_ThrowGrenade(  );
-		break;
-	case TF_DROPGOAL:
-		if ( self->playerclass )
-			DropGoalItems(  );
-		break;
-	case TF_PB_DETONATE:
-		TeamFortress_DetonatePipebombs(  );
-		break;
-	case TF_DETPACK_STOP:
-		TeamFortress_DetpackStop(  );
-		break;
-	case TF_ENGINEER_DETSENTRY:
-		if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
-			DestroyBuilding( self, "building_sentrygun" );
-		break;
-	case TF_ENGINEER_DETDISP:
-		if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
-			DestroyBuilding( self, "building_dispenser" );
-		break;
-	/*case 196:
-		if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
-			DestroyBuilding( self, "building_teleporter_exit" );
-		break;
-	case 197:
-		if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
-			DestroyBuilding( self, "building_teleporter_entrance" );
-		break;*/
-	case TF_SPY_SPY:
-		if ( self->playerclass == PC_SPY )
-			TeamFortress_SpyGoUndercover(  );
-		break;
-	case TF_SPY_DIE:
-		if ( self->playerclass == PC_SPY )
-			TeamFortress_SpyFeignDeath( 0 );
-		break;
-	case TF_SPY_SFEIGN_IMPULSE:
-		if ( self->playerclass == PC_SPY )
-			TeamFortress_SpyFeignDeath( 1 );
-		break;
-	case TF_ENGINEER_BUILD:
-		if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
-			TeamFortress_EngineerBuild(  );
-		break;
-	case AUTOSCAN_IMPULSE:
-		if ( self->playerclass == PC_SCOUT )
-			ScannerSwitch(  );
-		break;
-	case TF_FLAG_INFO:
-		if ( CTF_Map == 1 )
-			TeamFortress_CTF_FlagInfo(  );
-		else
-			TeamFortress_DisplayDetectionItems(  );
-		break;
-	case TF_DISPLAYLOCATION:
-		display_location(  );
-		break;
-	default:
-		DeadImpulses(  );
-		break;
-	}
-	if ( self->s.v.impulse == TF_DETPACK )
-	{
-		self->last_impulse = self->s.v.impulse;
-	}
-	if ( self->s.v.impulse == TF_SCAN )
-		self->last_impulse = self->s.v.impulse;
-	self->s.v.impulse = 0;
+        case TF_MEDIC_HELPME:
+            if ( self->playerclass )
+                TeamFortress_SaveMe(  );
+            break;
+        case TF_ID:
+            TeamFortress_ID(  );
+            break;
+        case TF_SHOWIDS:
+            TeamFortress_ShowIDs(  );
+            break;
+        case TF_GRENADE_T:
+            TeamFortress_ThrowGrenade(  );
+            break;
+        case TF_DROPGOAL:
+            if ( self->playerclass )
+                DropGoalItems(  );
+            break;
+        case TF_PB_DETONATE:
+            TeamFortress_DetonatePipebombs(  );
+            break;
+        case TF_DETPACK_STOP:
+            TeamFortress_DetpackStop(  );
+            break;
+        case TF_ENGINEER_DETSENTRY:
+            if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
+                DestroyBuilding( self, "building_sentrygun" );
+            break;
+        case TF_ENGINEER_DETDISP:
+            if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
+                DestroyBuilding( self, "building_dispenser" );
+            break;
+            /*case 196:
+              if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
+              DestroyBuilding( self, "building_teleporter_exit" );
+              break;
+              case 197:
+              if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
+              DestroyBuilding( self, "building_teleporter_entrance" );
+              break;*/
+        case TF_SPY_SPY:
+            if ( self->playerclass == PC_SPY )
+                TeamFortress_SpyGoUndercover(  );
+            break;
+        case TF_SPY_DIE:
+            if ( self->playerclass == PC_SPY )
+                TeamFortress_SpyFeignDeath( 0 );
+            break;
+        case TF_SPY_SFEIGN_IMPULSE:
+            if ( self->playerclass == PC_SPY )
+                TeamFortress_SpyFeignDeath( 1 );
+            break;
+        case TF_ENGINEER_BUILD:
+            if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
+                TeamFortress_EngineerBuild(  );
+            break;
+        case AUTOSCAN_IMPULSE:
+            if ( self->playerclass == PC_SCOUT )
+                ScannerSwitch(  );
+            break;
+        case TF_FLAG_INFO:
+            if ( CTF_Map == 1 )
+                TeamFortress_CTF_FlagInfo(  );
+            else
+                TeamFortress_DisplayDetectionItems(  );
+            break;
+        case TF_DISPLAYLOCATION:
+            display_location(  );
+            break;
+        default:
+            DeadImpulses(  );
+            break;
+    }
+    if ( self->s.v.impulse == TF_DETPACK )
+    {
+        self->last_impulse = self->s.v.impulse;
+    }
+    if ( self->s.v.impulse == TF_SCAN )
+        self->last_impulse = self->s.v.impulse;
+    self->s.v.impulse = 0;
 }
 
 void PreMatchImpulses(  )

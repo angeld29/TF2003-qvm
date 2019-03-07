@@ -364,3 +364,38 @@ void TG_Eff_Remove( gedict_t * pl )
 		return;
 	}
 }
+void TgImpulses()
+{
+    switch ( ( int ) self->s.v.impulse )
+    {
+        case TG_MAINMENU_IMPULSE:
+            self->current_menu = TG_MENU_MAIN;
+            break;
+        case TG_SG_REBUILD_IMPULSE:
+            Eng_StaticSG_Activate(  );
+            break;
+        case TG_SG_RELOAD_IMPULSE:
+            Eng_SGReload(  );
+            break;
+        case TG_SG_UPGRADE_IMPULSE:
+            Eng_SGUp(  );
+            break;
+        case TG_DISP_LOAD_IMPULSE:
+            Eng_DispLoad(  );
+            break;
+        case TG_DISP_UNLOAD_IMPULSE:
+            Eng_DispUnload(  );
+            break;
+        case TG_CONC_IMPULSE:
+            TG_Eff_Conc( self );
+            break;
+        case TG_FLASH_IMPULSE:
+            TG_Eff_Flash( self );
+            break;
+        case TG_EFF_REMOVE_IMPULSE:
+            TG_Eff_Remove(self);
+            break;
+        default: return;
+    }
+    self->s.v.impulse = 0;
+}

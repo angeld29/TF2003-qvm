@@ -555,24 +555,8 @@ void T_RadiusBounce( gedict_t * inflictor, gedict_t * attacker, float bounce, ge
 
 //////////////////////////////////////////
 
-void TeamFortress_Scan_Angel( int scanrange, int typescan )
+void TeamFortress_ScannerSet( int impulse )
 {
-	gedict_t *list;
-	gedict_t *saveent = NULL;
-	float   minlen;
-	float   len;
-	float   scen;
-	float   scfr;
-	vec3_t  lightningvec;
-	float   enemy_detected;
-	float   friend_detected;
-	float   any_detected;
-	float   any_detected2;
-	vec3_t  tmp;
-	float   multiscan;
-//	char    st[10];
-//	int     opt;
-
 	// prevent scan impulse from triggering anything else
 	self->s.v.impulse = 0;
 	self->last_impulse = 0;
@@ -582,8 +566,9 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 
 	if ( !( self->tf_items & NIT_SCANNER ) )
 		return;
+
 	// If Impulse is TF_SCAN_ENEMY, toggle Scanning for Enemies
-	if ( scanrange == TF_SCAN_ENEMY )
+	if ( impulse == TF_SCAN_ENEMY )
 	{
 		if ( self->tf_items_flags & NIT_SCANNER_ENEMY )
 		{
@@ -599,7 +584,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 	}
 	
 	// If Impulse is TF_SCAN_FRIENDLY, toggle Scanning for Friendlies
-	if ( scanrange == TF_SCAN_FRIENDLY )
+	if ( impulse == TF_SCAN_FRIENDLY )
 	{
 		if ( self->tf_items_flags & NIT_SCANNER_FRIENDLY )
 		{
@@ -613,7 +598,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 		self->StatusRefreshTime = g_globalvars.time + 0.1;
 		return;
 	}
-	if ( scanrange == TF_POST_SCANF_OFF )
+	if ( impulse == TF_POST_SCANF_OFF )
 	{
 		G_sprint( self, PRINT_HIGH, "Friendly Scanning disabled.\n" );
 		if ( self->tf_items_flags & NIT_SCANNER_FRIENDLY )
@@ -622,7 +607,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 		return;
 	}
 
-	if ( scanrange == TF_POST_SCANF_ON )
+	if ( impulse == TF_POST_SCANF_ON )
 	{
 		G_sprint( self, PRINT_HIGH, "Friendly Scanning enabled.\n" );
 		self->tf_items_flags |= NIT_SCANNER_FRIENDLY;
@@ -630,7 +615,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 		return;
 	}
 
-	if ( scanrange == TF_POST_SCANE_OFF )
+	if ( impulse == TF_POST_SCANE_OFF )
 	{
 		G_sprint( self, PRINT_HIGH, "Enemy Scanning disabled.\n" );
 		if ( self->tf_items_flags & NIT_SCANNER_ENEMY )
@@ -638,14 +623,14 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 		self->StatusRefreshTime = g_globalvars.time + 0.1;
 		return;
 	}
-	if ( scanrange == TF_POST_SCANE_ON )
+	if ( impulse == TF_POST_SCANE_ON )
 	{
 		G_sprint( self, PRINT_HIGH, "Enemy Scanning enabled.\n" );
 		self->tf_items_flags |= NIT_SCANNER_ENEMY;
 		self->StatusRefreshTime = g_globalvars.time + 0.1;
 		return;
 	}
-	if ( scanrange == TF_POST_AUTOSCAN_ON )
+	if ( impulse == TF_POST_AUTOSCAN_ON )
 	{
 		if ( self->ScannerOn != 1 )
 		{
@@ -656,7 +641,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 		}
 	}
 
-	if ( scanrange == TF_POST_AUTOSCAN_OFF )
+	if ( impulse == TF_POST_AUTOSCAN_OFF )
 	{
 		if ( self->ScannerOn == 1 )
 		{
@@ -666,76 +651,81 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 			G_sprint( self, PRINT_HIGH, "Scanner Off.\n" );
 		}
 	}
+}
 
-	if ( scanrange > 50 )
-		scanrange = 50;
+qboolean TFScout_CheckScanTarget( gedict_t* ent )
+{
+    if ( ent == self ) return false;
+    if ( strneq( ent->s.v.classname, "player" ) ) return false;
+    if ( !ent->s.v.takedamage ) return false;
+    if ( ent->s.v.health <= 0 ) return false;
+
+    if ( teamplay )
+    {
+        if ( ( self->tf_items_flags & NIT_SCANNER_FRIENDLY ) && ent->team_no > 0 && ent->team_no == self->team_no )
+            return true;
+
+        if ( ( self->tf_items_flags & NIT_SCANNER_ENEMY )&& ( self->team_no > 0 ) && ( ent->team_no > 0 ) && ( ent->team_no != self->team_no ) )
+            return true;
+    } else if ( self->tf_items_flags & NIT_SCANNER_MOVEMENT && ( vlen( ent->s.v.velocity ) > NIT_SCANNER_MIN_MOVEMENT ) )
+        return true;
+    return false;
+}
+void TeamFortress_Scan_Angel( int scanrange, int typescan )
+{
+	gedict_t *list;
+	gedict_t *saveent = NULL;
+	float   minlen;
+	float   len;
+	vec3_t  lightningvec;
+	int   any_detected2 = 0;
+	vec3_t  tmp;
+	int   multiscan;
+//	char    st[10];
+//	int     opt;
+
+	// prevent scan impulse from triggering anything else
+	self->s.v.impulse = 0;
+	self->last_impulse = 0;
+
+	if ( strneq( self->s.v.classname, "player" ) )
+		return;
+
+	if ( !( self->tf_items & NIT_SCANNER ) )
+		return;
+
+	if ( scanrange > NIT_SCANNER_MAXRANGE )
+		scanrange = NIT_SCANNER_MAXRANGE;
 
 	if ( self->ScanRange != scanrange )
 	{
 		self->ScanRange = scanrange;
 		self->StatusRefreshTime = g_globalvars.time + 0.1;
 	}
-	scen = 0;
-	scfr = 0;
-	// Set the Scanner flags
-	if ( self->tf_items_flags & NIT_SCANNER_ENEMY )
-		scen = 1;
-	if ( self->tf_items_flags & NIT_SCANNER_FRIENDLY )
-		scfr = 1;
 
 	// If no entity type is enabled, don't scan
-	if ( !scen && !scfr )
+	if ( self->tf_items_flags & ( NIT_SCANNER_ENEMY | NIT_SCANNER_FRIENDLY ) )
 	{
 		G_sprint( self, PRINT_HIGH, "All scanner functions are disabled.\n" );
 		return;
 	}
 	multiscan = ( self->settings_bits & TF_MULTISCAN_MASK) ? 0: 1;
+    if( !multiscan ) 
+        scanrange = NIT_SCANNER_MAXRANGE;
 
 	if ( typescan == 0 )
 		G_sprint( self, PRINT_HIGH, "Scanning...\n" );
-	any_detected2 = 0;
 	scanrange = scanrange * 25;
 	minlen = scanrange + 100;
 	for ( list = world; ( list = trap_findradius( list, self->s.v.origin, scanrange + 40 ) ); )
 	{
-		enemy_detected = 0;
-		friend_detected = 0;
-		any_detected = 0;
-		if ( list == self )
-			continue;
-		if ( strneq( list->s.v.classname, "player" ) )
-			continue;
-		if ( !list->s.v.takedamage )
-			continue;
-		if ( list->s.v.health <= 0 )
-			continue;
-		if ( teamplay )
-		{
-			if ( scfr && list->team_no > 0 && list->team_no == self->team_no )
-			{
-				friend_detected = 1;
-				any_detected = 1;
-			}
-			if ( scen && ( self->team_no > 0 ) && ( list->team_no > 0 )
-			     && ( list->team_no != self->team_no ) )
-			{
-				enemy_detected = 1;
-				any_detected = 1;
-			}
-		} else
-		{
-			any_detected = 1;
-			if ( ( self->tf_items_flags & 4 ) && ( vlen( list->s.v.velocity ) <= 50 ) )
-				any_detected = 0;
-		}
-		if ( any_detected )
+		if ( TFScout_CheckScanTarget( list ) )
 		{
 			any_detected2 = 1;
 			VectorSubtract( list->s.v.origin, self->s.v.origin, tmp );
-			if ( multiscan == 0 )
+            len = vlen( tmp );
+			if ( multiscan )
 			{
-
-				len = vlen( tmp );
 				if ( !saveent || ( len < minlen ) )
 				{
 					saveent = list;
@@ -744,7 +734,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 			} else
 			{
 				normalize( tmp, lightningvec );
-				VectorScale( lightningvec, vlen( tmp ) / 5, lightningvec );
+				VectorScale( lightningvec, len / 5, lightningvec );
 				VectorAdd( lightningvec, self->s.v.origin, lightningvec );
 				g_globalvars.msg_entity = EDICT_TO_PROG( self );
 				trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
@@ -760,7 +750,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 		}
 	}
 
-	if ( ( multiscan == 0 ) && saveent )
+	if ( ( !multiscan ) && saveent )
 	{
       		VectorSubtract( saveent->s.v.origin, self->s.v.origin, tmp );
       		normalize( tmp, lightningvec );

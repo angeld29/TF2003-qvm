@@ -438,6 +438,7 @@
 /*==================================================*/
 /* New Item Related Defines                      */
 /*==================================================*/
+#define NIT_SCANNER_MAXRANGE   100 // The amount of power spent on a scan with the scanner
 #define NIT_SCANNER_POWER   100 // The amount of power spent on a scan with the scanner
           // is multiplied by this to get the scanrange.
 #define NIT_SCANNER_MAXCELL   50  // The maximum number of cells than can be used in one scan
