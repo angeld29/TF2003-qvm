@@ -499,7 +499,7 @@ void TeamFortress_TeamShowMemberClasses( gedict_t * Player )
 					G_sprint( Player, 2, "The other members of your team are:\n" );
 				}
 				G_sprint( Player, 2, "%s : ", e->s.v.netname );
-				TeamFortress_PrintClassName( Player, e->playerclass, e->tfstate & 8 );
+				TeamFortress_PrintClassName( Player, e->playerclass, e->tfstate & TFSTATE_RANDOMPC );
 			}
 		}
 	}

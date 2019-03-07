@@ -1166,7 +1166,7 @@ void PlayerJump()
         /*//REMOVE!!! 
           if (self.fire_held_down && self.current_weapon == 32768) {
           stuffcmd(self, "v_idlescale 0\n");
-          self->tfstate = self->tfstate - (self->tfstate & 2048);
+          self->tfstate = self->tfstate - (self->tfstate & TFSTATE_AIMING);
           TeamFortress_SetSpeed(self);
           self->s.v.weaponframe = 0;
           self.heat = 0;
@@ -1186,7 +1186,7 @@ void PlayerJump()
     /* if (self.fire_held_down && self.current_weapon == 32768) {
        stuffcmd(self, "v_idlescale 0\n");
        sprint(self, 1, "You cannot fire the assault cannon without your feet on the ground...\n");
-       self->tfstate = self->tfstate - (self->tfstate & 2048);
+       self->tfstate = self->tfstate - (self->tfstate & TFSTATE_AIMING);
        TeamFortress_SetSpeed(self);
        self->s.v.weaponframe = 0;
        self.count = 1;
@@ -1436,7 +1436,7 @@ void CheckPowerups()
         {
             if ( self->invisible_finished )
             {
-                if ( self->tfstate & 64 )
+                if ( self->tfstate & TFSTATE_INVINCIBLE )
                 {
                     if ( self->invisible_finished < g_globalvars.time + 10 )
                         self->invisible_finished = g_globalvars.time + 666;
@@ -1580,7 +1580,7 @@ void CheckPowerups()
     if ( self->radsuit_finished )
     {
         self->air_finished = g_globalvars.time + 12;
-        if ( self->tfstate & 256 )
+        if ( self->tfstate & TFSTATE_RADSUIT)
         {
             if ( self->radsuit_finished == g_globalvars.time + 10 )
                 self->radsuit_finished = g_globalvars.time + 666;
@@ -1857,8 +1857,8 @@ void ClientDisconnect()
         te->real_frags = self->real_frags;
         //te->netname = self->netname;
         te->playerclass = self->playerclass;
-        if ( self->tfstate & 8 )
-            te->tfstate = 8;
+        if ( self->tfstate & TFSTATE_RANDOMPC )
+            te->tfstate = TFSTATE_RANDOMPC;
     }
     set_suicide_frame();
     self->s.v.netname[0] = 0;

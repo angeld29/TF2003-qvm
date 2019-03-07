@@ -148,11 +148,25 @@ set_item_t tf_settings[] = {
 /*  */    { NULL } 
 };
 
+void _set_print( int level, const char *fmt, ... )
+{
+    va_list         argptr;
+    char text[1024];
+
+    va_start( argptr, fmt );
+    _vsnprintf( text, sizeof(text), fmt, argptr );
+    va_end( argptr );
+
+    if( self != world  )
+        G_sprint( self, level, text );
+    else
+        G_conprintf( text );
+}
 char           *G_NewString( const char *string );
 static void _tfset_print_bits( unsigned int  val, const set_bits_t* sb )
 {
     for(; sb->name; sb++ ){
-        G_conprintf( " %s:%s: %s\n", sb->key, sb->name, val & sb->bit ? _ON: _OFF );
+        _set_print( PRINT_HIGH, " %s:%s: %s\n", sb->key, sb->name, val & sb->bit ? _ON: _OFF );
     }
 }
 
@@ -201,13 +215,14 @@ static const char*_tf_get_setname_by_val( int val, const set_set_t* ss )
 static const char*_tf_get_print_allsetname( const set_set_t* ss )
 {
     for(; ss->key; ss++ ){
-       G_conprintf( "%s ", ss->key );
+       _set_print( PRINT_HIGH, "%s ", ss->key );
     }
     return "unknown";
 }
 
 static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oninit  )
 {
+    if( oninit != TFSET_LOCALINFO ) _set_print( PRINT_HIGH, "%s:%s: ", si->key, si->name );
     switch( si->type ){
         case TFS_INT_BITS:
             if( idx < 0 ){
@@ -215,7 +230,7 @@ static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oni
                     si->val._int = atoi(val);
                 }
                 if( oninit != TFSET_LOCALINFO ){
-                    G_conprintf( "%s:%s: %d\n", si->key, si->name, si->val._uint );
+                    _set_print( PRINT_CHAT, "%d\n", si->val._uint );
                     _tfset_print_bits( si->val._uint, si->bitsdesc );
                 }
             }else{
@@ -235,27 +250,27 @@ static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oni
                     }
                 }
                 if( oninit != TFSET_LOCALINFO )
-                    G_conprintf( "%s:%s: %s\n", sb->key, sb->name, bit_set? _ON: _OFF );
+                    _set_print( PRINT_HIGH, "%s:%s: %s\n", sb->key, sb->name, bit_set? _ON: _OFF );
             }
             break;
         case TFS_INT:
             if( val && val[0] ) si->val._int = atoi( val );
-            if( oninit != TFSET_LOCALINFO ) G_conprintf( "%s:%s: %d\n", si->key, si->name, si->val._int );
+            if( oninit != TFSET_LOCALINFO ) _set_print( PRINT_CHAT, "%d\n", si->val._int );
             break;
         case TFS_FLOAT:
             if( val && val[0] ) si->val._int = atof( val );
-            if( oninit != TFSET_LOCALINFO ) G_conprintf( "%s:%s: %.2f\n", si->key, si->name, si->val._float );
+            if( oninit != TFSET_LOCALINFO ) _set_print( PRINT_CHAT, "%.2f\n", si->val._float );
             break;
         case TFS_STRING:
             if( val && val[0] ){
                 if( oninit ) {
                     si->val._str = G_NewString( val );
                 }else{
-                    G_conprintf( "Changing string settings allowed only by localinfo\n"
-                            "%s:%s: %.2f\n", si->key, si->name, si->val._float );
+                    _set_print( PRINT_HIGH, "Changing string settings allowed only by localinfo\n");
+                    _set_print( PRINT_CHAT, "%.2f\n", si->val._float );
                 }
             }
-			if( oninit != TFSET_LOCALINFO ) G_conprintf( "%s:%s: %s\n", si->key, si->name, si->val._str );
+			if( oninit != TFSET_LOCALINFO ) _set_print( PRINT_CHAT, "%s\n", si->val._str );
             break;
         case TFS_BOOL:
             if( val && val[0] ){
@@ -266,16 +281,16 @@ static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oni
                     si->val._int = 0;
                 }
             }
-            if( oninit != TFSET_LOCALINFO ) G_conprintf( "%s:%s: %s\n", si->key, si->name, si->val._int? _ON : _OFF );
+            if( oninit != TFSET_LOCALINFO ) _set_print( PRINT_CHAT, "%s\n", si->val._int? _ON : _OFF );
             break;
         case TFS_INT_SET:
             if( val && val[0] ){
                 si->val._int = _tf_get_setval_by_name( val, si->setdesc, atoi( si->default_val ));
             }
             if( oninit != TFSET_LOCALINFO ) {
-                G_conprintf( "%s:%s: %s ( ", si->key, si->name, _tf_get_setname_by_val(si->val._int, si->setdesc ) );
+                _set_print( PRINT_CHAT, "%s ( ", _tf_get_setname_by_val(si->val._int, si->setdesc ) );
                 _tf_get_print_allsetname( si->setdesc );
-                G_conprintf( ")\n");
+                _set_print( PRINT_CHAT, ")\n");
             }
             break;
         default: 
@@ -295,35 +310,9 @@ void TeamFortress_ShowTF(  )
 {
     set_item_t* si = &tf_settings[0];
     for(; si->name; si++ ){
-        switch( si->type ){
-            case TFS_INT_BITS:
-                {
-                    const set_bits_t* sb = si->bitsdesc;
-                    G_sprint( self, PRINT_HIGH,  "%s:\n", si->name);
-                    for(; sb->name; sb++ ){
-                        G_sprint( self, PRINT_HIGH,  " %s: %s\n", sb->name, si->val._uint & sb->bit ? _ON: _OFF );
-                    }
-                }
-                break;
-            case TFS_INT:
-                G_sprint( self, PRINT_HIGH,  "%s: %d\n", si->name, si->val._int );
-                break;
-            case TFS_FLOAT:
-                G_sprint( self, PRINT_HIGH,  "%s: %.2f\n", si->name, si->val._float );
-                break;
-            case TFS_STRING:
-                G_sprint( self, PRINT_HIGH,  "%s: %s\n", si->name, si->val._str );
-                break;
-            case TFS_BOOL:
-                G_sprint( self, PRINT_HIGH,  "%s: %s\n", si->name, si->val._int? _ON : _OFF );
-                break;
-            case TFS_INT_SET:
-                G_sprint( self, PRINT_HIGH,  "%s: %s\n", si->name, _tf_get_setname_by_val(si->val._int, si->setdesc ) );
-                break;
-            default: 
-                break;
-        }
+        tf_set_val( si, -1, NULL, 0 );
     }
+
     G_sprint( self, 2, _TF2003 " (build %d) " _BY_SD_ANGEL "\n" ,build_number());
     G_sprint( self, 2,  "%s\n", ANGEL_VERSION);
 }

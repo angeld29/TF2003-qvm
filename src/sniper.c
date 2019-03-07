@@ -63,7 +63,7 @@ void SniperSight_Update(  )
 	vec3_t  org, end;
 	gedict_t *owner = PROG_TO_EDICT( self->s.v.owner );
 
-	if ( !( owner->tfstate & TFSTATE_AIMING ) || owner->current_weapon != 32 )
+	if ( !( owner->tfstate & TFSTATE_AIMING ) || owner->current_weapon != WEAP_SNIPER_RIFLE )
 	{
 		owner->tfstate -= ( owner->tfstate & TFSTATE_AIMING );
 		TeamFortress_SetSpeed( owner );

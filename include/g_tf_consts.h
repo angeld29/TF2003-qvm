@@ -38,6 +38,7 @@
 #define TFSTATE_HALLUCINATING  16384  // set when player is hallucinating
 #define TFSTATE_TRANQUILISED   32768  // set when player is tranquilised
 #define TFSTATE_CANT_MOVE    65536  // set when player is setting a detpack
+#define TFSTATE_MAX_FLAMES    131072// set when player has 4 or more numflames
 
 // Defines used by TF_T_Damage (see combat.qc)
 #define TF_TD_IGNOREARMOUR 1  // Bypasses the armour of the target

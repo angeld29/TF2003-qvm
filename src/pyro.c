@@ -336,10 +336,10 @@ void FlameFollow(  )
 	if ( ( enemy->armorclass & AT_SAVEFIRE ) && enemy->s.v.armorvalue > 0 )
 		self->s.v.health = 0;
 
-	if ( enemy->tfstate & 131072 )
+	if ( enemy->tfstate & TFSTATE_MAX_FLAMES )
 	{
 		self->s.v.health = FLAME_PLYRMAXTIME;
-		enemy->tfstate = enemy->tfstate - ( enemy->tfstate & 131072 );
+		enemy->tfstate = enemy->tfstate - ( enemy->tfstate & TFSTATE_MAX_FLAMES );
 	}
 	if ( self->s.v.health < 1 )
 	{
@@ -409,7 +409,7 @@ void OnPlayerFlame_touch(  )
 			return;
 		if ( other->numflames >= 4 )
 		{
-			other->tfstate = other->tfstate | 131072;
+			other->tfstate = other->tfstate | TFSTATE_MAX_FLAMES;
 			return;
 		}
 		if ( streq( other->s.v.classname, "player" ) )
@@ -474,7 +474,7 @@ void WorldFlame_touch(  )
 			return;
 		if ( other->numflames >= 4 )
 		{
-			other->tfstate = other->tfstate | 131072;
+			other->tfstate = other->tfstate | TFSTATE_MAX_FLAMES;
 			return;
 		}
 		if ( streq( other->s.v.classname, "player" ) )
@@ -541,7 +541,7 @@ void Flamer_stream_touch(  )
 				return;
 			if ( other->numflames >= 4 )
 			{
-				other->tfstate = other->tfstate | 131072;
+				other->tfstate = other->tfstate | TFSTATE_MAX_FLAMES;
 				return;
 			}
 			if ( ( other->armorclass & AT_SAVEFIRE ) && other->s.v.armorvalue > 0 )
@@ -621,7 +621,7 @@ void Napalm_touch(  )
 				return;
 			if ( other->numflames >= 4 )
 			{
-				other->tfstate = other->tfstate | 131072;
+				other->tfstate = other->tfstate | TFSTATE_MAX_FLAMES;
 				return;
 			}
 			if ( ( other->armorclass & AT_SAVEFIRE ) && other->s.v.armorvalue > 0 )

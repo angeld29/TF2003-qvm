@@ -417,7 +417,7 @@ void TeamFortress_ChangeClass(  )
 		}
 		self->nextpc = self->s.v.impulse - TF_CHANGEPC;
 		G_sprint( self, 2, "After dying, you will return as a " );
-		TeamFortress_PrintClassName( self, self->nextpc, self->tfstate & 8 );
+		TeamFortress_PrintClassName( self, self->nextpc, self->tfstate & TFSTATE_RANDOMPC );
 		if ( self->s.v.deadflag )
 			self->immune_to_check = g_globalvars.time + 10;
 		return;
@@ -498,10 +498,10 @@ void TeamFortress_ChangeClass(  )
 	if ( self->playerclass == PC_RANDOM )
 	{
 		G_sprint( self, 2, "Random Playerclass.\n" );
-		self->tfstate |= 8;
+		self->tfstate |= TFSTATE_RANDOMPC;
 		self->playerclass = 1 + (int)( g_random(  ) * ( 10 - 1 ) );
 	}
-	TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & 8 );
+	TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & TFSTATE_RANDOMPC );
 	TeamFortress_SetEquipment(  );
 	TeamFortress_SetHealth(  );
 	TeamFortress_PrepareForArenaRespawn();
@@ -544,7 +544,7 @@ void TeamFortress_ChangeClass(  )
 		if ( spot->team_no == self->team_no && spot != self )
 		{
 			G_sprint( spot, 2, "%s is playing as a ", self->s.v.netname );
-			TeamFortress_PrintClassName( spot, self->playerclass, self->tfstate & 8 );
+			TeamFortress_PrintClassName( spot, self->playerclass, self->tfstate & TFSTATE_RANDOMPC );
 		}
 	}
 	if ( tf_data.cease_fire )
@@ -1328,7 +1328,7 @@ void TeamFortress_ThrowGrenade(  )
 {
 	gedict_t *te;
 
-	if ( !( self->tfstate & 1 ) )
+	if ( !( self->tfstate & TFSTATE_GRENPRIMED ) )
 		return;
 	self->tfstate |= TFSTATE_GRENTHROWING;
 	for ( te = world ; ( te = trap_find( te, FOFS( s.v.classname ), "primer" ) ) ; )
