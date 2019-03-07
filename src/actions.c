@@ -558,7 +558,7 @@ void TeamFortress_ID_Sentry( gedict_t * te )
     {
         if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )
         {
-            if ( te->s.v.weapon != 3 )
+            if ( (int)te->s.v.weapon != 3 )
                 G_centerprint( self, "\n\n\nYour SentryGun Level %.0f\nHealth: %.0f\nShells: %.0f\n",
                         te->s.v.weapon, te->s.v.health, te->s.v.ammo_shells );
             else
@@ -576,7 +576,7 @@ void TeamFortress_ID_Sentry( gedict_t * te )
             {
                 if ( self->playerclass == PC_ENGINEER )
                 {
-                    if ( te->s.v.weapon != 3 )
+                    if ( (int)te->s.v.weapon != 3 )
                         G_centerprint( self, "\n\n\nFriendly Sentrygun Level %.0f made by\n%s\nHealth: %.0f\nShells: %.0f\n",
                                 te->s.v.weapon, te->real_owner->s.v.netname, te->s.v.health, te->s.v.ammo_shells );
                     else
