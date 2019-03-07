@@ -85,7 +85,7 @@ void CeaseFire_think(  )
 {
 	gedict_t *te;
 
-	if ( g_globalvars.time > tf_data.cb_ceasefire_time && self->s.v.weapon == 1 && tf_data.cease_fire == 1 )
+	if ( g_globalvars.time > tf_data.cb_ceasefire_time && self->s.v.weapon == WEAP_HOOK && tf_data.cease_fire == 1 )
 	{
 		tf_data.cease_fire = 0;
 		G_bprint( 2, "RESUME FIRE\n" );

@@ -1164,7 +1164,7 @@ void PlayerJump()
                 sound( self, 4, "misc/water2.wav", 1, 1 );
         }
         /*//REMOVE!!! 
-          if (self.fire_held_down && self.current_weapon == 32768) {
+          if (self.fire_held_down && self.current_weapon == WEAP_ASSAULT_CANNON) {
           stuffcmd(self, "v_idlescale 0\n");
           self->tfstate = self->tfstate - (self->tfstate & TFSTATE_AIMING);
           TeamFortress_SetSpeed(self);
@@ -1183,7 +1183,7 @@ void PlayerJump()
     self->s.v.flags = ( int ) self->s.v.flags - ( ( int ) self->s.v.flags & FL_JUMPRELEASED );
     self->s.v.button2 = 0;
     sound( self, 4, "player/plyrjmp8.wav", 1, 1 );
-    /* if (self.fire_held_down && self.current_weapon == 32768) {
+    /* if (self.fire_held_down && self.current_weapon == WEAP_ASSAULT_CANNON) {
        stuffcmd(self, "v_idlescale 0\n");
        sprint(self, 1, "You cannot fire the assault cannon without your feet on the ground...\n");
        self->tfstate = self->tfstate - (self->tfstate & TFSTATE_AIMING);
@@ -1399,7 +1399,7 @@ void PlayerPreThink()
     }
     if ( g_globalvars.time < self->pausetime || tf_data.cease_fire == 1 )
         SetVector( self->s.v.velocity, 0, 0, 0 );
-    if ( g_globalvars.time > self->attack_finished && !self->s.v.currentammo && self->s.v.weapon > 16 )
+    if ( g_globalvars.time > self->attack_finished && !self->s.v.currentammo && self->s.v.weapon > WEAP_AXE )
     {
         self->s.v.weapon = W_BestWeapon();
         W_SetCurrentAmmo();
