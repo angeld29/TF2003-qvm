@@ -373,7 +373,7 @@ int Sentry_FindTarget(  )
 
 void Sentry_FoundTarget(  )
 {
-    if ( self->s.v.ammo_shells > 0 || ( self->s.v.ammo_rockets > 0 && self->s.v.weapon == 3 ) || tg_data.sg_unlimit_ammo )
+    if ( self->s.v.ammo_shells > 0 || ( self->s.v.ammo_rockets > 0 && (int)( self->s.v.weapon ) == 3 ) || tg_data.sg_unlimit_ammo )
         sound( self, 2, "weapons/turrspot.wav", 1, 1 );
     Sentry_HuntTarget(  );
     if ( self->super_damage_finished < g_globalvars.time )
@@ -864,7 +864,7 @@ int Sentry_Fire(  )
         return 0;
 
     // Level 3 Turrets fire rockets every 3 seconds
-    if (  tg_data.sg_fire_rockets && self->s.v.weapon == 3 && 
+    if (  tg_data.sg_fire_rockets && (int)( self->s.v.weapon ) == 3 && 
             ( (self->s.v.ammo_rockets > 0 ) || ( tg_data.sg_unlimit_ammo) )
             && self->super_damage_finished < g_globalvars.time )
     {
@@ -934,7 +934,7 @@ int Sentry_Fire(  )
         }
     }
     if( !tg_data.sg_unlimit_ammo && tg_data.sg_fire_rockets )
-        if ( self->s.v.ammo_rockets <= 0 && self->s.v.weapon == 3 && g_random(  ) < 0.1 )
+        if ( self->s.v.ammo_rockets <= 0 && (int)( self->s.v.weapon ) == 3 && g_random(  ) < 0.1 )
             G_sprint( self->real_owner, 2, "Sentry Gun is out of rockets.\n" );
     return 1;
 }

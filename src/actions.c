@@ -562,7 +562,7 @@ void TeamFortress_ID_Sentry( gedict_t * te )
                 G_centerprint( self, "\n\n\nYour SentryGun Level %.0f\nHealth: %.0f\nShells: %.0f\n",
                         te->s.v.weapon, te->s.v.health, te->s.v.ammo_shells );
             else
-                G_centerprint( self, "\n\n\nYour SentryGun Level %.0f\nHealth: %.0f\nShells: %.0f Rockets: %.0f\n",
+                G_centerprint( self, "\n\n\nYour SentryGun Level %.0f\nHealth: %.0f\nShells: %.0f\nRockets: %.0f\n",
                         te->s.v.weapon, te->s.v.health, te->s.v.ammo_shells, te->s.v.ammo_rockets );
         } else
             G_centerprint( self, "\n\n\n\nYour SentryGun\n" );
@@ -581,7 +581,7 @@ void TeamFortress_ID_Sentry( gedict_t * te )
                                 te->s.v.weapon, te->real_owner->s.v.netname, te->s.v.health, te->s.v.ammo_shells );
                     else
                     {
-                        G_centerprint( self, "\n\n\nFriendly Sentrygun Level %.0f made by\n%s\nHealth: %.0f\nShells: %.0f Rockets: %.0f\n",
+                        G_centerprint( self, "\n\n\nFriendly Sentrygun Level %.0f made by\n%s\nHealth: %.0f\nShells: %.0f\nRockets: %.0f\n",
                                 te->s.v.weapon, te->real_owner->s.v.netname, te->s.v.health, te->s.v.ammo_shells, te->s.v.ammo_rockets );
                     }
                 } else

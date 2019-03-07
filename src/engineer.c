@@ -884,14 +884,14 @@ int Engineer_SentryGun_Upgrade( gedict_t* gun )
         if ( !tfset(tg_enabled) )
             self->s.v.ammo_cells = self->s.v.ammo_cells - BUILD_COST_SENTRYGUN;
 
-        gun->s.v.weapon = gun->s.v.weapon + 1;
-        gun->s.v.max_health = gun->s.v.max_health * 1.2;
-        gun->s.v.health = gun->s.v.max_health;
-        gun->maxammo_shells = gun->maxammo_shells * 1.2;
+        gun->s.v.weapon = (int) (gun->s.v.weapon + 1);
+        gun->s.v.max_health = (int) (gun->s.v.max_health * 1.2);
+        gun->s.v.health = (int) gun->s.v.max_health;
+        gun->maxammo_shells = (int)(gun->maxammo_shells * 1.2);
         G_sprint( self, 2, "You upgrade the Sentry Gun to level %.0f\n", gun->s.v.weapon );
 
         sound( gun, 3, "weapons/turrset.wav", 1, 1 );
-        if ( gun->s.v.weapon == 2 ){
+        if ( (int)gun->s.v.weapon == 2 ){
             gun->s.v.think = ( func_t ) lvl2_sentry_stand;
             gun->s.v.skin = 1;
         } else {
@@ -930,7 +930,7 @@ int Engineer_SentryGun_InsertAmmo( gedict_t* gun )
         return 0;
     if (!( (gun->s.v.ammo_shells < gun->maxammo_shells 
                     && self->s.v.ammo_shells > 0)
-                || ( gun->s.v.weapon == 3 
+                || ( (int)gun->s.v.weapon == 3 
                     && gun->s.v.ammo_rockets < gun->maxammo_rockets
                     && self->s.v.ammo_rockets > 0))) 
         return 0;
@@ -943,7 +943,7 @@ int Engineer_SentryGun_InsertAmmo( gedict_t* gun )
         self->s.v.ammo_shells = self->s.v.ammo_shells - am;
 
     gun->s.v.ammo_shells = gun->s.v.ammo_shells + am;
-    if ( gun->s.v.weapon == 3 )
+    if ( (int)gun->s.v.weapon == 3 )
     {
         am = 10 * 2;
         if ( am > self->s.v.ammo_rockets )
@@ -1000,7 +1000,7 @@ void Engineer_UseSentryGun( gedict_t * gun )
 
     G_sprint( self, 2, "Level %.0f Sentry Gun has %.0f health, %.0f shells",
             gun->s.v.weapon, gun->s.v.health, gun->s.v.ammo_shells );
-    if ( gun->s.v.weapon == 3 )
+    if ( (int)gun->s.v.weapon == 3 )
     {
         G_sprint( self, 2, ", %.0f rockets", gun->s.v.ammo_rockets );
     }
