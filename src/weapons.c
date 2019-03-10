@@ -41,7 +41,7 @@ const weapon_info_t weapons_info[]= {
 {  WEAP_HOOK             , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.1, "progs/v_grap.mdl", "", "", 0},
 {  WEAP_BIOWEAPON        , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_bio.mdl", "", "weapons/ax1.wav", 0},
 {  WEAP_MEDIKIT          , IT_AXE,              0,          0, FOFS(ammo_medikit),    F_INT,0,0,0,0, 0,0,     0,0, 0.5, "progs/v_medi.mdl", "", "weapons/ax1.wav", 0},
-{  WEAP_SPANNER          , IT_AXE,              0,          0, FOFS(s.v.ammo_cells),  F_FLOAT,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_span.mdl", "", "weapons/ax1.wav", 0},
+{  WEAP_SPANNER          , IT_AXE,              0,          0, FOFS(s.v.ammo_cells),  F_FLOAT,0,0,0,0, 0,0,   0,0, 0.5, "progs/v_span.mdl", "", "weapons/ax1.wav", 0},
 {  WEAP_AXE              , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_axe.mdl", "", "weapons/ax1.wav", 0},
 {  WEAP_SNIPER_RIFLE     , IT_SHOTGUN,          IT_SHELLS,  1, FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 0,0,   0,0, 1.5, "progs/v_srifle.mdl", "", "weapons/sniper.wav", 0},
 {  WEAP_AUTO_RIFLE       , IT_SUPER_SHOTGUN,    IT_SHELLS,  2, FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 0,0,   0,0, 0.1, "progs/v_srifle.mdl", "", "weapons/sniper.wav", 0},
