@@ -355,30 +355,6 @@ void   TF_LocalinfoSettings( )
     float fvar;
     set_item_t* si = &tf_settings[0];
 
-    for(; si->name; si++ ){
-        if( si->key && si->key[0] ){
-            GetSVInfokeyString( si->key, si->key2, value, sizeof( value ), si->default_val);
-            if( value[0] ) tf_set( si->key, value, TFSET_LOCALINFO);
-        }
-        if( si->type == TFS_INT_BITS ){
-            const set_bits_t* sb = si->bitsdesc;
-            for(; sb->name; sb++ ){
-                if( sb->key && sb->key[0] ){
-                    GetSVInfokeyString( sb->key, sb->key2, value, sizeof( value ), sb->default_val? "1":"0");
-                    if( value[0] ) tf_set( sb->key, value, TFSET_LOCALINFO);
-                }
-            }
-        }
-    }
-
-    /*    if( !first_decode )
-          {
-          G_bprint(2,"!!!BUG BUG BUG!!!\nfirst_decode != 0 %d %s\n!!!BUG BUG BUG!!!\n", tfset_toggleflags, self->s.v.netname);
-          tfset_toggleflags |= TFLAG_FIRSTENTRY;
-          G_bprint(2,"toggleflags %d\n", tfset_toggleflags );
-          return;
-          }
-          first_decode = 0;*/
     memset( &tf_data, 0, sizeof(tf_data));
     tfset_toggleflags = 0; //g_globalvars.parm10;
     if ( coop || !deathmatch )
@@ -436,6 +412,31 @@ void   TF_LocalinfoSettings( )
 
     tfset_toggleflags |= GetSVInfokeyInt( "temp1", NULL, 0 );
     tfset_toggleflags |= TFLAG_FIRSTENTRY;
+
+    for(; si->name; si++ ){
+        if( si->key && si->key[0] ){
+            GetSVInfokeyString( si->key, si->key2, value, sizeof( value ), si->default_val);
+            if( value[0] ) tf_set( si->key, value, TFSET_LOCALINFO);
+        }
+        if( si->type == TFS_INT_BITS ){
+            const set_bits_t* sb = si->bitsdesc;
+            for(; sb->name; sb++ ){
+                if( sb->key && sb->key[0] ){
+                    GetSVInfokeyString( sb->key, sb->key2, value, sizeof( value ), sb->default_val? "1":"0");
+                    if( value[0] ) tf_set( sb->key, value, TFSET_LOCALINFO);
+                }
+            }
+        }
+    }
+
+    /*    if( !first_decode )
+          {
+          G_bprint(2,"!!!BUG BUG BUG!!!\nfirst_decode != 0 %d %s\n!!!BUG BUG BUG!!!\n", tfset_toggleflags, self->s.v.netname);
+          tfset_toggleflags |= TFLAG_FIRSTENTRY;
+          G_bprint(2,"toggleflags %d\n", tfset_toggleflags );
+          return;
+          }
+          first_decode = 0;*/
 
     //tf_data.birthday = GetSVInfokeyBool( "bd", "birthday", false );
     if( tfset(birthday) )
