@@ -348,18 +348,83 @@ extern char    nextmap[64];
 void   TF_LocalinfoSettings( )
 {
     char    value[100];
-    char    st[10];
-    gedict_t *ent;
-    gedict_t *te;
-    int i;
-    float fvar;
     set_item_t* si = &tf_settings[0];
 
     memset( &tf_data, 0, sizeof(tf_data));
     tfset_toggleflags = 0; //g_globalvars.parm10;
     if ( coop || !deathmatch )
         tfset_toggleflags |= TFLAG_CLASS_PERSIST;
+
+    tfset_toggleflags -= ( tfset_toggleflags & TFLAG_TEAMFRAGS );
+
+    tfset_toggleflags -= ( tfset_toggleflags & TFLAG_CHEATCHECK );
+
+    tfset_toggleflags |= GetSVInfokeyInt( "temp1", NULL, 0 );
+    tfset_toggleflags |= TFLAG_FIRSTENTRY;
+
     strncpy( nextmap, mapname, sizeof(nextmap) );
+    for(; si->name; si++ ){
+        if( si->key && si->key[0] ){
+            GetSVInfokeyString( si->key, si->key2, value, sizeof( value ), si->default_val);
+            if( value[0] ) tf_set( si->key, value, TFSET_LOCALINFO);
+        }
+        if( si->type == TFS_INT_BITS ){
+            const set_bits_t* sb = si->bitsdesc;
+            for(; sb->name; sb++ ){
+                if( sb->key && sb->key[0] ){
+                    GetSVInfokeyString( sb->key, sb->key2, value, sizeof( value ), sb->default_val? "1":"0");
+                    if( value[0] ) tf_set( sb->key, value, TFSET_LOCALINFO);
+                }
+            }
+        }
+    }
+
+    GetSVInfokeyString( "sg", NULL, value, sizeof( value ), "new" );
+    if ( !strcmp( value, "old" ) )
+    {
+        tfset_flagoff( sg_newfind );
+        tfset_sg_sfire   = SG_SFIRE_281;
+    }
+
+    if ( !strcmp( value, "fix" ) )
+    {
+        tfset_flagoff( sg_newfind );
+        tfset_sg_sfire   = SG_SFIRE_MTFL2;
+    }
+
+    if ( !strcmp( value, "oldmtfl" ) )
+    {
+        tfset_flagoff( sg_newfind );
+        tfset_sg_sfire   = SG_SFIRE_MTFL1;
+    }
+    if ( !strcmp( value, "mtflf" ) )
+    {
+        tfset_flagon( sg_newfind );
+        tfset_sg_sfire   = SG_SFIRE_MTFL1;
+    }
+
+    if ( !strcmp( value, "oldf" ) )
+    {
+        tfset_flagon( sg_newfind );
+        tfset_sg_sfire   = SG_SFIRE_281;
+    }
+
+    if ( !strcmp( value, "new" ) )
+    {
+        tfset_flagon( sg_newfind );
+        tfset_sg_sfire   = SG_SFIRE_NEW;
+    }
+
+
+}
+
+void   TF_FinalizeSettings( )
+{
+    //char    st[10];
+    gedict_t *ent;
+    gedict_t *te;
+    int i;
+    float fvar;
 
     ent = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
     if ( ent )
@@ -406,28 +471,6 @@ void   TF_LocalinfoSettings( )
     tfset_autokick_time = 0;
     tf_data.cease_fire = 0;
 
-    tfset_toggleflags -= ( tfset_toggleflags & TFLAG_TEAMFRAGS );
-
-    tfset_toggleflags -= ( tfset_toggleflags & TFLAG_CHEATCHECK );
-
-    tfset_toggleflags |= GetSVInfokeyInt( "temp1", NULL, 0 );
-    tfset_toggleflags |= TFLAG_FIRSTENTRY;
-
-    for(; si->name; si++ ){
-        if( si->key && si->key[0] ){
-            GetSVInfokeyString( si->key, si->key2, value, sizeof( value ), si->default_val);
-            if( value[0] ) tf_set( si->key, value, TFSET_LOCALINFO);
-        }
-        if( si->type == TFS_INT_BITS ){
-            const set_bits_t* sb = si->bitsdesc;
-            for(; sb->name; sb++ ){
-                if( sb->key && sb->key[0] ){
-                    GetSVInfokeyString( sb->key, sb->key2, value, sizeof( value ), sb->default_val? "1":"0");
-                    if( value[0] ) tf_set( sb->key, value, TFSET_LOCALINFO);
-                }
-            }
-        }
-    }
 
     /*    if( !first_decode )
           {
@@ -569,43 +612,6 @@ void   TF_LocalinfoSettings( )
     else
         team_top_colors[4] = TeamFortress_TeamGetColor( 4 ) - 1;
 
-
-
-    GetSVInfokeyString( "sg", NULL, st, sizeof( st ), "new" );
-    if ( !strcmp( st, "old" ) )
-    {
-        tfset_flagoff( sg_newfind );
-        tfset_sg_sfire   = SG_SFIRE_281;
-    }
-
-    if ( !strcmp( st, "fix" ) )
-    {
-        tfset_flagoff( sg_newfind );
-        tfset_sg_sfire   = SG_SFIRE_MTFL2;
-    }
-
-    if ( !strcmp( st, "oldmtfl" ) )
-    {
-        tfset_flagoff( sg_newfind );
-        tfset_sg_sfire   = SG_SFIRE_MTFL1;
-    }
-    if ( !strcmp( st, "mtflf" ) )
-    {
-        tfset_flagon( sg_newfind );
-        tfset_sg_sfire   = SG_SFIRE_MTFL1;
-    }
-
-    if ( !strcmp( st, "oldf" ) )
-    {
-        tfset_flagon( sg_newfind );
-        tfset_sg_sfire   = SG_SFIRE_281;
-    }
-
-    if ( !strcmp( st, "new" ) )
-    {
-        tfset_flagon( sg_newfind );
-        tfset_sg_sfire   = SG_SFIRE_NEW;
-    }
 
 
     memset( &tg_data, 0, sizeof(tg_data));

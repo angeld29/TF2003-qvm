@@ -25,7 +25,7 @@
 static int     item_list_bit;
 char   *team_menu_string = NULL;
 int     CTF_Map;
-void UpdateAbbreviations( gedict_t * Goal )
+static void UpdateAbbreviations( gedict_t * Goal )
 {
 
 	if ( !Goal->has_abbreviated )

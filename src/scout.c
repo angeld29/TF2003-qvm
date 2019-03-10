@@ -704,7 +704,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 	}
 
 	// If no entity type is enabled, don't scan
-	if ( self->tf_items_flags & ( NIT_SCANNER_ENEMY | NIT_SCANNER_FRIENDLY ) )
+	if ( !( self->tf_items_flags & ( NIT_SCANNER_ENEMY | NIT_SCANNER_FRIENDLY )) )
 	{
 		G_sprint( self, PRINT_HIGH, "All scanner functions are disabled.\n" );
 		return;
