@@ -1651,6 +1651,7 @@ void TeamFortress_SetEquipment(  )
 		self->s.v.takedamage = 0;
 		self->s.v.solid = SOLID_NOT;
 		self->s.v.movetype = MOVETYPE_NONE;//!!!REMOVE ME MOVETYPE_NOCLIP;
+		self->s.v.movetype = MOVETYPE_NOCLIP;
 		self->s.v.model = "";
 		self->mdl = "";
 		self->s.v.modelindex = 0;
@@ -1865,7 +1866,7 @@ void TeamFortress_SetupRespawn( int Suicided )
 				G_sprint( self, 2, "NO lives left, returning to Observer mode.\n" );
 				self->playerclass = 0;
 				self->tfstate -= ( self->tfstate & TFSTATE_RANDOMPC );
-				self->s.v.movetype = MOVETYPE_NONE;//!!!REMOVE ME MOVETYPE_NOCLIP;
+				self->s.v.movetype = MOVETYPE_NOCLIP;
 				self->s.v.solid = SOLID_NOT;
 				self->s.v.model = "";
 				self->mdl = "";
@@ -2661,6 +2662,7 @@ void PlayerObserverMode(  )
 	self->s.v.takedamage = 0;
 	self->s.v.solid = SOLID_NOT;
 	self->s.v.movetype = MOVETYPE_NONE;//!!!REMOVE ME MOVETYPE_NOCLIP;
+	self->s.v.movetype = MOVETYPE_NOCLIP;
 	G_sprint( self, 2, "Observer mode\n" );
 	CenterPrint( self, "\n" );
 	stuffcmd( self, "cl_rollangle 0\n" );
