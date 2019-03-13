@@ -15,7 +15,7 @@ by [sd] angel for MTFL
 sg_rfire изменено на on off (было new old )
 autoteam теперь включается только заданием числа( ранее on было эквивалентно 30 )
 
-localinfo sg deprecated, работет только из localinfo и применятся после дургих настроек sg переопределя их
+localinfo sg deprecated, работет только из localinfo и применяться после других настроек sg переопределяя их
 
 old     = sg_newfind off, sg_sfire old
 fix     = sg_newfind off, sg_sfire mtfl2
@@ -69,7 +69,7 @@ mod set  не работает при запуске удаленно через ркон
 Енг:
 [+] Упрощено обслуживание построек
 при ударе спаннером 
-дружественные апгредется, чинятся, заряжаются
+дружественные апгредится, чинятся, заряжаются
 вражеские разбираются
 serverinfo old_spanner on/off ( default off)
 
