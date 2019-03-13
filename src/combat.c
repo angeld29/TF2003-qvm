@@ -746,3 +746,14 @@ void ApplyDmgRoll( gedict_t* self )
     self->s.v.v_angle[PITCH] += val * crandom();
     self->s.v.v_angle[YAW]   += val * crandom();
 }
+
+void  ExplosionEffect( float*origin )
+{
+    trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+    trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
+    trap_WriteCoord( MSG_MULTICAST, origin[0] );
+    trap_WriteCoord( MSG_MULTICAST, origin[1] );
+    trap_WriteCoord( MSG_MULTICAST, origin[2] );
+    trap_multicast( PASSVEC3( origin ),MULTICAST_PHS );
+}
+

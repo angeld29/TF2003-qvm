@@ -423,12 +423,7 @@ void Sentry_Explode(  )
             dremove( self->oldenemy );
     } else
         dremove( self->trigger_field );
-    trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-    trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
-    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-    trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+    ExplosionEffect( self->s.v.origin );
     BecomeExplosion(  );
 }
 
@@ -466,12 +461,7 @@ void Sentry_Die(  )
         ThrowGib( "progs/tgib3.mdl", -70 );
         tf_data.deathmsg = DMSG_SG_EXPLODION;
         T_RadiusDamage( self, self->real_owner, 75 + self->s.v.ammo_rockets * 8, self );
-        trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-        trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
-        trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-        trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-        trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-        trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+        ExplosionEffect( self->s.v.origin );
     } else
     {
         self->real_owner->has_sentry -= 1;

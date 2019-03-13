@@ -179,12 +179,7 @@ void EMPExplode(  )
     }
     tf_data.deathmsg = DMSG_GREN_EMP_AMMO;
     T_RadiusDamage( self, PROG_TO_EDICT( self->s.v.enemy ), expsize, world );
-    trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-    trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
-    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-    trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+    ExplosionEffect( self->s.v.origin );
 
     // Respawn
     Respawn_Item( self, PROG_TO_EDICT( self->s.v.enemy ) );
@@ -261,12 +256,7 @@ void EMPGrenadeExplode(  )
                 T_RadiusDamage( te, PROG_TO_EDICT( self->s.v.owner ), expsize, te );
                 te->s.v.think = ( func_t ) TeamFortress_AmmoboxRemove;//SUB_Remove;
                 te->s.v.nextthink = g_globalvars.time + 0.1;
-                trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-                trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
-                trap_WriteCoord( MSG_MULTICAST, te->s.v.origin[0] );
-                trap_WriteCoord( MSG_MULTICAST, te->s.v.origin[1] );
-                trap_WriteCoord( MSG_MULTICAST, te->s.v.origin[2] );
-                trap_multicast( PASSVEC3( te->s.v.origin ), 1 );
+                ExplosionEffect( te->s.v.origin );
             }
             continue;
         }
@@ -299,12 +289,7 @@ void EMPGrenadeExplode(  )
                         te->s.v.think = ( func_t ) SUB_Remove;
                         te->s.v.nextthink = g_globalvars.time + 0.1;
                     }
-                    trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-                    trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
-                    trap_WriteCoord( MSG_MULTICAST, te->s.v.origin[0] );
-                    trap_WriteCoord( MSG_MULTICAST, te->s.v.origin[1] );
-                    trap_WriteCoord( MSG_MULTICAST, te->s.v.origin[2] );
-                    trap_multicast( PASSVEC3( te->s.v.origin ), 1 );
+                    ExplosionEffect( te->s.v.origin );
                 }
             }
             continue;
@@ -784,12 +769,7 @@ void Dispenser_Explode(  )
     ThrowGib( "progs/dgib1.mdl", -30 );
     ThrowGib( "progs/dgib2.mdl", -50 );
     ThrowGib( "progs/dgib3.mdl", -50 );
-    trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-    trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
-    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-    trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-    trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+    ExplosionEffect( self->s.v.origin );
     BecomeExplosion(  );
 }
 

@@ -176,12 +176,7 @@ void NapalmGrenadeNetThink(  )
 				stuffcmd( other, "bf\nbf\n" );
 		}
 	}
-	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-	trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+	ExplosionEffect( self->s.v.origin );
 	self->heat = self->heat + 1;
 	if ( self->heat > 7 )
 	{
@@ -223,12 +218,7 @@ void NapalmGrenadeExplode(  )
         				stuffcmd( other, "bf\nbf\n" );
         		}
         	}
-        	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-        	trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
-        	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-        	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-        	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-        	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+        	ExplosionEffect( self->s.v.origin );
         	head = spawn(  );
         	head->s.v.think = ( func_t ) NapalmGrenadeNetThink;
         	head->s.v.nextthink = g_globalvars.time + 1;
@@ -825,12 +815,7 @@ void T_IncendiaryTouch(  )
 	normalize( self->s.v.velocity, vtemp );
 	VectorScale( vtemp, 8, vtemp );
 	VectorSubtract( self->s.v.origin, vtemp, self->s.v.origin );
-	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-	trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+	ExplosionEffect( self->s.v.origin );
 	dremove( self );
 }
 

@@ -285,12 +285,7 @@ void ConcussionGrenadeTouch(  )
 void ConcussionGrenadeExplode(  )
 {
 	T_RadiusBounce( self, PROG_TO_EDICT( self->s.v.owner ), 240, world );
-	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-	trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+	ExplosionEffect( self->s.v.origin );
 	dremove( self );
 }
 

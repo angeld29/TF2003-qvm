@@ -1163,12 +1163,8 @@ void T_MissileTouch(  )
 		T_RadiusDamage( self, PROG_TO_EDICT( self->s.v.owner ), 92, other );
 	normalize( self->s.v.velocity, tmp );
 	VectorScale( tmp, -8, tmp );
-	VectorAdd( self->s.v.origin, tmp, self->s.v.origin ) trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-	trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-	trap_multicast( PASSVEC3( self->s.v.origin ), MULTICAST_PHS );
+	VectorAdd( self->s.v.origin, tmp, self->s.v.origin );
+        ExplosionEffect( self->s.v.origin );
 	dremove( self );
 }
 
@@ -1433,12 +1429,7 @@ void GrenadeExplode(  )
 			te = trap_find( te, FOFS( s.v.classname ), "grenade" );
 		}
 	}
-	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-	trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-	trap_multicast( PASSVEC3( self->s.v.origin ), MULTICAST_PHS );
+	ExplosionEffect( self->s.v.origin );
 	BecomeExplosion(  );
 }
 
