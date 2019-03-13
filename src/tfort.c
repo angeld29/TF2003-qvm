@@ -2435,7 +2435,7 @@ void NormalGrenadeExplode(  )
 {
 	tf_data.deathmsg = DMSG_GREN_HAND;
 	T_RadiusDamage( self, PROG_TO_EDICT( self->s.v.owner ), 180, world );
-	ExplosionEffect( self->s.v.origin );
+	TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
 	dremove( self );
 }
 void TeamFortress_DisplayDetectionItems(  )

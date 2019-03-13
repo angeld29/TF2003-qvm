@@ -273,18 +273,14 @@ void fire_touch(  )
 
 void barrel_explode(  )
 {
+    vec3_t v;
 	self->s.v.takedamage = DAMAGE_NO;
 	self->s.v.classname = "explo_box";
 	// did say self.owner
 	T_RadiusDamage( self, self, 160, world );
 
-	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-	trap_WriteByte( MSG_MULTICAST, TE_EXPLOSION );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] + 32 );
-
-	trap_multicast( PASSVEC3( self->s.v.origin ), MULTICAST_PHS );
+    VectorCopy( self->s.v.origin, v); v[2] += 32;
+    TempEffectCoord( v, TE_EXPLOSION );
 
 	ent_remove( self );
 }
@@ -395,14 +391,7 @@ void Laser_Touch(  )
 		TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 15, 0, TF_TD_ELECTRICITY );
 	} else
 	{
-		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-		trap_WriteByte( MSG_MULTICAST, TE_GUNSHOT );
-		trap_WriteByte( MSG_MULTICAST, 5 );
-		trap_WriteCoord( MSG_MULTICAST, org[0] );
-		trap_WriteCoord( MSG_MULTICAST, org[1] );
-		trap_WriteCoord( MSG_MULTICAST, org[2] );
-
-		trap_multicast( PASSVEC3( org ), MULTICAST_PVS );
+        TempEffectCount( org, TE_GUNSHOT, 5);
 	}
 
 	dremove( self );

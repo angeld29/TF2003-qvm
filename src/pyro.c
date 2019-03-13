@@ -176,7 +176,7 @@ void NapalmGrenadeNetThink(  )
 				stuffcmd( other, "bf\nbf\n" );
 		}
 	}
-	ExplosionEffect( self->s.v.origin );
+	TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
 	self->heat = self->heat + 1;
 	if ( self->heat > 7 )
 	{
@@ -218,7 +218,7 @@ void NapalmGrenadeExplode(  )
         				stuffcmd( other, "bf\nbf\n" );
         		}
         	}
-        	ExplosionEffect( self->s.v.origin );
+        	TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
         	head = spawn(  );
         	head->s.v.think = ( func_t ) NapalmGrenadeNetThink;
         	head->s.v.nextthink = g_globalvars.time + 1;
@@ -815,7 +815,7 @@ void T_IncendiaryTouch(  )
 	normalize( self->s.v.velocity, vtemp );
 	VectorScale( vtemp, 8, vtemp );
 	VectorSubtract( self->s.v.origin, vtemp, self->s.v.origin );
-	ExplosionEffect( self->s.v.origin );
+	TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
 	dremove( self );
 }
 

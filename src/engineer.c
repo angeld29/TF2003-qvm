@@ -91,12 +91,7 @@ void LaserBolt_Touch(  )
         return;
     } else
     {
-        trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-        trap_WriteByte( MSG_MULTICAST, TE_SPIKE );
-        trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-        trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-        trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-        trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+        TempEffectCoord( self->s.v.origin, TE_SPIKE );
     }
     dremove( self );
 }
@@ -179,7 +174,7 @@ void EMPExplode(  )
     }
     tf_data.deathmsg = DMSG_GREN_EMP_AMMO;
     T_RadiusDamage( self, PROG_TO_EDICT( self->s.v.enemy ), expsize, world );
-    ExplosionEffect( self->s.v.origin );
+    TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
 
     // Respawn
     Respawn_Item( self, PROG_TO_EDICT( self->s.v.enemy ) );
@@ -203,12 +198,7 @@ void EMPGrenadeExplode(  )
     gedict_t *te;
     gedict_t *oldself;
 
-    trap_WriteByte( MSG_BROADCAST, SVC_TEMPENTITY );
-    trap_WriteByte( MSG_BROADCAST, TE_TAREXPLOSION );
-    trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[0] );
-    trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[1] );
-    trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[2] );
-    trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+    TempEffectCoord( self->s.v.origin, TE_TAREXPLOSION );
     for ( te = world; (te = trap_findradius( te, self->s.v.origin, 240 )); )
     {
         if ( te->s.v.touch == ( func_t ) ammo_touch || te->s.v.touch == ( func_t ) weapon_touch )
@@ -256,7 +246,7 @@ void EMPGrenadeExplode(  )
                 T_RadiusDamage( te, PROG_TO_EDICT( self->s.v.owner ), expsize, te );
                 te->s.v.think = ( func_t ) TeamFortress_AmmoboxRemove;//SUB_Remove;
                 te->s.v.nextthink = g_globalvars.time + 0.1;
-                ExplosionEffect( te->s.v.origin );
+                TempEffectCoord(  te->s.v.origin , TE_EXPLOSION );
             }
             continue;
         }
@@ -289,7 +279,7 @@ void EMPGrenadeExplode(  )
                         te->s.v.think = ( func_t ) SUB_Remove;
                         te->s.v.nextthink = g_globalvars.time + 0.1;
                     }
-                    ExplosionEffect( te->s.v.origin );
+                    TempEffectCoord(  te->s.v.origin , TE_EXPLOSION );
                 }
             }
             continue;
@@ -769,7 +759,7 @@ void Dispenser_Explode(  )
     ThrowGib( "progs/dgib1.mdl", -30 );
     ThrowGib( "progs/dgib2.mdl", -50 );
     ThrowGib( "progs/dgib3.mdl", -50 );
-    ExplosionEffect( self->s.v.origin );
+    TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
     BecomeExplosion(  );
 }
 

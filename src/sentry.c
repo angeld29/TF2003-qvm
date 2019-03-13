@@ -423,7 +423,7 @@ void Sentry_Explode(  )
             dremove( self->oldenemy );
     } else
         dremove( self->trigger_field );
-    ExplosionEffect( self->s.v.origin );
+    TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
     BecomeExplosion(  );
 }
 
@@ -461,7 +461,7 @@ void Sentry_Die(  )
         ThrowGib( "progs/tgib3.mdl", -70 );
         tf_data.deathmsg = DMSG_SG_EXPLODION;
         T_RadiusDamage( self, self->real_owner, 75 + self->s.v.ammo_rockets * 8, self );
-        ExplosionEffect( self->s.v.origin );
+        TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
     } else
     {
         self->real_owner->has_sentry -= 1;

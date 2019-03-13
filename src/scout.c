@@ -238,13 +238,9 @@ void FlashGrenadeExplode(  )
 	vec3_t  tmp;
 
 	owner = PROG_TO_EDICT( self->s.v.owner );
-	self->s.v.effects = ( int ) self->s.v.effects | 4;
-	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-	trap_WriteByte( MSG_MULTICAST, TE_TAREXPLOSION );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-	trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+	self->s.v.effects = ( int ) self->s.v.effects | EF_BRIGHTFIELD;
+
+    TempEffectCoord( self->s.v.origin, TE_TAREXPLOSION );
 	for ( te = world; ( te = trap_findradius( te, self->s.v.origin, 300 ) ); )
 	{
 		if ( strneq( te->s.v.classname, "player" ) )
@@ -285,7 +281,7 @@ void ConcussionGrenadeTouch(  )
 void ConcussionGrenadeExplode(  )
 {
 	T_RadiusBounce( self, PROG_TO_EDICT( self->s.v.owner ), 240, world );
-	ExplosionEffect( self->s.v.origin );
+	TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
 	dremove( self );
 }
 

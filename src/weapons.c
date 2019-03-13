@@ -112,11 +112,11 @@ void W_Precache(  )
 }
 
 
-static void  GunShotEffect( float*origin )
+void  TempEffectCount( float*origin, int type, int count  )
 {
     trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-    trap_WriteByte( MSG_MULTICAST, TE_GUNSHOT );
-    trap_WriteByte( MSG_MULTICAST, 3 );
+    trap_WriteByte( MSG_MULTICAST, type );
+    trap_WriteByte( MSG_MULTICAST, count );
     trap_WriteCoord( MSG_MULTICAST, origin[0] );
     trap_WriteCoord( MSG_MULTICAST, origin[1] );
     trap_WriteCoord( MSG_MULTICAST, origin[2] );
@@ -188,7 +188,7 @@ void W_FireAxe(  )
 	{
 		sound( self, CHAN_WEAPON, "player/axhit2.wav", 1, ATTN_NORM );
 
-		GunShotEffect( org );
+		TempEffectCount( org , TE_GUNSHOT, 3);
 	}
 }
 
@@ -237,7 +237,7 @@ void W_FireSpanner(  )
 			{
 				sound( self, CHAN_WEAPON, "player/axhit2.wav", 1, ATTN_NORM );
 
-				GunShotEffect( org );
+				TempEffectCount( org , TE_GUNSHOT, 3);
 			}
 		}
 		return;
@@ -286,7 +286,7 @@ void W_FireSpanner(  )
 									self->s.v.ammo_cells = self->s.v.ammo_cells - healam;
 								sound( trace_ent,
 								       CHAN_WEAPON, "items/r_item1.wav", 1, ATTN_NORM );
-								GunShotEffect( org );
+								TempEffectCount( org , TE_GUNSHOT, 3);
 								W_SetCurrentAmmo(  );
 							}
 							return;
@@ -302,7 +302,7 @@ void W_FireSpanner(  )
 	} else
 	{
 		sound( self, 1, "player/axhit2.wav", 1, 1 );
-		GunShotEffect( org );
+		TempEffectCount( org , TE_GUNSHOT, 3);
 	}
 }
 
@@ -515,7 +515,7 @@ void W_FireMedikit(  )
 	{
 		sound( self, CHAN_WEAPON, "player/axhit2.wav", 1, ATTN_NORM );
 
-		GunShotEffect( org );
+		TempEffectCount( org , TE_GUNSHOT, 3);
 	}
 }
 
@@ -590,7 +590,7 @@ void W_FireBioweapon(  )
 	{
 		sound( self, CHAN_WEAPON, "player/axhit2.wav", 1, ATTN_NORM );
 
-		GunShotEffect( org );
+		TempEffectCount( org , TE_GUNSHOT, 3);
 	}
 }
 
@@ -658,13 +658,7 @@ SpawnBlood
 */
 void SpawnBlood( vec3_t org, float damage )
 {
-	trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-	trap_WriteByte( MSG_MULTICAST, TE_BLOOD );
-	trap_WriteByte( MSG_MULTICAST, 1 );
-	trap_WriteCoord( MSG_MULTICAST, org[0] );
-	trap_WriteCoord( MSG_MULTICAST, org[1] );
-	trap_WriteCoord( MSG_MULTICAST, org[2] );
-	trap_multicast( PASSVEC3( org ), MULTICAST_PVS );
+    TempEffectCount( org, TE_BLOOD, 1 );
 }
 
 /*
@@ -737,26 +731,9 @@ void AddMultiDamage( gedict_t * hit, float damage )
 void Multi_Finish(  )
 {
 	if ( puff_count )
-	{
-		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-		trap_WriteByte( MSG_MULTICAST, TE_GUNSHOT );
-		trap_WriteByte( MSG_MULTICAST, puff_count );
-		trap_WriteCoord( MSG_MULTICAST, puff_org[0] );
-		trap_WriteCoord( MSG_MULTICAST, puff_org[1] );
-		trap_WriteCoord( MSG_MULTICAST, puff_org[2] );
-		trap_multicast( PASSVEC3( puff_org ), MULTICAST_PVS );
-	}
-
+        TempEffectCount( puff_org, TE_GUNSHOT, puff_count );
 	if ( blood_count )
-	{
-		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-		trap_WriteByte( MSG_MULTICAST, TE_BLOOD );
-		trap_WriteByte( MSG_MULTICAST, blood_count );
-		trap_WriteCoord( MSG_MULTICAST, blood_org[0] );
-		trap_WriteCoord( MSG_MULTICAST, blood_org[1] );
-		trap_WriteCoord( MSG_MULTICAST, blood_org[2] );
-		trap_multicast( PASSVEC3( puff_org ), MULTICAST_PVS );
-	}
+        TempEffectCount( blood_org, TE_BLOOD, blood_count );
 }
 
 /*
@@ -927,14 +904,7 @@ void FireSniperBullet( vec3_t direction, float damage )
 	if ( g_globalvars.trace_fraction != 1 )
 		TraceAttack( damage, direction );
 	if ( !g_globalvars.trace_ent )
-	{
-		trap_WriteByte( MSG_BROADCAST, SVC_TEMPENTITY );
-		trap_WriteByte( MSG_BROADCAST, TE_SPIKE );
-		trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[0] );
-		trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[1] );
-		trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[2] );
-		trap_multicast( PASSVEC3( g_globalvars.trace_endpos ), MULTICAST_PHS );
-	}
+        TempEffectCoord( g_globalvars.trace_endpos, TE_SPIKE );
 
 	ApplyMultiDamage(  );
 }
@@ -1038,12 +1008,7 @@ void W_FireSniperRifle(  )
 		}
 	}else
 	{
-		trap_WriteByte( MSG_BROADCAST, SVC_TEMPENTITY );
-		trap_WriteByte( MSG_BROADCAST, TE_SPIKE );
-		trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[0] );
-		trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[1] );
-		trap_WriteCoord( MSG_BROADCAST, g_globalvars.trace_endpos[2] );
-		trap_multicast( PASSVEC3( g_globalvars.trace_endpos ), MULTICAST_PHS );
+        TempEffectCoord( g_globalvars.trace_endpos, TE_SPIKE );
 	}
 	ClearMultiDamage(  );
 	if ( g_globalvars.trace_fraction != 1 )
@@ -1138,7 +1103,7 @@ void T_MissileTouch(  )
 	normalize( self->s.v.velocity, tmp );
 	VectorScale( tmp, -8, tmp );
 	VectorAdd( self->s.v.origin, tmp, self->s.v.origin );
-        ExplosionEffect( self->s.v.origin );
+    TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
 	dremove( self );
 }
 
@@ -1403,7 +1368,7 @@ void GrenadeExplode(  )
 			te = trap_find( te, FOFS( s.v.classname ), "grenade" );
 		}
 	}
-	ExplosionEffect( self->s.v.origin );
+	TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
 	BecomeExplosion(  );
 }
 
@@ -1635,17 +1600,12 @@ void spike_touch(  )
 			TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 18, TF_TD_NOTTEAM, TF_TD_NAIL );
 	} else
 	{
-		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
 		if ( !strcmp( self->s.v.classname, "wizspike" ) )
-			trap_WriteByte( MSG_MULTICAST, TE_WIZSPIKE );
+            TempEffectCoord( self->s.v.origin, TE_WIZSPIKE );
 		else if ( !strcmp( self->s.v.classname, "knightspike" ) )
-			trap_WriteByte( MSG_MULTICAST, TE_KNIGHTSPIKE );
+            TempEffectCoord( self->s.v.origin, TE_KNIGHTSPIKE );
 		else
-			trap_WriteByte( MSG_MULTICAST, TE_SPIKE );
-		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-		trap_multicast( PASSVEC3( self->s.v.origin ), MULTICAST_PHS );
+            TempEffectCoord( self->s.v.origin, TE_SPIKE );
 	}
 	dremove( self );
 }
@@ -1684,12 +1644,7 @@ void superspike_touch(  )
 			TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), ndmg, TF_TD_NOTTEAM, TF_TD_NAIL );
 	} else
 	{
-		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-		trap_WriteByte( MSG_MULTICAST, TE_SUPERSPIKE );
-		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-		trap_multicast( PASSVEC3( self->s.v.origin ), MULTICAST_PHS );
+        TempEffectCoord( self->s.v.origin, TE_SUPERSPIKE );
 	}
 	dremove( self );
 }

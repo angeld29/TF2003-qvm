@@ -74,7 +74,7 @@ void MirvGrenadeExplode(  )
 
 	tf_data.deathmsg = DMSG_GREN_MIRV;
 	T_RadiusDamage( self, PROG_TO_EDICT( self->s.v.owner ), 100, world );
-    ExplosionEffect( self->s.v.origin );
+    TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
 	self->s.v.solid = SOLID_NOT;
 	// Launch mirvs
 	for ( i = 0; i < GR_TYPE_MIRV_NO; i++)
@@ -445,7 +445,7 @@ void TeamFortress_DetpackExplode(  )
 				}
 			}
 		}
-		ExplosionEffect( self->s.v.origin );
+		TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
 	} else
 		G_sprint( self->real_owner, 2, "Your detpack fizzled out.\n" );
 	// This code handles a disarming scout with protection

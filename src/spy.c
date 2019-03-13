@@ -1331,12 +1331,7 @@ void GasGrenadeMakeGas(  )
 	self->heat = self->heat + 1;
 	if ( self->heat == 1 )
 	{
-		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-		trap_WriteByte( MSG_MULTICAST, TE_TAREXPLOSION );
-		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-		trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] );
-		trap_multicast( PASSVEC3( self->s.v.origin ), 2 );
+        TempEffectCoordPVS( self->s.v.origin, TE_TAREXPLOSION );
 		return;
 	}
 	if ( self->heat <= 20 )
@@ -1344,12 +1339,9 @@ void GasGrenadeMakeGas(  )
 		self->s.v.weapon = self->s.v.weapon + 1;
 		if ( self->s.v.weapon == 1 )
 		{
-			trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-			trap_WriteByte( MSG_MULTICAST, TE_LAVASPLASH );
-			trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[0] );
-			trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[1] );
-			trap_WriteCoord( MSG_MULTICAST, self->s.v.origin[2] - 24 );
-			trap_multicast( PASSVEC3( self->s.v.origin ), 2 );
+            vec3_t v;
+            VectorCopy( self->s.v.origin, v); v[2] -= 24;
+            TempEffectCoordPVS( v, TE_LAVASPLASH );
 		} else
 		{
 			if ( self->s.v.weapon == 2 )

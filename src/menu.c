@@ -1621,23 +1621,13 @@ void TG_SavePosition_Menu_Input( int inp )
 		VectorCopy( self->s.v.origin, savepos );
 		VectorCopy( self->s.v.angles, saveangle );
 		VectorCopy( self->s.v.velocity, savevel );
-		trap_WriteByte( MULTICAST_PHS_R, SVC_TEMPENTITY );
-		trap_WriteByte( MULTICAST_PHS_R, TE_TAREXPLOSION );
-		trap_WriteCoord( MULTICAST_PHS_R, savepos[0] );
-		trap_WriteCoord( MULTICAST_PHS_R, savepos[1] );
-		trap_WriteCoord( MULTICAST_PHS_R, savepos[2] );
-		trap_multicast( PASSVEC3( savepos ), 1 );
+        TempEffectCoord( savepos, TE_TAREXPLOSION );
 		ResetMenu(  );
 		break;
 	case 2:
 		if ( VectorCompareF( savepos, 0, 0, 0 ) )
 			break;
-		trap_WriteByte( MULTICAST_PHS_R, SVC_TEMPENTITY );
-		trap_WriteByte( MULTICAST_PHS_R, TE_TAREXPLOSION );
-		trap_WriteCoord( MULTICAST_PHS_R, savepos[0] );
-		trap_WriteCoord( MULTICAST_PHS_R, savepos[1] );
-		trap_WriteCoord( MULTICAST_PHS_R, savepos[2] );
-		trap_multicast( PASSVEC3( savepos ), 1 );
+        TempEffectCoord( savepos, TE_TAREXPLOSION );
 		G_sprint( self, 2, "Saved position: '%.0f %.0f %.0f'\n", savepos[0],
 			  savepos[1], savepos[2] );
 		G_sprint( self, 2, "angle: '%.0f %.0f %.0f'\n", saveangle[0],
