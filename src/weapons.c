@@ -112,6 +112,16 @@ void W_Precache(  )
 }
 
 
+static void  GunShotEffect( float*origin )
+{
+    trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
+    trap_WriteByte( MSG_MULTICAST, TE_GUNSHOT );
+    trap_WriteByte( MSG_MULTICAST, 3 );
+    trap_WriteCoord( MSG_MULTICAST, origin[0] );
+    trap_WriteCoord( MSG_MULTICAST, origin[1] );
+    trap_WriteCoord( MSG_MULTICAST, origin[2] );
+    trap_multicast( PASSVEC3( origin ), MULTICAST_PVS );
+}
 //======================================================================
 // Calculate the attack_finished time
 void Attack_Finished( float att_delay )
@@ -178,13 +188,7 @@ void W_FireAxe(  )
 	{
 		sound( self, CHAN_WEAPON, "player/axhit2.wav", 1, ATTN_NORM );
 
-		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-		trap_WriteByte( MSG_MULTICAST, TE_GUNSHOT );
-		trap_WriteByte( MSG_MULTICAST, 3 );
-		trap_WriteCoord( MSG_MULTICAST, org[0] );
-		trap_WriteCoord( MSG_MULTICAST, org[1] );
-		trap_WriteCoord( MSG_MULTICAST, org[2] );
-		trap_multicast( PASSVEC3( org ), MULTICAST_PVS );
+		GunShotEffect( org );
 	}
 }
 
@@ -233,13 +237,7 @@ void W_FireSpanner(  )
 			{
 				sound( self, CHAN_WEAPON, "player/axhit2.wav", 1, ATTN_NORM );
 
-				trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-				trap_WriteByte( MSG_MULTICAST, TE_GUNSHOT );
-				trap_WriteByte( MSG_MULTICAST, 3 );
-				trap_WriteCoord( MSG_MULTICAST, org[0] );
-				trap_WriteCoord( MSG_MULTICAST, org[1] );
-				trap_WriteCoord( MSG_MULTICAST, org[2] );
-				trap_multicast( PASSVEC3( org ), MULTICAST_PVS );
+				GunShotEffect( org );
 			}
 		}
 		return;
@@ -288,13 +286,7 @@ void W_FireSpanner(  )
 									self->s.v.ammo_cells = self->s.v.ammo_cells - healam;
 								sound( trace_ent,
 								       CHAN_WEAPON, "items/r_item1.wav", 1, ATTN_NORM );
-								trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-								trap_WriteByte( MSG_MULTICAST, TE_GUNSHOT );
-								trap_WriteByte( MSG_MULTICAST, 3 );
-								trap_WriteCoord( MSG_MULTICAST, org[0] );
-								trap_WriteCoord( MSG_MULTICAST, org[1] );
-								trap_WriteCoord( MSG_MULTICAST, org[2] );
-								trap_multicast( PASSVEC3( org ), MULTICAST_PVS );
+								GunShotEffect( org );
 								W_SetCurrentAmmo(  );
 							}
 							return;
@@ -310,13 +302,7 @@ void W_FireSpanner(  )
 	} else
 	{
 		sound( self, 1, "player/axhit2.wav", 1, 1 );
-		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-		trap_WriteByte( MSG_MULTICAST, TE_GUNSHOT );
-		trap_WriteByte( MSG_MULTICAST, 3 );
-		trap_WriteCoord( MSG_MULTICAST, org[0] );
-		trap_WriteCoord( MSG_MULTICAST, org[1] );
-		trap_WriteCoord( MSG_MULTICAST, org[2] );
-		trap_multicast( PASSVEC3( org ), MULTICAST_PVS );
+		GunShotEffect( org );
 	}
 }
 
@@ -529,13 +515,7 @@ void W_FireMedikit(  )
 	{
 		sound( self, CHAN_WEAPON, "player/axhit2.wav", 1, ATTN_NORM );
 
-		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-		trap_WriteByte( MSG_MULTICAST, TE_GUNSHOT );
-		trap_WriteByte( MSG_MULTICAST, 3 );
-		trap_WriteCoord( MSG_MULTICAST, org[0] );
-		trap_WriteCoord( MSG_MULTICAST, org[1] );
-		trap_WriteCoord( MSG_MULTICAST, org[2] );
-		trap_multicast( PASSVEC3( org ), MULTICAST_PVS );
+		GunShotEffect( org );
 	}
 }
 
@@ -610,13 +590,7 @@ void W_FireBioweapon(  )
 	{
 		sound( self, CHAN_WEAPON, "player/axhit2.wav", 1, ATTN_NORM );
 
-		trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
-		trap_WriteByte( MSG_MULTICAST, TE_GUNSHOT );
-		trap_WriteByte( MSG_MULTICAST, 3 );
-		trap_WriteCoord( MSG_MULTICAST, org[0] );
-		trap_WriteCoord( MSG_MULTICAST, org[1] );
-		trap_WriteCoord( MSG_MULTICAST, org[2] );
-		trap_multicast( PASSVEC3( org ), MULTICAST_PVS );
+		GunShotEffect( org );
 	}
 }
 

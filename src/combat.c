@@ -754,6 +754,6 @@ void  ExplosionEffect( float*origin )
     trap_WriteCoord( MSG_MULTICAST, origin[0] );
     trap_WriteCoord( MSG_MULTICAST, origin[1] );
     trap_WriteCoord( MSG_MULTICAST, origin[2] );
-    trap_multicast( PASSVEC3( origin ),MULTICAST_PHS );
+    trap_multicast( PASSVEC3( origin ), MULTICAST_PHS );
 }
 
