@@ -40,99 +40,9 @@ static const int     default_class_discard[10][4] = {
 	{0, 0, 1, 0}
 };
 
-void TeamFortress_Cmd_Discard( void )
+void doDiscard( gedict_t* newmis, gedict_t *self)
 {
-	int     ammo_tmp;
 	vec3_t  vtemp;
-	int argc,i;
-	char    value[1024];
-
-	argc  = trap_CmdArgc();
-	newmis = spawn(  );
-
-	if ( default_class_discard[self->playerclass][0] )
-		newmis->s.v.ammo_shells = self->s.v.ammo_shells;
-	if ( default_class_discard[self->playerclass][1] )
-		newmis->s.v.ammo_nails = self->s.v.ammo_nails;
-	if ( default_class_discard[self->playerclass][2] )
-		newmis->s.v.ammo_rockets = self->s.v.ammo_rockets;
-	if ( default_class_discard[self->playerclass][3] )
-		newmis->s.v.ammo_cells = self->s.v.ammo_cells;
-
-	for (  i = 1 ; i < argc ; i++ )
-	{
-		trap_CmdArgv( i, value, sizeof( value ) );
-		switch( value[0] )
-		{
-			case 's':
-				trap_CmdArgv( ++i, value, sizeof( value ) );
-				ammo_tmp = atoi(value);
-				if( ammo_tmp > 0 )
-				{
-					if( ammo_tmp > self->s.v.ammo_shells )
-						ammo_tmp = self->s.v.ammo_shells;
-				}else
-				{
-					if( -ammo_tmp > self->s.v.ammo_shells )
-						ammo_tmp = 0;
-					else
-						ammo_tmp += self->s.v.ammo_shells;
-				}
-				newmis->s.v.ammo_shells = ammo_tmp;
-				break;
-			case 'n':
-				trap_CmdArgv( ++i, value, sizeof( value ) );
-				ammo_tmp = atoi(value);
-				if( ammo_tmp > 0 )
-				{
-					if( ammo_tmp > self->s.v.ammo_nails )
-						ammo_tmp = self->s.v.ammo_nails;
-				}else
-				{
-					if( -ammo_tmp > self->s.v.ammo_nails )
-						ammo_tmp = 0;
-					else
-						ammo_tmp += self->s.v.ammo_nails;
-				}
-				newmis->s.v.ammo_nails = ammo_tmp;
-				break;
-				
-			case 'r':
-				trap_CmdArgv( ++i, value, sizeof( value ) );
-				ammo_tmp = atoi(value);
-				if( ammo_tmp > 0 )
-				{
-					if( ammo_tmp > self->s.v.ammo_rockets )
-						ammo_tmp = self->s.v.ammo_rockets;
-				}else
-				{
-					if( -ammo_tmp > self->s.v.ammo_rockets )
-						ammo_tmp = 0;
-					else
-						ammo_tmp += self->s.v.ammo_rockets;
-				}
-				newmis->s.v.ammo_rockets = ammo_tmp;
-				break;
-			case 'c':
-				trap_CmdArgv( ++i, value, sizeof( value ) );
-				ammo_tmp = atoi(value);
-				if( ammo_tmp > 0 )
-				{
-					if( ammo_tmp > self->s.v.ammo_cells )
-						ammo_tmp = self->s.v.ammo_cells;
-				}else
-				{
-					if( -ammo_tmp > self->s.v.ammo_cells )
-						ammo_tmp = 0;
-					else
-						ammo_tmp += self->s.v.ammo_cells;
-				}
-				newmis->s.v.ammo_cells = ammo_tmp;
-				break;
-		}
-		
-	}
-
 	if ( !( newmis->s.v.ammo_shells + newmis->s.v.ammo_nails + newmis->s.v.ammo_rockets + newmis->s.v.ammo_cells ) )
 	{
 		dremove( newmis );
@@ -180,11 +90,24 @@ void TeamFortress_Cmd_Discard( void )
 	setmodel( newmis, "progs/backpack.mdl" );
 }
 
-void TeamFortress_Discard(  )
+static int bound_discard_ammo( int ammo4drop, int have_ammo )
 {
-	int     ammo_tmp;
-	vec3_t  vtemp;
+    if( ammo4drop > 0 )
+    {
+        if( ammo4drop > have_ammo )
+            ammo4drop = have_ammo;
+    }else {
+        if( -ammo4drop > have_ammo )
+            ammo4drop = 0;
+        else
+            ammo4drop += have_ammo;
+    }
+    return ammo4drop;
+}
 
+static gedict_t* defaultDiscard( gedict_t*self)
+{
+    gedict_t*newmis;
 	newmis = spawn(  );
 
 	if ( default_class_discard[self->playerclass][0] )
@@ -195,86 +118,73 @@ void TeamFortress_Discard(  )
 		newmis->s.v.ammo_rockets = self->s.v.ammo_rockets;
 	if ( default_class_discard[self->playerclass][3] )
 		newmis->s.v.ammo_cells = self->s.v.ammo_cells;
+    return newmis;
+}
 
-	ammo_tmp = self->discard_shells;
-	if ( ammo_tmp >= 0 )
+void TeamFortress_Cmd_Discard( void )
+{
+	int     ammo_tmp;
+	int argc,i;
+	char    value[1024];
+
+	argc  = trap_CmdArgc();
+	newmis = defaultDiscard( self );
+
+	for (  i = 1 ; i < argc-1 ; i++ )
 	{
-		if ( ammo_tmp <= self->s.v.ammo_shells )
-			newmis->s.v.ammo_shells = self->s.v.ammo_shells -  ammo_tmp;
-		else
-			newmis->s.v.ammo_shells = 0;
+		trap_CmdArgv( i, value, sizeof( value ) );
+
+        trap_CmdArgv( ++i, value, sizeof( value ) );
+        ammo_tmp = atoi(value);
+		switch( value[0] )
+		{
+			case 's':
+				newmis->s.v.ammo_shells = bound_discard_ammo( ammo_tmp, self->s.v.ammo_shells);
+				break;
+			case 'n':
+				newmis->s.v.ammo_nails = bound_discard_ammo( ammo_tmp, self->s.v.ammo_nails);
+				break;
+				
+			case 'r':
+				newmis->s.v.ammo_rockets = bound_discard_ammo( ammo_tmp, self->s.v.ammo_rockets);
+				break;
+			case 'c':
+				newmis->s.v.ammo_cells = bound_discard_ammo( ammo_tmp, self->s.v.ammo_cells);
+				break;
+		}
+		
 	}
-	ammo_tmp = self->discard_nails;
-	if ( ammo_tmp >= 0 )
-	{
-		if ( ammo_tmp <= self->s.v.ammo_nails )
-			newmis->s.v.ammo_nails = self->s.v.ammo_nails - ammo_tmp;
-		else
-			newmis->s.v.ammo_nails = 0;
-	}
-	ammo_tmp = self->discard_rockets;
-	if ( ammo_tmp >= 0 )
-	{
-		if ( ammo_tmp <= self->s.v.ammo_rockets )
-			newmis->s.v.ammo_rockets = self->s.v.ammo_rockets - ammo_tmp;
-		else
-			newmis->s.v.ammo_rockets = 0;
-	}
-	ammo_tmp = self->discard_cells;
-	if ( ammo_tmp >= 0 )
-	{
-		if ( ammo_tmp <= self->s.v.ammo_cells )
-			newmis->s.v.ammo_cells = self->s.v.ammo_cells - ammo_tmp;
-		else
-			newmis->s.v.ammo_cells = 0;
-	}
+    doDiscard( newmis, self );
+}
+
+static int bound_discard_ammo_classic( int ammo4drop, int have_ammo )
+{
+    if ( ammo4drop <= have_ammo )
+        return have_ammo -  ammo4drop;
+    else
+        return 0; 
+}
+
+void TeamFortress_Discard(  )
+{
+	int     ammo_tmp;
+
+	newmis = defaultDiscard( self );
 
 
-	if ( !( newmis->s.v.ammo_shells + newmis->s.v.ammo_nails + newmis->s.v.ammo_rockets + newmis->s.v.ammo_cells ) )
-	{
-		dremove( newmis );
-		return;
-	}
-	g_globalvars.newmis = EDICT_TO_PROG( newmis );
+    if( self->discard_shells >= 0 )
+			newmis->s.v.ammo_shells = bound_discard_ammo_classic( self->discard_shells, self->s.v.ammo_shells );
 
-	if ( newmis->s.v.ammo_shells )
-		self->s.v.ammo_shells = self->s.v.ammo_shells - newmis->s.v.ammo_shells;
-	if ( newmis->s.v.ammo_nails )
-		self->s.v.ammo_nails = self->s.v.ammo_nails - newmis->s.v.ammo_nails;
-	if ( newmis->s.v.ammo_rockets )
-		self->s.v.ammo_rockets = self->s.v.ammo_rockets - newmis->s.v.ammo_rockets;
-	if ( newmis->s.v.ammo_cells )
-		self->s.v.ammo_cells = self->s.v.ammo_cells - newmis->s.v.ammo_cells;
-	W_SetCurrentAmmo();
-	sound( self, CHAN_ITEM, "weapons/lock4.wav", 1, 1 );
-	increment_team_ammoboxes( self->team_no );
+    if( self->discard_nails >= 0 )
+			newmis->s.v.ammo_nails = bound_discard_ammo_classic( self->discard_nails, self->s.v.ammo_nails );
 
-	newmis->s.v.enemy = EDICT_TO_PROG( self );
-	newmis->s.v.health = g_globalvars.time;
-	newmis->s.v.weapon = 0;
-	newmis->s.v.movetype = MOVETYPE_TOSS;
-	newmis->s.v.solid = SOLID_TRIGGER;
-	newmis->s.v.classname = "ammobox";
-	newmis->team_no = self->team_no;
-	trap_makevectors( self->s.v.v_angle );
-	if ( self->s.v.v_angle[0] )
-	{
-		VectorScale( g_globalvars.v_forward, 400, newmis->s.v.velocity );
-		VectorScale( g_globalvars.v_up, 200, vtemp );
-		VectorAdd( vtemp, newmis->s.v.velocity, newmis->s.v.velocity );
-	} else
-	{
-		aim( newmis->s.v.velocity );
-		VectorScale( newmis->s.v.velocity, 400, newmis->s.v.velocity );
-		newmis->s.v.velocity[2] = 200;
-	}
-	SetVector( newmis->s.v.avelocity, 0, 300, 0 );
-	setsize( newmis, 0, 0, 0, 0, 0, 0 );
-	setorigin( newmis, PASSVEC3( self->s.v.origin ) );
-	newmis->s.v.nextthink = g_globalvars.time + 30;
-	newmis->s.v.think = ( func_t ) TeamFortress_AmmoboxRemove;//	SUB_Remove;
-	newmis->s.v.touch = ( func_t ) TeamFortress_AmmoboxTouch;
-	setmodel( newmis, "progs/backpack.mdl" );
+    if( self->discard_rockets >= 0 )
+			newmis->s.v.ammo_rockets = bound_discard_ammo_classic( self->discard_rockets, self->s.v.ammo_rockets );
+
+    if( self->discard_cells >= 0 )
+			newmis->s.v.ammo_cells = bound_discard_ammo_classic( self->discard_cells, self->s.v.ammo_cells );
+
+    doDiscard( newmis, self );
 }
 
 void TeamFortress_SaveMe(  )
