@@ -209,6 +209,17 @@ void SP_i_p_t(  )
 	SP_info_player_teamspawn(  );
 }
 
+void goalSetSize( gedict_t*self)
+{
+    if ( !self->goal_state )
+        self->goal_state = TFGS_INACTIVE;
+    if ( VectorCompareF( self->goal_min, 0, 0, 0 ) )
+        SetVector( self->goal_min, -16, -16, -24 );
+    if ( VectorCompareF( self->goal_max, 0, 0, 0 ) )
+        SetVector( self->goal_max, 16, 16, 32 );
+    setsize( self, PASSVEC3( self->goal_min ), PASSVEC3( self->goal_max ) );
+}
+
 void SP_info_tfgoal(  )
 {
 	if ( !CheckExistence(  ) )
@@ -237,13 +248,7 @@ void SP_info_tfgoal(  )
 	trap_precache_sound( "items/damage2.wav" );
 	trap_precache_sound( "items/damage3.wav" );
 	self->s.v.solid = SOLID_TRIGGER;
-	if ( !self->goal_state )
-		self->goal_state = TFGS_INACTIVE;
-	if ( VectorCompareF( self->goal_min, 0, 0, 0 ) )
-		SetVector( self->goal_min, -16, -16, -24 );
-	if ( VectorCompareF( self->goal_max, 0, 0, 0 ) )
-		SetVector( self->goal_max, 16, 16, 32 );
-	setsize( self, PASSVEC3( self->goal_min ), PASSVEC3( self->goal_max ) );
+    goalSetSize( self );
 	TF_StartGoal(  );
 }
 
@@ -275,13 +280,7 @@ void SP_info_tfgoal_timer(  )
 		dremove( self );
 	}
 	self->s.v.solid = SOLID_NOT;
-	if ( !self->goal_state )
-		self->goal_state = TFGS_INACTIVE;
-	if ( VectorCompareF( self->goal_min, 0, 0, 0 ) )
-		SetVector( self->goal_min, -16, -16, -24 );
-	if ( VectorCompareF( self->goal_max, 0, 0, 0 ) )
-		SetVector( self->goal_max, 16, 16, 32 );
-	setsize( self, PASSVEC3( self->goal_min ), PASSVEC3( self->goal_max ) );
+    goalSetSize( self );
 	TF_StartGoal(  );
 }
 
@@ -313,8 +312,6 @@ void SP_item_tfgoal(  )
 		trap_precache_sound( self->s.v.noise );
 	}
 	self->s.v.touch = ( func_t ) item_tfgoal_touch;
-	if ( !self->goal_state )
-		self->goal_state = TFGS_INACTIVE;
 	if ( self->goal_activation & TFGI_SOLID )
 		self->s.v.solid = SOLID_BBOX;
 	else
@@ -326,11 +323,8 @@ void SP_item_tfgoal(  )
 		self->pausetime = 60;
 	if ( self->delay && !self->pausetime )
 		self->pausetime = self->delay;
-	if ( VectorCompareF( self->goal_min, 0, 0, 0 ) )
-		SetVector( self->goal_min, -16, -16, -24 );
-	if ( VectorCompareF( self->goal_max, 0, 0, 0 ) )
-		SetVector( self->goal_max, 16, 16, 32 );
-	setsize( self, PASSVEC3( self->goal_min ), PASSVEC3( self->goal_max ) );
+
+    goalSetSize( self );
 	TF_StartItem(  );
 }
 
