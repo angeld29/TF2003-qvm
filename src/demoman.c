@@ -74,12 +74,7 @@ void MirvGrenadeExplode(  )
 
 	tf_data.deathmsg = DMSG_GREN_MIRV;
 	T_RadiusDamage( self, PROG_TO_EDICT( self->s.v.owner ), 100, world );
-	trap_WriteByte( MSG_BROADCAST, SVC_TEMPENTITY );
-	trap_WriteByte( MSG_BROADCAST, TE_EXPLOSION );
-	trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[0] );
-	trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[1] );
-	trap_WriteCoord( MSG_BROADCAST, self->s.v.origin[2] );
-	trap_multicast( PASSVEC3( self->s.v.origin ), 1 );
+    ExplosionEffect( self->s.v.origin );
 	self->s.v.solid = SOLID_NOT;
 	// Launch mirvs
 	for ( i = 0; i < GR_TYPE_MIRV_NO; i++)
