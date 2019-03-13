@@ -534,6 +534,26 @@ int IsAffectedBy( gedict_t * Goal, gedict_t * Player, gedict_t * AP )
 	return 0;
 }
 
+void boundPlayerPrimedGrenades( gedict_t *Player, int no_grenades_1, int no_grenades_2)
+{
+    gedict_t *te;
+    if ( Player->tfstate & TFSTATE_GRENPRIMED )
+    {
+        for( te = world; ( te = trap_find( te, FOFS( s.v.classname ), "primer" )); )
+        {
+            if ( te->s.v.owner == EDICT_TO_PROG( Player ) )
+            {
+                if (( te->s.v.impulse == 151 && no_grenades_2 < 0 ) || ( te->s.v.impulse == 150 && no_grenades_1 < 0 ) )
+                {
+                    Player->tfstate -= ( Player->tfstate & ( TFSTATE_GRENPRIMED | TFSTATE_GRENTHROWING) );
+                    dremove( te );
+                } 
+                break;
+            }
+        }
+    }
+}
+
 void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float addb )
 {
 	gedict_t *oldself;
@@ -591,39 +611,8 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 			Player->no_grenades_1 = Player->no_grenades_1 + Goal->no_grenades_1;
 			Player->no_grenades_2 = Player->no_grenades_2 + Goal->no_grenades_2;
 			bound_other_ammo( Player );
-			if ( Player->tfstate & TFSTATE_GRENPRIMED )
-			{
-				te = trap_find( world, FOFS( s.v.classname ), "primer" );
-				while ( te )
-				{
-					if ( te->s.v.owner == EDICT_TO_PROG( Player ) )
-					{
-						if ( te->s.v.impulse == 151 && Goal->no_grenades_2 < 0 )
-						{
-							Player->tfstate =
-							    Player->tfstate - ( Player->tfstate & TFSTATE_GRENPRIMED );
-							Player->tfstate =
-							    Player->tfstate -
-							    ( Player->tfstate & TFSTATE_GRENTHROWING );
-							dremove( te );
-						} else
-						{
-							if ( te->s.v.impulse == 150 && Goal->no_grenades_1 < 0 )
-							{
-								Player->tfstate =
-								    Player->tfstate -
-								    ( Player->tfstate & TFSTATE_GRENPRIMED );
-								Player->tfstate =
-								    Player->tfstate -
-								    ( Player->tfstate & TFSTATE_GRENTHROWING );
-								dremove( te );
-							}
-						}
-						te = NULL;
-					} else
-						te = trap_find( te, FOFS( s.v.classname ), "primer" );
-				}
-			}
+            boundPlayerPrimedGrenades( Player, Goal->no_grenades_1, Goal->no_grenades_2  );
+
 			if ( !tfset(disable_powerups) && ( Goal->invincible_finished > 0 ) )
 			{
 				Player->s.v.items = ( int ) Player->s.v.items | IT_INVULNERABILITY;
@@ -787,34 +776,8 @@ void RemoveResults( gedict_t * Goal, gedict_t * Player )
 	Player->no_grenades_1 = Player->no_grenades_1 - Goal->no_grenades_1;
 	Player->no_grenades_2 = Player->no_grenades_2 - Goal->no_grenades_2;
 	bound_other_ammo( Player );
-	if ( Player->tfstate & TFSTATE_GRENPRIMED )
-	{
-		te = trap_find( world, FOFS( s.v.classname ), "primer" );
-		while ( te )
-		{
-			if ( te->s.v.owner == EDICT_TO_PROG( Player ) )
-			{
-				if ( te->s.v.impulse == 151 && Goal->no_grenades_2 < 0 )
-				{
-					Player->tfstate = Player->tfstate - ( Player->tfstate & TFSTATE_GRENPRIMED );
-					Player->tfstate = Player->tfstate - ( Player->tfstate & TFSTATE_GRENTHROWING );
-					dremove( te );
-				} else
-				{
-					if ( te->s.v.impulse == 150 && Goal->no_grenades_1 < 0 )
-					{
-						Player->tfstate =
-						    Player->tfstate - ( Player->tfstate & TFSTATE_GRENPRIMED );
-						Player->tfstate =
-						    Player->tfstate - ( Player->tfstate & TFSTATE_GRENTHROWING );
-						dremove( te );
-					}
-				}
-				te = NULL;
-			} else
-				te = trap_find( te, FOFS( s.v.classname ), "primer" );
-		}
-	}
+    boundPlayerPrimedGrenades( Player, -Goal->no_grenades_1, -Goal->no_grenades_2  );
+
 	puinvin = 0;
 	puinvis = 0;
 	puquad = 0;
