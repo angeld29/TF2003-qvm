@@ -2170,16 +2170,24 @@ void SP_info_player_team2(  )
 	self->team_str_home = "ts1";
 }
 
-void SP_item_flag_team2(  )
-{
-	gedict_t *dp;
+void SP_item_flag_ctf(  int team )
+{	gedict_t *dp;
 
 	CTF_Map = 1;
 	UpdateAbbreviations( self );
 	trap_precache_sound( "ogre/ogwake.wav" );
 	trap_precache_sound( "boss2/pop2.wav" );
 	self->s.v.classname = "item_tfgoal";
-	self->s.v.netname = "Team 1 Flag";
+    if( team == 2 ){
+        self->s.v.netname = "Team 1 Flag";
+        self->s.v.skin = 0;
+        self->goal_no = 1;
+    }else{
+        self->s.v.netname = "Team 2 Flag";
+        self->s.v.skin = 1;
+        self->goal_no = 2;
+    }
+
 	self->broadcast = " " _G _O _T " the enemy team's flag!\n";
 	self->deathtype = "You've got the enemy flag!\n";
 	self->s.v.noise = "ogre/ogwake.wav";
@@ -2187,9 +2195,8 @@ void SP_item_flag_team2(  )
 		self->mdl = "progs/tf_stan.mdl";
 	else
 		self->mdl = "progs/tf_flag.mdl";
-	self->s.v.skin = 0;
+
 	setmodel( self, self->mdl );
-	self->goal_no = 1;
 	self->goal_activation = TFGI_GLOW | TFGI_DROP | TFGI_REMOVE | TFGI_RETURN_REMOVE | TFGI_RETURN_GOAL | TFGI_ITEMGLOWS;
 	self->goal_effects = TFGE_AP;
 	self->pausetime = 128;
@@ -2206,16 +2213,24 @@ void SP_item_flag_team2(  )
 	VectorCopy( self->s.v.origin, dp->s.v.origin );
 	dp->s.v.classname = "info_tfgoal";
 	dp->goal_activation = TFGA_TOUCH;
-	dp->team_no = 1;
-	dp->items_allowed = 2;
-	dp->goal_no = 3;
+    if( team == 2 ){
+        dp->team_no = 1;
+        dp->items_allowed = 2;
+        dp->goal_no = 3;
+        dp->activate_goal_no = 5;
+        dp->axhitme = 2;
+    }else{
+        dp->team_no = 2;
+        dp->items_allowed = 1;
+        dp->goal_no = 4;
+        dp->activate_goal_no = 6;
+        dp->axhitme = 1;
+    }
 	dp->goal_effects = TFGE_AP | TFGE_AP_TEAM;
 	dp->broadcast = " " _C _A _P _T _U _R _E _D " the enemy flag!\n";
 	dp->s.v.message = "You " _C _A _P _T _U _R _E _D " the enemy flag!\n";
 	dp->s.v.noise = "boss2/pop2.wav";
 	dp->goal_result = TFGR_ADD_BONUSES;
-	dp->activate_goal_no = 5;
-	dp->axhitme = 2;
 	dp->count = 10;
 	dp->s.v.frags = 10;
 	dp->s.v.solid = SOLID_TRIGGER;
@@ -2231,7 +2246,7 @@ void SP_item_flag_team2(  )
 	dp->goal_effects = TFGE_AP;
 	dp->s.v.frags = 5;
 	dp->goal_activation = 0;
-	dp->goal_no = 5;
+	dp->goal_no = (team == 2)? 5: 6;
 	dp->s.v.solid = SOLID_NOT;
 	dp->goal_state = 2;
 	SetVector( dp->goal_min, -16, -16, -24 );
@@ -2241,75 +2256,14 @@ void SP_item_flag_team2(  )
 	dp->s.v.think = ( func_t ) TF_PlaceGoal;
 }
 
+void SP_item_flag_team2(  )
+{
+    SP_item_flag_ctf(2);
+}
+
 void SP_item_flag_team1(  )
 {
-	gedict_t *dp;
-
-	CTF_Map = 1;
-	UpdateAbbreviations( self );
-	trap_precache_sound( "ogre/ogwake.wav" );
-	trap_precache_sound( "boss2/pop2.wav" );
-	self->s.v.classname = "item_tfgoal";
-	self->s.v.netname = "Team 2 Flag";
-	self->broadcast = " " _G _O _T " the enemy team's flag!\n";
-	self->deathtype = "You've got the enemy flag!\n";
-	self->s.v.noise = "ogre/ogwake.wav";
-	if ( tfset_toggleflags & TFLAG_USE_WAR_STD )
-		self->mdl = "progs/tf_stan.mdl";
-	else
-		self->mdl = "progs/tf_flag.mdl";
-	setmodel( self, self->mdl );
-	self->s.v.skin = 1;
-	self->goal_no = 2;
-	self->goal_activation = TFGI_GLOW | TFGI_DROP | TFGI_REMOVE | TFGI_RETURN_REMOVE | TFGI_RETURN_GOAL | TFGI_ITEMGLOWS;
-	self->goal_effects = TFGE_AP;
-	self->pausetime = 128;
-	SetVector( self->goal_min, -16, -16, -24 );
-	SetVector( self->goal_max, 16, 16, 32 );
-	setsize( self, PASSVEC3( self->goal_min ), PASSVEC3( self->goal_max ) );
-	self->s.v.touch = ( func_t ) item_tfgoal_touch;
-	self->goal_state = 2;
-	self->s.v.solid = SOLID_TRIGGER;
-	setorigin( self, PASSVEC3( self->s.v.origin ) );
-	self->s.v.nextthink = g_globalvars.time + 0.2;
-	self->s.v.think = ( func_t ) TF_PlaceItem;
-	dp = spawn(  );
-	VectorCopy( self->s.v.origin, dp->s.v.origin );
-	dp->s.v.classname = "info_tfgoal";
-	dp->goal_activation = TFGA_TOUCH;
-	dp->team_no = 2;
-	dp->items_allowed = 1;
-	dp->goal_no = 4;
-	dp->goal_effects = TFGE_AP | TFGE_AP_TEAM;
-	dp->broadcast = " " _C _A _P _T _U _R _E _D " the enemy flag!\n";
-	dp->s.v.message = "You " _C _A _P _T _U _R _E _D " the enemy flag!\n";
-	dp->s.v.noise = "boss2/pop2.wav";
-	dp->goal_result = TFGR_ADD_BONUSES;
-	dp->activate_goal_no = 6;
-	dp->axhitme = 1;
-	dp->count = 10;
-	dp->s.v.frags = 10;
-	dp->s.v.solid = SOLID_TRIGGER;
-	dp->goal_state = 2;
-	SetVector( dp->goal_min, -16, -16, -24 );
-	SetVector( dp->goal_max, 16, 16, 32 );
-	setsize( dp, PASSVEC3( dp->goal_min ), PASSVEC3( dp->goal_max ) );
-	dp->s.v.nextthink = g_globalvars.time + 0.2;
-	dp->s.v.think = ( func_t ) TF_PlaceGoal;
-	dp = spawn(  );
-	VectorCopy( dp->s.v.origin, dp->s.v.origin );
-	dp->s.v.classname = "info_tfgoal";
-	dp->goal_effects = TFGE_AP;
-	dp->s.v.frags = 5;
-	dp->goal_activation = 0;
-	dp->goal_no = 6;
-	dp->s.v.solid = SOLID_NOT;
-	dp->goal_state = 2;
-	SetVector( dp->goal_min, -16, -16, -24 );
-	SetVector( dp->goal_max, 16, 16, 32 );
-	setsize( dp, PASSVEC3( dp->goal_min ), PASSVEC3( dp->goal_max ) );
-	dp->s.v.nextthink = g_globalvars.time + 0.2;
-	dp->s.v.think = ( func_t ) TF_PlaceGoal;
+    SP_item_flag_ctf(1);
 }
 
 void CTF_FlagCheck(  )
