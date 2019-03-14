@@ -2340,7 +2340,7 @@ void ForceRespawn( gedict_t * P )
 			if ( te )
 				AttemptToActivate( te, self, spot );
 		}
-		if ( spot->goal_effects == TFGE_AP )
+		if ( spot->goal_effects == TFSP_REMOVESELF )
 		{
 			spot->s.v.classname = "deadpoint";
 			spot->team_str_home = "";

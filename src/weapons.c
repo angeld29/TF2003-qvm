@@ -137,27 +137,36 @@ void Attack_Finished( float att_delay )
 W_FireAxe
 ================
 */
-
-void W_FireAxe(  )
+static gedict_t* getMeleeTagret( vec3_t* org, gedict_t * self )
 {
 	vec3_t  source, dest;
-	vec3_t  org, def;
 
 	trap_makevectors( self->s.v.v_angle );
 
 	VectorCopy( self->s.v.origin, source );
 	source[2] += 16;
 	VectorScale( g_globalvars.v_forward, 64, dest );
-	VectorAdd( dest, source, dest )
-        //source = self->s.v.origin + '0 0 16';
-        traceline( PASSVEC3( source ), PASSVEC3( dest ), false, self );
-	if ( g_globalvars.trace_fraction == 1.0 )
-		return;
+	VectorAdd( dest, source, dest );
+    traceline( PASSVEC3( source ), PASSVEC3( dest ), false, self );
 
-	VectorScale( g_globalvars.v_forward, 4, org );
-	VectorSubtract( g_globalvars.trace_endpos, org, org );
-// org = trace_endpos - g_globalvars.v_forward*4;
-	if ( PROG_TO_EDICT( g_globalvars.trace_ent )->s.v.takedamage )
+	if ( g_globalvars.trace_fraction == 1.0 )
+		return NULL;
+
+	VectorScale( g_globalvars.v_forward, 4, *org );
+	VectorSubtract( g_globalvars.trace_endpos, *org, *org );
+    return PROG_TO_EDICT( g_globalvars.trace_ent );
+}
+
+void W_FireAxe(  )
+{
+	vec3_t  org, def;
+    gedict_t * trace_ent;
+
+    trace_ent = getMeleeTagret(&org, self );
+    if( !trace_ent ) 
+        return;
+
+	if ( trace_ent->s.v.takedamage )
 	{
 		PROG_TO_EDICT( g_globalvars.trace_ent )->axhitme = 1;
 		SpawnBlood( org, 20 );
@@ -194,23 +203,13 @@ void W_FireAxe(  )
 
 void W_FireSpanner(  )
 {
-	vec3_t  source;
 	vec3_t  org;
-	vec3_t  dest;
 	float   healam;
 	gedict_t *te, *trace_ent;
 
-	trap_makevectors( self->s.v.v_angle );
-	VectorCopy( self->s.v.origin, source );
-	source[2] += 16;
-	VectorScale( g_globalvars.v_forward, 64, dest );
-	VectorAdd( dest, source, dest ) traceline( PASSVEC3( source ), PASSVEC3( dest ), false, self );
-	if ( g_globalvars.trace_fraction == 1.0 )
-		return;
-
-	VectorScale( g_globalvars.v_forward, 4, org );
-	VectorSubtract( g_globalvars.trace_endpos, org, org );
-	trace_ent = PROG_TO_EDICT( g_globalvars.trace_ent );
+    trace_ent = getMeleeTagret(&org, self );
+    if( !trace_ent ) 
+        return;
 
 	if ( trace_ent->goal_activation & TFGA_SPANNER )
 	{
@@ -308,26 +307,15 @@ void W_FireSpanner(  )
 
 void W_FireMedikit(  )
 {
-	vec3_t  source, dest;
 	vec3_t  org;
 	float   healam;
 	gedict_t *te;
 	gedict_t *BioInfection, *trace_ent;
 
-	trap_makevectors( self->s.v.v_angle );
+    trace_ent = getMeleeTagret(&org, self );
+    if( !trace_ent ) 
+        return;
 
-	VectorCopy( self->s.v.origin, source );
-	source[2] += 16;
-	VectorScale( g_globalvars.v_forward, 64, dest );
-	VectorAdd( dest, source, dest )
-	    //source = self->s.v.origin + '0 0 16';
-	    traceline( PASSVEC3( source ), PASSVEC3( dest ), false, self );
-	if ( g_globalvars.trace_fraction == 1.0 )
-		return;
-
-	VectorScale( g_globalvars.v_forward, 4, org );
-	VectorSubtract( g_globalvars.trace_endpos, org, org );
-	trace_ent = PROG_TO_EDICT( g_globalvars.trace_ent );
 	if ( trace_ent->s.v.takedamage )
 	{
 		if ( streq( trace_ent->s.v.classname, "player" ) )
@@ -521,25 +509,12 @@ void W_FireMedikit(  )
 
 void W_FireBioweapon(  )
 {
-	vec3_t  source, dest;
-
 	vec3_t  org;
 	gedict_t *BioInfection, *trace_ent;
 
-	trap_makevectors( self->s.v.v_angle );
-
-	VectorCopy( self->s.v.origin, source );
-	source[2] += 16;
-	VectorScale( g_globalvars.v_forward, 64, dest );
-	VectorAdd( dest, source, dest )
-	    //source = self->s.v.origin + '0 0 16';
-	    traceline( PASSVEC3( source ), PASSVEC3( dest ), false, self );
-	if ( g_globalvars.trace_fraction == 1.0 )
-		return;
-
-	VectorScale( g_globalvars.v_forward, 4, org );
-	VectorSubtract( g_globalvars.trace_endpos, org, org );
-	trace_ent = PROG_TO_EDICT( g_globalvars.trace_ent );
+    trace_ent = getMeleeTagret(&org, self );
+    if( !trace_ent ) 
+        return;
 
 	if ( trace_ent->s.v.takedamage )
 	{
