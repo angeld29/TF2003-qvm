@@ -312,4 +312,13 @@ void set_think( gedict_t* e, int start, int end, th_die_func_t frame_func, th_di
 void  TempEffectCoord( float*origin, int type );
 void  TempEffectCoordPVS( float*origin, int type );
 void  TempEffectCount( float*origin, int type, int count  );
+
+extern const vec3_t  VEC_ORIGIN ;
+extern const vec3_t  VEC_HULL_MIN ;
+extern const vec3_t  VEC_HULL_MAX ;
+
+extern const vec3_t  VEC_HULL2_MIN ;
+extern const vec3_t  VEC_HULL2_MAX ;
+void TF_SpawnPlayer( gedict_t * self );
+
 #endif

@@ -467,78 +467,18 @@ void TeamFortress_ChangeClass(  )
 	self->air_finished = g_globalvars.time + 12;
 	self->s.v.solid = SOLID_SLIDEBOX;
 	self->pausetime = 0;
-	spot = SelectSpawnPoint(  );
-	VectorCopy( spot->s.v.origin, self->s.v.origin );
-	self->s.v.origin[2]++;
+    
 
-	VectorCopy( spot->s.v.angles, self->s.v.angles );
-	self->s.v.fixangle = 1;
 
-	setmodel( self, "" );
-
-	modelindex_null = self->s.v.modelindex;
-
-	setmodel( self, "progs/eyes.mdl" );
-	modelindex_eyes = self->s.v.modelindex;
-	setmodel( self, "progs/player.mdl" );
-	modelindex_player = self->s.v.modelindex;
-	setsize( self, -16, -16, -24, 16, 16, 32 );
-	self->s.v.view_ofs[0] = self->s.v.view_ofs[1] = 0;
-	self->s.v.view_ofs[2] = 22;
-
-	player_stand1(  );
-	if ( deathmatch || coop )
-	{
-		trap_makevectors( self->s.v.angles );
-		SetVector( v, self->s.v.origin[0] + g_globalvars.v_forward[0] * 20,
-			   self->s.v.origin[1] + g_globalvars.v_forward[1] * 20,
-			   self->s.v.origin[2] + g_globalvars.v_forward[2] * 20 );
-		spawn_tfog( v );
-	}
 	if ( self->playerclass == PC_RANDOM )
 	{
 		G_sprint( self, 2, "Random Playerclass.\n" );
 		self->tfstate |= TFSTATE_RANDOMPC;
 		self->playerclass = 1 + (int)( g_random(  ) * ( 10 - 1 ) );
 	}
-	TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & TFSTATE_RANDOMPC );
-	TeamFortress_SetEquipment(  );
-	TeamFortress_SetHealth(  );
-	TeamFortress_PrepareForArenaRespawn();
-	TeamFortress_SetSpeed( self );
-	TeamFortress_SetSkin( self );
-	TeamFortress_ExecClassScript( self );
-	if ( streq( spot->s.v.classname, "info_player_teamspawn" ) && tf_data.cb_prematch_time < g_globalvars.time )
-	{
-		if ( spot->s.v.items )
-		{
-			te = Finditem( spot->s.v.items );
-			if ( te != world )
-				tfgoalitem_GiveToPlayer( te, self, self );
-			if ( !( spot->goal_activation & TFSP_MULTIPLEITEMS ) )
-				spot->s.v.items = 0;
-		}
-		if ( spot->s.v.message )
-		{
-			CenterPrint( self, "%s", spot->s.v.message );
-			if ( !( spot->goal_activation & TFSP_MULTIPLEMSGS ) )
-				spot->s.v.message = 0;
-		}
-		if ( spot->activate_goal_no )
-		{
-			te = Findgoal( spot->activate_goal_no );
-			if ( te )
-				AttemptToActivate( te, self, spot );
-		}
-		if ( spot->goal_effects == TFGE_AP )
-		{
-			spot->s.v.classname = "deadpoint";
-			spot->team_str_home = "";
-			spot->s.v.nextthink = g_globalvars.time + 1;
-			spot->s.v.think = ( func_t ) SUB_Remove;
-		}
-	}
-	
+
+    TF_SpawnPlayer( self );
+
 	for( spot = world;( spot = trap_find( spot, FOFS( s.v.classname ), "player" ) ) ;)
 	{
 		if ( spot->team_no == self->team_no && spot != self )
@@ -547,12 +487,7 @@ void TeamFortress_ChangeClass(  )
 			TeamFortress_PrintClassName( spot, self->playerclass, self->tfstate & TFSTATE_RANDOMPC );
 		}
 	}
-	if ( tf_data.cease_fire )
-	{
-		G_sprint( self, 2, "\n\nCEASE FIRE MODE\n" );
-		self->tfstate |= TFSTATE_CANT_MOVE;
-		TeamFortress_SetSpeed( self );
-	}
+	TeamFortress_ExecClassScript( self );
 }
 
 void TeamFortress_DisplayLegalClasses(  )

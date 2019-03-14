@@ -33,6 +33,7 @@ const vec3_t  VEC_HULL_MAX = { 16, 16, 32 };
 
 const vec3_t  VEC_HULL2_MIN = { -32, -32, -24 };
 const vec3_t  VEC_HULL2_MAX = { 32, 32, 64 };
+
 int     modelindex_eyes, modelindex_player, modelindex_null;
 int     last_id;
 float   rj;
@@ -908,17 +909,10 @@ void PutClientInServer()
         Engineer_RemoveBuildings( self );
 
     self->s.v.takedamage = 2;
-    TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & TFSTATE_RANDOMPC );
-    TeamFortress_SetEquipment();
-    TeamFortress_SetHealth();
-    TeamFortress_PrepareForArenaRespawn();
-    TeamFortress_SetSpeed( self );
-    TeamFortress_SetSkin( self );
     stuffcmd( self, "v_idlescale 0\nfov 90\n" );
     stuffcmd( self, "v_cshift; wait; bf\n" );
     self->eff_info.conc_idle = 0;
     SetTeamName( self );
-    W_SetCurrentAmmo();
     self->attack_finished = g_globalvars.time + 0.3;
     self->th_pain = player_pain;
     self->th_die = PlayerDie;
@@ -928,46 +922,27 @@ void PutClientInServer()
         TF_zoom( 90 );
     }
     self->s.v.deadflag = DEAD_NO;
+
     self->pausetime = 0;
-    spot = SelectSpawnPoint();
 
-    self->observer_list = spot;
-    VectorCopy( spot->s.v.origin, self->s.v.origin );
-    self->s.v.origin[2]++;
+    TF_SpawnPlayer( self );
 
-    VectorCopy( spot->s.v.angles, self->s.v.angles );
-
-    self->s.v.fixangle = 1;
-    if ( streq( spot->s.v.classname, "info_player_teamspawn" ) && tf_data.cb_prematch_time < g_globalvars.time )
+    SetVector( self->s.v.velocity, 0, 0, 0 );
+    if ( !self->playerclass )
     {
-        if ( spot->s.v.items )
-        {
-            te = Finditem( spot->s.v.items );
-            if ( te != world )
-                tfgoalitem_GiveToPlayer( te, self, self );
-            if ( !( spot->goal_activation & TFSP_MULTIPLEITEMS ) )
-                spot->s.v.items = 0;
-        }
-        if ( spot->s.v.message )
-        {
-            CenterPrint( self, "%s", spot->s.v.message );
-            if ( !( spot->goal_activation & TFSP_MULTIPLEMSGS ) )
-                spot->s.v.message = NULL;
-        }
-        if ( spot->activate_goal_no )
-        {
-            te = Findgoal( spot->activate_goal_no );
-            if ( te )
-                AttemptToActivate( te, self, spot );
-        }
-        if ( spot->goal_effects == TFSP_REMOVESELF )
-        {
-            spot->s.v.classname = "deadpoint";
-            spot->team_str_home = "";
-            spot->s.v.nextthink = g_globalvars.time + 1;
-            spot->s.v.think = ( func_t ) SUB_Remove;
-        }
+        self->s.v.modelindex = modelindex_null;
+        self->current_menu = MENU_DEFAULT;
     }
+    infokey( world, "rj", s, sizeof( s ) );
+    if ( atof( s ) != 0 )
+    {
+        rj = atof( s );
+    } else
+        rj = 1;
+}
+
+void TF_SpawnPlayer( gedict_t * self )
+{
     setmodel( self, "" );
     modelindex_null = self->s.v.modelindex;
     // oh, this is a hack!
@@ -977,36 +952,20 @@ void PutClientInServer()
     setmodel( self, "progs/player.mdl" );
     modelindex_player = self->s.v.modelindex;
 
-    if ( !self->playerclass )
-    {
-        self->s.v.modelindex = modelindex_null;
-        self->current_menu = MENU_DEFAULT;
-    }
     setsize( self, PASSVEC3( VEC_HULL_MIN ), PASSVEC3( VEC_HULL_MAX ) );
     SetVector( self->s.v.view_ofs, 0, 0, 22 );
-    SetVector( self->s.v.velocity, 0, 0, 0 );
-    //фикс застревания игроков друг в друге на респавн
-    //spawn_tdeath после установки размеров игрока
-    if ( self->playerclass )
-        spawn_tdeath( spot->s.v.origin, self );
+
+    TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & TFSTATE_RANDOMPC );
+    TeamFortress_SetEquipment();
+    TeamFortress_SetHealth();
+    TeamFortress_PrepareForArenaRespawn();
+    TeamFortress_SetSpeed(self);
+    TeamFortress_SetSkin(self);
+    W_SetCurrentAmmo();
+
+    ForceRespawn( self );
 
     player_stand1();
-    if ( deathmatch || coop )
-    {
-        trap_makevectors( self->s.v.angles );
-        if ( self->playerclass )
-        {
-            VectorScale( g_globalvars.v_forward, 20, v );
-            VectorAdd( v, self->s.v.origin, v );
-            spawn_tfog( v );
-        }
-    }
-    infokey( world, "rj", s, sizeof( s ) );
-    if ( atof( s ) != 0 )
-    {
-        rj = atof( s );
-    } else
-        rj = 1;
 
     if ( tf_data.cease_fire )
     {
@@ -1015,7 +974,6 @@ void PutClientInServer()
         TeamFortress_SetSpeed( self );
     }
 }
-
 
 void SP_Null_tf_spawn()
 {
