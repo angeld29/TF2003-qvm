@@ -418,6 +418,7 @@ void   TF_LocalinfoSettings( )
 
 }
 
+void UpdateServerinfoScores();
 void   TF_FinalizeSettings( )
 {
     //char    st[10];

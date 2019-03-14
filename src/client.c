@@ -71,7 +71,7 @@ void SetNewParms( void )
     g_globalvars.parm4 = 25;
     g_globalvars.parm5 = 0;
     g_globalvars.parm6 = 0;
-    g_globalvars.parm6 = 0;
+    g_globalvars.parm7 = 0;
     g_globalvars.parm8 = 1;
     g_globalvars.parm9 = 0;
     g_globalvars.parm10 = 0;

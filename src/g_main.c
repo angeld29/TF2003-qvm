@@ -202,9 +202,11 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 
         case GAME_CLIENT_COMMAND:
             self = PROG_TO_EDICT( g_globalvars.self );
-            RestoreGlobals();
-            return ClientCommand();
-
+            {
+                int ret = ClientCommand();
+                RestoreGlobals();
+                return ret;
+            }
         case GAME_CLIENT_USERINFO_CHANGED:
             // called on user /cmd setinfo	if value changed
             // return not zero dont allow change

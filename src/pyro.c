@@ -336,7 +336,7 @@ void FlameFollow(  )
 	        // only remove the flame if it is not the master flame, or if it is the last flame
 		if ( self->s.v.effects != EF_DIMLIGHT || enemy->numflames <= 1 )
 		{
-			enemy->numflames = enemy->numflames - 1;
+			//enemy->numflames = enemy->numflames - 1;
 			enemy->numflames = 0;
 			FlameDestroy( self );
 			return;
@@ -764,7 +764,7 @@ void T_IncendiaryTouch(  )
 			traceline( PASSVEC3( self->s.v.origin ), PASSVEC3( head->s.v.origin ), 1, self );
 			VectorSubtract( self->s.v.origin, head->s.v.origin, vtemp );
 			if ( g_globalvars.trace_fraction == 1
-			     || ( g_globalvars.trace_fraction != 1 && vlen( vtemp ) <= 64 ) )
+			     || ( vlen( vtemp ) <= 64 ) )
 			{
 				tf_data.deathmsg = DMSG_FLAME;
 				TF_T_Damage( head, self, owner, 10, TF_TD_NOTTEAM, TF_TD_FIRE );

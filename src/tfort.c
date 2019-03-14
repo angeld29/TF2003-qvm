@@ -691,20 +691,18 @@ void TeamFortress_Inventory(  )
 	if ( self->s.v.armorvalue > 0 )
 		TeamFortress_DescribeArmor( self, self->armorclass );
 
-	if ( !tfset(invis_only) )
-	{
-		if ( self->playerclass == PC_SPY && !tfset(invis_only) )
-		{
-			G_sprint( self, 2, "Skin : " );
-			if ( self->undercover_skin )
-				TeamFortress_PrintClassName( self, self->undercover_skin, 0 );
-			else
-				G_sprint( self, 2, "Spy\n" );
+    if ( self->playerclass == PC_SPY && !tfset(invis_only) )
+    {
+        G_sprint( self, 2, "Skin : " );
+        if ( self->undercover_skin )
+            TeamFortress_PrintClassName( self, self->undercover_skin, 0 );
+        else
+            G_sprint( self, 2, "Spy\n" );
 
-			G_sprint( self, 2, "Colors : Team %d",
-				  ( self->undercover_team ) ? self->undercover_team : self->team_no );
-		}
-	}
+        G_sprint( self, 2, "Colors : Team %d",
+                ( self->undercover_team ) ? self->undercover_team : self->team_no );
+    }
+
 	G_sprint( self, 2, "\n" );
 	for ( te = world;( te = trap_find( te, FOFS( s.v.classname ), "detpack" ) ) ; )
 	{

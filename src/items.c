@@ -1272,7 +1272,7 @@ void key_touch(  )
 		self->s.v.model = "";
 	} else
 	{
-		if ( coop && self->s.v.deadflag )
+		if (  self->s.v.deadflag )
 		{
 			dremove( self );
 			return;

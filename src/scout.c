@@ -371,13 +371,13 @@ void ConcussionGrenadeTimer(  )
 	if ( self->s.v.health < 0 )
 		self->s.v.health = 0;
 	self->s.v.nextthink = g_globalvars.time + 0.25;
-	pos = trap_pointcontents( PASSVEC3( owner->s.v.origin ) );
-	src[0] = owner->s.v.origin[0] + owner->s.v.maxs[0] + 2;
-	src[1] = owner->s.v.origin[1] + owner->s.v.maxs[1] + 2;
-	src[2] = owner->s.v.origin[2];
-	pos = trap_pointcontents( PASSVEC3( src ) );
 	if ( ( ( int ) owner->s.v.flags & FL_ONGROUND ) || ( ( int ) owner->s.v.flags & FL_INWATER) )
 	{
+        //pos = trap_pointcontents( PASSVEC3( owner->s.v.origin ) );
+        src[0] = owner->s.v.origin[0] + owner->s.v.maxs[0] + 2;
+        src[1] = owner->s.v.origin[1] + owner->s.v.maxs[1] + 2;
+        src[2] = owner->s.v.origin[2];
+        pos = trap_pointcontents( PASSVEC3( src ) );
 		if ( !owner->is_feigning )
 		{
 			trap_makevectors( owner->s.v.v_angle );

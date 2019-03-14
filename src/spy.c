@@ -1281,6 +1281,7 @@ void GasGrenadeMakeGas(  )
 						continue;
 					if ( timer->s.v.think != ( func_t ) HallucinationTimer )
 						continue;
+                    break;
 				}
 				if ( timer )
 				{
@@ -1568,6 +1569,7 @@ void T_TranqDartTouch(  )
 						continue;
 					if ( timer->s.v.think != ( func_t ) TranquiliserTimer )
 						continue;
+                    break;
 				}
 				if ( timer )
 					timer->s.v.nextthink = g_globalvars.time + 15;

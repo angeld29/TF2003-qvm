@@ -333,7 +333,7 @@ void Menu_Class_Input( int imp )
 
 	//char    st[10];
 
-	if ( imp > 10 && imp < 1 )
+	if ( imp > 10 || imp < 1 )
 		return;
 	self->s.v.impulse = imp + TF_CHANGEPC;
 	if ( self->playerclass )
