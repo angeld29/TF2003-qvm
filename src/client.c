@@ -1374,6 +1374,20 @@ void PlayerPreThink()
    Check for turning off powerups
    ================
    */
+static gedict_t* findGlowGoal( gedict_t* self )
+{
+    gedict_t* te = world;
+    for(; (te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" ));)
+    {
+        if ( te->s.v.owner == EDICT_TO_PROG( self ) )
+        {
+            if ( te->goal_activation & TFGI_GLOW )
+                return te;
+        }
+    }
+    return NULL;
+}
+    
 void CheckPowerups()
 {
     float   lighton;
@@ -1461,26 +1475,12 @@ void CheckPowerups()
         }
         if ( self->invincible_finished > g_globalvars.time )
         {
-            self->s.v.effects = ( int ) self->s.v.effects | 8;
-            self->s.v.effects = ( int ) self->s.v.effects | 128;
-        } else
+            self->s.v.effects = ( int ) self->s.v.effects | EF_DIMLIGHT;
+            self->s.v.effects = ( int ) self->s.v.effects | EF_RED;
+        } else if ( !findGlowGoal( self ) )
         {
-            lighton = 0;
-            te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
-            while ( te )
-            {
-                if ( te->s.v.owner == EDICT_TO_PROG( self ) )
-                {
-                    if ( te->goal_activation & TFGI_GLOW )
-                        lighton = 1;
-                }
-                te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
-            }
-            if ( !lighton )
-            {
-                self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & 8 );
-                self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & 128 );
-            }
+            self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & EF_DIMLIGHT);
+            self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & EF_RED );
         }
     }
     if ( self->super_damage_finished )
@@ -1513,26 +1513,12 @@ void CheckPowerups()
         }
         if ( self->super_damage_finished > g_globalvars.time )
         {
-            self->s.v.effects = ( int ) self->s.v.effects | 8;
-            self->s.v.effects = ( int ) self->s.v.effects | 64;
-        } else
+            self->s.v.effects = ( int ) self->s.v.effects | EF_DIMLIGHT;
+            self->s.v.effects = ( int ) self->s.v.effects | EF_BLUE;
+        } else if ( !findGlowGoal( self ) )
         {
-            lighton = 0;
-            te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
-            while ( te )
-            {
-                if ( te->s.v.owner == EDICT_TO_PROG( self ) )
-                {
-                    if ( te->goal_activation & TFGI_GLOW )
-                        lighton = 1;
-                }
-                te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
-            }
-            if ( !lighton )
-            {
-                self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & 8 );
-                self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & 64 );
-            }
+            self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & EF_DIMLIGHT);
+            self->s.v.effects = ( int ) self->s.v.effects - ( ( int ) self->s.v.effects & EF_BLUE );
         }
     }
     if ( self->radsuit_finished )
