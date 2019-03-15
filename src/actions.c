@@ -125,18 +125,19 @@ void TeamFortress_Cmd_Discard( void )
 {
 	int     ammo_tmp;
 	int argc,i;
-	char    value[1024];
+	char    type[10];
+	char    value[10];
 
 	argc  = trap_CmdArgc();
 	newmis = defaultDiscard( self );
 
 	for (  i = 1 ; i < argc-1 ; i++ )
 	{
-		trap_CmdArgv( i, value, sizeof( value ) );
+		trap_CmdArgv( i, type, sizeof( type ) );
 
         trap_CmdArgv( ++i, value, sizeof( value ) );
         ammo_tmp = atoi(value);
-		switch( value[0] )
+		switch( type[0] )
 		{
 			case 's':
 				newmis->s.v.ammo_shells = bound_discard_ammo( ammo_tmp, self->s.v.ammo_shells);
