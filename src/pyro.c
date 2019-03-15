@@ -404,7 +404,7 @@ void OnPlayerFlame_touch(  )
 		}
 		if ( streq( other->s.v.classname, "player" ) )
 		{
-			if ( ( teamplay & 16 ) && other->team_no > 0
+			if ( ( teamplay & TEAMPLAY_NOEXPLOSIVE ) && other->team_no > 0
 			     && other->team_no == PROG_TO_EDICT( self->s.v.owner )->team_no )
 				return;
 			CenterPrint( other, "You are on fire!\n" );
@@ -458,7 +458,7 @@ void WorldFlame_touch(  )
 		self->s.v.think = ( func_t ) QW_Flame_ResetTouch;
 		self->s.v.nextthink = g_globalvars.time + 1;
 	}
-	if ( other != world && other->s.v.solid != 1 && other->s.v.health > 0 )
+	if ( other != world && other->s.v.solid != SOLID_TRIGGER && other->s.v.health > 0 )
 	{
 		if ( tf_data.cb_prematch_time > g_globalvars.time )
 			return;
@@ -469,7 +469,7 @@ void WorldFlame_touch(  )
 		}
 		if ( streq( other->s.v.classname, "player" ) )
 		{
-			if ( ( teamplay & 16 ) && other->team_no > 0
+			if ( ( teamplay & TEAMPLAY_NOEXPLOSIVE ) && other->team_no > 0
 			     && other->team_no == PROG_TO_EDICT( self->s.v.owner )->team_no )
 				return;
 			CenterPrint( other, "You are on fire!\n" );
@@ -500,54 +500,49 @@ void WorldFlame_touch(  )
 	}
 }
 
-void spawnFlameOnPlayer( gedict_t*self, gedict_t*other, int dmg )
+void spawnFlameOnPlayer( gedict_t*self, gedict_t*other)
 {
-	gedict_t *flame;
-	vec3_t  vtemp;
+    gedict_t *flame;
+    vec3_t  vtemp;
 
-    if ( other->s.v.takedamage == DAMAGE_AIM && other->s.v.health > 0 )
+    if ( tf_data.cb_prematch_time > g_globalvars.time )
+        return;
+    if ( other->numflames >= 4 )
     {
-        tf_data.deathmsg = DMSG_FLAME;
-        TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), dmg, TF_TD_NOTTEAM | TF_TD_MOREKICK, TF_TD_FIRE );
-        if ( tf_data.cb_prematch_time > g_globalvars.time )
-            return;
-        if ( other->numflames >= 4 )
-        {
-            other->tfstate = other->tfstate | TFSTATE_MAX_FLAMES;
-            return;
-        }
-        if ( ( other->armorclass & AT_SAVEFIRE ) && other->s.v.armorvalue > 0 )
-            return;
-        if ( streq( other->s.v.classname, "player" ) )
-        {
-            if ( ( teamplay & TEAMPLAY_NOEXPLOSIVE ) && other->team_no > 0
-                    && other->team_no == PROG_TO_EDICT( self->s.v.owner )->team_no )
-                return;
-            CenterPrint( other, "You are on fire!\n" );
-            stuffcmd( other, "bf\n" );
-        }
-        if ( other->numflames < 1 )
-        {
-            flame = FlameSpawn( 1, other );
-            sound( flame, 2, "ambience/fire1.wav", 1, 1 );
-        } else
-        {
-            flame = FlameSpawn( 3, other );
-            if ( flame == world )
-                return;
-        }
-        flame->s.v.classname = "fire";
-        flame->s.v.health = FLAME_PLYRMAXTIME;
-        other->numflames = other->numflames + 1;
-        VectorCopy( other->s.v.velocity, flame->s.v.velocity );
-        flame->s.v.enemy = EDICT_TO_PROG( other );
-        flame->s.v.touch = ( func_t ) OnPlayerFlame_touch;
-        flame->s.v.owner = self->s.v.owner;
-        VectorCopy( self->s.v.origin, vtemp );
-        setorigin( flame, PASSVEC3( vtemp ) );
-        flame->s.v.nextthink = g_globalvars.time + 0.1;
-        flame->s.v.think = ( func_t ) FlameFollow;
+        other->tfstate = other->tfstate | TFSTATE_MAX_FLAMES;
+        return;
     }
+    if ( ( other->armorclass & AT_SAVEFIRE ) && other->s.v.armorvalue > 0 )
+        return;
+    if ( streq( other->s.v.classname, "player" ) )
+    {
+        if ( ( teamplay & TEAMPLAY_NOEXPLOSIVE ) && other->team_no > 0
+                && other->team_no == PROG_TO_EDICT( self->s.v.owner )->team_no )
+            return;
+        CenterPrint( other, "You are on fire!\n" );
+        stuffcmd( other, "bf\n" );
+    }
+    if ( other->numflames < 1 )
+    {
+        flame = FlameSpawn( 1, other );
+        sound( flame, 2, "ambience/fire1.wav", 1, 1 );
+    } else
+    {
+        flame = FlameSpawn( 3, other );
+        if ( flame == world )
+            return;
+    }
+    flame->s.v.classname = "fire";
+    flame->s.v.health = FLAME_PLYRMAXTIME;
+    other->numflames = other->numflames + 1;
+    VectorCopy( other->s.v.velocity, flame->s.v.velocity );
+    flame->s.v.enemy = EDICT_TO_PROG( other );
+    flame->s.v.touch = ( func_t ) OnPlayerFlame_touch;
+    flame->s.v.owner = self->s.v.owner;
+    VectorCopy( self->s.v.origin, vtemp );
+    setorigin( flame, PASSVEC3( vtemp ) );
+    flame->s.v.nextthink = g_globalvars.time + 0.1;
+    flame->s.v.think = ( func_t ) FlameFollow;
 }
 // first touch : direct touch with the flamer stream or flame from grenade
 void Flamer_stream_touch(  )
@@ -570,9 +565,11 @@ void Flamer_stream_touch(  )
 
 	if ( streq( other->s.v.classname, "fire" ) )
 		return;
-	if ( other != world )
-	{
-        spawnFlameOnPlayer( self, other, 10 );
+	if ( other != world && other->s.v.takedamage == DAMAGE_AIM && other->s.v.health > 0 )
+    {
+        tf_data.deathmsg = DMSG_FLAME;
+        TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 10, TF_TD_NOTTEAM | TF_TD_MOREKICK, TF_TD_FIRE );
+        spawnFlameOnPlayer( self, other );
 	} else
 	{
 		if ( g_random(  ) < 0.3 || trap_pointcontents( PASSVEC3( self->s.v.origin ) + 1 ) != -1 )
@@ -608,9 +605,11 @@ void Napalm_touch(  )
 
 	if ( streq( other->s.v.classname, "fire" ) )
 		return;
-	if ( other != world )
-	{
-        spawnFlameOnPlayer( self, other, 6 );
+	if ( other != world && other->s.v.takedamage == DAMAGE_AIM && other->s.v.health > 0 )
+    {
+        tf_data.deathmsg = DMSG_FLAME;
+        TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 6, TF_TD_NOTTEAM | TF_TD_MOREKICK, TF_TD_FIRE );
+        spawnFlameOnPlayer( self, other );
 	} else
 	{
 		if ( trap_pointcontents( PASSVEC3( self->s.v.origin ) + 1 ) != -1 )
