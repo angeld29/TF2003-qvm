@@ -311,9 +311,9 @@ void StartDemoRecord();
 int log2powerof2( unsigned int v );
 void set_think( gedict_t* e, int start, int end, th_die_func_t frame_func, th_die_func_t last_func, th_die_func_t last_think );
 
-void  TempEffectCoord( float*origin, int type );
-void  TempEffectCoordPVS( float*origin, int type );
-void  TempEffectCount( float*origin, int type, int count  );
+void  TempEffectCoord( vec3_t origin, int type );
+void  TempEffectCoordPVS( vec3_t origin, int type );
+void  TempEffectCount( vec3_t origin, int type, int count  );
 
 extern const vec3_t  VEC_ORIGIN ;
 extern const vec3_t  VEC_HULL_MIN ;

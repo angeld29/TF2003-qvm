@@ -201,7 +201,7 @@ void NapalmGrenadeExplode(  )
             return;
         }
         // do an incendiary-cannon explosion instead
-        self->s.v.effects = ( int ) self->s.v.effects | 8;
+        self->s.v.effects = ( int ) self->s.v.effects | EF_DIMLIGHT;
 
         // don't do radius damage to the other, because all the damage
         // was done in the impact
@@ -438,10 +438,8 @@ static gedict_t* spawnFlameOnPlayer( gedict_t*self, gedict_t*other, int zdelta)
 // OnPlayerflame : no damage if enemy not dead, spawn flames if touched
 void OnPlayerFlame_touch(  )
 {
-    if( other != PROG_TO_EDICT( self->s.v.enemy ) ) 
-        return;
-
-    spawnFlameOnPlayer( self, other, 0);
+	if ( other != world && other->s.v.health > 0 && other != PROG_TO_EDICT( self->s.v.enemy ) )
+        spawnFlameOnPlayer( self, other, 0);
 }
 
 
@@ -466,13 +464,14 @@ void WorldFlame_touch(  )
 		self->s.v.think = ( func_t ) QW_Flame_ResetTouch;
 		self->s.v.nextthink = g_globalvars.time + 1;
 	}
-    if( other->s.v.solid != SOLID_TRIGGER )
-        return;
 
-    if(( flame = spawnFlameOnPlayer( self, other, 10)) )
+	if ( other != world && other->s.v.solid != SOLID_TRIGGER && other->s.v.health > 0 )
     {
-        flame->s.v.nextthink = g_globalvars.time + 0.15;
-        flame->s.v.health = 0;
+        if(( flame = spawnFlameOnPlayer( self, other, 10)) )
+        {
+            flame->s.v.nextthink = g_globalvars.time + 0.15;
+            flame->s.v.health = 0;
+        }
     }
 }
 
@@ -514,11 +513,14 @@ void Flamer_stream_touch(  )
 
 	if ( streq( other->s.v.classname, "fire" ) )
 		return;
-	if ( other != world && other->s.v.takedamage == DAMAGE_AIM && other->s.v.health > 0 )
+	if ( other != world )
     {
-        tf_data.deathmsg = DMSG_FLAME;
-        TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 10, TF_TD_NOTTEAM | TF_TD_MOREKICK, TF_TD_FIRE );
-        spawnFlameOnPlayer( self, other, 0 );
+        if( other->s.v.takedamage == DAMAGE_AIM && other->s.v.health > 0 )
+        {
+            tf_data.deathmsg = DMSG_FLAME;
+            TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 10, TF_TD_NOTTEAM | TF_TD_MOREKICK, TF_TD_FIRE );
+            spawnFlameOnPlayer( self, other, 0 );
+        }
 	} else
 	{
 		if ( g_random(  ) < 0.3 || trap_pointcontents( PASSVEC3( self->s.v.origin ) + 1 ) != -1 )
@@ -539,11 +541,14 @@ void Napalm_touch(  )
 {
 	if ( streq( other->s.v.classname, "fire" ) )
 		return;
-	if ( other != world && other->s.v.takedamage == DAMAGE_AIM && other->s.v.health > 0 )
+	if ( other != world )
     {
-        tf_data.deathmsg = DMSG_FLAME;
-        TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 6, TF_TD_NOTTEAM | TF_TD_MOREKICK, TF_TD_FIRE );
-        spawnFlameOnPlayer( self, other, 0 );
+        if( other->s.v.takedamage == DAMAGE_AIM && other->s.v.health > 0) 
+        {
+            tf_data.deathmsg = DMSG_FLAME;
+            TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 6, TF_TD_NOTTEAM | TF_TD_MOREKICK, TF_TD_FIRE );
+            spawnFlameOnPlayer( self, other, 0 );
+        }
 	} else
 	{
 		if ( trap_pointcontents( PASSVEC3( self->s.v.origin ) + 1 ) != -1 )

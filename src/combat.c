@@ -746,7 +746,7 @@ void ApplyDmgRoll( gedict_t* self )
     self->s.v.v_angle[YAW]   += val * crandom();
 }
 
-void  TempEffectCoord( float*origin, int type )
+void  TempEffectCoord( vec3_t origin, int type )
 {
     trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
     trap_WriteByte( MSG_MULTICAST, type );
@@ -756,7 +756,7 @@ void  TempEffectCoord( float*origin, int type )
     trap_multicast( PASSVEC3( origin ), MULTICAST_PHS );
 }
 
-void  TempEffectCoordPVS( float*origin, int type )
+void  TempEffectCoordPVS( vec3_t origin, int type )
 {
     trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
     trap_WriteByte( MSG_MULTICAST, type );

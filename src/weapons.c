@@ -112,7 +112,7 @@ void W_Precache(  )
 }
 
 
-void  TempEffectCount( float*origin, int type, int count  )
+void  TempEffectCount( vec3_t origin, int type, int count  )
 {
     trap_WriteByte( MSG_MULTICAST, SVC_TEMPENTITY );
     trap_WriteByte( MSG_MULTICAST, type );
