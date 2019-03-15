@@ -22,188 +22,168 @@
 
 #include "g_local.h"
 typedef struct mod_s{
-	char   *command;
-	void    ( *Action ) ( int );
+    char   *command;
+    void    ( *Action ) ( int );
 } mod_t;
 void WP_command( int argc );
 void Red_Def_command( int argc );
 
 void   TF_Set_Cmd( int argc  );
 const static mod_t   mod_cmds[] = {
-	{"wp", WP_command},
-	{"red_def", Red_Def_command},
-	{"set", TF_Set_Cmd },
-	{NULL, NULL}
+    {"wp", WP_command},
+    {"red_def", Red_Def_command},
+    {"set", TF_Set_Cmd },
+    {NULL, NULL}
 };
 
 
 
 void ModCommand()
 {
-        char    cmd_command[1024];
-        int argc;
-        const mod_t  *ucmd;
+    char    cmd_command[1024];
+    int argc;
+    const mod_t  *ucmd;
 
-        argc = trap_CmdArgc();
-        if( argc < 2 )
-                return;
+    argc = trap_CmdArgc();
+    if( argc < 2 )
+        return;
 
 
-        trap_CmdArgv( 1, cmd_command, sizeof( cmd_command ) );
+    trap_CmdArgv( 1, cmd_command, sizeof( cmd_command ) );
 
-	for ( ucmd = mod_cmds; ucmd->command; ucmd++ )
-	{
-		if ( strcmp( cmd_command, ucmd->command ) )
-			continue;
-		ucmd->Action( argc );
-		return;
-	}
-	return;
+    for ( ucmd = mod_cmds; ucmd->command; ucmd++ )
+    {
+        if ( strcmp( cmd_command, ucmd->command ) )
+            continue;
+        ucmd->Action( argc );
+        return;
+    }
+    return;
 
 }
 extern vec3_t end_pos;
 
 void DrawWPS();
 void ClearWaypoints(  );
+static void cmd_addLink( int argc, qboolean dual )
+{
+    char    cmd_command[100];
+    wp_link_t link;
+    int i1,i2;
+    if( argc < 5 )
+        return;
+
+    memset(&link, 0 ,sizeof(link));
+    trap_CmdArgv( 3, cmd_command, sizeof( cmd_command ) );
+    i1 = atoi( cmd_command );
+    trap_CmdArgv( 4, cmd_command, sizeof( cmd_command ) );
+    i2 = atoi( cmd_command );
+    link.teams = 15;
+    if( argc > 5 )
+    {
+        trap_CmdArgv( 5, cmd_command, sizeof( cmd_command ) );
+        link.flags = atoi( cmd_command );
+    }
+    if( argc > 6 )
+    {
+        trap_CmdArgv( 6, cmd_command, sizeof( cmd_command ) );
+        link.teams = atoi( cmd_command );
+    }
+
+    if( argc > 7 )
+    {
+        trap_CmdArgv( 7, cmd_command, sizeof( cmd_command ) );
+        link.req_velocity = atof( cmd_command );
+
+    }
+    AddLink( i1, i2, &link);
+    if( dual )
+        AddLink( i2, i1, &link);
+
+}
+
 void WP_command( int argc )
 {
-        char    cmd_command[1024];
-        if( argc < 3)
-                return;
-        
-        trap_CmdArgv( 2, cmd_command, sizeof( cmd_command ) );
+    char    cmd_command[100];
+    if( argc < 3)
+        return;
 
-        if(!strcmp(cmd_command, "add"))
+    trap_CmdArgv( 2, cmd_command, sizeof( cmd_command ) );
+
+    if(!strcmp(cmd_command, "add"))
+    {
+        waypoint_t wp;
+
+        if( argc < 7 )
+            return;
+
+        memset(&wp, 0 ,sizeof(wp));
+        trap_CmdArgv( 3, cmd_command, sizeof( cmd_command ) );
+        wp.index = atoi( cmd_command );
+        trap_CmdArgv( 4, cmd_command, sizeof( cmd_command ) );
+        wp.origin[0] = atof( cmd_command );
+        trap_CmdArgv( 5, cmd_command, sizeof( cmd_command ) );
+        wp.origin[1] = atof( cmd_command );
+        trap_CmdArgv( 6, cmd_command, sizeof( cmd_command ) );
+        wp.origin[2] = atof( cmd_command );
+        wp.teams = 15 ;// (1<<0)+(1<<1)+(1<<2)+(1<<3);
+        if( argc > 7 )
         {
-                waypoint_t wp;
+            trap_CmdArgv( 7, cmd_command, sizeof( cmd_command ) );
+            wp.flags = atoi( cmd_command );
 
-                if( argc < 7 )
-                        return;
-
-                memset(&wp, 0 ,sizeof(wp));
-                trap_CmdArgv( 3, cmd_command, sizeof( cmd_command ) );
-                wp.index = atoi( cmd_command );
-                trap_CmdArgv( 4, cmd_command, sizeof( cmd_command ) );
-                wp.origin[0] = atof( cmd_command );
-                trap_CmdArgv( 5, cmd_command, sizeof( cmd_command ) );
-                wp.origin[1] = atof( cmd_command );
-                trap_CmdArgv( 6, cmd_command, sizeof( cmd_command ) );
-                wp.origin[2] = atof( cmd_command );
-                wp.teams = 15 ;// (1<<0)+(1<<1)+(1<<2)+(1<<3);
-                if( argc > 7 )
-                {
-                        trap_CmdArgv( 7, cmd_command, sizeof( cmd_command ) );
-                        wp.flags = atoi( cmd_command );
-                        
-                }
-                if( argc > 8 )
-                {
-                        trap_CmdArgv( 8, cmd_command, sizeof( cmd_command ) );
-                        wp.teams = atoi( cmd_command );
-                }
-
-                if( argc > 9 )
-                {
-                        trap_CmdArgv( 9, cmd_command, sizeof( cmd_command ) );
-                        wp.radius = atof( cmd_command );
-                        
-                }
-                AddWaypoint(&wp);
-                return;
+        }
+        if( argc > 8 )
+        {
+            trap_CmdArgv( 8, cmd_command, sizeof( cmd_command ) );
+            wp.teams = atoi( cmd_command );
         }
 
-        if(!strcmp(cmd_command, "link"))
+        if( argc > 9 )
         {
-                wp_link_t link;
-                int i1,i2;
-                if( argc < 5 )
-                        return;
+            trap_CmdArgv( 9, cmd_command, sizeof( cmd_command ) );
+            wp.radius = atof( cmd_command );
 
-                memset(&link, 0 ,sizeof(link));
-                trap_CmdArgv( 3, cmd_command, sizeof( cmd_command ) );
-                i1 = atoi( cmd_command );
-                trap_CmdArgv( 4, cmd_command, sizeof( cmd_command ) );
-                i2 = atoi( cmd_command );
-                link.teams = 15;
-                if( argc > 5 )
-                {
-                        trap_CmdArgv( 5, cmd_command, sizeof( cmd_command ) );
-                        link.flags = atoi( cmd_command );
-                }
-                if( argc > 6 )
-                {
-                        trap_CmdArgv( 6, cmd_command, sizeof( cmd_command ) );
-                        link.teams = atoi( cmd_command );
-                }
-
-                if( argc > 7 )
-                {
-                        trap_CmdArgv( 7, cmd_command, sizeof( cmd_command ) );
-                        link.req_velocity = atof( cmd_command );
-                        
-                }
-                AddLink( i1, i2, &link);
-                return;
         }
+        AddWaypoint(&wp);
+        return;
+    }
 
-        if(!strcmp(cmd_command, "dlink"))
-        {
-                wp_link_t link;
-                int i1,i2;
-                if( argc < 5 )
-                        return;
+    if(!strcmp(cmd_command, "link"))
+    {
+        cmd_addLink(argc, false);
+        return;
+    }
 
-                memset(&link, 0 ,sizeof(link));
-                trap_CmdArgv( 3, cmd_command, sizeof( cmd_command ) );
-                i1 = atoi( cmd_command );
-                trap_CmdArgv( 4, cmd_command, sizeof( cmd_command ) );
-                i2 = atoi( cmd_command );
-                link.teams = 15;
-                if( argc > 5 )
-                {
-                        trap_CmdArgv( 5, cmd_command, sizeof( cmd_command ) );
-                        link.flags = atoi( cmd_command );
-                }
-                if( argc > 6 )
-                {
-                        trap_CmdArgv( 6, cmd_command, sizeof( cmd_command ) );
-                        link.teams = atoi( cmd_command );
-                }
+    if(!strcmp(cmd_command, "dlink"))
+    {
+        cmd_addLink(argc, true);
+        return;
+    }
 
-                if( argc > 7 )
-                {
-                        trap_CmdArgv( 7, cmd_command, sizeof( cmd_command ) );
-                        link.req_velocity = atof( cmd_command );
-                        
-                }
-                AddLink( i1, i2, &link);
-                AddLink( i2, i1, &link);
-                return;
-        }
+    if(!strcmp(cmd_command, "target"))
+    {
+        if( argc < 6 )
+            return;
 
-        if(!strcmp(cmd_command, "target"))
-        {
-                if( argc < 6 )
-                        return;
-
-                trap_CmdArgv( 3, cmd_command, sizeof( cmd_command ) );
-                end_pos[0] = atof( cmd_command );
-                trap_CmdArgv( 4, cmd_command, sizeof( cmd_command ) );
-                end_pos[1] = atof( cmd_command );
-                trap_CmdArgv( 5, cmd_command, sizeof( cmd_command ) );
-                end_pos[2] = atof( cmd_command );
-                return;
-        }
-        if(!strcmp(cmd_command, "draw"))
-        {
-                DrawWPS();
-                return;
-        }
-        if(!strcmp(cmd_command, "clear"))
-        {
-                ClearWaypoints();
-                return;
-        }
+        trap_CmdArgv( 3, cmd_command, sizeof( cmd_command ) );
+        end_pos[0] = atof( cmd_command );
+        trap_CmdArgv( 4, cmd_command, sizeof( cmd_command ) );
+        end_pos[1] = atof( cmd_command );
+        trap_CmdArgv( 5, cmd_command, sizeof( cmd_command ) );
+        end_pos[2] = atof( cmd_command );
+        return;
+    }
+    if(!strcmp(cmd_command, "draw"))
+    {
+        DrawWPS();
+        return;
+    }
+    if(!strcmp(cmd_command, "clear"))
+    {
+        ClearWaypoints();
+        return;
+    }
 }
 void Red_Def_command( int argc )
 {

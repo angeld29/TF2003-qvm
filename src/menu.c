@@ -702,14 +702,7 @@ void Menu_EngineerFix_Dispenser_Input( int inp )
 	self->s.v.impulse = 0;
 	self->building = world;
 	bound_other_ammo( self );
-	if ( !self->s.v.armorvalue )
-	{
-		self->s.v.armortype = 0;
-		self->armorclass = 0;
-		self->s.v.items =
-		    ( int ) self->s.v.items -
-		    ( ( int ) self->s.v.items & ( IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3 ) );
-	}
+    bound_other_armor( self );
 	W_SetCurrentAmmo(  );
 
 }
@@ -802,14 +795,7 @@ void Menu_EngineerFix_SentryGun_Input( int inp )
 	ResetMenu(  );
 	self->s.v.impulse = 0;
 	bound_other_ammo( self );
-	if ( !self->s.v.armorvalue )
-	{
-		self->s.v.armortype = 0;
-		self->armorclass = 0;
-		self->s.v.items =
-		    ( int ) self->s.v.items -
-		    ( ( int ) self->s.v.items & ( IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3 ) );
-	}
+    bound_other_armor( self );
 	W_SetCurrentAmmo(  );
 
 }
@@ -892,14 +878,7 @@ void Menu_Dispenser_Input( int inp )
 	self->building = world;
 	self->building_wait = g_globalvars.time + 0.5;
 	bound_other_ammo( self );
-	if ( !self->s.v.armorvalue )
-	{
-		self->s.v.armortype = 0;
-		self->armorclass = 0;
-		self->s.v.items =
-		    ( int ) self->s.v.items -
-		    ( ( int ) self->s.v.items & ( IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3 ) );
-	}
+    bound_other_armor( self );
 	W_SetCurrentAmmo(  );
 
 }

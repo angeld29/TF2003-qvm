@@ -584,6 +584,17 @@ WEAPONS
 ===============================================================================
 */
 
+void bound_other_armor( gedict_t*self )
+{
+	if ( !self->s.v.armorvalue )
+	{
+		self->s.v.armortype = 0;
+		self->armorclass = 0;
+		self->s.v.items = ( int ) self->s.v.items -
+		    ( ( int ) self->s.v.items & ( IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3 ) );
+	}
+}
+
 void bound_other_ammo( gedict_t * p )
 {
 	if ( p->s.v.ammo_shells > TeamFortress_GetMaxAmmo( p, IT_SHELLS ) )

@@ -248,6 +248,7 @@ void            DropQuad( float timeleft );
 void            DropRing( float timeleft );
 void            DropBackpack();
 void 		bound_other_ammo( gedict_t * p );
+void bound_other_armor( gedict_t*self );
 void 		Respawn_Item( gedict_t * ritem, gedict_t * act );
 //triggers.c
 void            spawn_tfog( vec3_t org );
