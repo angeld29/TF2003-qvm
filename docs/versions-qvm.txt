@@ -2,6 +2,25 @@ QuakeWorld TeamFortress 2003 (QVM/DDL/SO Versions)
 by [sd] angel for MTFL
 
 ////////////////////////////////////////////////////
+Внесенные изменения (на 15.03.2019 r1):
+[+] Рефакторинг кода:
+    *scoutscan 
+    *sgaim  new & mtfl
+    *remove glow check by tfgoal
+    *hwguy attack 
+    *flashtimernew
+    *buble for conc
+    *t_damage  team damage
+    *primegren ( flare, caltrop )
+    *armortype 
+    *flameonplayer all types
+    *worldflame 
+    *pyro 
+    *reddef  cmd command
+    *check lost armor ( remove armor type)
+    *wplink  cmd command
+
+////////////////////////////////////////////////////
 Внесенные изменения (на 13.03.2019 r1):
 [+] Рефакторинг кода создания temp_entites
 [+] Рефакторинг кода tf_goal_result, исправлена ошибка с удалением запраймленой гранаты еслт гоал удаляет положительное число гранат( ранее граната пропадала если гоал удалял отрицательное число гранат) 
