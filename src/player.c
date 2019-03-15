@@ -500,48 +500,54 @@ void player_assaultcannonup2(  )
 		player_assaultcannon1(  );
 	}
 }
-void player_assaultcannon1(  )
+static void player_assaultcannon( gedict_t* self,  int frame )
 {
 	vec3_t  v;
-#ifndef NEWHWGUY
-	int     st;
-#endif
-
-	self->s.v.frame = 103;
-	self->s.v.think = ( func_t ) player_assaultcannon2;
 	self->s.v.nextthink = g_globalvars.time + 0.1;
 
 	VectorCopy( self->s.v.velocity, v );
 	v[2] = 0;
+#ifndef NEWHWGUY
+    if( frame == 2 )
+        stuffcmd( self, "v_idlescale 0\n" );
+#endif
 // if (vlen(self->s.v.velocity) < 50 && (self.flags & #FL_ONGROUND)) {
 	if ( vlen( v ) < 20 && ( ( int ) self->s.v.flags & FL_ONGROUND ) )
 	{
-		muzzleflash(  );
-		sound( self, 1, "weapons/asscan2.wav", 1, 1 );
 		if ( self->s.v.weaponframe == 2 )
 			self->s.v.weaponframe = 4;
 		else
 			self->s.v.weaponframe = 2;
+
+        if( frame == 1 )
+        {
+            muzzleflash(  );
+            sound( self, 1, "weapons/asscan2.wav", 1, 1 );
+        }
 		SuperDamageSound(  );
 		W_FireAssaultCannon(  );
+
+        if( frame == 1 ){
 #ifndef NEWHWGUY
-		stuffcmd( self, "v_idlescale " );
-		if ( self->heat < 5 )
-			st = ( self->heat * 4 );
-		else
-			st = 20;
-		stuffcmd( self, "%d\n", st );
+		stuffcmd( self, "v_idlescale %d\n", min( (int)(self->heat*4), 20) );
 #endif
+        }else{
+            self->heat = self->heat + 0.1;
+            stuffcmd( self, "bf\n" );
+        }
 	} else
 	{
-		sound( self, 1, "weapons/asscan4.wav", 1, 1 );
 		if ( self->s.v.weaponframe == 2 )
 			self->s.v.weaponframe = 0;
 		else
 			self->s.v.weaponframe = 2;
+
+        if( frame == 1 ){
+            sound( self, 1, "weapons/asscan4.wav", 1, 1 );
 #ifndef NEWHWGUY
-		stuffcmd( self, "v_idlescale 5\n" );
+            stuffcmd( self, "v_idlescale 5\n" );
 #endif
+        }
 	}
 	if ( !self->s.v.button0 || self->s.v.ammo_shells <= self->assault_min_shells || intermission_running )
 	{
@@ -556,51 +562,21 @@ void player_assaultcannon1(  )
 		return;
 	}
 	Attack_Finished( 0.1 );
+
+}
+void player_assaultcannon1(  )
+{
+	self->s.v.frame = 103;
+	self->s.v.think = ( func_t ) player_assaultcannon2;
+    player_assaultcannon( self, 1 );
 }
 
 void player_assaultcannon2(  )
 {
-	vec3_t  v;
 
 	self->s.v.frame = 104;
 	self->s.v.think = ( func_t ) player_assaultcannon1;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-	VectorCopy( self->s.v.velocity, v );
-	v[2] = 0;
-#ifndef NEWHWGUY
-	stuffcmd( self, "v_idlescale 0\n" );
-#endif
-// if (vlen(self->s.v.velocity) < 50 && (self.flags & #FL_ONGROUND)) {
-	if ( vlen( v ) < 20 && ( ( int ) self->s.v.flags & FL_ONGROUND ) )
-	{
-		if ( self->s.v.weaponframe == 2 )
-			self->s.v.weaponframe = 4;
-		else
-			self->s.v.weaponframe = 2;
-		SuperDamageSound(  );
-		W_FireAssaultCannon(  );
-		self->heat = self->heat + 0.1;
-		stuffcmd( self, "bf\n" );
-	} else
-	{
-		if ( self->s.v.weaponframe == 2 )
-			self->s.v.weaponframe = 0;
-		else
-			self->s.v.weaponframe = 2;
-	}
-	if ( !self->s.v.button0 || self->s.v.ammo_shells <= self->assault_min_shells || intermission_running )
-	{
-#ifndef NEWHWGUY
-		stuffcmd( self, "v_idlescale 0\n" );
-#endif
-		self->tfstate = self->tfstate - ( self->tfstate & TFSTATE_AIMING );
-		TeamFortress_SetSpeed( self );
-		self->s.v.weaponframe = 0;
-		self->count = 1;
-		player_assaultcannondown1(  );
-		return;
-	}
-	Attack_Finished( 0.1 );
+    player_assaultcannon( self,  2 );
 }
 
 void player_assaultcannondown1(  )
