@@ -185,6 +185,39 @@ void WP_command( int argc )
         return;
     }
 }
+
+static gedict_t* getTeam2Flag()
+{
+    gedict_t *Goal,*te;
+    Goal = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
+
+    if ( !Goal )
+        return NULL;
+    if ( !Goal->display_item_status1 )
+        return NULL;
+    te = Finditem( Goal->display_item_status1 );
+
+    if( !te || te == world || te->team_no != 2 )
+    {
+        te = Finditem( Goal->display_item_status2 );
+    }
+    if( !te || te == world || te->team_no != 2 )
+    {
+        te = Finditem( Goal->display_item_status3 );
+    }
+    if( !te || te == world || te->team_no != 2 )
+    {
+        te = Finditem( Goal->display_item_status4 );
+    }
+
+    if ( te == world || te->team_no != 2 )
+    {
+        if( self != world )
+            G_sprint(self,2,"Item is missing.\n" );
+        return NULL;
+    }
+    return Goal;
+}
 void Red_Def_command( int argc )
 {
     char    cmd_command[1024];
@@ -219,41 +252,18 @@ void Red_Def_command( int argc )
             return;
         }
 
-        Goal = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
-
-        if ( !Goal )
-            return;
-        if ( !Goal->display_item_status1 )
-            return;
-        te = Finditem( Goal->display_item_status1 );
-
-        if( !te || te == world || te->team_no != 2 )
+        if( (Goal = getTeam2Flag()))
         {
-            te = Finditem( Goal->display_item_status2 );
-        }
-        if( !te || te == world || te->team_no != 2 )
-        {
-            te = Finditem( Goal->display_item_status3 );
-        }
-        if( !te || te == world || te->team_no != 2 )
-        {
-            te = Finditem( Goal->display_item_status4 );
+            owner = PROG_TO_EDICT(te->s.v.owner);
+            if( owner != world )
+            {
+                tfgoalitem_RemoveFromPlayer( te, owner, 1 );
+            }
+            te->take_sshot = 1;
+            red_def_mode = true;
+            G_bprint(3, "Red-DEF mode activated\n");
         }
 
-        if ( te == world || te->team_no != 2 )
-        {
-            if( self != world )
-                G_sprint(self,2,"Item is missing.\n" );
-            return;
-        }
-        owner = PROG_TO_EDICT(te->s.v.owner);
-        if( owner != world )
-        {
-            tfgoalitem_RemoveFromPlayer( te, owner, 1 );
-        }
-        te->take_sshot = 1;
-        red_def_mode = true;
-        G_bprint(3, "Red-DEF mode activated\n");
         return;
     }
     if( !strcmp(cmd_command,"off") )
@@ -264,35 +274,12 @@ void Red_Def_command( int argc )
                 G_sprint(self,3,"Red-Def mode not active\n");
             return;
         }
-        Goal = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
-
-        if ( !Goal )
-            return;
-        if ( !Goal->display_item_status1 )
-            return;
-        te = Finditem( Goal->display_item_status1 );
-        if( !te || te == world || te->team_no != 2 )
+        if( (Goal = getTeam2Flag()))
         {
-            te = Finditem( Goal->display_item_status2 );
+            te->take_sshot = 0;
+            red_def_mode = false;
+            G_bprint(3, "Red-DEF mode deactivated\n");
         }
-        if( !te || te == world || te->team_no != 2 )
-        {
-            te = Finditem( Goal->display_item_status3 );
-        }
-        if( !te || te == world || te->team_no != 2 )
-        {
-            te = Finditem( Goal->display_item_status4 );
-        }
-
-        if ( te == world || te->team_no != 2 )
-        {
-            if( self != world )
-                G_sprint(self,2,"Item is missing.\n" );
-            return;
-        }
-        te->take_sshot = 0;
-        red_def_mode = false;
-        G_bprint(3, "Red-DEF mode deactivated\n");
         return;
     }
 
