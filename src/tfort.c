@@ -1441,6 +1441,21 @@ void TeamFortress_SetColor( gedict_t * p, int top, int bottom )
         }
 }
 
+static void setArmorType( gedict_t* self )
+{
+    if ( self->s.v.armortype >= 0.8 )
+        self->s.v.items = ( int ) self->s.v.items | IT_ARMOR3;
+    else
+    {
+        if ( self->s.v.armortype >= 0.6 )
+            self->s.v.items = ( int ) self->s.v.items | IT_ARMOR2;
+        else
+        {
+            if ( self->s.v.armortype >= 0.3 )
+                self->s.v.items = ( int ) self->s.v.items | IT_ARMOR1;
+        }
+    }
+}
 
 void TeamFortress_SetEquipment(  )
 {
@@ -1594,18 +1609,8 @@ void TeamFortress_SetEquipment(  )
 		setmodel( self, "" );
 	}
 
-	if ( self->s.v.armortype >= 0.8 )
-		self->s.v.items = ( int ) self->s.v.items | IT_ARMOR3;
-	else
-	{
-		if ( self->s.v.armortype >= 0.6 )
-			self->s.v.items = ( int ) self->s.v.items | IT_ARMOR2;
-		else
-		{
-			if ( self->s.v.armortype >= 0.3 )
-				self->s.v.items = ( int ) self->s.v.items | IT_ARMOR1;
-		}
-	}
+    setArmorType( self );
+
 	if ( tfset(allow_hook) && self->playerclass )
 		self->weapons_carried |= WEAP_HOOK;
 	W_SetCurrentAmmo(  );
@@ -1874,18 +1879,7 @@ void TeamFortress_CheckClassStats(  )
 
 	self->s.v.items = ( int ) self->s.v.items - ( ( int ) self->s.v.items & ( IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3 ) );
 
-	if ( self->s.v.armortype >= 0.8 )
-		self->s.v.items = ( int ) self->s.v.items | IT_ARMOR3;
-	else
-	{
-		if ( self->s.v.armortype >= 0.6 )
-			self->s.v.items = ( int ) self->s.v.items | IT_ARMOR2;
-		else
-		{
-			if ( self->s.v.armortype >= 0.3 )
-				self->s.v.items = ( int ) self->s.v.items | IT_ARMOR1;
-		}
-	}
+    setArmorType( self );
 }
 
 
