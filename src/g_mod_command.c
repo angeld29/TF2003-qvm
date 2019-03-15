@@ -254,10 +254,10 @@ void Red_Def_command( int argc )
 
         if( (Goal = getTeam2Flag()))
         {
-            owner = PROG_TO_EDICT(te->s.v.owner);
+            owner = PROG_TO_EDICT(Goal->s.v.owner);
             if( owner != world )
             {
-                tfgoalitem_RemoveFromPlayer( te, owner, 1 );
+                tfgoalitem_RemoveFromPlayer( Goal, owner, 1 );
             }
             te->take_sshot = 1;
             red_def_mode = true;
