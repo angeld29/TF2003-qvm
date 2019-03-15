@@ -16,7 +16,7 @@ by [sd] angel for MTFL
     *flameonplayer all types
     *worldflame 
     *pyro 
-    *reddef  cmd command
+    *reddef  mod command
     *check lost armor ( remove armor type)
     *wplink  cmd command
 
