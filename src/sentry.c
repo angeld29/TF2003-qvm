@@ -478,28 +478,33 @@ void Sentry_Die(  )
     }
 }
 
+void sgAimNew( gedict_t* self, gedict_t* targ, vec3_t* src, vec3_t* dst, vec3_t* norm_dir)
+{
+    vec3_t  dir,  tmp;
+    trap_makevectors( self->s.v.v_angle );
+
+    VectorAdd( self->s.v.origin, self->s.v.view_ofs, *src );
+    VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, *dst );
+    VectorSubtract( *dst, *src, dir );
+
+    normalize(dir, *norm_dir);
+
+    //чтобы не попадать в подставку
+    traceline( PASSVEC3( *src ), PASSVEC3( *dst ), 0, self );
+
+    if( (PROG_TO_EDICT(g_globalvars.trace_ent) == self->trigger_field) && vlen(dir) > 100 )
+    {
+        VectorScale( *norm_dir, 60, tmp);
+        VectorAdd(*src,tmp,*src);
+    }
+}
 void FireSentryBulletsNEW( int shotcount, gedict_t * targ, float spread_x, float spread_y, float spread_z )
 {
     vec3_t  src;
     vec3_t  dst;
-    vec3_t  dir,  tmp, norm_dir;
+    vec3_t  norm_dir;
 
-    trap_makevectors( self->s.v.v_angle );
-
-    VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
-    VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
-    VectorSubtract( dst, src, dir );
-
-    normalize(dir,norm_dir);
-
-    //чтобы не попадать в подставку
-    traceline( PASSVEC3( src ), PASSVEC3( dst ), 0, self );
-
-    if( (PROG_TO_EDICT(g_globalvars.trace_ent) == self->trigger_field) && vlen(dir) > 100 )
-    {
-        VectorScale(norm_dir, 60, tmp);
-        VectorAdd(src,tmp,src);
-    }
+    sgAimNew( self, targ, &src, &dst, &norm_dir );
 
     ClearMultiDamage(  );
     traceline( PASSVEC3( src ), PASSVEC3( dst ), 0, self );
@@ -525,18 +530,24 @@ void FireSentryBulletsNEW( int shotcount, gedict_t * targ, float spread_x, float
    FireSentryBulletsMTFL2
    ====================================
    */
+static void sgAimMTFL2( gedict_t*self, gedict_t*  targ, vec3_t* src, vec3_t * dir )
+{
+    vec3_t  dst;
+
+    trap_makevectors( self->s.v.v_angle );
+
+    VectorAdd( self->s.v.origin, self->s.v.view_ofs, *src );
+    VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
+    VectorSubtract( dst, *src, *dir );
+}
+
 void FireSentryBulletsMTFL2( int shotcount, gedict_t * targ, float spread_x, float spread_y, float spread_z )
 {
     vec3_t  direction;
     vec3_t  src;
-    vec3_t  dst;
     vec3_t  dir, end, tmp;
 
-    trap_makevectors( self->s.v.v_angle );
-
-    VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
-    VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
-    VectorSubtract( dst, src, dir );
+    sgAimMTFL2( self, targ, &src, &dir );
 
     ClearMultiDamage(  );
     VectorScale( dir, 2048, end );
@@ -573,37 +584,22 @@ void    FireSentryLighting( gedict_t * targ )
 {
     vec3_t  src;
     vec3_t  dst;
-    vec3_t  dir, end,direction, tmp,norm_dir;
+    vec3_t  dir, end, norm_dir;
     gedict_t*trace_ent;
 
     switch( tfset_sg_sfire )
     {
         case SG_SFIRE_NEW:
             VectorCopy( self->s.v.angles, self->s.v.v_angle );
-            trap_makevectors( self->s.v.v_angle );
+            sgAimNew( self, targ, &src, &dst, &norm_dir );
 
-            VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
-            VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
-            VectorSubtract( dst, src, dir );
-
-            normalize(dir,norm_dir);
-            traceline( PASSVEC3( src ), PASSVEC3( dst ), 0, self );
-
-            if( (PROG_TO_EDICT(g_globalvars.trace_ent) == self->trigger_field) && vlen(dir) > 100 )
-            {
-                VectorScale(norm_dir, 60, tmp);
-                VectorAdd(src,tmp,src);
-            }
             VectorCopy(dst,end);
             break;
         case SG_SFIRE_MTFL2:
             VectorCopy( self->s.v.angles, self->s.v.v_angle );
-            trap_makevectors( self->s.v.v_angle );
-            VectorAdd( self->s.v.origin, self->s.v.view_ofs, src );
-            VectorAdd( targ->s.v.origin, targ->s.v.view_ofs, dst );
+            sgAimMTFL2( self, targ, &src, &dir );
 
-            VectorSubtract( dst, src, dir );
-            VectorNormalize( direction );
+            VectorNormalize( dir );
             VectorScale( dir, 2048, end );
             VectorAdd( end, src, end );
             break;
