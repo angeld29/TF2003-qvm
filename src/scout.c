@@ -149,25 +149,6 @@ void FlashTimer(  )
 	self->s.v.nextthink = g_globalvars.time + 0.6;
 }
 
-void FlashTimerNew(  )
-{
-	gedict_t *te;
-
-	te = PROG_TO_EDICT( self->s.v.owner );
-	te->FlashTime = te->FlashTime - 0.6;
-	if ( te->FlashTime < 5 || ( self->gren_eff_time <= g_globalvars.time && tg_data.gren_time ) )
-	{
-		te->FlashTime = 0;
-		stuffcmd( te, "v_cshift; wait; bf\n" );
-		ent_remove( self );
-		return;
-	}
-	stuffcmd( te, "v_cshift %.0f %.0f %.0f %.0f\n", te->FlashTime * 10,
-		  te->FlashTime * 10, te->FlashTime * 10, te->FlashTime * 10 );
-
-	self->s.v.nextthink = g_globalvars.time + 0.6;
-}
-
 void FlashPlayer( gedict_t*p, gedict_t*attacker )
 {
         gedict_t* te;
@@ -202,7 +183,7 @@ void FlashPlayer( gedict_t*p, gedict_t*attacker )
        	
        	if ( tfset(new_flash) )
        	{
-       	        te->s.v.think = ( func_t ) FlashTimerNew;
+       	        te->s.v.think = ( func_t ) FlashTimer;
        	        te->s.v.nextthink = g_globalvars.time + NEW_FLASH_START_TIME;
        	        if( p == attacker )
        	        {
