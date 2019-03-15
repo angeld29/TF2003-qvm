@@ -620,6 +620,25 @@ qboolean TFScout_CheckScanTarget( gedict_t* ent )
         return true;
     return false;
 }
+
+void tempLighting(gedict_t*self, gedict_t* to,  vec3_t tmp)
+{
+    vec3_t lightningvec;
+
+    normalize( tmp, lightningvec );
+    VectorScale( lightningvec, vlen( tmp ) / 5, lightningvec );
+    VectorAdd( lightningvec, self->s.v.origin, lightningvec );
+    g_globalvars.msg_entity = EDICT_TO_PROG( self );
+    trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
+    trap_WriteByte( MSG_ONE, TE_LIGHTNING1 );
+    WriteEntity( MSG_ONE, to );
+    trap_WriteCoord( MSG_ONE, self->s.v.origin[0] );
+    trap_WriteCoord( MSG_ONE, self->s.v.origin[1] );
+    trap_WriteCoord( MSG_ONE, self->s.v.origin[2] + 8 );
+    trap_WriteCoord( MSG_ONE, lightningvec[0] );
+    trap_WriteCoord( MSG_ONE, lightningvec[1] );
+    trap_WriteCoord( MSG_ONE, lightningvec[2] + 8 );
+}
 void TeamFortress_Scan_Angel( int scanrange, int typescan )
 {
 	gedict_t *list;
@@ -682,19 +701,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 				}
 			} else
 			{
-				normalize( tmp, lightningvec );
-				VectorScale( lightningvec, len / 5, lightningvec );
-				VectorAdd( lightningvec, self->s.v.origin, lightningvec );
-				g_globalvars.msg_entity = EDICT_TO_PROG( self );
-				trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
-				trap_WriteByte( MSG_ONE, TE_LIGHTNING1 );
-				WriteEntity( MSG_ONE, list );
-				trap_WriteCoord( MSG_ONE, self->s.v.origin[0] );
-				trap_WriteCoord( MSG_ONE, self->s.v.origin[1] );
-				trap_WriteCoord( MSG_ONE, self->s.v.origin[2] + 8 );
-				trap_WriteCoord( MSG_ONE, lightningvec[0] );
-				trap_WriteCoord( MSG_ONE, lightningvec[1] );
-				trap_WriteCoord( MSG_ONE, lightningvec[2] + 8 );
+                tempLighting( self, list, tmp);
 			}
 		}
 	}
@@ -702,19 +709,7 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 	if ( ( !multiscan ) && saveent )
 	{
       		VectorSubtract( saveent->s.v.origin, self->s.v.origin, tmp );
-      		normalize( tmp, lightningvec );
-      		VectorScale( lightningvec, vlen( tmp ) / 5, lightningvec );
-      		VectorAdd( lightningvec, self->s.v.origin, lightningvec );
-      		g_globalvars.msg_entity = EDICT_TO_PROG( self );
-      		trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
-      		trap_WriteByte( MSG_ONE, TE_LIGHTNING1 );
-      		WriteEntity( MSG_ONE, saveent );
-      		trap_WriteCoord( MSG_ONE, self->s.v.origin[0] );
-      		trap_WriteCoord( MSG_ONE, self->s.v.origin[1] );
-      		trap_WriteCoord( MSG_ONE, self->s.v.origin[2] + 8 );
-      		trap_WriteCoord( MSG_ONE, lightningvec[0] );
-      		trap_WriteCoord( MSG_ONE, lightningvec[1] );
-      		trap_WriteCoord( MSG_ONE, lightningvec[2] + 8 );
+            tempLighting( self, saveent, tmp);
 	}
 
 	if ( typescan == 0 && any_detected2 == 0 )
