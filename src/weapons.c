@@ -2618,13 +2618,13 @@ void ImpulseCommands(  )
                 TeamFortress_PrimeGrenade(  );
                 break;
             case TF_SCAN_10:
-                TeamFortress_Scan_Angel( 10, 0 );
+                TeamFortress_Scan_Angel( 10, false );
                 break;
             case TF_SCAN_30:
-                TeamFortress_Scan_Angel( 30, 0 );
+                TeamFortress_Scan_Angel( 30, false );
                 break;
             case TF_SCAN_100:
-                TeamFortress_Scan_Angel( 100, 0 );
+                TeamFortress_Scan_Angel( 100, false );
                 break;
             case TF_DETPACK_5:
                 TeamFortress_SetDetpack( 5 );

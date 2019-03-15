@@ -229,6 +229,7 @@ void Test(  )
         G_sprint( self, 2, "mapname %s %s\n", mapname, nextmap);
         G_sprint( self, 2, " intermission... %d %f %f\n", intermission_running, intermission_exittime, g_globalvars.time );
         G_sprint( self, 2, " dmg ... %f %f\n", self->eff_info.dmg, self->eff_info.dmg_curr );
+        G_sprint( self, 2, " %d %d %d\n", self->is_building, self->is_detpacking, self->is_feigning );
         if( tfset(tg_enabled) ){
             if( self->eff_info.conc_idle == 0 ){
                 self->eff_info.conc_idle = 130;

@@ -90,7 +90,7 @@ void    RemoveFlare(  );
 void    RemoveOldFlare( int tno );
 //void    TeamFortress_Scan( float scanrange );
 void TeamFortress_ScannerSet( int impulse );
-void    TeamFortress_Scan_Angel( int scanrange, int typescan );
+void    TeamFortress_Scan_Angel( int scanrange, qboolean is_auto );
 void    TeamFortress_SetDetpack( float timer );
 void    Engineer_UseDispenser( gedict_t * disp );
 void    Engineer_UseSentryGun( gedict_t * gun );

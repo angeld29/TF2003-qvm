@@ -605,7 +605,9 @@ void TeamFortress_ScannerSet( int impulse )
 qboolean TFScout_CheckScanTarget( gedict_t* ent )
 {
     if ( ent == self ) return false;
-    if ( strneq( ent->s.v.classname, "player" ) ) return false;
+    if ( strneq( ent->s.v.classname, "player" ) 
+            //&& strneq( ent->s.v.classname, "building_sentrygun" ) 
+            ) return false;
     if ( !ent->s.v.takedamage ) return false;
     if ( ent->s.v.health <= 0 ) return false;
 
@@ -621,12 +623,15 @@ qboolean TFScout_CheckScanTarget( gedict_t* ent )
     return false;
 }
 
-void tempLighting(gedict_t*self, gedict_t* to,  vec3_t tmp)
+void tempLighting(gedict_t*self, gedict_t* to)
 {
     vec3_t lightningvec;
+    float len;
 
-    normalize( tmp, lightningvec );
-    VectorScale( lightningvec, vlen( tmp ) / 5, lightningvec );
+    VectorSubtract( to->s.v.origin, self->s.v.origin, lightningvec );
+    len = VectorNormalize( lightningvec );
+
+    VectorScale( lightningvec, len / 5, lightningvec );
     VectorAdd( lightningvec, self->s.v.origin, lightningvec );
     g_globalvars.msg_entity = EDICT_TO_PROG( self );
     trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
@@ -639,7 +644,7 @@ void tempLighting(gedict_t*self, gedict_t* to,  vec3_t tmp)
     trap_WriteCoord( MSG_ONE, lightningvec[1] );
     trap_WriteCoord( MSG_ONE, lightningvec[2] + 8 );
 }
-void TeamFortress_Scan_Angel( int scanrange, int typescan )
+void TeamFortress_Scan_Angel( int scanrange, qboolean is_auto )
 {
 	gedict_t *list;
 	gedict_t *saveent = NULL;
@@ -681,8 +686,9 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
     if( !multiscan ) 
         scanrange = NIT_SCANNER_MAXRANGE;
 
-	if ( typescan == 0 )
+	if ( !is_auto )
 		G_sprint( self, PRINT_HIGH, "Scanning...\n" );
+
 	scanrange = scanrange * 25;
 	minlen = scanrange + 100;
 	for ( list = world; ( list = trap_findradius( list, self->s.v.origin, scanrange + 40 ) ); )
@@ -690,10 +696,10 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 		if ( TFScout_CheckScanTarget( list ) )
 		{
 			any_detected2 = 1;
-			VectorSubtract( list->s.v.origin, self->s.v.origin, tmp );
-            len = vlen( tmp );
-			if ( multiscan )
+			if ( !multiscan )
 			{
+                VectorSubtract( list->s.v.origin, self->s.v.origin, tmp );
+                len = vlen( tmp );
 				if ( !saveent || ( len < minlen ) )
 				{
 					saveent = list;
@@ -701,18 +707,17 @@ void TeamFortress_Scan_Angel( int scanrange, int typescan )
 				}
 			} else
 			{
-                tempLighting( self, list, tmp);
+                tempLighting( self, list );
 			}
 		}
 	}
 
 	if ( ( !multiscan ) && saveent )
 	{
-      		VectorSubtract( saveent->s.v.origin, self->s.v.origin, tmp );
-            tempLighting( self, saveent, tmp);
+            tempLighting( self, saveent );
 	}
 
-	if ( typescan == 0 && any_detected2 == 0 )
+	if ( !is_auto && any_detected2 == 0 )
 		G_sprint( self, PRINT_HIGH, "No blips.\n" );
 
 	W_SetCurrentAmmo(  );
