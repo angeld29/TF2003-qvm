@@ -153,6 +153,18 @@ The damage is coming from inflictor, but get mad at attacker
 This should be the only function that ever reduces health.
 ============
 */
+#define allowedClasname( attacker, targ ) \
+( streq( attacker->s.v.classname, "player" ) \
+	     && ( streq( targ->s.v.classname, "player" ) \
+		  || streq( targ->s.v.classname, "building_sentrygun" ) \
+		  || streq( targ->s.v.classname, "building_dispenser" ) \
+		  || streq( targ->s.v.classname, "building_teleporter_entrance" ) \
+		  || streq( targ->s.v.classname, "building_teleporter_exit" ) ) )
+
+#define isTeamDamage( attacker, targ ) \
+    ( targ->team_no > 0 && targ->team_no == attacker->team_no \
+                 && targ != attacker && ( T_flags & TF_TD_NOTTEAM ) )
+
 gedict_t *damage_attacker, *damage_inflictor;
 void T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker, float damage )
 {
@@ -267,8 +279,7 @@ void T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker, float
 		return;
 	}
 
-	if ( streq( attacker->s.v.classname, "player" )
-	     && ( streq( targ->s.v.classname, "player" ) || streq( targ->s.v.classname, "building_sentrygun" ) ) )
+    if ( allowedClasname( attacker, targ ) )
 	{
 		if ( targ->team_no > 0 && targ->team_no == attacker->team_no && targ != attacker )
 		{
@@ -539,15 +550,9 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 		return;
 	}
 	// team play damage avoidance
-	if ( streq( attacker->s.v.classname, "player" )
-	     && ( streq( targ->s.v.classname, "player" )
-		  || streq( targ->s.v.classname, "building_sentrygun" )
-		  || streq( targ->s.v.classname, "building_dispenser" )
-		  || streq( targ->s.v.classname, "building_teleporter_entrance" )
-		  || streq( targ->s.v.classname, "building_teleporter_exit" ) ) )
-	{
-		if ( targ->team_no > 0 && targ->team_no == attacker->team_no
-		     && targ != attacker && ( T_flags & TF_TD_NOTTEAM ) )
+	if ( allowedClasname( attacker, targ ) )
+    {
+		if ( isTeamDamage( attacker, targ ) )
 		{
 			if ( T_AttackType & TF_TD_EXPLOSION )
 			{
@@ -585,15 +590,9 @@ void TF_T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 		targ->s.v.health = targ->s.v.health - take;
 	}
 
-	if ( streq( attacker->s.v.classname, "player" )
-	     && ( streq( targ->s.v.classname, "player" )
-		  || streq( targ->s.v.classname, "building_sentrygun" )
-		  || streq( targ->s.v.classname, "building_dispenser" )
-		  || streq( targ->s.v.classname, "building_teleporter_entrance" )
-		  || streq( targ->s.v.classname, "building_teleporter_exit" ) ) )
+    if ( allowedClasname( attacker, targ ) )
 	{
-		if ( targ->team_no > 0 && targ->team_no == attacker->team_no
-		     && targ != attacker && ( T_flags & TF_TD_NOTTEAM ) )
+        if ( isTeamDamage( attacker, targ ) )
 		{
 			olddmsg = tf_data.deathmsg;
 			if ( T_AttackType & TF_TD_EXPLOSION )
