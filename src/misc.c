@@ -538,7 +538,7 @@ void SP_air_bubbles(  )
 	ent_remove( self );
 }
 
-void make_bubbles(  )
+gedict_t* spawn_buble( gedict_t* self )
 {
 	gedict_t *bubble;
 
@@ -557,6 +557,12 @@ void make_bubbles(  )
 	bubble->cnt = 0;
 
 	setsize( bubble, -8, -8, -8, 8, 8, 8 );
+    return bubble;
+}
+
+void make_bubbles(  )
+{
+    spawn_buble( self );
 
 	self->s.v.nextthink = g_globalvars.time + g_random(  ) + 0.5;
 	self->s.v.think = ( func_t ) make_bubbles;

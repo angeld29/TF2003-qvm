@@ -280,6 +280,7 @@ int		infront(gedict_t* targ);
 void    make_bubbles(  );
 void    bubble_remove(  );
 void    bubble_bob(  );
+gedict_t* spawn_buble( gedict_t* self );
 
 
 // common tf

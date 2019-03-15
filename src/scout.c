@@ -300,20 +300,9 @@ void OldConcussionGrenadeTimer(  )
 	if ( tg_data.gren_time && self->gren_eff_time <= g_globalvars.time )
 		self->s.v.health = 0;
 
-	newmis = spawn(  );
-	g_globalvars.newmis = EDICT_TO_PROG( newmis );
-	setmodel( newmis, "progs/s_bubble.spr" );
-	setorigin( newmis, PASSVEC3( owner->s.v.origin ) );
-	newmis->s.v.movetype = MOVETYPE_NOCLIP;
-	newmis->s.v.solid = SOLID_NOT;
-	SetVector( newmis->s.v.velocity, 0, 0, 15 );
-	newmis->s.v.nextthink = g_globalvars.time + 0.5;
-	newmis->s.v.think = ( func_t ) bubble_bob;
-	newmis->s.v.touch = ( func_t ) bubble_remove;
-	newmis->s.v.classname = "bubble";
-	newmis->s.v.frame = 0;
-	newmis->cnt = 0;
-	setsize( newmis, -8, -8, -8, 8, 8, 8 );
+        newmis = spawn_buble( owner );
+		g_globalvars.newmis = EDICT_TO_PROG( newmis );
+
 	self->s.v.health = self->s.v.health - 20;
 	if ( owner->playerclass == PC_MEDIC )
 		self->s.v.health = self->s.v.health - 20;
@@ -350,20 +339,8 @@ void ConcussionGrenadeTimer(  )
 	if ( self->s.v.health == 200 || self->s.v.health == 400 || self->s.v.health == 600
 	     || self->s.v.health == 800 || self->s.v.health == 1000 )
 	{
-		newmis = spawn(  );
+        newmis = spawn_buble( owner );
 		g_globalvars.newmis = EDICT_TO_PROG( newmis );
-		setmodel( newmis, "progs/s_bubble.spr" );
-		setorigin( newmis, PASSVEC3( owner->s.v.origin ) );
-		newmis->s.v.movetype = MOVETYPE_NOCLIP;
-		newmis->s.v.solid = SOLID_NOT;
-		SetVector( newmis->s.v.velocity, 0, 0, 15 );
-		newmis->s.v.nextthink = g_globalvars.time + 0.5;
-		newmis->s.v.think = ( func_t ) bubble_bob;
-		newmis->s.v.touch = ( func_t ) bubble_remove;
-		newmis->s.v.classname = "bubble";
-		newmis->s.v.frame = 0;
-		newmis->cnt = 0;
-		setsize( newmis, -8, -8, -8, 8, 8, 8 );
 	}
 	self->s.v.health = self->s.v.health - 10;
 	if ( owner->playerclass == PC_MEDIC )
