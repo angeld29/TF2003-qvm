@@ -931,6 +931,52 @@ void TeamFortress_Inventory(  )
 void    TeamFortress_GrenadePrimed(  );
 
 
+static qboolean primeGrenage( int gtype )
+{
+    switch ( gtype )
+    {
+
+        case GR_TYPE_FLARE:
+            newmis = spawn(  );
+            newmis->s.v.owner = EDICT_TO_PROG( self );
+            newmis->s.v.movetype = MOVETYPE_TOSS;
+            newmis->s.v.solid = SOLID_BBOX;
+            newmis->s.v.classname = "grenade";
+            trap_makevectors( self->s.v.v_angle );
+            if ( self->s.v.v_angle[0] )
+            {
+                newmis->s.v.velocity[0] = g_globalvars.v_forward[0] * 1200 + g_globalvars.v_up[0] * 200;
+                newmis->s.v.velocity[1] = g_globalvars.v_forward[1] * 1200 + g_globalvars.v_up[1] * 200;
+                newmis->s.v.velocity[2] = g_globalvars.v_forward[2] * 1200 + g_globalvars.v_up[2] * 200;
+            } else
+            {
+                aim( newmis->s.v.velocity );
+                VectorScale( newmis->s.v.velocity, 1200, newmis->s.v.velocity );
+                newmis->s.v.velocity[2] = 75;
+            }
+            vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
+            newmis->s.v.weapon = self->team_no;
+            newmis->s.v.think = ( func_t ) FlareGrenadeExplode;
+            newmis->s.v.nextthink = g_globalvars.time + 0.8;
+            newmis->s.v.touch = ( func_t ) FlareGrenadeTouch;
+            newmis->s.v.skin = 1;
+            newmis->mdl = "flare";
+            setmodel( newmis, "progs/flare.mdl" );
+            setsize( newmis, 0, 0, 0, 0, 0, 0 );
+            setorigin( newmis, PASSVEC3( self->s.v.origin ) );
+            return true;
+            break;
+        case GR_TYPE_CALTROPS:
+            G_sprint( self, 2, "Opening Caltrop canister...\n" );
+            break;
+        default:
+            G_sprint( self, 2, "%s primed, 3 seconds...\n", GrenadePrimeName[gtype] );
+            if ( self->settings_bits & TF_INTERNAL_GRENSOUND )
+                stuffcmd( self, "play count.wav\n" );
+            break;
+    }
+    return false;
+}
 void TeamFortress_PrimeGrenade(  )
 {
 	int     gtype = -1;
@@ -954,45 +1000,8 @@ void TeamFortress_PrimeGrenade(  )
 			if ( !tg_data.unlimit_grens )
 				self->no_grenades_1--;
 
-			switch ( gtype )
-			{
-
-			case GR_TYPE_FLARE:
-				newmis = spawn(  );
-				g_globalvars.newmis = EDICT_TO_PROG( newmis );
-				newmis->s.v.owner = EDICT_TO_PROG( self );
-				newmis->s.v.movetype = MOVETYPE_TOSS;
-				newmis->s.v.solid = SOLID_BBOX;
-				newmis->s.v.classname = "grenade";
-				trap_makevectors( self->s.v.v_angle );
-				newmis->s.v.velocity[0] =
-				    ( g_globalvars.v_forward[0] * 600 + g_globalvars.v_up[0] * 25 ) * 700;
-				newmis->s.v.velocity[1] =
-				    ( g_globalvars.v_forward[1] * 600 + g_globalvars.v_up[1] * 25 ) * 700;
-				newmis->s.v.velocity[2] =
-				    ( g_globalvars.v_forward[2] * 600 + g_globalvars.v_up[2] * 25 ) * 700;
-				vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
-				newmis->s.v.weapon = self->team_no;
-				newmis->s.v.think = ( func_t ) FlareGrenadeExplode;
-				newmis->s.v.nextthink = g_globalvars.time + 0.8;
-				newmis->s.v.touch = ( func_t ) FlareGrenadeTouch;
-				newmis->s.v.skin = 1;
-				newmis->mdl = "flare";
-				setmodel( newmis, "progs/flare.mdl" );
-				setsize( newmis, 0, 0, 0, 0, 0, 0 );
-				setorigin( newmis, PASSVEC3( self->s.v.origin ) );
-				return;
-				break;
-			case GR_TYPE_CALTROPS:
-				G_sprint( self, 2, "Opening Caltrop canister...\n" );
-				break;
-			default:
-				G_sprint( self, 2, "%s primed, 3 seconds...\n", GrenadePrimeName[gtype] );
-				if ( self->settings_bits & TF_INTERNAL_GRENSOUND )
-				        stuffcmd( self, "play count.wav\n" );
-				break;
-			}
-
+            if( primeGrenage( gtype ) )
+                return;
 		} else
 		{
 			G_sprint( self, 2, "No %ss left.\n", GrenadePrimeName[gtype] );
@@ -1013,52 +1022,9 @@ void TeamFortress_PrimeGrenade(  )
 		{
 			if ( !tg_data.unlimit_grens )
 				self->no_grenades_2--;
-			switch ( gtype )
-			{
 
-			case GR_TYPE_FLARE:
-				newmis = spawn(  );
-				newmis->s.v.owner = EDICT_TO_PROG( self );
-				newmis->s.v.movetype = MOVETYPE_TOSS;
-				newmis->s.v.solid = SOLID_BBOX;
-				newmis->s.v.classname = "grenade";
-				trap_makevectors( self->s.v.v_angle );
-				if ( self->s.v.v_angle[0] )
-				{
-					newmis->s.v.velocity[0] =
-					    g_globalvars.v_forward[0] * 1200 + g_globalvars.v_up[0] * 200;
-					newmis->s.v.velocity[1] =
-					    g_globalvars.v_forward[1] * 1200 + g_globalvars.v_up[1] * 200;
-					newmis->s.v.velocity[2] =
-					    g_globalvars.v_forward[2] * 1200 + g_globalvars.v_up[2] * 200;
-				} else
-				{
-					aim( newmis->s.v.velocity );
-					VectorScale( newmis->s.v.velocity, 1200, newmis->s.v.velocity );
-					newmis->s.v.velocity[2] = 75;
-				}
-				vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
-				newmis->s.v.weapon = self->team_no;
-				newmis->s.v.think = ( func_t ) FlareGrenadeExplode;
-				newmis->s.v.nextthink = g_globalvars.time + 0.8;
-				newmis->s.v.touch = ( func_t ) FlareGrenadeTouch;
-				newmis->s.v.skin = 1;
-				newmis->mdl = "flare";
-				setmodel( newmis, "progs/flare.mdl" );
-				setsize( newmis, 0, 0, 0, 0, 0, 0 );
-				setorigin( newmis, PASSVEC3( self->s.v.origin ) );
-				return;
-				break;
-			case GR_TYPE_CALTROPS:
-				G_sprint( self, 2, "Opening Caltrop canister...\n" );
-				break;
-			default:
-				G_sprint( self, 2, "%s primed, 3 seconds...\n", GrenadePrimeName[gtype] );
-				if ( self->settings_bits & TF_INTERNAL_GRENSOUND )
-				        stuffcmd( self, "play count.wav\n" );
-				break;
-			}
-
+            if( primeGrenage( gtype ) )
+                return;
 		} else
 		{
 			G_sprint( self, 2, "No %ss left.\n", GrenadePrimeName[gtype] );
