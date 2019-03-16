@@ -1074,7 +1074,7 @@ void PlayerDie(  )
 		self = saveself;
 		self->s.v.deadflag = DEAD_NO;
 	}
-	self->s.v.items = ( int ) self->s.v.items - ( ( int ) self->s.v.items & 524288 );
+	self->s.v.items = ( int ) self->s.v.items - ( ( int ) self->s.v.items & IT_INVISIBILITY );
 	self->invisible_finished = 0;
 	self->invincible_finished = 0;
 	self->super_damage_finished = 0;

@@ -1846,12 +1846,10 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 	}
 	if ( !lighton )
 	{
-		AP->s.v.effects = AP->s.v.effects - ( ( int ) AP->s.v.effects & 8 );
-		AP->s.v.effects = AP->s.v.effects - ( ( int ) AP->s.v.effects & 64 );
-		AP->s.v.effects = AP->s.v.effects - ( ( int ) AP->s.v.effects & 128 );
+		AP->s.v.effects = (int) AP->s.v.effects - ( ( int ) AP->s.v.effects &( EF_DIMLIGHT | EF_BLUE |EF_RED ));
 	}
 	if ( Item->goal_activation & TFGI_ITEMGLOWS )
-		Item->s.v.effects = ( int ) Item->s.v.effects | 8;
+		Item->s.v.effects = ( int ) Item->s.v.effects | EF_DIMLIGHT;
 	if ( !spyoff )
 		AP->is_unabletospy = 0;
 	if ( !key1on )
