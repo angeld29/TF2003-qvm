@@ -281,8 +281,8 @@ void OldConcussionGrenadeTimer(  )
 	if ( tg_data.gren_time && self->gren_eff_time <= g_globalvars.time )
 		self->s.v.health = 0;
 
-        newmis = spawn_buble( owner );
-		g_globalvars.newmis = EDICT_TO_PROG( newmis );
+    newmis = spawn_buble( owner );
+    g_globalvars.newmis = EDICT_TO_PROG( newmis );
 
 	self->s.v.health = self->s.v.health - 20;
 	if ( owner->playerclass == PC_MEDIC )
@@ -317,8 +317,7 @@ void ConcussionGrenadeTimer(  )
 	}
 	if ( tg_data.gren_time && self->gren_eff_time <= g_globalvars.time )
 		self->s.v.health = 0;
-	if ( self->s.v.health == 200 || self->s.v.health == 400 || self->s.v.health == 600
-	     || self->s.v.health == 800 || self->s.v.health == 1000 )
+	if ( ( ((int)self->s.v.health) % 200) == 0 )
 	{
         newmis = spawn_buble( owner );
 		g_globalvars.newmis = EDICT_TO_PROG( newmis );
