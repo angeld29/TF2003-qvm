@@ -175,7 +175,6 @@ void T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker, float
 
 //      char    attackerteam[10], targteam[10];
 
-    G_dprintf(  "dmg %f %f %f \n", self->eff_info.dmg_curr, self->eff_info.dmg, damage );
 	if ( !targ->s.v.takedamage )
 		return;
 
