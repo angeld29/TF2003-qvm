@@ -1744,7 +1744,7 @@ void tfgoalitem_GiveToPlayer( gedict_t * Item, gedict_t * AP, gedict_t * Goal )
 	{
 		if ( Goal->goal_result & TFGR_NO_ITEM_RESULTS )
 		{
-			Item->goal_state = 1;
+			Item->goal_state = TFGS_ACTIVE;
 			return;
 		}
 	}
