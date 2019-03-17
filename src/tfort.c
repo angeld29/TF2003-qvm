@@ -1049,6 +1049,152 @@ void TeamFortress_PrimeGrenade(  )
 	tGrenade->s.v.think = ( func_t ) TeamFortress_GrenadePrimed;
 }
 
+static gedict_t* spawnGrenade( gedict_t* user, int type, int isthrow )
+{
+	qboolean printthrowmsg = true;
+    gedict_t* newmis;
+
+	newmis = spawn(  );
+	g_globalvars.newmis = EDICT_TO_PROG( newmis );
+	newmis->s.v.owner = EDICT_TO_PROG( user );
+	newmis->s.v.movetype = MOVETYPE_BOUNCE;
+	newmis->team_no = user->team_no;
+	newmis->s.v.solid = SOLID_BBOX;
+	newmis->s.v.classname = "grenade";
+	newmis->s.v.think = ( func_t ) SUB_Null;
+	setsize( newmis, 0, 0, 0, 0, 0, 0 );
+	setorigin( newmis, PASSVEC3( user->s.v.origin ) );
+	switch ( ( int ) type )
+    {
+        case GR_TYPE_NORMAL:
+            newmis->s.v.touch = ( func_t ) NormalGrenadeTouch;
+            newmis->s.v.think = ( func_t ) NormalGrenadeExplode;
+            newmis->s.v.skin = 0;
+            SetVector( newmis->s.v.avelocity, 300, 300, 300 );
+            if ( tfset(birthday) && g_random(  ) < 0.6 )
+                setmodel( newmis, "progs/grenade3.mdl" );
+            else
+                setmodel( newmis, "progs/hgren2.mdl" );
+            break;
+        case GR_TYPE_CONCUSSION:
+            newmis->s.v.touch = ( func_t ) ConcussionGrenadeTouch;
+            newmis->s.v.think = ( func_t ) ConcussionGrenadeExplode;
+            newmis->s.v.skin = 1;
+            SetVector( newmis->s.v.avelocity, 300, 300, 300 );
+            if ( tfset(birthday) && g_random(  ) < 0.6 )
+                setmodel( newmis, "progs/grenade3.mdl" );
+            else
+                setmodel( newmis, "progs/hgren2.mdl" );
+            break;
+
+        case GR_TYPE_NAIL:
+            newmis->s.v.touch = ( func_t ) NailGrenadeTouch;
+            newmis->s.v.think = ( func_t ) NailGrenadeExplode;
+            newmis->s.v.skin = 1;
+            SetVector( newmis->s.v.avelocity, 0, 300, 0 );
+            if ( tfset(birthday) && g_random(  ) < 0.6 )
+                setmodel( newmis, "progs/grenade3.mdl" );
+            else
+                setmodel( newmis, "progs/biggren.mdl" );
+            break;
+
+        case GR_TYPE_MIRV:
+            newmis->s.v.touch = ( func_t ) MirvGrenadeTouch;
+            newmis->s.v.think = ( func_t ) MirvGrenadeExplode;
+            newmis->s.v.skin = 0;
+            SetVector( newmis->s.v.avelocity, 0, 300, 0 );
+            if ( tfset(birthday) && g_random(  ) < 0.6 )
+                setmodel( newmis, "progs/grenade3.mdl" );
+            else
+                setmodel( newmis, "progs/biggren.mdl" );
+            break;
+
+        case GR_TYPE_NAPALM:
+            newmis->s.v.touch = ( func_t ) NapalmGrenadeTouch;
+            newmis->s.v.think = ( func_t ) NapalmGrenadeExplode;
+            newmis->s.v.skin = 2;
+            SetVector( newmis->s.v.avelocity, 0, 300, 0 );
+            if ( tfset(birthday) && g_random(  ) < 0.6 )
+                setmodel( newmis, "progs/grenade3.mdl" );
+            else
+                setmodel( newmis, "progs/biggren.mdl" );
+            break;
+
+        case GR_TYPE_FLARE:
+            if( isthrow ) {
+                newmis->s.v.touch = ( func_t ) FlareGrenadeTouch;
+                newmis->s.v.weapon = self->team_no;
+                newmis->s.v.think = ( func_t ) FlareGrenadeExplode;
+                newmis->s.v.skin = 1;
+                SetVector( newmis->s.v.avelocity, 300, 300, 300 );
+                if ( tfset(birthday) && g_random(  ) < 0.6 )
+                    setmodel( newmis, "progs/grenade3.mdl" );
+                else
+                    newmis->mdl = "flare";
+                setmodel( newmis, "progs/flare.mdl" );
+                printthrowmsg = false;
+            }else{
+                gedict_t* te = spawn(  );
+                G_sprint( user, 2, "Flare lit.\n" );
+                te->s.v.touch = ( func_t ) SUB_Null;
+                te->s.v.think = ( func_t ) RemoveFlare;
+                te->s.v.nextthink = g_globalvars.time + 25;
+                te->s.v.owner = EDICT_TO_PROG( user );
+                te->s.v.solid = 0;
+                user->s.v.effects = ( int ) user->s.v.effects | EF_BRIGHTLIGHT;
+                dremove( self );
+                dremove( newmis );
+                g_globalvars.newmis = EDICT_TO_PROG( world );
+                return NULL;
+            }
+            break;
+
+        case GR_TYPE_GAS:
+            newmis->s.v.touch = ( func_t ) GasGrenadeTouch;
+            newmis->s.v.think = ( func_t ) GasGrenadeExplode;
+            newmis->s.v.skin = isthrow ? 3: 2;
+            SetVector( newmis->s.v.avelocity, 300, 300, 300 );
+            if ( tfset(birthday) && g_random(  ) < 0.6 )
+                setmodel( newmis, "progs/grenade3.mdl" );
+            else
+                setmodel( newmis, "progs/grenade2.mdl" );
+            break;
+
+        case GR_TYPE_EMP:
+            newmis->s.v.touch = ( func_t ) EMPGrenadeTouch;
+            newmis->s.v.think = ( func_t ) EMPGrenadeExplode;
+            newmis->s.v.skin = 4;
+            SetVector( newmis->s.v.avelocity, 300, 300, 300 );
+            if ( tfset(birthday) && g_random(  ) < 0.6 )
+                setmodel( newmis, "progs/grenade3.mdl" );
+            else
+                setmodel( newmis, "progs/grenade2.mdl" );
+            break;
+
+        case GR_TYPE_FLASH:
+            newmis->s.v.touch = ( func_t ) FlashGrenadeTouch;
+            newmis->s.v.think = ( func_t ) FlashGrenadeExplode;
+            newmis->s.v.skin = 2;
+            SetVector( newmis->s.v.avelocity, 300, 300, 300 );
+            if ( tfset(birthday) && g_random(  ) < 0.6 )
+                setmodel( newmis, "progs/grenade3.mdl" );
+            else
+                setmodel( newmis, "progs/hgren2.mdl" );
+            break;
+
+        case GR_TYPE_CALTROPS:
+            newmis->s.v.touch = ( func_t ) (isthrow ? CanisterTouch : CaltropTouch );
+            newmis->s.v.think = ( func_t ) ScatterCaltrops;
+            newmis->s.v.skin = 0;
+            SetVector( newmis->s.v.avelocity, 0, 0, 0 );
+            printthrowmsg = false;
+            break;
+    }
+	if( isthrow && printthrowmsg )
+	        G_sprint( user, 0, "%s thrown.\n", GrenadePrimeName[type] );
+    return newmis;
+}
+
 void TeamFortress_GrenadePrimed(  )
 {
 	gedict_t *user;
@@ -1071,155 +1217,37 @@ void TeamFortress_GrenadePrimed(  )
 	sound( user, 1, "weapons/grenade.wav", 1, 1 );
 // sound (user, 1, "weapons/ax1.wav", 1, 1);
 	KickPlayer( -1, user );
-	newmis = spawn(  );
-	g_globalvars.newmis = EDICT_TO_PROG( newmis );
-	newmis->s.v.owner = EDICT_TO_PROG( user );
-	newmis->s.v.movetype = MOVETYPE_BOUNCE;
-	newmis->s.v.solid = SOLID_BBOX;
-	newmis->s.v.classname = "grenade";
+    
 	trap_makevectors( user->s.v.v_angle );
-	if ( user->s.v.deadflag )
-		SetVector( newmis->s.v.velocity, 0, 0, 200 );
-	else
-	{
-		if ( user->s.v.v_angle[0] )
-		{
-			newmis->s.v.velocity[0] =
-			    g_globalvars.v_forward[0] * 600 + g_globalvars.v_up[0] * 200 +
-			    crandom(  ) * g_globalvars.v_right[0] * 10 + crandom(  ) * g_globalvars.v_up[0] * 10;
-			newmis->s.v.velocity[1] =
-			    g_globalvars.v_forward[1] * 600 + g_globalvars.v_up[1] * 200 +
-			    crandom(  ) * g_globalvars.v_right[1] * 10 + crandom(  ) * g_globalvars.v_up[1] * 10;
-			newmis->s.v.velocity[2] =
-			    g_globalvars.v_forward[2] * 600 + g_globalvars.v_up[2] * 200 +
-			    crandom(  ) * g_globalvars.v_right[2] * 10 + crandom(  ) * g_globalvars.v_up[2] * 10;
-		} else
-		{
-			//newmis->s.v.velocity = aim(user, 10000);
-			aim( newmis->s.v.velocity );
-			VectorScale( newmis->s.v.velocity, 600, newmis->s.v.velocity );
-			newmis->s.v.velocity[2] = 200;
-		}
-	}
-	vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
-	newmis->s.v.think = ( func_t ) SUB_Null;
-	newmis->s.v.nextthink = self->heat;
-	switch ( ( int ) self->s.v.weapon )
-	{
-	case GR_TYPE_NORMAL:
-		newmis->s.v.touch = ( func_t ) NormalGrenadeTouch;
-		newmis->s.v.think = ( func_t ) NormalGrenadeExplode;
-		newmis->s.v.skin = 0;
-		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tfset(birthday) && g_random(  ) < 0.6 )
-			setmodel( newmis, "progs/grenade3.mdl" );
-		else
-			setmodel( newmis, "progs/hgren2.mdl" );
-		break;
-	case GR_TYPE_CONCUSSION:
-		newmis->s.v.touch = ( func_t ) ConcussionGrenadeTouch;
-		newmis->s.v.think = ( func_t ) ConcussionGrenadeExplode;
-		newmis->s.v.skin = 1;
-		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tfset(birthday) && g_random(  ) < 0.6 )
-			setmodel( newmis, "progs/grenade3.mdl" );
-		else
-			setmodel( newmis, "progs/hgren2.mdl" );
-		break;
+    newmis = spawnGrenade( user, self->s.v.weapon, true );
+    if( newmis ){
+        if ( user->s.v.deadflag )
+            SetVector( newmis->s.v.velocity, 0, 0, 200 );
+        else
+        {
+            if ( user->s.v.v_angle[0] )
+            {
+                newmis->s.v.velocity[0] =
+                    g_globalvars.v_forward[0] * 600 + g_globalvars.v_up[0] * 200 +
+                    crandom(  ) * g_globalvars.v_right[0] * 10 + crandom(  ) * g_globalvars.v_up[0] * 10;
+                newmis->s.v.velocity[1] =
+                    g_globalvars.v_forward[1] * 600 + g_globalvars.v_up[1] * 200 +
+                    crandom(  ) * g_globalvars.v_right[1] * 10 + crandom(  ) * g_globalvars.v_up[1] * 10;
+                newmis->s.v.velocity[2] =
+                    g_globalvars.v_forward[2] * 600 + g_globalvars.v_up[2] * 200 +
+                    crandom(  ) * g_globalvars.v_right[2] * 10 + crandom(  ) * g_globalvars.v_up[2] * 10;
+            } else
+            {
+                //newmis->s.v.velocity = aim(user, 10000);
+                aim( newmis->s.v.velocity );
+                VectorScale( newmis->s.v.velocity, 600, newmis->s.v.velocity );
+                newmis->s.v.velocity[2] = 200;
+            }
+        }
+        vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
+        newmis->s.v.nextthink = self->heat;
 
-	case GR_TYPE_NAIL:
-		newmis->s.v.touch = ( func_t ) NailGrenadeTouch;
-		newmis->s.v.think = ( func_t ) NailGrenadeExplode;
-		newmis->s.v.skin = 1;
-		SetVector( newmis->s.v.avelocity, 0, 300, 0 );
-		if ( tfset(birthday) && g_random(  ) < 0.6 )
-			setmodel( newmis, "progs/grenade3.mdl" );
-		else
-			setmodel( newmis, "progs/biggren.mdl" );
-		break;
-
-	case GR_TYPE_MIRV:
-		newmis->s.v.touch = ( func_t ) MirvGrenadeTouch;
-		newmis->s.v.think = ( func_t ) MirvGrenadeExplode;
-		newmis->s.v.skin = 0;
-		SetVector( newmis->s.v.avelocity, 0, 300, 0 );
-		if ( tfset(birthday) && g_random(  ) < 0.6 )
-			setmodel( newmis, "progs/grenade3.mdl" );
-		else
-			setmodel( newmis, "progs/biggren.mdl" );
-		break;
-
-	case GR_TYPE_NAPALM:
-		newmis->s.v.touch = ( func_t ) NapalmGrenadeTouch;
-		newmis->s.v.think = ( func_t ) NapalmGrenadeExplode;
-		newmis->s.v.skin = 2;
-		SetVector( newmis->s.v.avelocity, 0, 300, 0 );
-		if ( tfset(birthday) && g_random(  ) < 0.6 )
-			setmodel( newmis, "progs/grenade3.mdl" );
-		else
-			setmodel( newmis, "progs/biggren.mdl" );
-		break;
-
-	case GR_TYPE_FLARE:
-		newmis->s.v.touch = ( func_t ) FlareGrenadeTouch;
-		newmis->s.v.weapon = self->team_no;
-		newmis->s.v.think = ( func_t ) FlareGrenadeExplode;
-		newmis->s.v.skin = 1;
-		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tfset(birthday) && g_random(  ) < 0.6 )
-			setmodel( newmis, "progs/grenade3.mdl" );
-		else
-			newmis->mdl = "flare";
-		setmodel( newmis, "progs/flare.mdl" );
-		printthrowmsg = false;
-		break;
-
-	case GR_TYPE_GAS:
-		newmis->s.v.touch = ( func_t ) GasGrenadeTouch;
-		newmis->s.v.think = ( func_t ) GasGrenadeExplode;
-		newmis->s.v.skin = 3;
-		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tfset(birthday) && g_random(  ) < 0.6 )
-			setmodel( newmis, "progs/grenade3.mdl" );
-		else
-			setmodel( newmis, "progs/grenade2.mdl" );
-		break;
-
-	case GR_TYPE_EMP:
-		newmis->s.v.touch = ( func_t ) EMPGrenadeTouch;
-		newmis->s.v.think = ( func_t ) EMPGrenadeExplode;
-		newmis->s.v.skin = 4;
-		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tfset(birthday) && g_random(  ) < 0.6 )
-			setmodel( newmis, "progs/grenade3.mdl" );
-		else
-			setmodel( newmis, "progs/grenade2.mdl" );
-		break;
-
-	case GR_TYPE_FLASH:
-		newmis->s.v.touch = ( func_t ) FlashGrenadeTouch;
-		newmis->s.v.think = ( func_t ) FlashGrenadeExplode;
-		newmis->s.v.skin = 2;
-		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		if ( tfset(birthday) && g_random(  ) < 0.6 )
-			setmodel( newmis, "progs/grenade3.mdl" );
-		else
-			setmodel( newmis, "progs/hgren2.mdl" );
-		break;
-
-	case GR_TYPE_CALTROPS:
-		newmis->s.v.touch = ( func_t ) CanisterTouch;
-		newmis->s.v.think = ( func_t ) ScatterCaltrops;
-		newmis->s.v.skin = 0;
-		SetVector( newmis->s.v.avelocity, 0, 0, 0 );
-		printthrowmsg = false;
-		break;
-	}
-	if( printthrowmsg )
-	        G_sprint( user, 0, "%s thrown.\n", GrenadePrimeName[(int)self->s.v.weapon] );
-	        
-	setsize( newmis, 0, 0, 0, 0, 0, 0 );
-	setorigin( newmis, PASSVEC3( user->s.v.origin ) );
+    }
 	dremove( self );
 }
 
@@ -2195,98 +2223,17 @@ void TeamFortress_ExplodePerson(  )
 
 	owner->tfstate = owner->tfstate - ( ( int ) owner->tfstate & TFSTATE_GRENPRIMED );
 	KickPlayer( -2, owner );
-	newmis = spawn(  );
-	g_globalvars.newmis = EDICT_TO_PROG( newmis );
-	newmis->s.v.movetype = MOVETYPE_BOUNCE;
-	newmis->s.v.solid = SOLID_BBOX;
-	newmis->s.v.classname = "grenade";
-	newmis->team_no = owner->team_no;
-	newmis->s.v.owner = self->s.v.owner;
-	SetVector( newmis->s.v.velocity, 0, 0, 0 );
 
-	vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
-	newmis->s.v.think = ( func_t ) SUB_Null;
-	newmis->s.v.nextthink = g_globalvars.time + 0.1;
-	switch ( ( int ) self->s.v.weapon )
-	{
-	case GR_TYPE_NORMAL:
-		newmis->s.v.touch = ( func_t ) NormalGrenadeTouch;
-		newmis->s.v.think = ( func_t ) NormalGrenadeExplode;
-		newmis->s.v.skin = 0;
-		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		setmodel( newmis, "progs/hgren2.mdl" );
-		break;
+	newmis = spawnGrenade( owner, self->s.v.weapon, false );
 
-	case GR_TYPE_CONCUSSION:
-		newmis->s.v.touch = ( func_t ) ConcussionGrenadeTouch;
-		newmis->s.v.think = ( func_t ) ConcussionGrenadeExplode;
-		newmis->s.v.skin = 1;
-		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		setmodel( newmis, "progs/hgren2.mdl" );
-		break;
-	case GR_TYPE_NAIL:
-		newmis->s.v.touch = ( func_t ) NailGrenadeTouch;
-		newmis->s.v.think = ( func_t ) NailGrenadeExplode;
-		newmis->s.v.skin = 1;
-		SetVector( newmis->s.v.avelocity, 0, 300, 0 );
-		setmodel( newmis, "progs/biggren.mdl" );
-		break;
-	case GR_TYPE_MIRV:
-		newmis->s.v.touch = ( func_t ) MirvGrenadeTouch;
-		newmis->s.v.think = ( func_t ) MirvGrenadeExplode;
-		newmis->s.v.skin = 0;
-		SetVector( newmis->s.v.avelocity, 0, 300, 0 );
-		setmodel( newmis, "progs/biggren.mdl" );
-		break;
-	case GR_TYPE_NAPALM:
-		newmis->s.v.touch = ( func_t ) NapalmGrenadeTouch;
-		newmis->s.v.think = ( func_t ) NapalmGrenadeExplode;
-		newmis->s.v.skin = 2;
-		SetVector( newmis->s.v.avelocity, 0, 300, 0 );
-		setmodel( newmis, "progs/biggren.mdl" );
-		break;
-	case GR_TYPE_FLARE:
-		G_sprint( owner, 2, "Flare lit.\n" );
-		te = spawn(  );
-		te->s.v.touch = ( func_t ) SUB_Null;
-		te->s.v.think = ( func_t ) RemoveFlare;
-		te->s.v.nextthink = g_globalvars.time + 25;
-		te->s.v.owner = self->s.v.owner;
-		te->s.v.solid = 0;
-		owner->s.v.effects = ( int ) owner->s.v.effects | EF_BRIGHTLIGHT;
-		dremove( self );
-		dremove( newmis );
-		g_globalvars.newmis = EDICT_TO_PROG( world );
-		break;
-	case GR_TYPE_GAS:
-		newmis->s.v.touch = ( func_t ) GasGrenadeTouch;
-		newmis->s.v.think = ( func_t ) GasGrenadeExplode;
-		newmis->s.v.skin = 2;
-		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		setmodel( newmis, "progs/grenade2.mdl" );
-		break;
-	case GR_TYPE_EMP:
-		newmis->s.v.touch = ( func_t ) EMPGrenadeTouch;
-		newmis->s.v.think = ( func_t ) EMPGrenadeExplode;
-		newmis->s.v.skin = 4;
-		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		setmodel( newmis, "progs/grenade2.mdl" );
-		break;
-	case GR_TYPE_FLASH:
-		newmis->s.v.touch = ( func_t ) FlashGrenadeTouch;
-		newmis->s.v.think = ( func_t ) FlashGrenadeExplode;
-		newmis->s.v.skin = 1;
-		SetVector( newmis->s.v.avelocity, 300, 300, 300 );
-		setmodel( newmis, "progs/grenade2.mdl" );
-		break;
-	case GR_TYPE_CALTROPS:
-		newmis->s.v.touch = ( func_t ) CaltropTouch;
-		newmis->s.v.think = ( func_t ) ScatterCaltrops;
-		break;
+    if( newmis )
+    {
+        SetVector( newmis->s.v.velocity, 0, 0, 0 );
 
-	}
-	setsize( newmis, 0, 0, 0, 0, 0, 0 );
-	setorigin( newmis, PASSVEC3( owner->s.v.origin ) );
+        vectoangles( newmis->s.v.velocity, newmis->s.v.angles );
+        newmis->s.v.nextthink = g_globalvars.time + 0.1;
+    }
+
 	if ( tfset(birthday) )
 		G_bprint( 1, explode_msgs[0], owner->s.v.netname );
 	else

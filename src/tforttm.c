@@ -136,7 +136,7 @@ int TeamFortress_TeamSet( int tno )
 	if ( !TeamFortress_TeamGetColor( tno ) )
 	{
 		//TeamFortress_TeamSetColor( tno );
-		if ( !TeamFortress_TeamGetColor( tno ) )
+//		if ( !TeamFortress_TeamGetColor( tno ) )
 		{
 			G_sprint( self, 2, "You can't start a new team with your color, since another " );
 			G_sprint( self, 2, "already using that color. Change your pants color, then try again.\n" );
