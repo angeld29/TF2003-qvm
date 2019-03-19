@@ -928,11 +928,6 @@ void PutClientInServer()
     TF_SpawnPlayer( self );
 
     SetVector( self->s.v.velocity, 0, 0, 0 );
-    if ( !self->playerclass )
-    {
-        self->s.v.modelindex = modelindex_null;
-        self->current_menu = MENU_DEFAULT;
-    }
     infokey( world, "rj", s, sizeof( s ) );
     if ( atof( s ) != 0 )
     {
@@ -951,6 +946,12 @@ void TF_SpawnPlayer( gedict_t * self )
 
     setmodel( self, "progs/player.mdl" );
     modelindex_player = self->s.v.modelindex;
+
+    if ( !self->playerclass )
+    {
+        self->s.v.modelindex = modelindex_null;
+        self->current_menu = MENU_DEFAULT;
+    }
 
     setsize( self, PASSVEC3( VEC_HULL_MIN ), PASSVEC3( VEC_HULL_MAX ) );
     SetVector( self->s.v.view_ofs, 0, 0, 22 );
