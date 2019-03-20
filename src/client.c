@@ -969,7 +969,6 @@ void TF_SpawnPlayer( gedict_t * self )
     TeamFortress_PrepareForArenaRespawn();
     TeamFortress_SetSpeed(self);
     TeamFortress_SetSkin(self);
-    W_SetCurrentAmmo();
 
     ForceRespawn( self );
 

@@ -2598,22 +2598,22 @@ void KickCheater( gedict_t * p )
 
 void TeamFortress_PrepareForArenaRespawn(  )
 {
-        if( !tfset_arena_mode )
-                return;
+    if( !tfset_arena_mode )
+        return;
 
-	self->s.v.ammo_rockets = self->maxammo_rockets;
-	self->s.v.ammo_nails  = self->maxammo_nails  ;
-	self->s.v.ammo_shells = self->maxammo_shells ;
-	self->s.v.ammo_cells  = self->maxammo_cells  ;
-	self->ammo_detpack    = self->maxammo_detpack;
-	self->ammo_medikit    = self->maxammo_medikit;
+    self->s.v.ammo_rockets = self->maxammo_rockets;
+    self->s.v.ammo_nails  = self->maxammo_nails  ;
+    self->s.v.ammo_shells = self->maxammo_shells ;
+    self->s.v.ammo_cells  = self->maxammo_cells  ;
+    self->ammo_detpack    = self->maxammo_detpack;
+    self->ammo_medikit    = self->maxammo_medikit;
 
-	//self->armorclass |= class_set[pc].armorclass;
-	self->s.v.armortype = self->armor_allowed;
-	self->s.v.armorvalue =self->maxarmor;
+    //self->armorclass |= class_set[pc].armorclass;
+    self->s.v.armortype = self->armor_allowed;
+    self->s.v.armorvalue =self->maxarmor;
 
-	self->no_grenades_1 = 4;
-	self->no_grenades_2 = 4;
-	bound_other_ammo( self );
-	W_SetCurrentAmmo(  );
+    self->no_grenades_1 = 4;
+    self->no_grenades_2 = 4;
+    bound_other_ammo( self );
+    W_SetCurrentAmmo(  );
 }
