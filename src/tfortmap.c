@@ -2301,62 +2301,67 @@ void CTF_FlagCheck(  )
 
 void ForceRespawn( gedict_t * P )
 {
-	gedict_t *spot;
-	gedict_t *te;
-	gedict_t *oldself;
-	vec3_t  tmp;
+    gedict_t *spot;
+    gedict_t *te;
+    gedict_t *oldself;
+    vec3_t  v;
 
-	oldself = self;
-	self = P;
-	spot = SelectSpawnPoint(  );
-	if ( self->playerclass )
-		spawn_tdeath( spot->s.v.origin, self );
-	self->observer_list = spot;
-	VectorCopy( spot->s.v.origin, self->s.v.origin );
-	self->s.v.origin[2] += 1;
-	VectorCopy( spot->s.v.angles, self->s.v.angles );
-	self->s.v.fixangle = 1;
-	if ( streq( spot->s.v.classname, "info_player_teamspawn" ) && tf_data.cb_prematch_time < g_globalvars.time )
-	{
-		if ( spot->s.v.items )
-		{
-			te = Finditem( spot->s.v.items );
-			if ( te != world )
-				tfgoalitem_GiveToPlayer( te, self, self );
-			if ( !( spot->goal_activation & TFSP_MULTIPLEITEMS ) )
-				spot->s.v.items = 0;
-		}
-		if ( spot->s.v.message )
-		{
-			CenterPrint( self, "%s", spot->s.v.message );
-			if ( !( spot->goal_activation & TFSP_MULTIPLEMSGS ) )
-				spot->s.v.message = NULL;
-		}
-		if ( spot->activate_goal_no )
-		{
-			te = Findgoal( spot->activate_goal_no );
-			if ( te )
-				AttemptToActivate( te, self, spot );
-		}
-		if ( spot->goal_effects == TFSP_REMOVESELF )
-		{
-			spot->s.v.classname = "deadpoint";
-			spot->team_str_home = "";
-			spot->s.v.nextthink = g_globalvars.time + 1;
-			spot->s.v.think = ( func_t ) SUB_Remove;
-		}
-	}
-	if ( deathmatch || coop )
-	{
-		trap_makevectors( self->s.v.angles );
-		if ( self->playerclass )
-		{
-			VectorScale( g_globalvars.v_forward, 20, tmp );
-			VectorAdd( tmp, self->s.v.origin, tmp );
-			spawn_tfog( tmp );
-		}
-	}
-	self = oldself;
+    oldself = self;
+    self = P;
+
+    spot = SelectSpawnPoint(  );
+
+    self->observer_list = spot;
+    VectorCopy( spot->s.v.origin, self->s.v.origin );
+    self->s.v.origin[2]++;
+    VectorCopy( spot->s.v.angles, self->s.v.angles );
+
+    self->s.v.fixangle = 1;
+    if ( streq( spot->s.v.classname, "info_player_teamspawn" ) && tf_data.cb_prematch_time < g_globalvars.time )
+    {
+        if ( spot->s.v.items )
+        {
+            te = Finditem( spot->s.v.items );
+            if ( te != world )
+                tfgoalitem_GiveToPlayer( te, self, self );
+            if ( !( spot->goal_activation & TFSP_MULTIPLEITEMS ) )
+                spot->s.v.items = 0;
+        }
+        if ( spot->s.v.message )
+        {
+            CenterPrint( self, "%s", spot->s.v.message );
+            if ( !( spot->goal_activation & TFSP_MULTIPLEMSGS ) )
+                spot->s.v.message = NULL;
+        }
+        if ( spot->activate_goal_no )
+        {
+            te = Findgoal( spot->activate_goal_no );
+            if ( te )
+                AttemptToActivate( te, self, spot );
+        }
+        if ( spot->goal_effects == TFSP_REMOVESELF )
+        {
+            spot->s.v.classname = "deadpoint";
+            spot->team_str_home = "";
+            spot->s.v.nextthink = g_globalvars.time + 1;
+            spot->s.v.think = ( func_t ) SUB_Remove;
+        }
+    }
+    if ( deathmatch || coop )
+    {
+        if ( self->playerclass )
+        {
+            trap_makevectors( self->s.v.angles );
+            VectorScale( g_globalvars.v_forward, 20, v );
+            VectorAdd( v, self->s.v.origin, v );
+            spawn_tfog(v);
+        }
+    }
+    //фикс застревания игроков друг в друге на респавн
+    //spawn_tdeath после установки размеров игрока
+    if ( self->playerclass )
+        spawn_tdeath( spot->s.v.origin, self );
+    self = oldself;
 }
 
 void DropGoalItems(  )
