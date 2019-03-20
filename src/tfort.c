@@ -455,9 +455,9 @@ void TeamFortress_ChangeClass(  )
 		G_sprint( self, 2, "Your team has enough of that class.\n" );
 		return;
 	}
-	TeamFortress_ExecClassScript( self );
 
 	self->playerclass = ( self->s.v.impulse != 1 ) ? ( self->s.v.impulse - TF_CHANGEPC ) : PC_CIVILIAN;
+	TeamFortress_ExecClassScript( self );
 
 	self->nextpc = 0;
 	self->s.v.takedamage = DAMAGE_AIM;
