@@ -927,7 +927,6 @@ void PutClientInServer()
 
     TF_SpawnPlayer( self );
 
-    SetVector( self->s.v.velocity, 0, 0, 0 );
     infokey( world, "rj", s, sizeof( s ) );
     if ( atof( s ) != 0 )
     {
@@ -938,14 +937,27 @@ void PutClientInServer()
 
 void TF_SpawnPlayer( gedict_t * self )
 {
-    setmodel( self, "" );
-    modelindex_null = self->s.v.modelindex;
-    // oh, this is a hack!
-    setmodel( self, "progs/eyes.mdl" );
-    modelindex_eyes = self->s.v.modelindex;
+    static int not_inited_modelindex = 1;
+    if( not_inited_modelindex )
+    {
+        setmodel( self, "" );
+        modelindex_null = self->s.v.modelindex;
+        // oh, this is a hack!
+        setmodel( self, "progs/eyes.mdl" );
+        modelindex_eyes = self->s.v.modelindex;
 
-    setmodel( self, "progs/player.mdl" );
-    modelindex_player = self->s.v.modelindex;
+        setmodel( self, "progs/player.mdl" );
+        modelindex_player = self->s.v.modelindex;
+        not_inited_modelindex = 0;
+    }
+
+    if ( !self->playerclass )
+    {
+        self->s.v.modelindex = modelindex_null;
+        self->current_menu = MENU_DEFAULT;
+    }else{
+        self->s.v.modelindex = modelindex_player;
+    }
 
     if ( !self->playerclass )
     {
@@ -955,6 +967,7 @@ void TF_SpawnPlayer( gedict_t * self )
 
     setsize( self, PASSVEC3( VEC_HULL_MIN ), PASSVEC3( VEC_HULL_MAX ) );
     SetVector( self->s.v.view_ofs, 0, 0, 22 );
+    SetVector( self->s.v.velocity, 0, 0, 0 );
 
     TeamFortress_PrintClassName( self, self->playerclass, self->tfstate & TFSTATE_RANDOMPC );
     TeamFortress_SetEquipment();
@@ -962,7 +975,6 @@ void TF_SpawnPlayer( gedict_t * self )
     TeamFortress_PrepareForArenaRespawn();
     TeamFortress_SetSpeed(self);
     TeamFortress_SetSkin(self);
-    W_SetCurrentAmmo();
 
     ForceRespawn( self );
 
