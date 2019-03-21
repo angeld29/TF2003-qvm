@@ -875,7 +875,7 @@ void TeamFortress_Inventory(  )
 void    TeamFortress_GrenadePrimed(  );
 
 
-static qboolean primeGrenage( int gtype )
+static qboolean primeGrenade( int gtype )
 {
     switch ( gtype )
     {
@@ -944,7 +944,7 @@ void TeamFortress_PrimeGrenade(  )
 			if ( !tg_data.unlimit_grens )
 				self->no_grenades_1--;
 
-            if( primeGrenage( gtype ) )
+            if( primeGrenade( gtype ) )
                 return;
 		} else
 		{
@@ -967,7 +967,7 @@ void TeamFortress_PrimeGrenade(  )
 			if ( !tg_data.unlimit_grens )
 				self->no_grenades_2--;
 
-            if( primeGrenage( gtype ) )
+            if( primeGrenade( gtype ) )
                 return;
 		} else
 		{
@@ -1142,7 +1142,6 @@ static gedict_t* spawnGrenade( gedict_t* user, int type, int isthrow )
 void TeamFortress_GrenadePrimed(  )
 {
 	gedict_t *user;
-	qboolean printthrowmsg = true;
 
 	user = PROG_TO_EDICT( self->s.v.owner );
 	if ( !( user->tfstate & TFSTATE_GRENTHROWING ) && !user->s.v.deadflag )
@@ -1213,9 +1212,6 @@ void TeamFortress_ThrowGrenade(  )
 	}
 
 }
-
-
-
 
 int IsLegalClass( int pc )
 {
@@ -1302,8 +1298,7 @@ void TeamFortress_SetHealth(  )
 {
 	int     pc ;
 	pc = self->playerclass;
-	//if ( (pc <= 0 || pc >= 10)  && (pc != 11 ))
-	if ( (pc <= 0 || pc > 11) )
+	if ( (pc <= 0 || pc >= 10)  && (pc != 11 ))
 	{
 		pc = 0;
 		self->s.v.takedamage = 0;
@@ -1311,9 +1306,10 @@ void TeamFortress_SetHealth(  )
 	self->s.v.health = self->s.v.max_health = class_set[pc].maxhealth;
 }
 
+// TODO получать скин не из инфо, получение нескольких скинов
 const char* TeamFortress_GetSkinByTeamClass( int tn, int pc )
 {
-        static char skin[20];
+    static char skin[20];
 
 	GetSVInfokeyString( class_set[pc].infokey4skin[tn - 1], NULL,
 			    skin, sizeof( skin ), class_set[pc].defaultskin );
@@ -1835,8 +1831,7 @@ void TeamFortress_DropAmmo( int type )
           				if ( self->s.v.ammo_cells / AMMO_COST_SHELLS > ammo - self->s.v.ammo_shells )
           				{
           					G_sprint( self, 2, "you make some shells.\n" );
-          					self->s.v.ammo_cells =
-          					    self->s.v.ammo_cells - ( ammo - self->s.v.ammo_shells ) * AMMO_COST_SHELLS;
+          					self->s.v.ammo_cells = self->s.v.ammo_cells - ( ammo - self->s.v.ammo_shells ) * AMMO_COST_SHELLS;
           					self->s.v.ammo_shells = ammo;
           				}
           			}
@@ -1854,9 +1849,7 @@ void TeamFortress_DropAmmo( int type )
 					if ( self->s.v.ammo_cells / AMMO_COST_NAILS > ammo - self->s.v.ammo_nails )
 					{
 						G_sprint( self, 2, "you make some nails.\n" );
-						self->s.v.ammo_cells =
-						    self->s.v.ammo_cells - ( ammo -
-									     self->s.v.ammo_nails ) * AMMO_COST_NAILS;
+						self->s.v.ammo_cells = self->s.v.ammo_cells - ( ammo - self->s.v.ammo_nails ) * AMMO_COST_NAILS;
 						self->s.v.ammo_nails = ammo;
 					}
 				}
@@ -2004,25 +1997,25 @@ void TeamFortress_AmmoboxTouch(  )
 		switch ( ( int ) self->s.v.weapon )
 		{
 		case 1:
-			if ( other->s.v.ammo_shells >= TeamFortress_GetMaxAmmo( other, 256 ) )
+			if ( other->s.v.ammo_shells >= TeamFortress_GetMaxAmmo( other, IT_SHELLS ) )
 				return;
 			other->s.v.ammo_shells += self->aflag;
 			G_sprint( other, 0, "You picked up %d shells\n", ( int ) self->aflag );
 			break;
 		case 2:
-			if ( other->s.v.ammo_nails >= TeamFortress_GetMaxAmmo( other, 512 ) )
+			if ( other->s.v.ammo_nails >= TeamFortress_GetMaxAmmo( other, IT_NAILS ) )
 				return;
 			other->s.v.ammo_nails += self->aflag;
 			G_sprint( other, 0, "You picked up %d nails\n", ( int ) self->aflag );
 			break;
 		case 3:
-			if ( other->s.v.ammo_rockets >= TeamFortress_GetMaxAmmo( other, 1024 ) )
+			if ( other->s.v.ammo_rockets >= TeamFortress_GetMaxAmmo( other, IT_ROCKETS ) )
 				return;
 			other->s.v.ammo_rockets += self->aflag;
 			G_sprint( other, 0, "You picked up %d rockets\n", ( int ) self->aflag );
 			break;
 		case 4:
-			if ( other->s.v.ammo_cells >= TeamFortress_GetMaxAmmo( other, 2048 ) )
+			if ( other->s.v.ammo_cells >= TeamFortress_GetMaxAmmo( other, IT_CELLS ) )
 				return;
 			other->s.v.ammo_cells += self->aflag;
 			G_sprint( other, 0, "You picked up %d cells\n", ( int ) self->aflag );
@@ -2040,7 +2033,7 @@ void TeamFortress_AmmoboxTouch(  )
 }
 
 
-void RemoveOldAmmoboxOld( int tno )
+/*void RemoveOldAmmoboxOld( int tno )
 {
 	int     index;
 	gedict_t *old;
@@ -2066,7 +2059,7 @@ void RemoveOldAmmoboxOld( int tno )
 		}
 		old = trap_find( old, FOFS( s.v.classname ), "ammobox" );
 	}
-}
+}*/
 
 void RemoveOldAmmobox( int tno )
 {
@@ -2221,54 +2214,37 @@ void NormalGrenadeExplode(  )
 	TempEffectCoord(  self->s.v.origin , TE_EXPLOSION );
 	dremove( self );
 }
+static qboolean displayItem( gedict_t*Goal, int display_item_status )
+{
+	gedict_t *te;
+    if( ! display_item_status ) return false;
+
+    te = Finditem( Goal->display_item_status1 );
+    if ( te != world )
+        DisplayItemStatus( Goal, self, te );
+    else
+        G_sprint( self, 2, "Item is missing.\n" );
+
+    return true;
+}
+
 void TeamFortress_DisplayDetectionItems(  )
 {
 	gedict_t *Goal;
-	gedict_t *te;
 
 	Goal = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
 
 	if ( !Goal )
 		return;
-	if ( Goal->display_item_status1 )
-	{
-		te = Finditem( Goal->display_item_status1 );
-		if ( te != world )
-			DisplayItemStatus( Goal, self, te );
-		else
-			G_sprint( self, 2, "Item is missing.\n" );
-	} else
-		return;
 
-	if ( Goal->display_item_status2 )
-	{
-		te = Finditem( Goal->display_item_status2 );
-		if ( te != world )
-			DisplayItemStatus( Goal, self, te );
-		else
-			G_sprint( self, 2, "Item is missing.\n" );
-	} else
-		return;
-
-	if ( Goal->display_item_status3 )
-	{
-		te = Finditem( Goal->display_item_status3 );
-		if ( te != world )
-			DisplayItemStatus( Goal, self, te );
-		else
-			G_sprint( self, 2, "Item is missing.\n" );
-	} else
-		return;
-	if ( Goal->display_item_status4 )
-	{
-		te = Finditem( Goal->display_item_status4 );
-		if ( te != world )
-			DisplayItemStatus( Goal, self, te );
-		else
-			G_sprint( self, 2, "Item is missing.\n" );
-	} else
-		return;
-
+    if(! displayItem( Goal, Goal->display_item_status1 ) )
+            return;
+    if(! displayItem( Goal, Goal->display_item_status2 ) )
+            return;
+    if(! displayItem( Goal, Goal->display_item_status3 ) )
+            return;
+    if(! displayItem( Goal, Goal->display_item_status4 ) )
+            return;
 }
 
 
