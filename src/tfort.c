@@ -2219,7 +2219,7 @@ static qboolean displayItem( gedict_t*Goal, int display_item_status )
 	gedict_t *te;
     if( ! display_item_status ) return false;
 
-    te = Finditem( Goal->display_item_status1 );
+    te = Finditem( display_item_status );
     if ( te != world )
         DisplayItemStatus( Goal, self, te );
     else
