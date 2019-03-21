@@ -431,19 +431,10 @@ void GasGrenadeExplode(  )
 	        // Make some bubbles :)
 		for ( pos = 0; pos < 10; pos++ )
 		{
-			newmis = spawn(  );
-			setmodel( newmis, "progs/s_bubble.spr" );
-			setorigin( newmis, PASSVEC3( self->s.v.origin ) );
-			newmis->s.v.movetype = MOVETYPE_NOCLIP;
-			newmis->s.v.solid = SOLID_NOT;
-			SetVector( newmis->s.v.velocity, 0, 0, 15 );
+            newmis = spawn_buble( self );
+
+            newmis->s.v.touch = 0;
 			newmis->s.v.velocity[2] = 10 + g_random(  ) * 20;
-			newmis->s.v.nextthink = g_globalvars.time + 0.5;
-			newmis->s.v.think = ( func_t ) bubble_bob;
-			newmis->s.v.classname = "bubble";
-			newmis->s.v.frame = 0;
-			newmis->cnt = 0;
-			setsize( newmis, -8, -8, -8, 8, 8, 8 );
 		}
 	}
 	dremove( self );
@@ -748,7 +739,7 @@ void T_TranqDartTouch(  )
 		tf_data.deathmsg = DMSG_TRANQ;
 		TF_T_Damage( other, self, PROG_TO_EDICT( self->s.v.owner ), 20, TF_TD_NOTTEAM, TF_TD_NAIL );
 		if ( streq( other->s.v.classname, "player" ) &&
-		     !( other->team_no == PROG_TO_EDICT( self->s.v.owner )->team_no && ( teamplay & ( 2 | 4 ) ) ) )
+		     !( other->team_no == PROG_TO_EDICT( self->s.v.owner )->team_no && ( teamplay & ( TEAMPLAY_HALFARMOR_DIRECT | TEAMPLAY_NODIRECT ) ) ) )
 		{
 			if ( other->tfstate & TFSTATE_TRANQUILISED )
 			{
@@ -842,11 +833,11 @@ void Spy_RemoveDisguise( gedict_t * spy )
 		{
 			spy->is_undercover = 0;
 			spy->s.v.modelindex = modelindex_player;
-			if ( ( int ) spy->s.v.items & 524288 )
+			if ( ( int ) spy->s.v.items & IT_INVISIBILITY )
 			{
 				spy->invisible_finished = 0;
 				spy->invisible_time = 0;
-				spy->s.v.items = ( int ) spy->s.v.items - 524288;
+				spy->s.v.items = ( int ) spy->s.v.items - IT_INVISIBILITY;
 			}
 			self->StatusRefreshTime = g_globalvars.time + 0.1;
 		}

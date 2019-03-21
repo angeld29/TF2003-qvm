@@ -261,6 +261,8 @@ static const class_settings_t class_set[] = {
 
 };
 
+static const int classset_num = sizeof(class_set)/sizeof( class_set[0] );
+
 const char   *GrenadeNames[] = { "BUG",
 	"Normal",
 	"Concussion",
@@ -457,7 +459,6 @@ void TeamFortress_ChangeClass(  )
 	}
 
 	self->playerclass = ( self->s.v.impulse != 1 ) ? ( self->s.v.impulse - TF_CHANGEPC ) : PC_CIVILIAN;
-	TeamFortress_ExecClassScript( self );
 
 	self->nextpc = 0;
 	self->s.v.takedamage = DAMAGE_AIM;
@@ -493,81 +494,24 @@ void TeamFortress_ChangeClass(  )
 void TeamFortress_DisplayLegalClasses(  )
 {
 	int     gotone;
-	int     ill;
+	int     ill,i;
 
 	G_sprint( self, 2, "Legal Classes for your team are:\n" );
 	gotone = 0;
 	ill = TeamFortress_TeamGetIllegalClasses( self->team_no );
-	if ( !( illegalclasses[0] & 1 ) && !( ill & 1 ) )
-	{
-		if ( gotone )
-			G_sprint( self, 2, ", " );
-		gotone = 1;
-		G_sprint( self, 2, "Scout" );
-	}
-	if ( !( illegalclasses[0] & 2 ) && !( ill & 2 ) )
-	{
-		if ( gotone )
-			G_sprint( self, 2, ", " );
-		gotone = 1;
-		G_sprint( self, 2, "Sniper" );
-	}
-	if ( !( illegalclasses[0] & 4 ) && !( ill & 4 ) )
-	{
-		if ( gotone )
-			G_sprint( self, 2, ", " );
-		gotone = 1;
-		G_sprint( self, 2, "Soldier" );
-	}
-	if ( !( illegalclasses[0] & 8 ) && !( ill & 8 ) )
-	{
-		if ( gotone )
-			G_sprint( self, 2, ", " );
-		gotone = 1;
-		G_sprint( self, 2, "Demolitions Man" );
-	}
-	if ( !( illegalclasses[0] & 16 ) && !( ill & 16 ) )
-	{
-		if ( gotone )
-			G_sprint( self, 2, ", " );
-		gotone = 1;
-		G_sprint( self, 2, "Combat Medic" );
-	}
-	if ( !( illegalclasses[0] & 32 ) && !( ill & 32 ) )
-	{
-		if ( gotone )
-			G_sprint( self, 2, ", " );
-		gotone = 1;
-		G_sprint( self, 2, "Heavy Weapons Guy" );
-	}
-	if ( !( illegalclasses[0] & 64 ) && !( ill & 64 ) )
-	{
-		if ( gotone )
-			G_sprint( self, 2, ", " );
-		gotone = 1;
-		G_sprint( self, 2, "Pyro" );
-	}
-	if ( !( illegalclasses[0] & 256 ) && !( ill & 256 ) )
-	{
-		if ( gotone )
-			G_sprint( self, 2, ", " );
-		gotone = 1;
-		G_sprint( self, 2, "Spy" );
-	}
-	if ( !( illegalclasses[0] & 512 ) && !( ill & 512 ) )
-	{
-		if ( gotone )
-			G_sprint( self, 2, ", " );
-		gotone = 1;
-		G_sprint( self, 2, "Engineer" );
-	}
-	if ( !( illegalclasses[0] & 128 ) && !( ill & 128 ) )
-	{
-		if ( gotone )
-			G_sprint( self, 2, ", " );
-		gotone = 1;
-		G_sprint( self, 2, "RandomPC" );
-	}
+    for( i = 0; i < classset_num; i++)
+    {
+        int bitmask = class_set[i].bitmask;
+        if(  bitmask == 0 ) continue;
+        if ( !( illegalclasses[0] & bitmask ) && !( ill & bitmask ) )
+        {
+            if ( gotone )
+                G_sprint( self, 2, ", " );
+            gotone = 1;
+            G_sprint( self, 2, class_set[i].name );
+        }
+    }
+
 	G_sprint( self, 2, "\n" );
 }
 
