@@ -1862,13 +1862,10 @@ void TeamFortress_DropAmmo( int type )
        			{
        				if ( self->playerclass == PC_ENGINEER )
        				{
-       					if ( self->s.v.ammo_cells /
-       					     AMMO_COST_ROCKETS > ammo - self->s.v.ammo_rockets )
+       					if ( self->s.v.ammo_cells / AMMO_COST_ROCKETS > ammo - self->s.v.ammo_rockets )
        					{
        						G_sprint( self, 2, "you make some rockets.\n" );
-       						self->s.v.ammo_cells =
-       						    self->s.v.ammo_cells -
-       						    ( ammo - self->s.v.ammo_rockets ) * AMMO_COST_ROCKETS;
+       						self->s.v.ammo_cells = self->s.v.ammo_cells - ( ammo - self->s.v.ammo_rockets ) * AMMO_COST_ROCKETS;
        						self->s.v.ammo_rockets = ammo;
        					}
        				}
