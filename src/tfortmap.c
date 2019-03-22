@@ -1587,6 +1587,39 @@ void tfgoal_timer_tick(  )
 	}
 }
 
+void item_tfgoal_touch_CTF(  )
+{
+    gedict_t *te;
+    if( CTF_Map != 1 ) return;
+
+    if ( VectorCompare( self->s.v.origin, self->s.v.oldorigin ) )
+        return;
+    if( other->team_no != self->goal_no )
+        return;
+
+    if( other->team_no == 1 )
+        G_bprint( 2, "%s " _R _E _T _U _R _N _E _D " the " _B _L _U _E " flag!\n", other->s.v.netname );
+    else
+        G_bprint( 2, "%s " _R _E _T _U _R _N _E _D " the " _R _E _D " flag!\n", other->s.v.netname );
+
+    te = trap_find( world, FOFS( s.v.classname ), "player" );
+    while ( te )
+    {
+        if ( te->team_no == self->goal_no )
+            CenterPrint( te, "\n\n\nYour flag was " _R _E _T _U _R _N _E _D "!!" );
+        else
+            CenterPrint( te, "\n\n\nThe " _E _N _E _M _Y " flag was " _R _E _T _U _R _N _E _D "!!" );
+        te = trap_find( te, FOFS( s.v.classname ), "player" );
+    }
+    self->goal_state = 2;
+    self->s.v.solid = SOLID_TRIGGER;
+    self->s.v.touch = ( func_t ) item_tfgoal_touch;
+    VectorCopy( self->s.v.oldorigin, self->s.v.origin );
+    setmodel( self, self->mdl );
+    setorigin( self, PASSVEC3( self->s.v.origin ) );
+    sound( self, 2, "items/itembk2.wav", 1, 1 );
+}
+
 void item_tfgoal_touch(  )
 {
 	gedict_t *te;
@@ -1610,74 +1643,8 @@ void item_tfgoal_touch(  )
 	        return;
 	}
 
-	if ( CTF_Map == 1 )
-	{
-		if ( self->goal_no == 1 )
-		{
-			if ( !VectorCompare( self->s.v.origin, self->s.v.oldorigin ) )
-			{
-				if ( other->team_no == 1 )
-				{
-					G_bprint( 2, "%s " _R _E _T _U _R _N _E _D " the " _B _L _U _E " flag!\n", other->s.v.netname );
-					te = trap_find( world, FOFS( s.v.classname ), "player" );
-					while ( te )
-					{
-						if ( te->team_no == 1 )
-							CenterPrint( te, "\n\n\nYour flag was " _R _E _T _U _R _N _E _D "!!" );
-						else
-							CenterPrint( te, "\n\n\nThe " _E _N _E _M _Y " flag was " _R _E _T _U _R _N _E _D "!!" );
-						te = trap_find( te, FOFS( s.v.classname ), "player" );
-					}
-					self->goal_state = 2;
-					self->s.v.solid = SOLID_TRIGGER;
-					self->s.v.touch = ( func_t ) item_tfgoal_touch;
-					VectorCopy( self->s.v.oldorigin, self->s.v.origin );
-					setmodel( self, self->mdl );
-					setorigin( self, PASSVEC3( self->s.v.origin ) );
-					sound( self, 2, "items/itembk2.wav", 1, 1 );
-					return;
-				}
-			} else
-			{
-				if ( other->team_no == 1 )
-					return;
-			}
-		} else
-		{
-			if ( self->goal_no == 2 )
-			{
-				if ( !VectorCompare( self->s.v.origin, self->s.v.oldorigin ) )
-				{
-					if ( other->team_no == 2 )
-					{
-						G_bprint( 2, "%s " _R _E _T _U _R _N _E _D " the " _R _E _D " flag!\n", other->s.v.netname );
-						te = trap_find( world, FOFS( s.v.classname ), "player" );
-						while ( te )
-						{
-							if ( te->team_no == 2 )
-								CenterPrint( te, "\n\n\n Your flag was " _R _E _T _U _R _N _E _D "!!" );
-							else
-								CenterPrint( te,
-									     "\n\n\n The " _E _N _E _M _Y " flag was " _R _E _T _U _R _N _E _D "!!" );
-							te = trap_find( te, FOFS( s.v.classname ), "player" );
-						}
-						self->goal_state = 2;
-						self->s.v.solid = SOLID_TRIGGER;
-						self->s.v.touch = ( func_t ) item_tfgoal_touch;
-						VectorCopy( self->s.v.oldorigin, self->s.v.origin );
-						setmodel( self, self->mdl );
-						setorigin( self, PASSVEC3( self->s.v.origin ) );
-						sound( self, 2, "items/itembk2.wav", 1, 1 );
-						return;
-					}
-				} else
-				{
-					if ( other->team_no == 2 )
-						return;
-				}
-			}
-		}
-	}
+    item_tfgoal_touch_CTF();
+
 	if ( Activated( self, other ) )
 	{
 		tfgoalitem_GiveToPlayer( self, other, self );
