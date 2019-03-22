@@ -1624,16 +1624,14 @@ void TeamFortress_PlayerLostFlag()
 		{
 			if ( !( te->goal_activation & TFGI_KEEP ) || self->has_disconnected == 1 )
 				tfgoalitem_RemoveFromPlayer( te, self, 0 );
-			if ( CTF_Map == 1 && te->goal_no == 1 )
+            if( CTF_Map != 1 ) continue;
+			if ( te->goal_no == 1 )
 			{
 				G_bprint( 2, "%s " _L _O _S _T " the " _B _L _U _E " flag!\n", self->s.v.netname );
-			} else
-			{
-				if ( CTF_Map == 1 && te->goal_no == 2 )
-				{
-					G_bprint( 2, "%s " _L _O _S _T " the " _R _E _D " flag!\n", self->s.v.netname );
-				}
-			}
+			} else if ( te->goal_no == 2 )
+            {
+                G_bprint( 2, "%s " _L _O _S _T " the " _R _E _D " flag!\n", self->s.v.netname );
+            }
 		}
 	}
 }
