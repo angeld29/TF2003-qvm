@@ -1390,7 +1390,7 @@ void PlayerPreThink()
 static gedict_t* findGlowGoal( gedict_t* self )
 {
     gedict_t* te = world;
-    for(; (te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" ));)
+    for(; (te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" ));)
     {
         if ( te->s.v.owner == EDICT_TO_PROG( self ) )
         {
