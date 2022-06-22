@@ -28,21 +28,21 @@ gedict_t       *self, *other;
 
 globalvars_t    g_globalvars;
 static field_t         expfields[] = {
-    {"maxspeed", FOFS( maxspeed ), F_FLOAT}	,
-    {"gravity", FOFS( gravity ), F_FLOAT},
-    {"isBot", FOFS( isBot ), F_INT},
-	{"items2",      FOFS( items2 ),      F_FLOAT},
+  {"maxspeed", FOFS( maxspeed ), F_FLOAT}	,
+  {"gravity", FOFS( gravity ), F_FLOAT},
+  {"isBot", FOFS( isBot ), F_INT},
+  {"items2",      FOFS( items2 ),      F_FLOAT},
 
-	{"vw_index",    FOFS( vw_index ),    F_FLOAT},
-	{"movement",    FOFS( movement ),    F_VECTOR},
-	{"brokenankle", FOFS( brokenankle ), F_FLOAT},
-	{"mod_admin",   FOFS( k_admin ),     F_INT},
-	{"hideentity",  FOFS( hideentity ),  F_INT},
-	{"trackent",	FOFS( trackent ),	 F_INT},
-	{"hideplayers", FOFS( hideplayers ), F_INT},
-	{"visclients",  FOFS( visclients ),  F_INT},
-	{"teleported",  FOFS( teleported ),  F_INT},
-    {NULL}
+  {"vw_index",    FOFS( vw_index ),    F_FLOAT},
+  {"movement",    FOFS( movement ),    F_VECTOR},
+  {"brokenankle", FOFS( brokenankle ), F_FLOAT},
+  {"mod_admin",   FOFS( k_admin ),     F_INT},
+  {"hideentity",  FOFS( hideentity ),  F_INT},
+  {"trackent",	FOFS( trackent ),	 F_INT},
+  {"hideplayers", FOFS( hideplayers ), F_INT},
+  {"visclients",  FOFS( visclients ),  F_INT},
+  {"teleported",  FOFS( teleported ),  F_INT},
+  {NULL}
 };
 
 char     mapname[64];
