@@ -811,36 +811,44 @@ int Engineer_Dispenser_Dismantle( gedict_t* disp )
 // Engineer has used a Spanner on the Dispenser
 void Engineer_UseDispenser( gedict_t * disp )
 {
-    gedict_t *dist_checker;
+  gedict_t *dist_checker;
+  int status = 0;
 
-    if( !tfset(tg_enabled)  && (self->playerclass != PC_ENGINEER ))
+  if( !tfset(tg_enabled)  && (self->playerclass != PC_ENGINEER ))
+    return;
+  if (!tfset(old_spanner)) {
+    if( self->team_no && TeamFortress_isTeamsAllied( self->team_no , disp->real_owner->team_no) ){
+      status = Engineer_Dispenser_Repair(disp);
+      if( status ){
+        bound_other_ammo( self );
+        W_SetCurrentAmmo(  );
         return;
-    if (!tfset(old_spanner)) {
-        if( self->team_no && TeamFortress_isTeamsAllied( self->team_no , disp->real_owner->team_no) ){
-            if(Engineer_Dispenser_Repair(disp)) return;
-        }else{
-            Engineer_Dispenser_Dismantle(disp);
-            return;
-        }
+      }
+    }else{
+      Engineer_Dispenser_Dismantle(disp);
+      bound_other_ammo( self );
+      W_SetCurrentAmmo(  );
+      return;
     }
+  }
 
-    G_sprint( self, 2,
-            "Dispenser has %.0f health\n%.0f shells, %.0f nails, %.0f rockets\n%.0f cells, and %.0f armor\n",
-            disp->s.v.health, disp->s.v.ammo_shells, disp->s.v.ammo_nails, disp->s.v.ammo_rockets,
-            disp->s.v.ammo_cells, disp->s.v.armorvalue );
-    // Pop up the menu
-    self->current_menu = MENU_ENGINEER_FIX_DISPENSER;
-    self->menu_count = MENU_REFRESH_RATE;
-    self->building = disp;
+  G_sprint( self, 2,
+           "Dispenser has %.0f health\n%.0f shells, %.0f nails, %.0f rockets\n%.0f cells, and %.0f armor\n",
+           disp->s.v.health, disp->s.v.ammo_shells, disp->s.v.ammo_nails, disp->s.v.ammo_rockets,
+           disp->s.v.ammo_cells, disp->s.v.armorvalue );
+  // Pop up the menu
+  self->current_menu = MENU_ENGINEER_FIX_DISPENSER;
+  self->menu_count = MENU_REFRESH_RATE;
+  self->building = disp;
 
-    // Start a Distance checker, which removes the menu if the player
-    // gets too far away from the Dispenser.
-    dist_checker = spawn(  );
-    dist_checker->s.v.classname = "timer";
-    dist_checker->s.v.owner = EDICT_TO_PROG( self );
-    dist_checker->s.v.enemy = EDICT_TO_PROG( disp );
-    dist_checker->s.v.think = ( func_t ) CheckDistance;
-    dist_checker->s.v.nextthink = g_globalvars.time + 0.3;
+  // Start a Distance checker, which removes the menu if the player
+  // gets too far away from the Dispenser.
+  dist_checker = spawn(  );
+  dist_checker->s.v.classname = "timer";
+  dist_checker->s.v.owner = EDICT_TO_PROG( self );
+  dist_checker->s.v.enemy = EDICT_TO_PROG( disp );
+  dist_checker->s.v.think = ( func_t ) CheckDistance;
+  dist_checker->s.v.nextthink = g_globalvars.time + 0.3;
 }
 
 //=========================================================================
@@ -951,43 +959,49 @@ int Engineer_SentryGun_Dismantle( gedict_t* gun )
 // Engineer has used a Spanner on the SentryGun
 void Engineer_UseSentryGun( gedict_t * gun )
 {
-    gedict_t *dist_checker;
-    int status = 0;
-    if( !tfset(tg_enabled)  && (self->playerclass != PC_ENGINEER ))
+  gedict_t *dist_checker;
+  int status = 0;
+  if( !tfset(tg_enabled)  && (self->playerclass != PC_ENGINEER ))
+    return;
+  // automate tasks if old_spanner setting is disabled
+  if (!tfset(old_spanner)) {
+    if( self->team_no && TeamFortress_isTeamsAllied( self->team_no , gun->real_owner->team_no) ){
+      status += Engineer_SentryGun_Upgrade(gun);
+      status += Engineer_SentryGun_Repair(gun);
+      status += Engineer_SentryGun_InsertAmmo(gun);
+      if( status ){
+        bound_other_ammo( self );
+        W_SetCurrentAmmo(  );
         return;
-    // automate tasks if old_spanner setting is disabled
-    if (!tfset(old_spanner)) {
-        if( self->team_no && TeamFortress_isTeamsAllied( self->team_no , gun->real_owner->team_no) ){
-            status += Engineer_SentryGun_Upgrade(gun);
-            status += Engineer_SentryGun_Repair(gun);
-            status += Engineer_SentryGun_InsertAmmo(gun);
-            if( status ) return;
-        }else{
-            Engineer_SentryGun_Dismantle(gun);
-            return;
-        }
+      }
+    }else{
+      Engineer_SentryGun_Dismantle(gun);
+      bound_other_ammo( self );
+      W_SetCurrentAmmo(  );
+      return;
     }
+  }
 
-    G_sprint( self, 2, "Level %.0f Sentry Gun has %.0f health, %.0f shells",
-            gun->s.v.weapon, gun->s.v.health, gun->s.v.ammo_shells );
-    if ( (int)gun->s.v.weapon == 3 )
-    {
-        G_sprint( self, 2, ", %.0f rockets", gun->s.v.ammo_rockets );
-    }
+  G_sprint( self, 2, "Level %.0f Sentry Gun has %.0f health, %.0f shells",
+           gun->s.v.weapon, gun->s.v.health, gun->s.v.ammo_shells );
+  if ( (int)gun->s.v.weapon == 3 )
+  {
+    G_sprint( self, 2, ", %.0f rockets", gun->s.v.ammo_rockets );
+  }
 
-    if ( gun->has_sentry &&  tfset(tg_enabled) )
-        G_sprint( self, 2, ", static" );
+  if ( gun->has_sentry &&  tfset(tg_enabled) )
+    G_sprint( self, 2, ", static" );
 
-    G_sprint( self, 2, "\n" );
-    self->current_menu = MENU_ENGINEER_FIX_SENTRYGUN;
-    self->menu_count = MENU_REFRESH_RATE;
-    self->building = gun;
-    dist_checker = spawn(  );
-    dist_checker->s.v.classname = "timer";
-    dist_checker->s.v.owner = EDICT_TO_PROG( self );
-    dist_checker->s.v.enemy = EDICT_TO_PROG( gun );
-    dist_checker->s.v.think = ( func_t ) CheckDistance;
-    dist_checker->s.v.nextthink = g_globalvars.time + 0.3;
+  G_sprint( self, 2, "\n" );
+  self->current_menu = MENU_ENGINEER_FIX_SENTRYGUN;
+  self->menu_count = MENU_REFRESH_RATE;
+  self->building = gun;
+  dist_checker = spawn(  );
+  dist_checker->s.v.classname = "timer";
+  dist_checker->s.v.owner = EDICT_TO_PROG( self );
+  dist_checker->s.v.enemy = EDICT_TO_PROG( gun );
+  dist_checker->s.v.think = ( func_t ) CheckDistance;
+  dist_checker->s.v.nextthink = g_globalvars.time + 0.3;
 }
 
 void 	Engineer_RotateSG(  )

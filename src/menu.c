@@ -638,72 +638,70 @@ int Engineer_Dispenser_Repair( gedict_t* disp);
 int Engineer_Dispenser_Dismantle( gedict_t* disp );
 void Menu_EngineerFix_Dispenser_Input( int inp )
 {
-	float   metalcost;
-	float   am;
+  float   metalcost;
+  float   am;
 
-	if ( strneq( self->s.v.classname, "player" ) || !self->building
-	     || self->building == world )
-		return;
+  if ( strneq( self->s.v.classname, "player" ) || !self->building || self->building == world )
+    return;
 
-	switch ( inp )
-	{
-	case 1:
-		am = 20 * 2;
-		if ( am > self->s.v.ammo_shells )
-			am = self->s.v.ammo_shells;
-		if ( am > 400 - self->building->s.v.ammo_shells )
-			am = 400 - self->building->s.v.ammo_shells;
-		self->s.v.ammo_shells = self->s.v.ammo_shells - am;
-		self->building->s.v.ammo_shells = self->building->s.v.ammo_shells + am;
-		am = 20 * 2;
-		if ( am > self->s.v.ammo_nails )
-			am = self->s.v.ammo_nails;
-		if ( am > 600 - self->building->s.v.ammo_nails )
-			am = 600 - self->building->s.v.ammo_nails;
-		self->s.v.ammo_nails = self->s.v.ammo_nails - am;
-		self->building->s.v.ammo_nails = self->building->s.v.ammo_nails + am;
-		am = 10 * 2;
-		if ( am > self->s.v.ammo_rockets )
-			am = self->s.v.ammo_rockets;
-		if ( am > 300 - self->building->s.v.ammo_rockets )
-			am = 300 - self->building->s.v.ammo_rockets;
-		self->s.v.ammo_rockets = self->s.v.ammo_rockets - am;
-		self->building->s.v.ammo_rockets = self->building->s.v.ammo_rockets + am;
-		am = 10 * 2;
-		if ( am > self->s.v.ammo_cells )
-			am = self->s.v.ammo_cells;
-		if ( am > 400 - self->building->s.v.ammo_cells )
-			am = 400 - self->building->s.v.ammo_cells;
-		self->s.v.ammo_cells = self->s.v.ammo_cells - am;
-		self->building->s.v.ammo_cells = self->building->s.v.ammo_cells + am;
-		break;
-	case 2:
-		am = 40 * 2;
-		if ( am > self->s.v.armorvalue )
-			am = self->s.v.armorvalue;
-		if ( am > 500 - self->building->s.v.armorvalue )
-			am = 500 - self->building->s.v.armorvalue;
-		self->s.v.armorvalue = self->s.v.armorvalue - am;
-		self->building->s.v.armorvalue = self->building->s.v.armorvalue + am;
-		break;
-	case 3:
+  switch ( inp )
+    {
+      case 1:
+        am = 20 * 2;
+        if ( am > self->s.v.ammo_shells )
+          am = self->s.v.ammo_shells;
+        if ( am > 400 - self->building->s.v.ammo_shells )
+          am = 400 - self->building->s.v.ammo_shells;
+        self->s.v.ammo_shells = self->s.v.ammo_shells - am;
+        self->building->s.v.ammo_shells = self->building->s.v.ammo_shells + am;
+        am = 20 * 2;
+        if ( am > self->s.v.ammo_nails )
+          am = self->s.v.ammo_nails;
+        if ( am > 600 - self->building->s.v.ammo_nails )
+          am = 600 - self->building->s.v.ammo_nails;
+        self->s.v.ammo_nails = self->s.v.ammo_nails - am;
+        self->building->s.v.ammo_nails = self->building->s.v.ammo_nails + am;
+        am = 10 * 2;
+        if ( am > self->s.v.ammo_rockets )
+          am = self->s.v.ammo_rockets;
+        if ( am > 300 - self->building->s.v.ammo_rockets )
+          am = 300 - self->building->s.v.ammo_rockets;
+        self->s.v.ammo_rockets = self->s.v.ammo_rockets - am;
+        self->building->s.v.ammo_rockets = self->building->s.v.ammo_rockets + am;
+        am = 10 * 2;
+        if ( am > self->s.v.ammo_cells )
+          am = self->s.v.ammo_cells;
+        if ( am > 400 - self->building->s.v.ammo_cells )
+          am = 400 - self->building->s.v.ammo_cells;
+        self->s.v.ammo_cells = self->s.v.ammo_cells - am;
+        self->building->s.v.ammo_cells = self->building->s.v.ammo_cells + am;
+        break;
+      case 2:
+        am = 40 * 2;
+        if ( am > self->s.v.armorvalue )
+          am = self->s.v.armorvalue;
+        if ( am > 500 - self->building->s.v.armorvalue )
+          am = 500 - self->building->s.v.armorvalue;
+        self->s.v.armorvalue = self->s.v.armorvalue - am;
+        self->building->s.v.armorvalue = self->building->s.v.armorvalue + am;
+        break;
+      case 3:
         Engineer_Dispenser_Repair(self->building);
-		break;
-	case 4:
+        break;
+      case 4:
         Engineer_Dispenser_Dismantle(self->building);
-		break;
-	case 5:
-		break;
-	default:
-		return;
-		break;
-	}
-	ResetMenu(  );
-	self->s.v.impulse = 0;
-	self->building = world;
-	bound_other_ammo( self );
-    bound_other_armor( self );
-	W_SetCurrentAmmo(  );
+        break;
+      case 5:
+        break;
+      default:
+        return;
+        break;
+    }
+  ResetMenu(  );
+  self->s.v.impulse = 0;
+  self->building = world;
+  bound_other_ammo( self );
+  W_SetCurrentAmmo(  );
 
 }
 
