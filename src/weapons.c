@@ -24,23 +24,23 @@
 #include "g_local.h"
 
 typedef struct {
-    int w, bit_item, bit_ammo, wnum; 
-	int			ammo_ofs;
-	fieldtype_t	ammo_type;
-    int ammo_shells, ammo_nails, ammo_rockets, ammo_cells;
-    int clip, reload_time;
-    void (* fire_func)();
-    void (* can_use_f)();
-    float attack_finished;
-    char* model,*model_mode,*sound;
-    int   have_mode;
+  int w, bit_item, bit_ammo, wnum;
+  int			ammo_ofs;
+  fieldtype_t	ammo_type;
+  int ammo_shells, ammo_nails, ammo_rockets, ammo_cells;
+  int clip, reload_time;
+  void (* fire_func)();
+  void (* can_use_f)();
+  float attack_finished;
+  char* model,*model_mode,*sound;
+  int   have_mode;
 }weapon_info_t;
 
 const weapon_info_t weapons_info[]= {
 {  0 },
 {  WEAP_HOOK             , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.1, "progs/v_grap.mdl", "", "", 0},
 {  WEAP_BIOWEAPON        , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_bio.mdl", "", "weapons/ax1.wav", 0},
-{  WEAP_MEDIKIT          , IT_AXE,              0,          0, FOFS(ammo_medikit),    F_INT,0,0,0,0, 0,0,     0,0, 0.5, "progs/v_medi.mdl", "", "weapons/ax1.wav", 0},
+{  WEAP_MEDIKIT          , IT_AXE,              0,          0, FOFS(ammo_medikit),    F_INT,0,0,0,0, 0,0,     0,0, 0.5, "progs/v_bio.mdl"/*progs/v_medi.mdl*/, "", "weapons/ax1.wav", 0},
 {  WEAP_SPANNER          , IT_AXE,              IT_CELLS,   0, FOFS(s.v.ammo_cells),  F_FLOAT,0,0,0,0, 0,0,   0,0, 0.5, "progs/v_span.mdl", "", "weapons/ax1.wav", 0},
 {  WEAP_AXE              , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_axe.mdl", "", "weapons/ax1.wav", 0},
 {  WEAP_SNIPER_RIFLE     , IT_SHOTGUN,          IT_SHELLS,  1, FOFS(s.v.ammo_shells), F_FLOAT,1,0,0,0, 0,0,   0,0, 1.5, "progs/v_srifle.mdl", "", "weapons/sniper.wav", 0},
@@ -69,44 +69,44 @@ void    button_fire(  );
 
 void W_Precache(  )
 {
-	trap_precache_sound( "weapons/r_exp3.wav" );           // new rocket explosion               
-	trap_precache_sound( "weapons/rocket1i.wav" );         // spike gun                          
-	trap_precache_sound( "weapons/sgun1.wav" );                                                  
-	trap_precache_sound( "weapons/guncock.wav" );          // player shotgun                     
-	trap_precache_sound( "weapons/ric1.wav" );             // ricochet (used in c code)          
-	trap_precache_sound( "weapons/ric2.wav" );             // ricochet (used in c code)          
-	trap_precache_sound( "weapons/ric3.wav" );             // ricochet (used in c code)          
-	trap_precache_sound( "weapons/spike2.wav" );           // super spikes                       
-	trap_precache_sound( "weapons/tink1.wav" );            // spikes tink (used in c code)       
-	trap_precache_sound( "weapons/grenade.wav" );          // grenade launcher                   
-	trap_precache_sound( "weapons/bounce.wav" );           // grenade bounce                     
-	trap_precache_sound( "weapons/shotgn2.wav" );          // super shotgun                      
-	trap_precache_sound( "wizard/wattack.wav" );           // sniper rifle                       
-	trap_precache_sound( "items/r_item1.wav" );            // Medikit                            
-	trap_precache_sound( "items/r_item2.wav" );            // Medikit                            
-	trap_precache_model( "progs/flame2.mdl" );             // Flamethrower                       
-	trap_precache_sound( "ambience/fire1.wav" );                                                 
-	trap_precache_sound( "blob/land1.wav" );               // Hook                               
-	trap_precache_model( "progs/v_spike.mdl" );            // Hook                               
-	trap_precache_sound( "hknight/hit.wav" );              	// Hook                       
-	                                                                                             
-	trap_precache_sound( "weapons/detpack.wav" );           
-	trap_precache_sound( "weapons/turrset.wav" );            // Sentry Gun Setup                 
-	trap_precache_sound( "weapons/turrspot.wav" );           // Sentry Gun Spot                  
-	trap_precache_sound( "weapons/turridle.wav" );           // Sentry Gun Idle                  
-	trap_precache_sound( "weapons/sniper.wav" );             // sniper rifle                       
-	trap_precache_sound( "weapons/flmfire2.wav" );           //flamethrower                         
-	trap_precache_sound( "weapons/flmgrexp.wav" );           //flamethrower                       
-	trap_precache_sound( "misc/vapeur2.wav" );               // flamethrower                     
-	trap_precache_sound( "weapons/asscan1.wav" );            // Assault Cannon Powerup           
-	trap_precache_sound( "weapons/asscan2.wav" );            // Assault Cannon Churning          
-	trap_precache_sound( "weapons/asscan3.wav" );            // Assault Cannon Powerdown         
-	trap_precache_sound( "weapons/asscan4.wav" );            
-	trap_precache_sound( "weapons/railgun.wav" );            // Railgun                          
-	trap_precache_sound( "weapons/dartgun.wav" );            // Spy's dart gun                   
+	trap_precache_sound( "weapons/r_exp3.wav" );           // new rocket explosion
+	trap_precache_sound( "weapons/rocket1i.wav" );         // spike gun
+	trap_precache_sound( "weapons/sgun1.wav" );
+	trap_precache_sound( "weapons/guncock.wav" );          // player shotgun
+	trap_precache_sound( "weapons/ric1.wav" );             // ricochet (used in c code)
+	trap_precache_sound( "weapons/ric2.wav" );             // ricochet (used in c code)
+	trap_precache_sound( "weapons/ric3.wav" );             // ricochet (used in c code)
+	trap_precache_sound( "weapons/spike2.wav" );           // super spikes
+	trap_precache_sound( "weapons/tink1.wav" );            // spikes tink (used in c code)
+	trap_precache_sound( "weapons/grenade.wav" );          // grenade launcher
+	trap_precache_sound( "weapons/bounce.wav" );           // grenade bounce
+	trap_precache_sound( "weapons/shotgn2.wav" );          // super shotgun
+	trap_precache_sound( "wizard/wattack.wav" );           // sniper rifle
+	trap_precache_sound( "items/r_item1.wav" );            // Medikit
+	trap_precache_sound( "items/r_item2.wav" );            // Medikit
+	trap_precache_model( "progs/flame2.mdl" );             // Flamethrower
+	trap_precache_sound( "ambience/fire1.wav" );
+	trap_precache_sound( "blob/land1.wav" );               // Hook
+	trap_precache_model( "progs/v_spike.mdl" );            // Hook
+	trap_precache_sound( "hknight/hit.wav" );              	// Hook
+
+	trap_precache_sound( "weapons/detpack.wav" );
+	trap_precache_sound( "weapons/turrset.wav" );            // Sentry Gun Setup
+	trap_precache_sound( "weapons/turrspot.wav" );           // Sentry Gun Spot
+	trap_precache_sound( "weapons/turridle.wav" );           // Sentry Gun Idle
+	trap_precache_sound( "weapons/sniper.wav" );             // sniper rifle
+	trap_precache_sound( "weapons/flmfire2.wav" );           //flamethrower
+	trap_precache_sound( "weapons/flmgrexp.wav" );           //flamethrower
+	trap_precache_sound( "misc/vapeur2.wav" );               // flamethrower
+	trap_precache_sound( "weapons/asscan1.wav" );            // Assault Cannon Powerup
+	trap_precache_sound( "weapons/asscan2.wav" );            // Assault Cannon Churning
+	trap_precache_sound( "weapons/asscan3.wav" );            // Assault Cannon Powerdown
+	trap_precache_sound( "weapons/asscan4.wav" );
+	trap_precache_sound( "weapons/railgun.wav" );            // Railgun
+	trap_precache_sound( "weapons/dartgun.wav" );            // Spy's dart gun
 	trap_precache_sound( "count.wav" );                      // grenade prime sound
 
-	trap_precache_model( "progs/v_flame.mdl" );              
+	trap_precache_model( "progs/v_flame.mdl" );
 	trap_precache_model( "progs/v_tgun.mdl" );
 
 }
@@ -163,7 +163,7 @@ void W_FireAxe(  )
     gedict_t * trace_ent;
 
     trace_ent = getMeleeTagret(org, self );
-    if( !trace_ent ) 
+    if( !trace_ent )
         return;
 
 	if ( trace_ent->s.v.takedamage )
@@ -208,7 +208,7 @@ void W_FireSpanner(  )
 	gedict_t *te, *trace_ent;
 
     trace_ent = getMeleeTagret(org, self );
-    if( !trace_ent ) 
+    if( !trace_ent )
         return;
 
 	if ( trace_ent->goal_activation & TFGA_SPANNER )
@@ -313,7 +313,7 @@ void W_FireMedikit(  )
 	gedict_t *BioInfection, *trace_ent;
 
     trace_ent = getMeleeTagret(org, self );
-    if( !trace_ent ) 
+    if( !trace_ent )
         return;
 
 	if ( trace_ent->s.v.takedamage )
@@ -355,9 +355,9 @@ void W_FireMedikit(  )
 						SpawnBlood( org, 20 );
 						G_bprint( 1, "%s healed %s of his hallucinations\n",
 							  self->s.v.netname, trace_ent->s.v.netname );
-						
+
 						ResetGasSkins(trace_ent);
-						if ( tfset_new_gas & GAS_MASK_PALETTE) 
+						if ( tfset_new_gas & GAS_MASK_PALETTE)
 							stuffcmd( trace_ent, "v_cshift; wait; bf\n" );
 						if ( !TeamFortress_isTeamsAllied(te->team_no , self->team_no) )
 							TF_AddFrags( self, 1 );
@@ -441,7 +441,7 @@ void W_FireMedikit(  )
 					}
 					return;
 				}
-				
+
 				if ( healam > 0 && trace_ent->s.v.health < trace_ent->s.v.max_health )
 				{
 					sound( trace_ent, 1, "items/r_item1.wav", 1, 1 );
@@ -513,7 +513,7 @@ void W_FireBioweapon(  )
 	gedict_t *BioInfection, *trace_ent;
 
     trace_ent = getMeleeTagret(org, self );
-    if( !trace_ent ) 
+    if( !trace_ent )
         return;
 
 	if ( trace_ent->s.v.takedamage )
@@ -729,7 +729,7 @@ void TraceAttack( float damage, vec3_t dir )
 	// org = trace_endpos - dir*4;
 	VectorScale( dir, 4, tmp );
 	VectorSubtract( g_globalvars.trace_endpos, tmp, org );
-	
+
 	if ( PROG_TO_EDICT( g_globalvars.trace_ent )->s.v.takedamage )
 	{
 		blood_count = blood_count + 1;
@@ -920,8 +920,8 @@ void W_FireSniperRifle(  )
 	else
 		traceline( PASSVEC3( src ), src[0] + dir[0] * 3072, src[1] + dir[1] * 3072,
 			   src[2] + dir[2] * 3072, false, self );
-	        
-	        
+
+
 	trace_ent = PROG_TO_EDICT( g_globalvars.trace_ent );
 
 	KickPlayer( -4, self );
@@ -1099,7 +1099,7 @@ void W_FireRocket(  )
 	newmis->s.v.movetype = MOVETYPE_FLYMISSILE;
 	newmis->s.v.solid = SOLID_BBOX;
 
-// set newmis speed     
+// set newmis speed
 	trap_makevectors( self->s.v.v_angle );
 	VectorScale( g_globalvars.v_forward, 900, newmis->s.v.velocity );
 
@@ -1900,8 +1900,8 @@ int W_BestWeapon(  )
         wi = WEAPON_BY_BIT( *w );
 
         if( !( wi->w & it ) ) continue;
-        
-        if( wi->w == WEAP_ASSAULT_CANNON && 
+
+        if( wi->w == WEAP_ASSAULT_CANNON &&
                 (self->s.v.ammo_cells >= 6 && self->s.v.ammo_shells > self->assault_min_shells ) ){
 			return WEAP_ASSAULT_CANNON;
         }
@@ -2275,9 +2275,9 @@ void W_PrintWeaponMessage(  )
 	case WEAP_TRANQ:
 		G_sprint( self, 1, "Tranquiliser gun selected\n" );
 		break;
-	case WEAP_BIOWEAPON:
+	/*case WEAP_BIOWEAPON:
 		G_sprint( self, 1, "BioWeapon readied\n" );
-		break;
+		break;*/
 	case WEAP_MEDIKIT:
 		G_sprint( self, 1, "Medikit/Bioweapon readied\n" );
 		break;
@@ -2287,7 +2287,7 @@ int W_CanUseWeapon( int weapon )
     // 1 no ammo
     // 2 no ammo assault
     // 3 no weapon
-    // 0 ok 
+    // 0 ok
 {
     if( !( weapon & self->weapons_carried )) return 3;
     switch( weapon )
@@ -2297,7 +2297,7 @@ int W_CanUseWeapon( int weapon )
             if ( self->hook_out )
                 Reset_Grapple( self->hook );
             break;
-        case WEAP_SNIPER_RIFLE: 
+        case WEAP_SNIPER_RIFLE:
             if ( self->s.v.ammo_shells < tfset_snip_ammo ) return 1;
             break;
         case WEAP_SHOTGUN://   128
@@ -2404,7 +2404,7 @@ void W_ChangeWeapon(  )
         if( !self->last_weapon ) return;
         am = W_CanUseWeapon( self->last_weapon );
         W_SetWeapon( self->last_weapon, self->last_weaponmode, am );
-        return; 
+        return;
     }else{
         while( wi->impulse && wi->impulse != self->s.v.impulse ) wi++;
     }
@@ -2425,7 +2425,7 @@ void W_ChangeWeapon(  )
         do{
             am = W_CanUseWeapon(*w);
             if(!am){
-                fl = *w; 
+                fl = *w;
                 break;
             }
             w++;
@@ -2441,7 +2441,7 @@ void W_ChangeWeapon(  )
         have_weapon = 0;
     }
     if( wi->impulse == 7 && fl == WEAP_GRENADE_LAUNCHER ) wm = 1;
-    
+
     W_SetWeapon( fl, wm, am );
 }
 
@@ -2450,7 +2450,7 @@ struct weapon_s{
     int mode;
 };
 
-const struct weapon_s weapon_cycle[] = { 
+const struct weapon_s weapon_cycle[] = {
     { WEAP_AXE             , 0},
     { WEAP_SPANNER         , 0},
     { WEAP_SHOTGUN         , 0},
@@ -2469,14 +2469,13 @@ const struct weapon_s weapon_cycle[] = {
     { WEAP_INCENDIARY      , 0},
     { WEAP_ASSAULT_CANNON  , 0},
     { WEAP_HOOK            , 0},
-    { WEAP_MEDIKIT         , 0},
-    { WEAP_BIOWEAPON       , 0},
+  //{ WEAP_BIOWEAPON       , 0},
     { WEAP_MEDIKIT         , 0},
     { 0,0                    }
-};                          
-const struct weapon_s weapon_cycle_rev[] = { 
+};
+const struct weapon_s weapon_cycle_rev[] = {
     { WEAP_MEDIKIT         , 0},
-    { WEAP_BIOWEAPON       , 0},
+  //{ WEAP_BIOWEAPON       , 0},
     { WEAP_HOOK            , 0},
     { WEAP_ASSAULT_CANNON  , 0},
     { WEAP_INCENDIARY      , 0},
@@ -2496,240 +2495,239 @@ const struct weapon_s weapon_cycle_rev[] = {
     { WEAP_SPANNER         , 0},
     { WEAP_AXE             , 0},
     { 0,0                    }
-};                          
+};
+
 void CycleWeaponCommand( int prev )
 {
-	float   it;
-	int   lw;
-    int wm;
-    int am;
-    const struct weapon_s *wp;
+  float   it;
+  int   lw;
+  int wm;
+  int am;
+  const struct weapon_s *wp;
 
-    wp = !prev ?&weapon_cycle[0] : &weapon_cycle_rev[0];
+  wp = !prev ?&weapon_cycle[0] : &weapon_cycle_rev[0];
 
-	if ( self->s.v.weaponmodel[0] == 0 || !self->current_weapon )
-		return;
-	if ( self->tfstate & TFSTATE_RELOADING )
-		return;
-	it = self->weapons_carried;
-	self->s.v.impulse = 0;
-	lw = self->current_weapon;
-    wm = ( lw == WEAP_GRENADE_LAUNCHER) ? self->weaponmode : 0;
+  if ( self->s.v.weaponmodel[0] == 0 || !self->current_weapon )
+    return;
+  if ( self->tfstate & TFSTATE_RELOADING )
+    return;
+  it = self->weapons_carried;
+  self->s.v.impulse = 0;
+  lw = self->current_weapon;
+  wm = ( lw == WEAP_GRENADE_LAUNCHER) ? self->weaponmode : 0;
 
-    while( wp->w && (wp->w != lw || wp->mode != wm) ) wp++;
-    if( !wp->w ) return;
+  while( wp->w && (wp->w != lw || wp->mode != wm) ) wp++;
+  if( !wp->w ) return;
 
-    do{
-        wp++;
-        if( !wp->w ) wp = !prev ?&weapon_cycle[0] : &weapon_cycle_rev[0];
-        am = W_CanUseWeapon( wp->w );
-        if(!am){
-            self->weaponmode = wp->mode;
-            self->current_weapon = wp->w;
-			self->last_weapon = lw;
-            self->last_weaponmode = wm;
-			W_SetCurrentAmmo(  );
-			W_PrintWeaponMessage(  );
-			self->StatusRefreshTime = g_globalvars.time + 0.1;
-            return;
-        }
-    }while( wp->w != lw || wp->mode != wm );
+  do{
+    wp++;
+    if( !wp->w ) wp = !prev ?&weapon_cycle[0] : &weapon_cycle_rev[0];
+    am = W_CanUseWeapon( wp->w );
+    if(!am){
+      self->weaponmode = wp->mode;
+      self->current_weapon = wp->w;
+      self->last_weapon = lw;
+      self->last_weaponmode = wm;
+      W_SetCurrentAmmo(  );
+      W_PrintWeaponMessage(  );
+      self->StatusRefreshTime = g_globalvars.time + 0.1;
+      return;
+    }
+  }while( wp->w != lw || wp->mode != wm );
 }
-
-
 
 void ImpulseCommands(  )
 {
-    char st[20];
+  char st[20];
 
-    if ( self->last_impulse == TF_DETPACK && self->s.v.impulse )
-        TeamFortress_SetDetpack( self->s.v.impulse );
-    else if ( self->last_impulse == TF_SCAN && self->s.v.impulse )
-        TeamFortress_ScannerSet( self->s.v.impulse );
+  if ( self->last_impulse == TF_DETPACK && self->s.v.impulse )
+    TeamFortress_SetDetpack( self->s.v.impulse );
+  else if ( self->last_impulse == TF_SCAN && self->s.v.impulse )
+      TeamFortress_ScannerSet( self->s.v.impulse );
     else if ( self->s.v.impulse == TF_SCAN_ENEMY || self->s.v.impulse == TF_SCAN_FRIENDLY )
         TeamFortress_ScannerSet( self->s.v.impulse );
 
-    if ( self->s.v.impulse == 8 && self->current_menu != MENU_CLASSHELP )
-    {
-        self->current_menu = MENU_CLASSHELP;
-        self->menu_count = MENU_REFRESH_RATE;
-        self->menu_displaytime = 0;
-    }
+  if ( self->s.v.impulse == 8 && self->current_menu != MENU_CLASSHELP )
+  {
+    self->current_menu = MENU_CLASSHELP;
+    self->menu_count = MENU_REFRESH_RATE;
+    self->menu_displaytime = 0;
+  }
 
-    if ( self->s.v.impulse == 242 && !tfset(birthday) )
+  if ( self->s.v.impulse == 242 && !tfset(birthday) )
+  {
+    GetSVInfokeyString( "bd", "birthday", st, sizeof( st ), "" );
+    if ( strneq( st, "off" ) )
     {
-        GetSVInfokeyString( "bd", "birthday", st, sizeof( st ), "" );
-        if ( strneq( st, "off" ) )
-        {
-            self->current_menu = MENU_BIRTHDAY1;
-            self->menu_count = MENU_REFRESH_RATE;
-            self->menu_displaytime = 0;
-            self->s.v.impulse = 0;
-            return;
-        }
+      self->current_menu = MENU_BIRTHDAY1;
+      self->menu_count = MENU_REFRESH_RATE;
+      self->menu_displaytime = 0;
+      self->s.v.impulse = 0;
+      return;
     }
-    if ( ( tf_data.cb_prematch_time > g_globalvars.time ) || tf_data.cease_fire )
-    {
-        PreMatchImpulses(  );
-        DeadImpulses(  );
-        self->s.v.impulse = 0;
-        return;
-    }
-    if ( self->s.v.impulse == TF_SPECIAL_SKILL )
-        UseSpecialSkill(  );
+  }
+  if ( ( tf_data.cb_prematch_time > g_globalvars.time ) || tf_data.cease_fire )
+  {
+    PreMatchImpulses(  );
+    DeadImpulses(  );
+    self->s.v.impulse = 0;
+    return;
+  }
+  if ( self->s.v.impulse == TF_SPECIAL_SKILL )
+    UseSpecialSkill(  );
 
-    if( tfset(tg_enabled) )
-        TgImpulses();
+  if( tfset(tg_enabled) )
+    TgImpulses();
 
-    if ( !self->is_building && !self->is_detpacking && !self->is_feigning )
-    {
-        switch ( ( int ) self->s.v.impulse )
-        {
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-            case TF_MEDIKIT:
-            case AXE_IMP:
-                W_ChangeWeapon(  );
-                break;
-            case TF_HOOK_IMP1:
-            case TF_HOOK_IMP2:
-                if ( tfset(allow_hook) )
-                    W_ChangeWeapon(  );
-                break;
-            case TF_WEAPLAST:
-                if ( self->last_weapon )
-                    W_ChangeWeapon(  );
-                break;
-            case TF_WEAPNEXT:
-                CycleWeaponCommand( 0 );
-                break;
-            case TF_WEAPPREV:
-                CycleWeaponCommand( 1 );
-                break;
-            case TF_GRENADE_1:
-            case TF_GRENADE_2:
-                TeamFortress_PrimeGrenade(  );
-                break;
-            case TF_SCAN_10:
-                TeamFortress_Scan_Angel( 10, false );
-                break;
-            case TF_SCAN_30:
-                TeamFortress_Scan_Angel( 30, false );
-                break;
-            case TF_SCAN_100:
-                TeamFortress_Scan_Angel( 100, false );
-                break;
-            case TF_DETPACK_5:
-                TeamFortress_SetDetpack( 5 );
-                break;
-            case TF_DETPACK_20:
-                TeamFortress_SetDetpack( 20 );
-                break;
-            case TF_DETPACK_50:
-                TeamFortress_SetDetpack( 50 );
-                break;
-            case TF_DROP_AMMO:
-                self->current_menu = MENU_DROP;
-                self->menu_count = MENU_REFRESH_RATE - 5;
-                break;
-            case TF_RELOAD:
-                TeamFortress_ReloadCurrentWeapon(  );
-                break;
-            case TF_DISCARD:
-                TeamFortress_Discard(  );
-                break;
-        }
-    }
+  if ( !self->is_building && !self->is_detpacking && !self->is_feigning )
+  {
     switch ( ( int ) self->s.v.impulse )
+      {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case TF_MEDIKIT:
+        case AXE_IMP:
+          W_ChangeWeapon(  );
+          break;
+        case TF_HOOK_IMP1:
+        case TF_HOOK_IMP2:
+          if ( tfset(allow_hook) )
+            W_ChangeWeapon(  );
+          break;
+        case TF_WEAPLAST:
+          if ( self->last_weapon )
+            W_ChangeWeapon(  );
+          break;
+        case TF_WEAPNEXT:
+          CycleWeaponCommand( 0 );
+          break;
+        case TF_WEAPPREV:
+          CycleWeaponCommand( 1 );
+          break;
+        case TF_GRENADE_1:
+        case TF_GRENADE_2:
+          TeamFortress_PrimeGrenade(  );
+          break;
+        case TF_SCAN_10:
+          TeamFortress_Scan_Angel( 10, false );
+          break;
+        case TF_SCAN_30:
+          TeamFortress_Scan_Angel( 30, false );
+          break;
+        case TF_SCAN_100:
+          TeamFortress_Scan_Angel( 100, false );
+          break;
+        case TF_DETPACK_5:
+          TeamFortress_SetDetpack( 5 );
+          break;
+        case TF_DETPACK_20:
+          TeamFortress_SetDetpack( 20 );
+          break;
+        case TF_DETPACK_50:
+          TeamFortress_SetDetpack( 50 );
+          break;
+        case TF_DROP_AMMO:
+          self->current_menu = MENU_DROP;
+          self->menu_count = MENU_REFRESH_RATE - 5;
+          break;
+        case TF_RELOAD:
+          TeamFortress_ReloadCurrentWeapon(  );
+          break;
+        case TF_DISCARD:
+          TeamFortress_Discard(  );
+          break;
+      }
+  }
+  switch ( ( int ) self->s.v.impulse )
     {
-        case TF_INVENTORY:
-            TeamFortress_Inventory(  );
-            break;
-        case TF_MEDIC_HELPME:
-            if ( self->playerclass )
-                TeamFortress_SaveMe(  );
-            break;
-        case TF_ID:
-            TeamFortress_ID(  );
-            break;
-        case TF_SHOWIDS:
-            TeamFortress_ShowIDs(  );
-            break;
-        case TF_GRENADE_T:
-            TeamFortress_ThrowGrenade(  );
-            break;
-        case TF_DROPGOAL:
-            if ( self->playerclass )
-                DropGoalItems(  );
-            break;
-        case TF_PB_DETONATE:
-            TeamFortress_DetonatePipebombs(  );
-            break;
-        case TF_DETPACK_STOP:
-            TeamFortress_DetpackStop(  );
-            break;
-        case TF_ENGINEER_DETSENTRY:
-            if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
-                DestroyBuilding( self, "building_sentrygun" );
-            break;
-        case TF_ENGINEER_DETDISP:
-            if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
-                DestroyBuilding( self, "building_dispenser" );
-            break;
-            /*case 196:
-              if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
+      case TF_INVENTORY:
+        TeamFortress_Inventory(  );
+        break;
+      case TF_MEDIC_HELPME:
+        if ( self->playerclass )
+          TeamFortress_SaveMe(  );
+        break;
+      case TF_ID:
+        TeamFortress_ID(  );
+        break;
+      case TF_SHOWIDS:
+        TeamFortress_ShowIDs(  );
+        break;
+      case TF_GRENADE_T:
+        TeamFortress_ThrowGrenade(  );
+        break;
+      case TF_DROPGOAL:
+        if ( self->playerclass )
+          DropGoalItems(  );
+        break;
+      case TF_PB_DETONATE:
+        TeamFortress_DetonatePipebombs(  );
+        break;
+      case TF_DETPACK_STOP:
+        TeamFortress_DetpackStop(  );
+        break;
+      case TF_ENGINEER_DETSENTRY:
+        if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )
+          DestroyBuilding( self, "building_sentrygun" );
+        break;
+      case TF_ENGINEER_DETDISP:
+        if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )
+          DestroyBuilding( self, "building_dispenser" );
+        break;
+      /*case 196:
+              if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )
               DestroyBuilding( self, "building_teleporter_exit" );
               break;
               case 197:
-              if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
+              if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )
               DestroyBuilding( self, "building_teleporter_entrance" );
               break;*/
-        case TF_SPY_SPY:
-            if ( self->playerclass == PC_SPY )
-                TeamFortress_SpyGoUndercover(  );
-            break;
-        case TF_SPY_DIE:
-            if ( self->playerclass == PC_SPY )
-                TeamFortress_SpyFeignDeath( 0 );
-            break;
-        case TF_SPY_SFEIGN_IMPULSE:
-            if ( self->playerclass == PC_SPY )
-                TeamFortress_SpyFeignDeath( 1 );
-            break;
-        case TF_ENGINEER_BUILD:
-            if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )			
-                TeamFortress_EngineerBuild(  );
-            break;
-        case AUTOSCAN_IMPULSE:
-            if ( self->playerclass == PC_SCOUT )
-                ScannerSwitch(  );
-            break;
-        case TF_FLAG_INFO:
-            if ( CTF_Map == 1 )
-                TeamFortress_CTF_FlagInfo(  );
-            else
-                TeamFortress_DisplayDetectionItems(  );
-            break;
-        case TF_DISPLAYLOCATION:
-            display_location(  );
-            break;
-        default:
-            DeadImpulses(  );
-            break;
+      case TF_SPY_SPY:
+        if ( self->playerclass == PC_SPY )
+          TeamFortress_SpyGoUndercover(  );
+        break;
+      case TF_SPY_DIE:
+        if ( self->playerclass == PC_SPY )
+          TeamFortress_SpyFeignDeath( 0 );
+        break;
+      case TF_SPY_SFEIGN_IMPULSE:
+        if ( self->playerclass == PC_SPY )
+          TeamFortress_SpyFeignDeath( 1 );
+        break;
+      case TF_ENGINEER_BUILD:
+        if ( self->playerclass == PC_ENGINEER || tfset(tg_enabled) )
+          TeamFortress_EngineerBuild(  );
+        break;
+      case AUTOSCAN_IMPULSE:
+        if ( self->playerclass == PC_SCOUT )
+          ScannerSwitch(  );
+        break;
+      case TF_FLAG_INFO:
+        if ( CTF_Map == 1 )
+          TeamFortress_CTF_FlagInfo(  );
+        else
+          TeamFortress_DisplayDetectionItems(  );
+        break;
+      case TF_DISPLAYLOCATION:
+        display_location(  );
+        break;
+      default:
+        DeadImpulses(  );
+        break;
     }
-    if ( self->s.v.impulse == TF_DETPACK )
-    {
-        self->last_impulse = self->s.v.impulse;
-    }
-    if ( self->s.v.impulse == TF_SCAN )
-        self->last_impulse = self->s.v.impulse;
-    self->s.v.impulse = 0;
+  if ( self->s.v.impulse == TF_DETPACK )
+  {
+    self->last_impulse = self->s.v.impulse;
+  }
+  if ( self->s.v.impulse == TF_SCAN )
+    self->last_impulse = self->s.v.impulse;
+  self->s.v.impulse = 0;
 }
 
 void PreMatchImpulses(  )
@@ -3067,7 +3065,7 @@ void W_WeaponFrame(  )
 								self->heat = g_globalvars.time;
 							else
 								self->heat = 50;
-        
+
 							self->height = 90;
 							self->tfstate = self->tfstate | TFSTATE_AIMING;
 							TeamFortress_SetSpeed( self );
