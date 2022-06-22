@@ -2477,7 +2477,6 @@ const struct weapon_s weapon_cycle[] = {
 const struct weapon_s weapon_cycle_rev[] = { 
     { WEAP_MEDIKIT         , 0},
     { WEAP_BIOWEAPON       , 0},
-    { WEAP_MEDIKIT         , 0},
     { WEAP_HOOK            , 0},
     { WEAP_ASSAULT_CANNON  , 0},
     { WEAP_INCENDIARY      , 0},

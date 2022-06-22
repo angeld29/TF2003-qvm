@@ -1325,29 +1325,81 @@ void DelayedResult(  )
 	dremove( self );
 }
 
+void DoCtfResults( gedict_t* Goal, gedict_t* AP )
+{
+    gedict_t *te;
+    static const char *ctf_msg_your_team_gotflag = "\n\n\nYour team " _G _O _T " the " _E _N _E _M _Y " flag!!";
+    static const char *ctf_msg_your_flag_taken   = "\n\n\nYour flag has been " _T _A _K _E _N "!!";
+    static const char *ctf_msgs_you_take_flag[] = {
+        "\n\n\nYou got the enemy flag!\n\nFlee!" ,
+        "\n\n\nYou got the enemy flag!\n\nHead for home!" ,
+        "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
+        "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
+        "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
+        "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
+        "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
+        "\n\n\nYou got the enemy flag!\n\n<Insert witty comment here>" ,
+        "\n\n\nYou got the enemy flag!\n\n" ,
+        "\n\n\nYou got the enemy flag!\n\n" ,
+        "\n\n\nIs that a flag in your pocket\nor a you just happy to see me?" 
+    };
+
+    static const int num_ctf_msgs = sizeof(ctf_msgs_you_take_flag)/sizeof(ctf_msgs_you_take_flag[0]);
+
+    if( CTF_Map != 1 ) return;
+    if( !AP || AP == world ) return;
+
+    for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
+    {
+        if( Goal->goal_no == 1 || Goal->goal_no == 2)
+        {
+            if ( te->team_no != Goal->goal_no )
+            {
+                if ( te == AP )
+                    CenterPrint( te, ctf_msgs_you_take_flag[(int)g_random()*num_ctf_msgs]);
+                else
+                    CenterPrint( te, ctf_msg_your_team_gotflag );
+            } else
+                CenterPrint( te, ctf_msg_your_flag_taken );
+        }else if( Goal->goal_no == 3 || Goal->goal_no == 4)
+        {
+            if ( te->team_no == ( Goal->goal_no % 2 + 1))
+            {
+                if ( te == AP )
+                    CenterPrint( te,"\n\n\nYou " _C _A _P _T _U _R _E _D " the flag!!" );
+                else
+                    CenterPrint( te,"\n\n\nYour flag was " _C _A _P _T _U _R _E _D "!!" );
+            } else
+                CenterPrint( te, "\n\n\nYour team " _C _A _P _T _U _R _E _D " the flag!!" );
+        }
+    }
+
+    switch( Goal->goal_no ) 
+    {
+        case 1:
+            G_bprint( 2, "%s " _G _O _T " the " _B _L _U _E " flag!\n", AP->s.v.netname );
+            AP->s.v.items = ( int ) AP->s.v.items | IT_KEY1;
+            break;
+        case 2:
+            G_bprint( 2, "%s " _G _O _T " the " _R _E _D " flag!\n", AP->s.v.netname );
+            AP->s.v.items = ( int ) AP->s.v.items | IT_KEY2;
+            break;
+        case 3:
+            G_bprint( 2, "%s " _C _A _P _T _U _R _E _D " the " _R _E _D " flag!\n", AP->s.v.netname );
+            AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY2 );
+            break;
+        case 4:
+            G_bprint( 2, "%s " _C _A _P _T _U _R _E _D " the " _B _L _U _E " flag!\n", AP->s.v.netname );
+            AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY1 );
+            break;
+    }
+}
+
 void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 {
 	gedict_t *te;
 	float   winners;
 //	float   gotone;
-        static const char *ctf_msg_your_team_gotflag = "\n\n\nYour team " _G _O _T " the " _E _N _E _M _Y " flag!!";
-        static const char *ctf_msg_your_flag_taken   = "\n\n\nYour flag has been " _T _A _K _E _N "!!";
-        static const char *ctf_msgs_you_take_flag[] = {
-                 "\n\n\nYou got the enemy flag!\n\nFlee!" ,
-                 "\n\n\nYou got the enemy flag!\n\nHead for home!" ,
-                 "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
-                 "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
-                 "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
-                 "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
-                 "\n\n\nYou got the enemy flag!\n\nReturn to base!" ,
-                 "\n\n\nYou got the enemy flag!\n\n<Insert witty comment here>" ,
-                 "\n\n\nYou got the enemy flag!\n\n" ,
-                 "\n\n\nYou got the enemy flag!\n\n" ,
-                 "\n\n\nIs that a flag in your pocket\nor a you just happy to see me?" 
-        };
-        
-        static const int num_ctf_msgs = sizeof(ctf_msgs_you_take_flag)/sizeof(ctf_msgs_you_take_flag[0]);
-
 
 	if ( tf_data.cb_prematch_time > g_globalvars.time )
 		return;
@@ -1393,74 +1445,8 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 	}
 	if ( winners == 1 )
 		TeamFortress_TeamShowScores( 2 );
-	if ( CTF_Map == 1 && AP && AP != world )
-    {
-        switch( Goal->goal_no ) 
-        {
-            case 1:
-                for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
-                {
-                    if ( te->team_no == 2 )
-                    {
-                        if ( te == AP )
-                        {
-                            CenterPrint( te, ctf_msgs_you_take_flag[(int)g_random()*num_ctf_msgs]);
-                        } else
-                            CenterPrint( te, ctf_msg_your_team_gotflag );
-                    } else
-                        CenterPrint( te, ctf_msg_your_flag_taken );
-                }
-                G_bprint( 2, "%s " _G _O _T " the " _B _L _U _E " flag!\n", AP->s.v.netname );
-                AP->s.v.items = ( int ) AP->s.v.items | IT_KEY1;
-                break;
-            case 2:
-                for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
-                {
-                    if ( te->team_no == 1 )
-                    {
-                        if ( te == AP )
-                        {
-                            CenterPrint( te, ctf_msgs_you_take_flag[(int)g_random()*num_ctf_msgs]);
-                        } else
-                            CenterPrint( te, ctf_msg_your_team_gotflag );
-                    } else
-                        CenterPrint( te, ctf_msg_your_flag_taken );
-                }
-                G_bprint( 2, "%s " _G _O _T " the " _R _E _D " flag!\n", AP->s.v.netname );
-                AP->s.v.items = ( int ) AP->s.v.items | IT_KEY2;
-                break;
-            case 3:
-                for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
-                {
-                    if ( te->team_no == 2 )
-                    {
-                        if ( te == AP )
-                            CenterPrint( te,"\n\n\nYou " _C _A _P _T _U _R _E _D " the flag!!" );
-                        else
-                            CenterPrint( te,"\n\n\nYour flag was " _C _A _P _T _U _R _E _D "!!" );
-                    } else
-                        CenterPrint( te, "\n\n\nYour team " _C _A _P _T _U _R _E _D " the flag!!" );
-                }
-                G_bprint( 2, "%s " _C _A _P _T _U _R _E _D " the " _R _E _D " flag!\n", AP->s.v.netname );
-                AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY2 );
-                break;
-            case 4:
-                for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )
-                {
-                    if ( te->team_no == 1 )
-                    {
-                        if ( te == AP )
-                            CenterPrint( te,"\n\n\nYou " _C _A _P _T _U _R _E _D " the flag!!" );
-                        else
-                            CenterPrint( te,"\n\n\nYour flag was " _C _A _P _T _U _R _E _D "!!" );
-                    } else
-                        CenterPrint( te, "\n\n\nYour team " _C _A _P _T _U _R _E _D " the flag!!" );
-                }
-                G_bprint( 2, "%s " _C _A _P _T _U _R _E _D " the " _B _L _U _E " flag!\n", AP->s.v.netname );
-                AP->s.v.items = AP->s.v.items - ( ( int ) AP->s.v.items & IT_KEY1 );
-                break;
-        }
-    }
+    DoCtfResults( Goal, AP );
+
 //	gotone = 0;
 	for( te = world; (te = trap_find( te, FOFS( s.v.classname ), "player" )); )        
 	{
@@ -1481,42 +1467,27 @@ void DoResults( gedict_t * Goal, gedict_t * AP, float addb )
 			{
 				if ( Goal->owners_team_broadcast && te->team_no == Goal->owned_by )
 					CenterPrint( te, "\n\n\n%s", Goal->owners_team_broadcast );
-				else
-				{
-					if ( Goal->team_broadcast )
+				else if ( Goal->team_broadcast )
 						CenterPrint( te, "\n\n\n%s", Goal->team_broadcast );
-				}
+
 				if ( Goal->netname_owners_team_broadcast && te->team_no == Goal->owned_by )
 				{
 					G_sprint( te, 2, "%s%s", AP->s.v.netname, Goal->netname_owners_team_broadcast );
-				} else
-				{
-					if ( Goal->netname_team_broadcast )
-					{
-						G_sprint( te, 2, "%s%s", AP->s.v.netname,
-							  Goal->netname_team_broadcast );
-					}
-				}
+				} else if ( Goal->netname_team_broadcast )
+                {
+                    G_sprint( te, 2, "%s%s", AP->s.v.netname, Goal->netname_team_broadcast );
+                }
 			} else
 			{
 				if ( Goal->owners_team_broadcast && te->team_no == Goal->owned_by )
 					CenterPrint( te, "\n\n\n%s", Goal->owners_team_broadcast );
-				else
-				{
-					if ( Goal->non_team_broadcast )
-						CenterPrint( te, "\n\n\n%s", Goal->non_team_broadcast );
-				}
+				else if ( Goal->non_team_broadcast )
+                    CenterPrint( te, "\n\n\n%s", Goal->non_team_broadcast );
+
 				if ( Goal->netname_owners_team_broadcast && te->team_no == Goal->owned_by )
-				{
 					G_sprint( te, 2, "%s%s", AP->s.v.netname, Goal->netname_owners_team_broadcast );
-				} else
-				{
-					if ( Goal->netname_non_team_broadcast )
-					{
-						G_sprint( te, 2, "%s%s", AP->s.v.netname,
-							  Goal->netname_non_team_broadcast );
-					}
-				}
+				else if ( Goal->netname_non_team_broadcast )
+                    G_sprint( te, 2, "%s%s", AP->s.v.netname, Goal->netname_non_team_broadcast );
 			}
 		}
 		if ( IsAffectedBy( Goal, te, AP ) )
@@ -1616,6 +1587,39 @@ void tfgoal_timer_tick(  )
 	}
 }
 
+void item_tfgoal_touch_CTF(  )
+{
+    gedict_t *te;
+    if( CTF_Map != 1 ) return;
+
+    if ( VectorCompare( self->s.v.origin, self->s.v.oldorigin ) )
+        return;
+    if( other->team_no != self->goal_no )
+        return;
+
+    if( other->team_no == 1 )
+        G_bprint( 2, "%s " _R _E _T _U _R _N _E _D " the " _B _L _U _E " flag!\n", other->s.v.netname );
+    else
+        G_bprint( 2, "%s " _R _E _T _U _R _N _E _D " the " _R _E _D " flag!\n", other->s.v.netname );
+
+    te = trap_find( world, FOFS( s.v.classname ), "player" );
+    while ( te )
+    {
+        if ( te->team_no == self->goal_no )
+            CenterPrint( te, "\n\n\nYour flag was " _R _E _T _U _R _N _E _D "!!" );
+        else
+            CenterPrint( te, "\n\n\nThe " _E _N _E _M _Y " flag was " _R _E _T _U _R _N _E _D "!!" );
+        te = trap_find( te, FOFS( s.v.classname ), "player" );
+    }
+    self->goal_state = 2;
+    self->s.v.solid = SOLID_TRIGGER;
+    self->s.v.touch = ( func_t ) item_tfgoal_touch;
+    VectorCopy( self->s.v.oldorigin, self->s.v.origin );
+    setmodel( self, self->mdl );
+    setorigin( self, PASSVEC3( self->s.v.origin ) );
+    sound( self, 2, "items/itembk2.wav", 1, 1 );
+}
+
 void item_tfgoal_touch(  )
 {
 	gedict_t *te;
@@ -1639,74 +1643,8 @@ void item_tfgoal_touch(  )
 	        return;
 	}
 
-	if ( CTF_Map == 1 )
-	{
-		if ( self->goal_no == 1 )
-		{
-			if ( !VectorCompare( self->s.v.origin, self->s.v.oldorigin ) )
-			{
-				if ( other->team_no == 1 )
-				{
-					G_bprint( 2, "%s " _R _E _T _U _R _N _E _D " the " _B _L _U _E " flag!\n", other->s.v.netname );
-					te = trap_find( world, FOFS( s.v.classname ), "player" );
-					while ( te )
-					{
-						if ( te->team_no == 1 )
-							CenterPrint( te, "\n\n\nYour flag was " _R _E _T _U _R _N _E _D "!!" );
-						else
-							CenterPrint( te, "\n\n\nThe " _E _N _E _M _Y " flag was " _R _E _T _U _R _N _E _D "!!" );
-						te = trap_find( te, FOFS( s.v.classname ), "player" );
-					}
-					self->goal_state = 2;
-					self->s.v.solid = SOLID_TRIGGER;
-					self->s.v.touch = ( func_t ) item_tfgoal_touch;
-					VectorCopy( self->s.v.oldorigin, self->s.v.origin );
-					setmodel( self, self->mdl );
-					setorigin( self, PASSVEC3( self->s.v.origin ) );
-					sound( self, 2, "items/itembk2.wav", 1, 1 );
-					return;
-				}
-			} else
-			{
-				if ( other->team_no == 1 )
-					return;
-			}
-		} else
-		{
-			if ( self->goal_no == 2 )
-			{
-				if ( !VectorCompare( self->s.v.origin, self->s.v.oldorigin ) )
-				{
-					if ( other->team_no == 2 )
-					{
-						G_bprint( 2, "%s " _R _E _T _U _R _N _E _D " the " _R _E _D " flag!\n", other->s.v.netname );
-						te = trap_find( world, FOFS( s.v.classname ), "player" );
-						while ( te )
-						{
-							if ( te->team_no == 2 )
-								CenterPrint( te, "\n\n\n Your flag was " _R _E _T _U _R _N _E _D "!!" );
-							else
-								CenterPrint( te,
-									     "\n\n\n The " _E _N _E _M _Y " flag was " _R _E _T _U _R _N _E _D "!!" );
-							te = trap_find( te, FOFS( s.v.classname ), "player" );
-						}
-						self->goal_state = 2;
-						self->s.v.solid = SOLID_TRIGGER;
-						self->s.v.touch = ( func_t ) item_tfgoal_touch;
-						VectorCopy( self->s.v.oldorigin, self->s.v.origin );
-						setmodel( self, self->mdl );
-						setorigin( self, PASSVEC3( self->s.v.origin ) );
-						sound( self, 2, "items/itembk2.wav", 1, 1 );
-						return;
-					}
-				} else
-				{
-					if ( other->team_no == 2 )
-						return;
-				}
-			}
-		}
-	}
+    item_tfgoal_touch_CTF();
+
 	if ( Activated( self, other ) )
 	{
 		tfgoalitem_GiveToPlayer( self, other, self );
@@ -2260,13 +2198,12 @@ void SP_item_flag_team1(  )
 
 void CTF_FlagCheck(  )
 {
-	gedict_t *te;
+	gedict_t *te = world;
 	float   flagcount;
 	float   pos;
 
 	flagcount = 0;
-	te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
-	while ( te )
+	while ( (te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" )) )
 	{
 		if ( te->goal_no == 1 )
 		{
@@ -2278,21 +2215,17 @@ void CTF_FlagCheck(  )
 				te->s.v.think = ( func_t ) tfgoalitem_remove;
 			}
 			flagcount = flagcount + 1;
-		} else
-		{
-			if ( te->goal_no == 2 )
-			{
-				pos = trap_pointcontents( PASSVEC3( te->s.v.origin ) );
-				if ( pos == -2 || pos == -6 )
-				{
-					G_conprintf( "*****BUG*****\nFlag(s) outside world.\nPlease report this.\n" );
-					te->s.v.nextthink = g_globalvars.time + 0.2;
-					te->s.v.think = ( func_t ) tfgoalitem_remove;
-				}
-				flagcount = flagcount + 1;
-			}
-		}
-		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
+		} else if ( te->goal_no == 2 )
+        {
+            pos = trap_pointcontents( PASSVEC3( te->s.v.origin ) );
+            if ( pos == -2 || pos == -6 )
+            {
+                G_conprintf( "*****BUG*****\nFlag(s) outside world.\nPlease report this.\n" );
+                te->s.v.nextthink = g_globalvars.time + 0.2;
+                te->s.v.think = ( func_t ) tfgoalitem_remove;
+            }
+            flagcount = flagcount + 1;
+        }
 	}
 	if ( flagcount != 2 )
 		G_conprintf( "*****BUG*****\nFlag(s) missing.\nPlease report this.\n" );

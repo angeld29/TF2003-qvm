@@ -1,8 +1,11 @@
+_old/
+.cache/
 src/Makefile.dl
 src/Makefile.vm
 *.asm
 _cmake/
 _build/
+_*/
 _buildout/
 bin/
 VM/

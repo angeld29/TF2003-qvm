@@ -65,10 +65,10 @@ void player_touch(  )
 				if ( other->playerclass != PC_MEDIC )
 				{
 					if ( !
-					     ( ( teamplay & 16 )
+					     ( ( teamplay & TEAMPLAY_NOEXPLOSIVE )
+                           && PROG_TO_EDICT( self->s.v.owner )->team_no
 					       && PROG_TO_EDICT( self->s.v.owner )->team_no ==
-					       PROG_TO_EDICT( self->s.v.enemy )->team_no
-					       && PROG_TO_EDICT( self->s.v.owner )->team_no ) )
+					       PROG_TO_EDICT( self->s.v.enemy )->team_no) )
 					{
 						found = 0;
 						te = trap_find( world, FOFS( s.v.classname ), "timer" );
@@ -96,8 +96,7 @@ void player_touch(  )
 						Bio->s.v.enemy = te->s.v.enemy;
 						other->tfstate = other->tfstate | TFSTATE_INFECTED;
 						other->infection_team_no = self->infection_team_no;
-						G_sprint( other, 1, "You have been infected by %s!\n",
-							  self->s.v.netname );
+						G_sprint( other, 1, "You have been infected by %s!\n", self->s.v.netname );
 						G_sprint( self, 1, "You have infected %s!\n", other->s.v.netname );
 					}
 				}
@@ -179,61 +178,6 @@ void player_shot( int start )
 	self->s.v.weaponframe = 1;
 	muzzleflash(  );
 }
-/*
-void player_shot1(  )
-{
-	self->s.v.frame = 113;
-	self->s.v.think = ( func_t ) player_shot2;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-
-	self->s.v.weaponframe = 1;
-	muzzleflash(  );
-}
-
-void player_shot2(  )
-{
-	self->s.v.frame = 114;
-	self->s.v.think = ( func_t ) player_shot3;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-
-	self->s.v.weaponframe = 2;
-}
-
-void player_shot3(  )
-{
-	self->s.v.frame = 115;
-	self->s.v.think = ( func_t ) player_shot4;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-
-	self->s.v.weaponframe = 3;
-}
-
-void player_shot4(  )
-{
-	self->s.v.frame = 116;
-	self->s.v.think = ( func_t ) player_shot5;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-
-	self->s.v.weaponframe = 4;
-}
-
-void player_shot5(  )
-{
-	self->s.v.frame = 117;
-	self->s.v.think = ( func_t ) player_shot6;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-
-	self->s.v.weaponframe = 5;
-}
-
-void player_shot6(  )
-{
-	self->s.v.frame = 118;
-	self->s.v.think = ( func_t ) player_run;
-	self->s.v.nextthink = g_globalvars.time + 0.1;
-
-	self->s.v.weaponframe = 6;
-}*/
 
 void player_autorifle1(  )
 {
@@ -1009,7 +953,6 @@ void PlayerSetDieFrames(int isdead)
         player_die(41, 49, isdead ? PlayerDead: NULL);
 		return;
 	}
-	//i = 1 + (int)( g_random(  ) * 6 );
 	switch((int)( g_random(  ) * 5 ))
 	{
 		case 0:

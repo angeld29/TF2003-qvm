@@ -959,6 +959,12 @@ void TF_SpawnPlayer( gedict_t * self )
         self->s.v.modelindex = modelindex_player;
     }
 
+    if ( !self->playerclass )
+    {
+        self->s.v.modelindex = modelindex_null;
+        self->current_menu = MENU_DEFAULT;
+    }
+
     setsize( self, PASSVEC3( VEC_HULL_MIN ), PASSVEC3( VEC_HULL_MAX ) );
     SetVector( self->s.v.view_ofs, 0, 0, 22 );
     SetVector( self->s.v.velocity, 0, 0, 0 );
@@ -1384,7 +1390,7 @@ void PlayerPreThink()
 static gedict_t* findGlowGoal( gedict_t* self )
 {
     gedict_t* te = world;
-    for(; (te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" ));)
+    for(; (te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" ));)
     {
         if ( te->s.v.owner == EDICT_TO_PROG( self ) )
         {

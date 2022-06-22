@@ -180,11 +180,22 @@ void Build_Chain(  )
 //                  so that setorigin doesn't stick them into a wall. I tried
 //                  to compare pointcontents, but that was too flaky.
 //
+
+static int checkDir( gedict_t* owner, const vec3_t v, int sign)
+{
+    traceline(
+            owner->s.v.origin[0]        + sign * v[0] * 16,
+            owner->s.v.origin[1]        + sign * v[1] * 16,
+            owner->s.v.origin[2] - 24   + sign * v[2] * 16,
+            owner->s.v.origin[0]        + sign * v[0] * 16,
+            owner->s.v.origin[1]        + sign * v[1] * 16,
+            owner->s.v.origin[2] - 24   + sign * v[2] * 16 + 58,
+            0, owner);
+    return g_globalvars.trace_fraction;
+}
+
 int Check_Overhead(  )
 {
-	vec3_t  src;
-	vec3_t  end;
-	vec3_t  tmp;
 	gedict_t *owner = PROG_TO_EDICT( self->s.v.owner );
 
 	trap_makevectors( owner->s.v.angles );
@@ -195,62 +206,20 @@ int Check_Overhead(  )
         // decide if it's worth it.
 
         // quick check right above head
-	VectorCopy( owner->s.v.origin, src );
-	VectorCopy( owner->s.v.origin, end );
-	src[2] -= 24;
-	end[2] -= 24;
+    if( checkDir( owner, VEC_ORIGIN, 0) != 0 )
+        return 0;
 
-	traceline( PASSVEC3( src ), PASSVEC3( end ), 0, owner );
-	if ( g_globalvars.trace_fraction != 1 )
-		return 0;
+    if( checkDir( owner, g_globalvars.v_forward, -1) != 0 )
+        return 0;
 
-	VectorCopy( owner->s.v.origin, src );
-	VectorCopy( owner->s.v.origin, end );
-	src[2] -= 24;
-	end[2] -= 24;
-	VectorScale( g_globalvars.v_forward, 16, tmp );
-	VectorSubtract( src, tmp, src );
-	VectorCopy( src, end );
-	end[2] += 58;
-	traceline( PASSVEC3( src ), PASSVEC3( end ), 0, owner );
-	if ( g_globalvars.trace_fraction != 1 )
-		return 0;
+    if( checkDir( owner, g_globalvars.v_forward, 1) != 0 )
+        return 0;
 
-	VectorCopy( owner->s.v.origin, src );
-	VectorCopy( owner->s.v.origin, end );
-	src[2] -= 24;
-	end[2] -= 24;
-	VectorScale( g_globalvars.v_forward, 16, tmp );
-	VectorAdd( src, tmp, src );
-	VectorCopy( src, end );
-	end[2] += 58;
-	traceline( PASSVEC3( src ), PASSVEC3( end ), 0, owner );
-	if ( g_globalvars.trace_fraction != 1 )
-		return 0;
+    if( checkDir( owner, g_globalvars.v_right, -1) != 0 )
+        return 0;
 
-	VectorCopy( owner->s.v.origin, src );
-	VectorCopy( owner->s.v.origin, end );
-	src[2] -= 24;
-	end[2] -= 24;
-	VectorScale( g_globalvars.v_right, 16, tmp );
-	VectorSubtract( src, tmp, src );
-	VectorCopy( src, end );
-	end[2] += 58;
-	traceline( PASSVEC3( src ), PASSVEC3( end ), 0, owner );
-	if ( g_globalvars.trace_fraction != 1 )
-		return 0;
-
-	VectorCopy( owner->s.v.origin, src );
-	VectorCopy( owner->s.v.origin, end );
-	src[2] -= 24;
-	end[2] -= 24;
-	VectorScale( g_globalvars.v_right, 16, tmp );
-	VectorAdd( src, tmp, src );
-	VectorCopy( src, end );
-	end[2] += 58;
-	traceline( PASSVEC3( src ), PASSVEC3( end ), 0, owner );
-	if ( g_globalvars.trace_fraction != 1 )
-		return 0;
+    if( checkDir( owner, g_globalvars.v_right, 1) != 0 )
+        return 0;
 
 	return 1;
 }
