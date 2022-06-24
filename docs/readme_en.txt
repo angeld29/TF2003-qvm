@@ -386,6 +386,8 @@ Common:
       128 - "showclasses" does NOT display spy skin info.
       256 - "showclasses" displays detpack info.
       512 - "showclasses" displays sentry gun info.
+      1024 - take screen shot at match end
+      2048 - play count.wav on grenade prime
       // In order to save space in setinfo buffer.
 [new] Customizable discard: 
       "setinfo mxs <to keep>" or "setinfo 1 <to keep>"

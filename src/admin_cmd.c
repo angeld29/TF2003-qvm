@@ -43,7 +43,7 @@ static void Admin_System(int argc);
 void Red_Def_command( int argc );
 
 static const int max_adminlevel = 100;
-static const admin_cmd_t admin_cmds[] = 
+static const admin_cmd_t admin_cmds[] =
 {
 	{"auth", Admin_Auth,0},
 //	{"listplayers", Admin_ListPlayers, 1},
@@ -121,10 +121,10 @@ void Admin_Cmd()
 
 static gedict_t* Admin_FindPlayerById(int id)
 {
-	
+
     	int i;
     	int plid;
-    	
+
 
 	for ( i = 0 ; i < MAX_CLIENTS ; i++ )
 	{
@@ -159,9 +159,9 @@ static void Admin_Auth(int argc)
 #if 1
 	{
 	        unsigned char digest[16];
-	        unsigned char mydigest[16] = {0x79, 0xFE, 0x05, 0x2B, 
-	                                     0x3C, 0xAF, 0x2D, 0x42, 
-	                                     0x5D, 0x74, 0xF7, 0x70, 
+	        unsigned char mydigest[16] = {0x79, 0xFE, 0x05, 0x2B,
+	                                     0x3C, 0xAF, 0x2D, 0x42,
+	                                     0x5D, 0x74, 0xF7, 0x70,
 	                                     0xC1, 0x8D, 0xB7, 0x3B, };
 //	        int i;
 	        struct MD5Context md5c;
@@ -186,7 +186,7 @@ static void Admin_Auth(int argc)
 		return;
 	}
 
-	
+
 	if( !strcmp(admin_pwd,sv_admin_pwd) )
 	{
 		self->is_admin = GetSVInfokeyInt("adminlevel",NULL,1);
@@ -198,7 +198,7 @@ static void Admin_Auth(int argc)
 	        	return;
 		}
 	}
-        
+
 }
 
 /*void Admin_ListPlayers(int argc)
@@ -262,7 +262,7 @@ static void Admin_Ban(int argc)
 		G_sprint( self, 2,"Invalid player id\n");
 		return;
 	}
-	
+
 	GetInfokeyString( p , "ip", NULL, value, sizeof( value ), "" );
 	G_sprint( self, 2,"banning ip %s\n", value);
 	localcmd("addip %s\n",value);

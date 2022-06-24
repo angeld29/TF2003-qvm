@@ -40,22 +40,21 @@
     _SET_LAST,
 } cl_setting_id_t;*/
 
-typedef enum
-{
-    CS_T_BOOL,
-    CS_T_INT,
-}cl_settings_type_t;
+typedef enum {
+  CS_T_BOOL,
+  CS_T_INT,
+} cl_settings_type_t;
 
-typedef struct cl_settings_s{
-    const char* key;
-    const char* key2;
-    const char* name;
-    const char* desc;
-    //cl_setting_id_t id;
-    cl_settings_type_t type;
-    int bit;
-    int defval;
-}cl_settings_t;
+typedef struct cl_settings_s {
+  const char *key;
+  const char *key2;
+  const char *name;
+  const char *desc;
+  // cl_setting_id_t id;
+  cl_settings_type_t type;
+  int bit;
+  int defval;
+} cl_settings_t;
 
 static const cl_settings_t cl_set[] = {
     {"sb",         NULL, "HWGuy shells backup",      "",     CS_T_INT, FOFS( assault_min_shells ), DEFAULT_ASSAULT_MIN_SHELLS, },
@@ -74,143 +73,136 @@ static const cl_settings_t cl_set[] = {
     {"grensound",  NULL, "Play sound on grenade prime",        "",  CS_T_BOOL,  TF_INTERNAL_GRENSOUND, 0, },
 };
 
-#define CL_SET_NUM  sizeof(cl_set)/sizeof(cl_set[0])
+#define CL_SET_NUM sizeof(cl_set) / sizeof(cl_set[0])
 
-typedef struct cl_set_map_s{
-    const char* key;
-    int idx;
-}cl_set_map_t;
+typedef struct cl_set_map_s {
+  const char *key;
+  int idx;
+} cl_set_map_t;
 
-int comp (const void *i, const void *j)
-{
-    return strcmp(((cl_set_map_t*)(i))->key, ((cl_set_map_t*)(j))->key);
+int comp(const void *i, const void *j) { return strcmp(((cl_set_map_t *)(i))->key, ((cl_set_map_t *)(j))->key); }
+
+static const cl_settings_t *get_set_info(const char *key) {
+  static cl_set_map_t key_map[CL_SET_NUM * 2];
+  cl_set_map_t *f = NULL;
+  static int num_set = 0;
+  cl_set_map_t key_s;
+  key_s.key = key;
+  if (!num_set) {
+    int i;
+    for (i = 0; i < CL_SET_NUM; i++) {
+      key_map[num_set].key = cl_set[i].key;
+      key_map[num_set++].idx = i;
+      if (cl_set[i].key2) {
+        key_map[num_set].key = cl_set[i].key2;
+        key_map[num_set++].idx = i;
+      }
+    }
+    qsort(key_map, num_set, sizeof(key_map[0]), comp);
+  }
+  if (!key)
+    return NULL;
+  f = bsearch(&key_s, key_map, num_set, sizeof(key_map[0]), comp);
+
+  if (!f)
+    return NULL;
+  return &cl_set[f->idx];
 }
 
-static const cl_settings_t* get_set_info( const char* key )
-{
-    static cl_set_map_t key_map[CL_SET_NUM * 2];
-    cl_set_map_t* f = NULL;
-    static int num_set = 0;
-    cl_set_map_t key_s;
-    key_s.key = key;
-    if( !num_set ){
-        int i;
-        for( i = 0; i < CL_SET_NUM; i++){
-            key_map[num_set].key = cl_set[i].key;
-            key_map[num_set++].idx = i;
-            if( cl_set[i].key2 ){
-                key_map[num_set].key = cl_set[i].key2;
-                key_map[num_set++].idx = i;
-            }
-        }
-        qsort(key_map, num_set, sizeof(key_map[0]), comp);
-    }
-    if( !key ) return NULL;
-    f = bsearch(&key_s, key_map, num_set, sizeof(key_map[0]), comp);
+void PrintClientSettingNew(gedict_t *p, const char *key) {
 
-    if(!f) return NULL;
-    return &cl_set[f->idx];
+  const cl_settings_t *s;
+  int val;
+
+  if (!key)
+    return;
+  s = get_set_info(key);
+  if (!s) {
+    G_sprint(p, 2, "Key '%s' not found\n", key);
+    return;
+  }
+  G_sprint(p, 2, "%s: ", s->name);
+  if (s->type == CS_T_INT) {
+    int val = *(int *)((byte *)p + s->bit);
+    G_sprint(p, PRINT_CHAT, "%d\n", val);
+  } else {
+    G_sprint(p, PRINT_CHAT, p->settings_bits & s->bit ? "On\n" : "Off\n");
+  }
+}
+qboolean SetClientSetting(gedict_t *p, const char *key, const char *value) {
+  const cl_settings_t *s;
+  int val;
+
+  s = get_set_info(key);
+  if (!s)
+    return 0;
+
+  if (!value || !value[0])
+    val = s->defval;
+  else
+    val = atoi(value);
+
+  if (s->type == CS_T_INT) {
+    *(int *)((byte *)p + s->bit) = val;
+  } else {
+    if (streq(value, "on")) {
+      p->settings_bits |= s->bit;
+    } else {
+      if (streq(value, "off")) {
+        p->settings_bits -= p->settings_bits & s->bit;
+      } else {
+        if (val)
+          p->settings_bits |= s->bit;
+        else
+          p->settings_bits -= p->settings_bits & s->bit;
+      }
+    }
+  }
+  p->StatusRefreshTime = g_globalvars.time + 0.2;
+  return 1;
 }
 
-void PrintClientSettingNew( gedict_t * p, const char* key)
-{
+void Client_Set_Cmd() {
+  char key[20];
+  char value[20];
+  int argc;
 
-    const cl_settings_t *s;
-    int val;
-
-    if( !key ) return;
-    s = get_set_info(key);
-    if( !s ){
-        G_sprint( p, 2, "Key '%s' not found\n", key );
-        return;
+  argc = trap_CmdArgc();
+  if (argc < 2) {
+    int i;
+    G_sprint(self, 2, "Player settings\n");
+    for (i = 0; i < CL_SET_NUM; i++) {
+      G_sprint(self, 2, "%s: ", cl_set[i].key);
+      PrintClientSettingNew(self, cl_set[i].key);
     }
-    G_sprint( p, 2, "%s: ", s->name );
-    if( s->type == CS_T_INT ){
-        int val = *(int*)((byte*)p + s->bit);
-        G_sprint( p, PRINT_CHAT, "%d\n", val );
-    }else{
-        G_sprint( p, PRINT_CHAT, p->settings_bits & s->bit ? "On\n":"Off\n" );
-    }
-
-
-}
-qboolean SetClientSetting( gedict_t * p, const char *key, const char *value )
-{
-    const cl_settings_t *s;
-    int val;
-
-    s = get_set_info(key);
-    if( !s ) return 0;
-
-    if( !value ||!value[0] ) val = s->defval;
-    else val = atoi(value);
-
-    if( s->type == CS_T_INT ){
-        *(int*)((byte*)p + s->bit) = val;
-    }else{
-        if( streq( value, "on" )){
-            p->settings_bits |= s->bit;
-        }else{
-            if( streq( value, "off" )){
-                p->settings_bits -= p->settings_bits & s->bit;
-            }else{
-                if( val )
-                    p->settings_bits |= s->bit;
-                else
-                    p->settings_bits -= p->settings_bits & s->bit;
-            }
-        }
-    }
-    p->StatusRefreshTime = g_globalvars.time + 0.2;
-    return 1;
-}
-
-void   Client_Set_Cmd(  )
-{
-    char    key[20];
-    char    value[20];
-    int argc;
-
-
-    argc = trap_CmdArgc();
-    if(argc < 2)
-    {
-        int i;
-        G_sprint( self, 2, "Player settings\n" );
-        for( i = 0; i < CL_SET_NUM; i++){
-            G_sprint( self, 2, "%s: ", cl_set[i].key );
-            PrintClientSettingNew( self, cl_set[i].key );
-        }
-        return;
-    }
-    trap_CmdArgv( 1, key, sizeof( key ) );
-    Q_strlwr( key );
-    if(argc < 3)
-    {
-        PrintClientSettingNew( self, key);
-        return;
-    }
-    trap_CmdArgv( 2, value, sizeof( value ) );
-    if( SetClientSetting( self, key, value) )
-        PrintClientSettingNew( self, key);
+    return;
+  }
+  trap_CmdArgv(1, key, sizeof(key));
+  Q_strlwr(key);
+  if (argc < 3) {
+    PrintClientSettingNew(self, key);
+    return;
+  }
+  trap_CmdArgv(2, value, sizeof(value));
+  if (SetClientSetting(self, key, value))
+    PrintClientSettingNew(self, key);
 }
 //=======================
-void ParseUserInfo()
-{
-    char    value[100];
-    int i;
-    self->assault_min_shells = DEFAULT_ASSAULT_MIN_SHELLS;
-    self->StatusBarRes = 0;
-    self->StatusBarSize = 0;
-    self->discard_shells = -1;
-    self->discard_nails = -1;
-    self->discard_rockets = -1;
-    self->discard_cells = -1;
-    self->settings_bits = TF_CLASS_HELP_MASK | TF_AUTOID_MASK | TF_INTERNAL_GRENSOUND;
-    self->internal_settings_bits = 0;
-    self->take_sshot = 0;
-    for(i = 0; i < CL_SET_NUM; i++){
-        if( GetInfokeyString( self, cl_set[i].key, cl_set[i].key2, value, sizeof( value ), NULL))
-            SetClientSetting( self, cl_set[i].key, value);
-    }
+void ParseUserInfo() {
+  char value[100];
+  int i;
+  self->assault_min_shells = DEFAULT_ASSAULT_MIN_SHELLS;
+  self->StatusBarRes = 0;
+  self->StatusBarSize = 0;
+  self->discard_shells = -1;
+  self->discard_nails = -1;
+  self->discard_rockets = -1;
+  self->discard_cells = -1;
+  self->settings_bits = TF_CLASS_HELP_MASK | TF_AUTOID_MASK | TF_INTERNAL_GRENSOUND;
+  self->internal_settings_bits = 0;
+  self->take_sshot = 0;
+  for (i = 0; i < CL_SET_NUM; i++) {
+    if (GetInfokeyString(self, cl_set[i].key, cl_set[i].key2, value, sizeof(value), NULL))
+      SetClientSetting(self, cl_set[i].key, value);
+  }
 }

@@ -266,12 +266,12 @@ int Vote_Admin_Init()
 
 void Vote_Admin_Run()
 {
-	int 		f1, needed_votes;
+  int 		f1, needed_votes;
 
-    G_bprint(2,  "%s "  _g _a _i _n " " _a _d _m _i _n " " _r _i _g _h _t _s "!\n", elect_player->s.v.netname);
-    G_sprint(elect_player, 2, "Type " _c _m _d " " _a _d _m _i _n " for admin commands.\n");
-	elect_level  = GetSVInfokeyInt(  "electlevel", NULL, 1 );
-    elect_player->is_admin = elect_level;
+  G_bprint(2,  "%s "  _g _a _i _n " " _a _d _m _i _n " " _r _i _g _h _t _s "!\n", elect_player->s.v.netname);
+  G_sprint(elect_player, 2, "Type " _c _m _d " " _a _d _m _i _n " for admin commands.\n");
+  elect_level  = GetSVInfokeyInt(  "electlevel", NULL, 1 );
+  elect_player->is_admin = elect_level;
 }
 
 void Vote_Cmd()
