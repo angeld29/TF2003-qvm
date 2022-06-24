@@ -62,10 +62,10 @@ void TeamFortress_MOTD(  )
         if ( self->got_aliases == 1 )
             return;
         G_sprint( self, 2, "binding aliases...\n" );
-        TeamFortress_Alias( "inv", 135, 0 );
-        TeamFortress_Alias( "showtf", 136, 0 );
-        TeamFortress_Alias( "autozoom", 174, 0 );
-        TeamFortress_Alias( "changeclass", 99, 0 );
+        TeamFortress_Alias( "inv", TF_INVENTORY, 0 );
+        TeamFortress_Alias( "showtf", TF_SHOWTF, 0 );
+        TeamFortress_Alias( "autozoom", TF_AUTOZOOM, 0 );
+        TeamFortress_Alias( "changeclass", TF_CHANGEPC_MENU, 0 );
         TeamFortress_Alias( "scout", TF_CHANGEPC + PC_SCOUT, 0 );
         TeamFortress_Alias( "sniper", TF_CHANGEPC + PC_SNIPER, 0 );
         TeamFortress_Alias( "soldier", TF_CHANGEPC + PC_SOLDIER, 0 );
@@ -76,24 +76,24 @@ void TeamFortress_MOTD(  )
         TeamFortress_Alias( "spy", TF_CHANGEPC + PC_SPY, 0 );
         TeamFortress_Alias( "engineer", TF_CHANGEPC + PC_ENGINEER, 0 );
         TeamFortress_Alias( "randompc", TF_CHANGEPC + PC_RANDOM, 0 );
-        TeamFortress_Alias( "is_aliased", 13, 0 );
+        TeamFortress_Alias( "is_aliased", TF_ALIAS_CHECK, 0 );
         return;
     }
     if ( self->motd <= 95 )
         self->motd += 1;
     if ( self->motd == 25 )
     {
-        TeamFortress_Alias( "detpipe", 170, 0 );
-        TeamFortress_Alias( "reload", 173, 0 );
+        TeamFortress_Alias( "detpipe", TF_PB_DETONATE, 0 );
+        TeamFortress_Alias( "reload", TF_RELOAD, 0 );
         TeamFortress_Alias("weapnext", TF_WEAPNEXT, 0);
         TeamFortress_Alias("weapprev", TF_WEAPPREV, 0);
         TeamFortress_Alias("weaplast", TF_WEAPLAST, 0);
-        TeamFortress_Alias( "scan10", 162, 0 );
-        TeamFortress_Alias( "scan30", 163, 0 );
-        TeamFortress_Alias( "scan50", 164, 0 );
-        TeamFortress_Alias( "scan100", 164, 0 );
-        TeamFortress_Alias( "scanf", 161, 0 );
-        TeamFortress_Alias( "scane", 160, 0 );
+        TeamFortress_Alias( "scan10", TF_SCAN_10, 0 );
+        TeamFortress_Alias( "scan30", TF_SCAN_30, 0 );
+        TeamFortress_Alias( "scan50", TF_SCAN_100, 0 );
+        TeamFortress_Alias( "scan100", TF_SCAN_100, 0 );
+        TeamFortress_Alias( "scanf", TF_SCAN_FRIENDLY, 0 );
+        TeamFortress_Alias( "scane", TF_SCAN_ENEMY, 0 );
         TeamFortress_Alias( "autoscan", AUTOSCAN_IMPULSE, 0 );
         TeamFortress_Alias("scanf_off", TF_SCAN, TF_POST_SCANF_OFF);
         TeamFortress_Alias("scanf_on" , TF_SCAN, TF_POST_SCANF_ON );
@@ -105,62 +105,62 @@ void TeamFortress_MOTD(  )
     }
     if ( self->motd == 35 )
     {
-        TeamFortress_Alias( "primeone", 150, 0 );
-        TeamFortress_Alias( "primetwo", 151, 0 );
-        TeamFortress_Alias( "throwgren", 152, 0 );
-        TeamFortress_Alias( "+gren1", 150, 0 );
-        TeamFortress_Alias( "+gren2", 151, 0 );
-        TeamFortress_Alias( "-gren1", 152, 0 );
-        TeamFortress_Alias( "-gren2", 152, 0 );
-        TeamFortress_Alias( "showscores", 145, 0 );
-        TeamFortress_Alias( "showclasses", 144, 0 );
-        TeamFortress_Alias( "query", 119, 0 );
+        TeamFortress_Alias( "primeone", TF_GRENADE_1, 0 );
+        TeamFortress_Alias( "primetwo", TF_GRENADE_2, 0 );
+        TeamFortress_Alias( "throwgren", TF_GRENADE_T, 0 );
+        TeamFortress_Alias( "+gren1", TF_GRENADE_1, 0 );
+        TeamFortress_Alias( "+gren2", TF_GRENADE_2, 0 );
+        TeamFortress_Alias( "-gren1", TF_GRENADE_T, 0 );
+        TeamFortress_Alias( "-gren2", TF_GRENADE_T, 0 );
+        TeamFortress_Alias( "showscores", TF_TEAM_SCORES, 0 );
+        TeamFortress_Alias( "showclasses", TF_TEAM_CLASSES, 0 );
+        TeamFortress_Alias( "query", TF_STATUS_QUERY, 0 );
         return;
     }
     if ( self->motd == 45 )
     {
-        TeamFortress_Alias( "dropkey", 175, 0 );
-        TeamFortress_Alias( "dropammo", 172, 0 );
-        TeamFortress_Alias( "dropitems", 194, 0 );
-        TeamFortress_Alias( "showloc", 118, 0 );
-        TeamFortress_Alias( "special", 171, 0 );
-        TeamFortress_Alias( "saveme", 181, 0 );
-        TeamFortress_Alias( "discard", 184, 0 );
-        TeamFortress_Alias( "id", 185, 0 );
+        TeamFortress_Alias( "dropkey", TF_DROPKEY, 0 );
+        TeamFortress_Alias( "dropammo", TF_DROP_AMMO, 0 );
+        TeamFortress_Alias( "dropitems", TF_DROPGOAL, 0 );
+        TeamFortress_Alias( "showloc", TF_DISPLAYLOCATION, 0 );
+        TeamFortress_Alias( "special", TF_SPECIAL_SKILL, 0 );
+        TeamFortress_Alias( "saveme", TF_MEDIC_HELPME, 0 );
+        TeamFortress_Alias( "discard", TF_DISCARD, 0 );
+        TeamFortress_Alias( "id", TF_ID, 0 );
         return;
     }
     if ( self->motd == 55 )
     {
-        TeamFortress_Alias( "flaginfo", 23, 0 );
-        TeamFortress_Alias( "maphelp", 131, 0 );
-        TeamFortress_Alias( "showids", 186, 0 );
+        TeamFortress_Alias( "flaginfo", TF_FLAG_INFO, 0 );
+        TeamFortress_Alias( "maphelp", TF_HELP_MAP, 0 );
+        TeamFortress_Alias( "showids", TF_SHOWIDS, 0 );
         stuffcmd( self, "bind 9 \"impulse 9\"\n" );
         stuffcmd( self, "bind 0 \"impulse 10\"\n" );
         return;
     }
     if ( self->motd == 65 )
     {
-        TeamFortress_Alias( "sbar_on", 182, 0 );
-        TeamFortress_Alias( "sbar_off", 183, 0 );
-        TeamFortress_Alias( "sbar_200", 71, 0 );
-        TeamFortress_Alias( "sbar_240", 71 + 1, 0 );
-        TeamFortress_Alias( "sbar_300", 71 + 2, 0 );
-        TeamFortress_Alias( "sbar_350", 71 + 3, 0 );
-        TeamFortress_Alias( "sbar_384", 71 + 4, 0 );
-        TeamFortress_Alias( "sbar_400", 71 + 5, 0 );
-        TeamFortress_Alias( "sbar_480", 71 + 6, 0 );
-        TeamFortress_Alias( "sbar_600", 71 + 7, 0 );
-        TeamFortress_Alias( "sbar_768", 71 + 8, 0 );
+        TeamFortress_Alias( "sbar_on", TF_STATUSBAR_ON, 0 );
+        TeamFortress_Alias( "sbar_off", TF_STATUSBAR_OFF, 0 );
+        TeamFortress_Alias( "sbar_200", TF_STATUSBAR_RES_START, 0 );
+        TeamFortress_Alias( "sbar_240", TF_STATUSBAR_RES_START + 1, 0 );
+        TeamFortress_Alias( "sbar_300", TF_STATUSBAR_RES_START + 2, 0 );
+        TeamFortress_Alias( "sbar_350", TF_STATUSBAR_RES_START + 3, 0 );
+        TeamFortress_Alias( "sbar_384", TF_STATUSBAR_RES_START + 4, 0 );
+        TeamFortress_Alias( "sbar_400", TF_STATUSBAR_RES_START + 5, 0 );
+        TeamFortress_Alias( "sbar_480", TF_STATUSBAR_RES_START + 6, 0 );
+        TeamFortress_Alias( "sbar_600", TF_STATUSBAR_RES_START + 7, 0 );
+        TeamFortress_Alias( "sbar_768", TF_STATUSBAR_RES_START + 8, 0 );
         return;
     }
     if ( self->motd == 75 )
     {
-        TeamFortress_Alias( "+det5", 165, 0 );
-        TeamFortress_Alias( "-det5", 169, 0 );
-        TeamFortress_Alias( "+det20", 166, 0 );
-        TeamFortress_Alias( "-det20", 169, 0 );
-        TeamFortress_Alias( "+det50", 167, 0 );
-        TeamFortress_Alias( "-det50", 169, 0 );
+        TeamFortress_Alias( "+det5", TF_DETPACK_5, 0 );
+        TeamFortress_Alias( "-det5", TF_DETPACK_STOP, 0 );
+        TeamFortress_Alias( "+det20", TF_DETPACK_20, 0 );
+        TeamFortress_Alias( "-det20", TF_DETPACK_STOP, 0 );
+        TeamFortress_Alias( "+det50", TF_DETPACK_50, 0 );
+        TeamFortress_Alias( "-det50", TF_DETPACK_STOP, 0 );
         return;
     }
     if ( self->motd == 85 )
@@ -181,12 +181,12 @@ void TeamFortress_MOTD(  )
     }
     if ( self->motd == 95 )
     {
-        TeamFortress_Alias( "disguise", 177, 0 );
-        TeamFortress_Alias( "feign", 178, 0 );
+        TeamFortress_Alias( "disguise", TF_SPY_SPY, 0 );
+        TeamFortress_Alias( "feign", TF_SPY_DIE, 0 );
         TeamFortress_Alias( "sfeign", TF_SPY_SFEIGN_IMPULSE, 0 );
-        TeamFortress_Alias( "build", 179, 0 );
-        TeamFortress_Alias( "detsentry", 188, 0 );
-        TeamFortress_Alias( "detdispenser", 187, 0 );
+        TeamFortress_Alias( "build", TF_ENGINEER_BUILD, 0 );
+        TeamFortress_Alias( "detsentry", TF_ENGINEER_DETSENTRY, 0 );
+        TeamFortress_Alias( "detdispenser", TF_ENGINEER_DETDISP, 0 );
     }
 }
 

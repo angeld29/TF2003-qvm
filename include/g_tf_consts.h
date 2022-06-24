@@ -83,20 +83,20 @@
 
 
 // FortressMap stuff
-#define TEAM1_CIVILIANS 1 
+#define TEAM1_CIVILIANS 1
 #define TEAM2_CIVILIANS 2
-#define TEAM3_CIVILIANS 4 
-#define TEAM4_CIVILIANS 8 
+#define TEAM3_CIVILIANS 4
+#define TEAM4_CIVILIANS 8
 
 // Defines for the playerclass
-#define PC_UNDEFINED 0 
+#define PC_UNDEFINED 0
 
-#define PC_SCOUT  1 
-#define PC_SNIPER  2 
-#define PC_SOLDIER  3 
-#define PC_DEMOMAN  4 
-#define PC_MEDIC  5 
-#define PC_HVYWEAP  6 
+#define PC_SCOUT  1
+#define PC_SNIPER  2
+#define PC_SOLDIER  3
+#define PC_DEMOMAN  4
+#define PC_MEDIC  5
+#define PC_HVYWEAP  6
 #define PC_PYRO   7
 #define PC_SPY   8
 #define PC_ENGINEER  9
@@ -117,7 +117,7 @@
 /* Impulse Defines                           */
 /*==================================================*/
 // Alias check to see whether they already have the aliases
-#define TF_ALIAS_CHECK  13 
+#define TF_ALIAS_CHECK  13
 
 // CTF Support Impulses
 #define TF_HOOK_IMP1  22
@@ -136,7 +136,7 @@
 #define TF_CAM_PROJECTILE_Z  55
 #define TF_CAM_REVANGLE   56
 #define TF_CAM_OFFSET   57
-#define TF_CAM_DROP    58 
+#define TF_CAM_DROP    58
 #define TF_CAM_FADETOBLACK  59
 #define TF_CAM_FADEFROMBLACK 60
 #define TF_CAM_FADETOWHITE  61
@@ -151,18 +151,18 @@
 #define TF_STATUSBAR_RES_START 71
 #define TF_STATUSBAR_RES_END 81
 
-// Added to PC_??? to get impulse to use if this clashes with your 
+// Added to PC_??? to get impulse to use if this clashes with your
 // own impulses, just change this value, not the PC_??
-#define TF_CHANGEPC_MENU   99 
-#define TF_CHANGEPC   100 
+#define TF_CHANGEPC_MENU   99
+#define TF_CHANGEPC   100
 // The next few impulses are all the class selections
-//PC_SCOUT  101 
-//PC_SNIPER  102 
-//PC_SOLDIER 103 
-//PC_DEMOMAN 104 
-//PC_MEDIC  105 
-//PC_HVYWEAP 106 
-//PC_PYRO  107 
+//PC_SCOUT  101
+//PC_SNIPER  102
+//PC_SOLDIER 103
+//PC_DEMOMAN 104
+//PC_MEDIC  105
+//PC_HVYWEAP 106
+//PC_PYRO  107
 //PC_RANDOM  108
 //PC_CIVILIAN 109  // Cannot be used
 //PC_SPY  110
@@ -176,7 +176,7 @@
 
 // Information impulses
 #define TF_INVENTORY  135
-#define TF_SHOWTF   136 
+#define TF_SHOWTF   136
 #define TF_SHOWLEGALCLASSES 137
 
 // Team Impulses
@@ -196,7 +196,7 @@
 // Impulses for new items
 #define TF_SCAN    159  // Scanner Pre-Impulse
 #define TF_SCAN_ENEMY  160  // Impulses to toggle scanning of enemies
-#define TF_SCAN_FRIENDLY 161  // Impulses to toggle scanning of friendlies 
+#define TF_SCAN_FRIENDLY 161  // Impulses to toggle scanning of friendlies
 #define TF_SCAN_10   162  // Scan using 10 enery (1 cell)
 #define TF_SCAN_30   163  // Scan using 30 energy (2 cells)
 #define TF_SCAN_100   164  // Scan using 100 energy (5 cells)
@@ -231,7 +231,7 @@
 #define TF_DROPKEY   175
 #define TF_DROPGOAL   194
 
-// Select Medikit  
+// Select Medikit
 #define TF_MEDIKIT   176
 
 // Spy Impulses
@@ -243,7 +243,7 @@
 #define TF_ENGINEER_BUILD 179
 #define TF_ENGINEER_SANDBAG 180
 
-// Medic!! 
+// Medic!!
 #define TF_MEDIC_HELPME  181
 
 // Status bar
@@ -363,20 +363,20 @@
 /*==================================================*/
 /* New Weapon Related Defines                  */
 /*==================================================*/
-// shots per reload 
-#define RE_SHOTGUN   8 
+// shots per reload
+#define RE_SHOTGUN   8
 #define RE_SUPER_SHOTGUN 16 // 8 shots
-#define RE_GRENADE_LAUNCHER 6 
-#define RE_ROCKET_LAUNCHER 4 
+#define RE_GRENADE_LAUNCHER 6
+#define RE_ROCKET_LAUNCHER 4
 
 // reload times
-#define RE_SHOTGUN_TIME    2 
-#define RE_SUPER_SHOTGUN_TIME  3 
-#define RE_GRENADE_LAUNCHER_TIME 4 
-#define RE_ROCKET_LAUNCHER_TIME  5 
+#define RE_SHOTGUN_TIME    2
+#define RE_SUPER_SHOTGUN_TIME  3
+#define RE_GRENADE_LAUNCHER_TIME 4
+#define RE_ROCKET_LAUNCHER_TIME  5
 
 // Maximum velocity you can move and fire the Sniper Rifle
-#define WEAP_SNIPER_RIFLE_MAX_MOVE 50 
+#define WEAP_SNIPER_RIFLE_MAX_MOVE 50
 
 // Medikit
 #define WEAP_MEDIKIT_HEAL 200  // Amount medikit heals per hit
@@ -388,33 +388,33 @@
 // Detpack
 #define WEAP_DETPACK_DISARMTIME 3    //Time it takes to disarm a Detpack
 #define WEAP_DETPACK_SETTIME  3    // Time it takes to set a Detpack
-#define WEAP_DETPACK_SIZE  1500 
+#define WEAP_DETPACK_SIZE  1500
 #define WEAP_DETPACK_BITS_NO  12   // Bits that detpack explodes into
 
 // Tranquiliser Gun
 #define TRANQ_TIME   15
 
 // Grenades
-#define GR_PRIMETIME  3 
-#define GR_TYPE_NONE  0 
-#define GR_TYPE_NORMAL  1 
-#define GR_TYPE_CONCUSSION 2 
-#define GR_TYPE_NAIL  3 
-#define GR_TYPE_MIRV  4 
-#define GR_TYPE_NAPALM  5 
-#define GR_TYPE_FLARE  6 
+#define GR_PRIMETIME  3
+#define GR_TYPE_NONE  0
+#define GR_TYPE_NORMAL  1
+#define GR_TYPE_CONCUSSION 2
+#define GR_TYPE_NAIL  3
+#define GR_TYPE_MIRV  4
+#define GR_TYPE_NAPALM  5
+#define GR_TYPE_FLARE  6
 #define GR_TYPE_GAS   7
 #define GR_TYPE_EMP   8
 #define GR_TYPE_FLASH  9
 #define GR_TYPE_CALTROPS  10
 
 // Defines for WeaponMode
-#define GL_NORMAL 0 
-#define GL_PIPEBOMB 1 
+#define GL_NORMAL 0
+#define GL_PIPEBOMB 1
 
 // Defines for Concussion Grenade
-//#define GR_CONCUSS_TIME 5 
-//#define GR_CONCUSS_DEC 20 
+//#define GR_CONCUSS_TIME 5
+//#define GR_CONCUSS_DEC 20
 
 // Defines for the Gas Grenade
 //#define GR_HALLU_TIME 0.5
@@ -423,9 +423,9 @@
 /*==================================================*/
 /* New Items                            */
 /*==================================================*/
-#define NIT_SCANNER    1 
+#define NIT_SCANNER    1
 
-#define NIT_SILVER_DOOR_OPENED  IT_KEY1 // 131072 
+#define NIT_SILVER_DOOR_OPENED  IT_KEY1 // 131072
 #define NIT_GOLD_DOOR_OPENED  IT_KEY2 // 262144
 
 /*==================================================*/
@@ -461,7 +461,7 @@
 #define PC_MEDIC_REGEN_TIME   3   // Number of seconds between each regen.
 #define PC_MEDIC_REGEN_AMOUNT  2  // Amount of health regenerated each regen.
 
-#define PC_SPY_CELL_REGEN_TIME  5 
+#define PC_SPY_CELL_REGEN_TIME  5
 #define PC_SPY_CELL_REGEN_AMOUNT 1
 #define PC_SPY_CELL_USAGE   3 // Amount of cells spent while invisible
 #define PC_SPY_GO_UNDERCOVER_TIME 4 // Time it takes to go undercover
@@ -523,9 +523,9 @@
 #define TFSP_REMOVESELF  1  // Remove itself after being spawned on
 
 // Defines for Goal States
-#define TFGS_ACTIVE  1 
-#define TFGS_INACTIVE 2 
-#define TFGS_REMOVED 3 
+#define TFGS_ACTIVE  1
+#define TFGS_INACTIVE 2
+#define TFGS_REMOVED 3
 #define TFGS_DELAYED 4
 
 
@@ -540,7 +540,7 @@
 #define TF_ILL_RANDOMPC  128
 #define TF_ILL_SPY   256
 #define TF_ILL_ENGINEER  512
-    
+
 /*==========================================================================*/
 /* Flamethrower                */
 /*==========================================================================*/
@@ -548,7 +548,7 @@
 #define FLAME_MAXBURNTIME 8   // lifetime in seconds of a flame on the world (big ones)
 #define NAPALM_MAXBURNTIME 20  // lifetime in seconds of flame from a napalm grenade
 #define FLAME_MAXPLYRFLAMES 4  // maximum number of flames on a player
-#define FLAME_NUMLIGHTS  1  // maximum number of light flame 
+#define FLAME_NUMLIGHTS  1  // maximum number of light flame
 #define FLAME_BURNRATIO  0.3 // the chance of a flame not 'sticking'
 #define GR_TYPE_FLAMES_NO 15  // number of flames spawned when a grenade explode
 
@@ -622,8 +622,8 @@
 									// In a map. Cannot be toggled by players.
 //#define TFLAG_SPYINVIS		512		// Spy invisible only
 //#define TFLAG_GRAPPLE		1024	// Grapple on/off
-#define TFLAG_FULLTEAMSCORE	2048		
-#define TFLAG_FLAG_EMULATION	4096		
+#define TFLAG_FULLTEAMSCORE	2048
+#define TFLAG_FLAG_EMULATION	4096
 #define TFLAG_USE_WAR_STD	8192
 
 
@@ -658,9 +658,9 @@
 #define TF_TAKE_SSHOT_MASK  1 << 10
 
 
-#define DG_TYPE_NORMAL  2 
-#define DG_TYPE_CONCUSSION 4 
-#define DG_TYPE_NAIL  8 
+#define DG_TYPE_NORMAL  2
+#define DG_TYPE_CONCUSSION 4
+#define DG_TYPE_NAIL  8
 #define DG_TYPE_MIRV  16
 #define DG_TYPE_NAPALM  32
 #define DG_TYPE_FLARE  64
@@ -670,8 +670,8 @@
 #define DG_TYPE_CALTROPS  1024
 #define DG_TYPE_DETPACK  2048
 
-#define BP_GREN  1  
-#define BP_GREN_BYTYPE  2  
+#define BP_GREN  1
+#define BP_GREN_BYTYPE  2
 #define BP_TYPE_ARMOR  4
 #define BP_TYPE_HEALTH  8
 #define BP_TYPE_DETPACK  16
@@ -701,7 +701,7 @@
 #define GAS_MASK_NEWGREN_TIMES   256
 #define GAS_MASK_NEWGREN_DMG     512
 
-#define GAS_OLG_GREN GAS_MASK_PALETTE 
+#define GAS_OLG_GREN GAS_MASK_PALETTE
 //16
 #define GAS_NEW_GREN (GAS_MASK_NEWGREN_EFFECTS | GAS_MASK_NEWGREN_TIMES | GAS_MASK_NEWGREN_DMG)
 //800
