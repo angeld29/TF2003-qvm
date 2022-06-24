@@ -337,7 +337,7 @@
 /*==================================================*/
 
 #define WEAP_HOOK    1
-#define WEAP_BIOWEAPON   2
+//#define WEAP_BIOWEAPON   2
 #define WEAP_MEDIKIT   4
 #define WEAP_SPANNER   8
 #define WEAP_AXE    16

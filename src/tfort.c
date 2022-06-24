@@ -135,7 +135,7 @@ static const class_settings_t class_set[] = {
 	{
 	 16,			//bitmask
 	 90, 320, 320,		//maxhelth ,speeds
-	 /*WEAP_BIOWEAPON | */WEAP_MEDIKIT | WEAP_SHOTGUN | WEAP_SUPER_SHOTGUN | WEAP_SUPER_NAILGUN,
+	 WEAP_MEDIKIT | WEAP_SHOTGUN | WEAP_SUPER_SHOTGUN | WEAP_SUPER_NAILGUN,
 	 WEAP_SUPER_NAILGUN,	//weapon: carried, start
 	 50, 50, 0, 0, 0, 50,	// ammo
 	 75, 150, 25, 50, 0, 100,	//maxammo
@@ -145,7 +145,7 @@ static const class_settings_t class_set[] = {
 	 0, 0,			//tf_items,tf_items_flags
 	 0, 50, 100,		//AC, val,max
 	 0.3, 0.6,		//AT ,Aallow
-	 /*WEAP_BIOWEAPON | */WEAP_MEDIKIT | WEAP_SHOTGUN | WEAP_SUPER_SHOTGUN | WEAP_SUPER_NAILGUN,	//items allowed
+	 WEAP_MEDIKIT | WEAP_SHOTGUN | WEAP_SUPER_SHOTGUN | WEAP_SUPER_NAILGUN,	//items allowed
 	 IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_SUPER_NAILGUN,	//items
 	 "Combat Medic", "tf_medic", //"tf_medic",
 	 {"sk_t1_medic", "sk_t2_medic", "sk_t3_medic", "sk_t4_medic"}

@@ -39,7 +39,6 @@ typedef struct {
 const weapon_info_t weapons_info[]= {
 {  0 },
 {  WEAP_HOOK             , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.1, "progs/v_grap.mdl", "", "", 0},
-{  WEAP_BIOWEAPON        , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_bio.mdl", "", "weapons/ax1.wav", 0},
 {  WEAP_MEDIKIT          , IT_AXE,              0,          0, FOFS(ammo_medikit),    F_INT,0,0,0,0, 0,0,     0,0, 0.5, "progs/v_bio.mdl"/*progs/v_medi.mdl*/, "", "weapons/ax1.wav", 0},
 {  WEAP_SPANNER          , IT_AXE,              IT_CELLS,   0, FOFS(s.v.ammo_cells),  F_FLOAT,0,0,0,0, 0,0,   0,0, 0.5, "progs/v_span.mdl", "", "weapons/ax1.wav", 0},
 {  WEAP_AXE              , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_axe.mdl", "", "weapons/ax1.wav", 0},
@@ -437,7 +436,7 @@ void W_FireMedikit() {
   }
 }
 
-void W_FireBioweapon() {
+/*void W_FireBioweapon() {
   vec3_t org;
   gedict_t *BioInfection, *trace_ent;
 
@@ -489,7 +488,7 @@ void W_FireBioweapon() {
 
     TempEffectCount(org, TE_GUNSHOT, 3);
   }
-}
+}*/
 
 //============================================================================
 
@@ -1431,206 +1430,6 @@ PLAYER WEAPON USE
 ===============================================================================
 */
 
-/*void W_SetCurrentAmmo_old(  )
-{
-        int     items;
-
-        if ( self->s.v.health <= 0 || !self->current_weapon )
-                return;
-        if ( self->current_weapon == WEAP_ASSAULT_CANNON && ( self->tfstate & TFSTATE_AIMING ) )
-                return;
-        player_run(  );
-        items = self->s.v.items;
-        items -= items & ( IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS );
-        self->s.v.weapon = 0;
-        switch ( self->current_weapon )
-        {
-        case WEAP_AXE:
-                self->s.v.currentammo = 0;
-                if ( self->playerclass == PC_SPY )
-                {
-                        if ( !self->weaponmode )
-                                self->s.v.weaponmodel = "progs/v_knife.mdl";
-                        else
-                                self->s.v.weaponmodel = "progs/v_knife2.mdl";
-                } else
-                        self->s.v.weaponmodel = "progs/v_axe.mdl";
-                self->s.v.weaponframe = 0;
-
-                break;
-        case WEAP_HOOK:
-                self->s.v.currentammo = 0;
-                self->s.v.weaponmodel = "progs/v_grap.mdl";
-                self->s.v.weaponframe = 0;
-                break;
-        case WEAP_SPANNER:
-                self->s.v.currentammo = self->s.v.ammo_cells;
-                self->s.v.weaponmodel = "progs/v_span.mdl";
-                self->s.v.weaponframe = 0;
-                break;
-        case WEAP_SHOTGUN:
-                self->s.v.currentammo = self->s.v.ammo_shells;
-                items |= 2048;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        self->s.v.weaponmodel = "progs/v_shot.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                items |= 256;
-                self->s.v.weapon = 1;
-                break;
-        case WEAP_SUPER_SHOTGUN:
-                self->s.v.currentammo = self->s.v.ammo_shells;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        self->s.v.weaponmodel = "progs/v_shot2.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                items |= 256;
-                self->s.v.weapon = 2;
-                break;
-        case WEAP_NAILGUN:
-                self->s.v.currentammo = self->s.v.ammo_nails;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        self->s.v.weaponmodel = "progs/v_nail.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                items |= 512;
-                self->s.v.weapon = 4;
-                break;
-        case WEAP_SUPER_NAILGUN:
-                self->s.v.currentammo = self->s.v.ammo_nails;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        self->s.v.weaponmodel = "progs/v_nail2.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                items |= 512;
-                self->s.v.weapon = 8;
-                break;
-        case WEAP_GRENADE_LAUNCHER:
-                self->s.v.currentammo = self->s.v.ammo_rockets;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        if ( self->weaponmode == GL_NORMAL )
-                                self->s.v.weaponmodel = "progs/v_rock.mdl";
-                        else
-                                self->s.v.weaponmodel = "progs/v_pipe.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                self->s.v.weapon = 16;
-                items |= 1024;
-                break;
-        case WEAP_ROCKET_LAUNCHER:
-                self->s.v.currentammo = self->s.v.ammo_rockets;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        self->s.v.weaponmodel = "progs/v_rock2.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                items |= 1024;
-                self->s.v.weapon = 32;
-                break;
-        case WEAP_LIGHTNING:
-                self->s.v.currentammo = self->s.v.ammo_cells;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        self->s.v.weaponmodel = "progs/v_light.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                items |= 2048;
-                self->s.v.weapon = 64;
-                break;
-        case WEAP_SNIPER_RIFLE:
-                self->s.v.currentammo = self->s.v.ammo_shells;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        self->s.v.weaponmodel = "progs/v_srifle.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                items |= 256;
-                self->s.v.weapon = 1;
-                break;
-        case WEAP_AUTO_RIFLE:
-                self->s.v.currentammo = self->s.v.ammo_shells;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        self->s.v.weaponmodel = "progs/v_srifle.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                items |= 256;
-                self->s.v.weapon = 2;
-                break;
-        case WEAP_ASSAULT_CANNON:
-                self->s.v.currentammo = self->s.v.ammo_shells;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        self->s.v.weaponmodel = "progs/v_asscan.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                items |= 256;
-                self->s.v.weapon = 32;
-                break;
-        case WEAP_FLAMETHROWER:
-                self->s.v.currentammo = self->s.v.ammo_cells;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        self->s.v.weaponmodel = "progs/v_flame.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                items |= 2048;
-                self->s.v.weapon = 16;
-                break;
-        case WEAP_INCENDIARY:
-                self->s.v.currentammo = self->s.v.ammo_rockets;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        self->s.v.weaponmodel = "progs/v_rock2.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                items |= 1024;
-                self->s.v.weapon = 32;
-                break;
-        case WEAP_MEDIKIT:
-//                 self->s.v.currentammo = 0;
-                self->s.v.currentammo = self->ammo_medikit;
-                self->s.v.weaponmodel = "progs/v_medi.mdl";
-                self->s.v.weaponframe = 0;
-                break;
-        case WEAP_BIOWEAPON:
-                self->s.v.currentammo = 0;
-                self->s.v.weaponmodel = "progs/v_bio.mdl";
-                self->s.v.weaponframe = 0;
-                break;
-        case WEAP_TRANQ:
-                self->s.v.currentammo = self->s.v.ammo_shells;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        self->s.v.weaponmodel = "progs/v_tgun.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                items |= 256;
-                self->s.v.weapon = 1;
-                break;
-        case WEAP_LASER:
-                self->s.v.currentammo = self->s.v.ammo_nails;
-                if ( !( self->tfstate & TFSTATE_RELOADING ) )
-                {
-                        self->s.v.weaponmodel = "progs/v_rail.mdl";
-                        self->s.v.weaponframe = 0;
-                }
-                items |= 512;
-                self->s.v.weapon = 1;
-                break;
-        default:
-                self->s.v.currentammo = 0;
-                self->s.v.weaponmodel = "";
-                self->s.v.weaponframe = 0;
-                break;
-        }
-        self->s.v.items = items;
-}*/
 void W_SetCurrentAmmo() {
   int items;
   const weapon_info_t *wi;
@@ -1985,24 +1784,6 @@ void W_Attack() {
     }
     Attack_Finished(0.5);
     break;
-  case WEAP_BIOWEAPON:
-    sound(self, 1, "weapons/ax1.wav", 1, 1);
-    switch ((int)(g_random() * 4)) {
-    case 0:
-      player_naxe(119, 1, W_FireBioweapon);
-      break;
-    case 1:
-      player_naxe(125, 5, W_FireBioweapon);
-      break;
-    case 2:
-      player_naxe(131, 1, W_FireBioweapon);
-      break;
-    default:
-      player_naxe(137, 5, W_FireBioweapon);
-      break;
-    }
-    Attack_Finished(0.5);
-    break;
   case WEAP_TRANQ:
     sound(self, 1, "weapons/dartgun.wav", 1, 1);
     player_shot(113);
@@ -2049,9 +1830,6 @@ void W_PrintWeaponMessage() {
   case WEAP_TRANQ:
     G_sprint(self, 1, "Tranquiliser gun selected\n");
     break;
-  /*case WEAP_BIOWEAPON:
-          G_sprint( self, 1, "BioWeapon readied\n" );
-          break;*/
   case WEAP_MEDIKIT:
     G_sprint(self, 1, "Medikit/Bioweapon readied\n");
     break;
@@ -2128,7 +1906,7 @@ struct w_impulse_s {
 };
 
 static struct w_impulse_s w_impulses[] = {
-    {1, 0, {WEAP_SPANNER, /*WEAP_BIOWEAPON, */ WEAP_MEDIKIT, WEAP_HOOK, WEAP_AXE, 0}},
+    {1, 0, {WEAP_SPANNER, WEAP_MEDIKIT, WEAP_HOOK, WEAP_AXE, 0}},
     {2, 0, {WEAP_SNIPER_RIFLE, WEAP_SHOTGUN, WEAP_TRANQ, WEAP_LASER, 0}},
     {3, 0, {WEAP_AUTO_RIFLE, WEAP_SUPER_SHOTGUN, 0}},
     {4, 0, {WEAP_NAILGUN, 0}},
@@ -2137,7 +1915,7 @@ static struct w_impulse_s w_impulses[] = {
     {7, 0, {WEAP_INCENDIARY, WEAP_ROCKET_LAUNCHER, WEAP_ASSAULT_CANNON, WEAP_GRENADE_LAUNCHER, 0}},
     {8, 0, {WEAP_LIGHTNING, 0}},
     {TF_MEDIKIT, 0, {WEAP_MEDIKIT, 0}},
-    {AXE_IMP, 0, {WEAP_SPANNER, /*WEAP_BIOWEAPON, */ WEAP_MEDIKIT, WEAP_HOOK, WEAP_AXE, 0}},
+    {AXE_IMP, 0, {WEAP_SPANNER,  WEAP_MEDIKIT, WEAP_HOOK, WEAP_AXE, 0}},
     {TF_HOOK_IMP1, 0, {WEAP_HOOK, 0}},
     {TF_HOOK_IMP2, 0, {WEAP_HOOK, 0}},
     {0},
@@ -2257,11 +2035,9 @@ const struct weapon_s weapon_cycle[] = {{WEAP_AXE, 0},
                                         {WEAP_INCENDIARY, 0},
                                         {WEAP_ASSAULT_CANNON, 0},
                                         {WEAP_HOOK, 0},
-                                        //{ WEAP_BIOWEAPON       , 0},
                                         {WEAP_MEDIKIT, 0},
                                         {0, 0}};
 const struct weapon_s weapon_cycle_rev[] = {{WEAP_MEDIKIT, 0},
-                                            //{ WEAP_BIOWEAPON       , 0},
                                             {WEAP_HOOK, 0},
                                             {WEAP_ASSAULT_CANNON, 0},
                                             {WEAP_INCENDIARY, 0},

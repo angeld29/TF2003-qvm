@@ -121,7 +121,7 @@ gedict_t 	*checkclient(  );
 void    	traceline( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z,
 		   int nomonst, gedict_t * ed );
 void 		TraceCapsule( float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z, int nomonst, gedict_t * ed ,
-			float min_x, float min_y, float min_z, 
+			float min_x, float min_y, float min_z,
 			float max_x, float max_y, float max_z);
 void    	stuffcmd( gedict_t * ed, const char *fmt , ...);
 int     	droptofloor( gedict_t * ed );
@@ -206,7 +206,6 @@ void 		W_WeaponFrame();
 void 		W_FireAxe();
 void            W_FireSpanner();
 void            W_FireMedikit();
-void            W_FireBioweapon();
 void    	W_FireShotgun();
 void    	W_FireSuperShotgun();
 void 		W_FireSniperRifle();
@@ -221,7 +220,7 @@ void    	W_FireFlame(  );
 void    	W_FireIncendiaryCannon(  );
 void    	W_FireTranq(  );
 void    	W_FireLaser(  );
-     		
+
 
 void BecomeExplosion();
 void ClearMultiDamage();
@@ -233,7 +232,7 @@ void Attack_Finished( float att_delay );
 void    W_PrintWeaponMessage();
 void T_MissileTouch();
 void    launch_spike( vec3_t org, vec3_t dir );
-//combat 
+//combat
 extern gedict_t *damage_attacker, *damage_inflictor;
 void            T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 			  float damage );
