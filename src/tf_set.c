@@ -258,7 +258,7 @@ static void   tf_set_val( set_item_t* si, int idx,  const char*val, qboolean oni
             if( oninit != TFSET_LOCALINFO ) _set_print( PRINT_CHAT, "%d\n", si->val._int );
             break;
         case TFS_FLOAT:
-            if( val && val[0] ) si->val._int = atof( val );
+            if( val && val[0] ) si->val._float = atof( val );
             if( oninit != TFSET_LOCALINFO ) _set_print( PRINT_CHAT, "%.2f\n", si->val._float );
             break;
         case TFS_STRING:
