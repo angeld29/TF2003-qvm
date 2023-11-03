@@ -39,6 +39,7 @@ typedef struct {
 const weapon_info_t weapons_info[]= {
 {  0 },
 {  WEAP_HOOK             , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.1, "progs/v_grap.mdl", "", "", 0},
+{  WEAP_BIOWEAPON        , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_bio.mdl", "", "weapons/ax1.wav", 0},
 {  WEAP_MEDIKIT          , IT_AXE,              0,          0, FOFS(ammo_medikit),    F_INT,0,0,0,0, 0,0,     0,0, 0.5, "progs/v_bio.mdl"/*progs/v_medi.mdl*/, "", "weapons/ax1.wav", 0},
 {  WEAP_SPANNER          , IT_AXE,              IT_CELLS,   0, FOFS(s.v.ammo_cells),  F_FLOAT,0,0,0,0, 0,0,   0,0, 0.5, "progs/v_span.mdl", "", "weapons/ax1.wav", 0},
 {  WEAP_AXE              , IT_AXE,              0,          0, 0,                     0,0,0,0,0, 0,0,         0,0, 0.5, "progs/v_axe.mdl", "", "weapons/ax1.wav", 0},
@@ -1915,7 +1916,7 @@ static struct w_impulse_s w_impulses[] = {
     {7, 0, {WEAP_INCENDIARY, WEAP_ROCKET_LAUNCHER, WEAP_ASSAULT_CANNON, WEAP_GRENADE_LAUNCHER, 0}},
     {8, 0, {WEAP_LIGHTNING, 0}},
     {TF_MEDIKIT, 0, {WEAP_MEDIKIT, 0}},
-    {AXE_IMP, 0, {WEAP_SPANNER,  WEAP_MEDIKIT, WEAP_HOOK, WEAP_AXE, 0}},
+    {AXE_IMP, 0, {WEAP_SPANNER, WEAP_MEDIKIT, WEAP_HOOK, WEAP_AXE, 0}},
     {TF_HOOK_IMP1, 0, {WEAP_HOOK, 0}},
     {TF_HOOK_IMP2, 0, {WEAP_HOOK, 0}},
     {0},

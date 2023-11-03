@@ -196,31 +196,31 @@ void            SpectatorThink();
 
 extern vec3_t  puff_org;
 
-int  	        W_BestWeapon();
-void            W_Precache();
-void            W_SetCurrentAmmo();
-void            SpawnBlood( vec3_t, float );
-void    	PreMatchImpulses(  );
-void    	DeadImpulses(  );
-void 		W_WeaponFrame();
-void 		W_FireAxe();
-void            W_FireSpanner();
-void            W_FireMedikit();
-void    	W_FireShotgun();
-void    	W_FireSuperShotgun();
-void 		W_FireSniperRifle();
-void 		W_FireAutoRifle();
-void            W_FireAssaultCannon();
-void            W_FireRocket();
-void            W_FireLightning();
-void    	W_FireGrenade();
-void    	W_FireSuperSpikes();
-void 		W_FireSpikes( float ox );
-void    	W_FireFlame(  );
-void    	W_FireIncendiaryCannon(  );
-void    	W_FireTranq(  );
-void    	W_FireLaser(  );
-
+int       W_BestWeapon();
+void      W_Precache();
+void      W_SetCurrentAmmo();
+void      SpawnBlood( vec3_t, float );
+void      PreMatchImpulses(  );
+void      DeadImpulses(  );
+void      W_WeaponFrame();
+void      W_FireAxe();
+void      W_FireSpanner();
+void      W_FireMedikit();
+void      W_FireShotgun();
+void      W_FireSuperShotgun();
+void      W_FireSniperRifle();
+void      W_FireAutoRifle();
+void      W_FireAssaultCannon();
+void      W_FireRocket();
+void      W_FireLightning();
+void      W_FireGrenade();
+void      W_FireSuperSpikes();
+void      W_FireSpikes( float ox );
+void      W_FireFlame(  );
+void      W_FireIncendiaryCannon(  );
+void      W_FireTranq(  );
+void      W_FireLaser(  );
+     		
 
 void BecomeExplosion();
 void ClearMultiDamage();
@@ -232,7 +232,7 @@ void Attack_Finished( float att_delay );
 void    W_PrintWeaponMessage();
 void T_MissileTouch();
 void    launch_spike( vec3_t org, vec3_t dir );
-//combat
+//combat 
 extern gedict_t *damage_attacker, *damage_inflictor;
 void            T_Damage( gedict_t * targ, gedict_t * inflictor, gedict_t * attacker,
 			  float damage );
