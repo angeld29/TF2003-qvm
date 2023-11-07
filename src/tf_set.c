@@ -430,6 +430,7 @@ void   TF_FinalizeSettings( )
     ent = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
     if ( ent )
     {
+        CTF_Map = 1;
         if ( !teamplay )
             trap_cvar_set( "teamplay", "21?TeamFortress" );
 

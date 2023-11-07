@@ -24,7 +24,7 @@
 
 static int     item_list_bit;
 char   *team_menu_string = NULL;
-int     CTF_Map;
+int     CTF_Map, CTF_HasFlagInfo;
 static void UpdateAbbreviations( gedict_t * Goal )
 {
 
@@ -393,6 +393,11 @@ void ParseTFDetect( gedict_t * AD )
 	}
 
 	teams_allied = AD->team_no;
+
+	if (!strnull(AD->non_team_str_home) || !strnull(AD->non_team_str_moved) || !strnull(AD->non_team_str_carried) 
+	  ||!strnull(AD->team_str_home) || !strnull(AD->team_str_moved) || !strnull(AD->team_str_carried)) {
+		CTF_HasFlagInfo	= 1;
+	}
 }
 
 gedict_t *Finditem( int ino )
@@ -2018,6 +2023,20 @@ void tfgoalitem_checkgoalreturn( gedict_t * Item )
 	}
 }
 
+int FlagTimeLeft(gedict_t * Flag) {
+	if ( Flag->s.v.think == ( func_t ) tfgoalitem_remove )
+	{
+		return floor( Flag->s.v.nextthink - g_globalvars.time );
+	}
+
+	if ( Flag->s.v.think == ( func_t ) tfgoalitem_dropthink )
+	{
+		return ( Flag->s.v.nextthink - g_globalvars.time + Flag->pausetime );
+	}
+
+	return 0;
+}
+
 void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 {
 	int     flag_time = 0;
@@ -2027,9 +2046,9 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 		if ( Goal->team_str_carried || Goal->non_team_str_carried )
 		{
 			if ( Player->team_no == Item->owned_by )
-				G_sprint( Player, 2, "%s ", Goal->team_str_carried );
+				G_sprint( Player, 10, "%s ", Goal->team_str_carried );
 			else
-				G_sprint( Player, 2, "%s ", Goal->non_team_str_carried );
+				G_sprint( Player, 10, "%s ", Goal->non_team_str_carried );
 
 	        	if( !(Item->s.v.owner) ) //FIXME !!!!!
 	        	{
@@ -2038,9 +2057,9 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 	        	}
 
 			if ( Player == PROG_TO_EDICT( Item->s.v.owner ) )
-				G_sprint( Player, 2, "You.\n" );
+				G_sprint( Player, 10, "You.\n" );
 			else
-				G_sprint( Player, 2, "%s.\n", PROG_TO_EDICT( Item->s.v.owner )->s.v.netname );
+				G_sprint( Player, 10, "%s.\n", PROG_TO_EDICT( Item->s.v.owner )->s.v.netname );
 		}
 	} else
 	{
@@ -2050,24 +2069,14 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 			{
 
 				if ( Player->team_no == Item->owned_by )
-					G_sprint( Player, 2, "%s", Goal->team_str_moved );
+					G_sprint( Player, 10, "%s", Goal->team_str_moved );
 				else
-					G_sprint( Player, 2, "%s", Goal->non_team_str_moved );
+					G_sprint( Player, 10, "%s", Goal->non_team_str_moved );
 
 				if ( tfset(flag_timer) )
 				{
-					if ( Item->s.v.think == ( func_t ) tfgoalitem_remove )
-					{
-						flag_time = floor( Item->s.v.nextthink - g_globalvars.time );
-					}
-
-					if ( Item->s.v.think == ( func_t ) tfgoalitem_dropthink )
-					{
-						flag_time =
-						    ( Item->s.v.nextthink - g_globalvars.time + Item->pausetime );
-					}
-					G_sprint( Player, 2, " :%3d\n", flag_time );
-
+					flag_time = FlagTimeLeft(Item);
+					G_sprint( Player, 10, " :%3d\n", flag_time );
 				}
 			}
 		} else
@@ -2075,9 +2084,9 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 			if ( Goal->team_str_home || Goal->non_team_str_home )
 			{
 				if ( Player->team_no == Item->owned_by )
-					G_sprint( Player, 2, "%s\n", Goal->team_str_home );
+					G_sprint( Player, 10, "%s\n", Goal->team_str_home );
 				else
-					G_sprint( Player, 2, "%s\n", Goal->non_team_str_home );
+					G_sprint( Player, 10, "%s\n", Goal->non_team_str_home );
 			}
 		}
 	}

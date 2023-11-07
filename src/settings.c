@@ -71,6 +71,7 @@ static const cl_settings_t cl_set[] = {
     {"exec_map",   "em", "Exec Map config",        "",       CS_T_BOOL, TF_EXEC_MAP_MASK, 0, },
     {"take_sshot", NULL, "Screenshot ScoreTable",        "", CS_T_BOOL, TF_TAKE_SSHOT_MASK, 0, },
     {"grensound",  NULL, "Play sound on grenade prime",        "",  CS_T_BOOL,  TF_INTERNAL_GRENSOUND, 0, },
+    {"usemapflaginfo",  NULL, "Use map defined flag info",        "",  CS_T_BOOL,  TF_INTERNAL_USEMAPFLAGINFO, 1, },
 };
 
 #define CL_SET_NUM sizeof(cl_set) / sizeof(cl_set[0])
