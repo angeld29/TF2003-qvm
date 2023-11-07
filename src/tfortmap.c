@@ -2046,9 +2046,9 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 		if ( Goal->team_str_carried || Goal->non_team_str_carried )
 		{
 			if ( Player->team_no == Item->owned_by )
-				G_sprint( Player, 10, "%s ", Goal->team_str_carried );
+				G_sprint( Player, 2, "%s ", Goal->team_str_carried );
 			else
-				G_sprint( Player, 10, "%s ", Goal->non_team_str_carried );
+				G_sprint( Player, 2, "%s ", Goal->non_team_str_carried );
 
 	        	if( !(Item->s.v.owner) ) //FIXME !!!!!
 	        	{
@@ -2057,9 +2057,9 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 	        	}
 
 			if ( Player == PROG_TO_EDICT( Item->s.v.owner ) )
-				G_sprint( Player, 10, "You.\n" );
+				G_sprint( Player, 2, "You.\n" );
 			else
-				G_sprint( Player, 10, "%s.\n", PROG_TO_EDICT( Item->s.v.owner )->s.v.netname );
+				G_sprint( Player, 2, "%s.\n", PROG_TO_EDICT( Item->s.v.owner )->s.v.netname );
 		}
 	} else
 	{
@@ -2069,14 +2069,14 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 			{
 
 				if ( Player->team_no == Item->owned_by )
-					G_sprint( Player, 10, "%s", Goal->team_str_moved );
+					G_sprint( Player, 2, "%s", Goal->team_str_moved );
 				else
-					G_sprint( Player, 10, "%s", Goal->non_team_str_moved );
+					G_sprint( Player, 2, "%s", Goal->non_team_str_moved );
 
 				if ( tfset(flag_timer) )
 				{
 					flag_time = FlagTimeLeft(Item);
-					G_sprint( Player, 10, " :%3d\n", flag_time );
+					G_sprint( Player, 2, " :%3d\n", flag_time );
 				}
 			}
 		} else
@@ -2084,9 +2084,9 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 			if ( Goal->team_str_home || Goal->non_team_str_home )
 			{
 				if ( Player->team_no == Item->owned_by )
-					G_sprint( Player, 10, "%s\n", Goal->team_str_home );
+					G_sprint( Player, 2, "%s\n", Goal->team_str_home );
 				else
-					G_sprint( Player, 10, "%s\n", Goal->non_team_str_home );
+					G_sprint( Player, 2, "%s\n", Goal->non_team_str_home );
 			}
 		}
 	}
