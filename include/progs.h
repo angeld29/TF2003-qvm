@@ -366,7 +366,8 @@ extern	int             teammaxplayers[5];
 //extern  float		teamadvantage[5];       
 extern 	int 		teams_allied;
 
-extern  int             CTF_Map;                
+extern  int             CTF_Map;
+extern  int             CTF_HasFlagInfo;                       
 extern  float           rj;                     
 extern char           *team_menu_string;  
 
