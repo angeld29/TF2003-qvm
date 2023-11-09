@@ -199,7 +199,7 @@ void ParseUserInfo() {
   self->discard_nails = -1;
   self->discard_rockets = -1;
   self->discard_cells = -1;
-  self->settings_bits = TF_CLASS_HELP_MASK | TF_AUTOID_MASK | TF_INTERNAL_GRENSOUND;
+  self->settings_bits = TF_CLASS_HELP_MASK | TF_AUTOID_MASK | TF_INTERNAL_GRENSOUND | TF_INTERNAL_USEMAPFLAGINFO;
   self->internal_settings_bits = 0;
   self->take_sshot = 0;
   for (i = 0; i < CL_SET_NUM; i++) {
