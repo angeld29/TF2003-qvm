@@ -71,7 +71,7 @@ static const cl_settings_t cl_set[] = {
     {"exec_map",   "em", "Exec Map config",        "",       CS_T_BOOL, TF_EXEC_MAP_MASK, 0, },
     {"take_sshot", NULL, "Screenshot ScoreTable",        "", CS_T_BOOL, TF_TAKE_SSHOT_MASK, 0, },
     {"grensound",  NULL, "Play sound on grenade prime",        "",  CS_T_BOOL,  TF_INTERNAL_GRENSOUND, 0, },
-    {"usemapflaginfo",  NULL, "Use map defined flag info",        "",  CS_T_BOOL,  TF_INTERNAL_USEMAPFLAGINFO, 1, },
+    {"ignoremapflaginfo",  NULL, "Ignore map defined flag info",        "",  CS_T_INT,  FOFS(ignoremapflaginfo), 0, },
 };
 
 #define CL_SET_NUM sizeof(cl_set) / sizeof(cl_set[0])
@@ -199,9 +199,10 @@ void ParseUserInfo() {
   self->discard_nails = -1;
   self->discard_rockets = -1;
   self->discard_cells = -1;
-  self->settings_bits = TF_CLASS_HELP_MASK | TF_AUTOID_MASK | TF_INTERNAL_GRENSOUND | TF_INTERNAL_USEMAPFLAGINFO;
+  self->settings_bits = TF_CLASS_HELP_MASK | TF_AUTOID_MASK | TF_INTERNAL_GRENSOUND;
   self->internal_settings_bits = 0;
   self->take_sshot = 0;
+  self->ignoremapflaginfo = 0;
   for (i = 0; i < CL_SET_NUM; i++) {
     if (GetInfokeyString(self, cl_set[i].key, cl_set[i].key2, value, sizeof(value), NULL))
       SetClientSetting(self, cl_set[i].key, value);

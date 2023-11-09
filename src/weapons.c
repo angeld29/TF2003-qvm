@@ -2265,7 +2265,7 @@ void ImpulseCommands() {
       ScannerSwitch();
     break;
   case TF_FLAG_INFO:
-    if (!CTF_HasFlagInfo || !(self->settings_bits & TF_INTERNAL_USEMAPFLAGINFO))
+    if (CTF_Map == 1)
       TeamFortress_CTF_FlagInfo();
     else
       TeamFortress_DisplayDetectionItems();
@@ -2323,7 +2323,7 @@ void PreMatchImpulses() {
     TeamFortress_ID();
     break;
   case TF_FLAG_INFO:
-    if (!CTF_HasFlagInfo || !(self->settings_bits & TF_INTERNAL_USEMAPFLAGINFO))
+    if (CTF_Map == 1)
       TeamFortress_CTF_FlagInfo();
     else
       TeamFortress_DisplayDetectionItems();
@@ -2406,7 +2406,7 @@ void DeadImpulses() {
     StatusRes(self->s.v.impulse - TF_STATUSBAR_RES_START);
     break;
   case TF_FLAG_INFO:
-    if (!CTF_HasFlagInfo || !(self->settings_bits & TF_INTERNAL_USEMAPFLAGINFO))
+    if (CTF_Map == 1)
       TeamFortress_CTF_FlagInfo();
     else
       TeamFortress_DisplayDetectionItems();

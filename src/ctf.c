@@ -25,20 +25,19 @@
 void TeamFortress_CTF_FlagInfo(  )
 {
 	gedict_t *te;
-	int flag_time;
 
 	te = Finditem( 1 );
 	if ( te->goal_state == 1 )
 	{
 		if ( self == PROG_TO_EDICT( te->s.v.owner ) )
-			G_sprint( self, 2, "You have the enemy flag.\n" );
+			G_sprint( self, 2, "You have the enemy flag. " );
 		else
 		{
 			G_sprint( self, 2, "%s has", PROG_TO_EDICT( te->s.v.owner )->s.v.netname );
 			if ( self->team_no == 1 )
-				G_sprint( self, 2, " your flag.\n" );
+				G_sprint( self, 2, " your flag. " );
 			else
-				G_sprint( self, 2, " the enemy flag.\n" );
+				G_sprint( self, 2, " the enemy flag. " );
 		}
 	} else
 	{
@@ -48,19 +47,12 @@ void TeamFortress_CTF_FlagInfo(  )
 				G_sprint( self, 2, "Your flag is lying about. " );
 			else
 				G_sprint( self, 2, "The enemy flag is lying about. " );
-			if ( tfset(flag_timer) )
-			{
-				flag_time = FlagTimeLeft(te);
-				G_sprint( self, 2, " :%3d\n", flag_time );
-			} else {
-				G_sprint( self, 2, "\n" );
-			}
 		} else
 		{
 			if ( self->team_no == 1 )
-				G_sprint( self, 2, "Your flag is in your base.\n" );
+				G_sprint( self, 2, "Your flag is in your base. " );
 			else
-				G_sprint( self, 2, "The enemy flag is in their base.\n" );
+				G_sprint( self, 2, "The enemy flag is in their base. " );
 		}
 	}
 	te = Finditem( 2 );
@@ -84,13 +76,6 @@ void TeamFortress_CTF_FlagInfo(  )
 				G_sprint( self, 2, "Your flag is lying about.\n" );
 			else
 				G_sprint( self, 2, "The enemy flag is lying about.\n" );
-			if ( tfset(flag_timer) )
-			{
-				flag_time = FlagTimeLeft(te);
-				G_sprint( self, 2, " :%3d\n", flag_time );
-			} else {
-				G_sprint( self, 2, "\n" );
-			}
 		} else
 		{
 			if ( self->team_no == 2 )

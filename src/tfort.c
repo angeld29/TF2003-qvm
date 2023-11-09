@@ -2216,8 +2216,12 @@ static qboolean displayItem( gedict_t*Goal, int display_item_status )
 
     te = Finditem( display_item_status );
     if ( te != world )
-        DisplayItemStatus( Goal, self, te );
-    else
+    {
+    	if (!TF_MapHasFlagInfo || self->ignoremapflaginfo)
+    		DisplayItemStatusDefaultFlagInfo( self, te );
+    	else
+        	DisplayItemStatus( Goal, self, te );
+    } else
         G_sprint( self, 2, "Item is missing.\n" );
 
     return true;

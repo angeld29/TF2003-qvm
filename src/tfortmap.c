@@ -24,7 +24,7 @@
 
 static int     item_list_bit;
 char   *team_menu_string = NULL;
-int     CTF_Map, CTF_HasFlagInfo;
+int     CTF_Map, TF_MapHasFlagInfo;
 static void UpdateAbbreviations( gedict_t * Goal )
 {
 
@@ -396,7 +396,7 @@ void ParseTFDetect( gedict_t * AD )
 
 	if (!strnull(AD->non_team_str_home) || !strnull(AD->non_team_str_moved) || !strnull(AD->non_team_str_carried) 
 	  ||!strnull(AD->team_str_home) || !strnull(AD->team_str_moved) || !strnull(AD->team_str_carried)) {
-		CTF_HasFlagInfo	= 1;
+		TF_MapHasFlagInfo = 1;
 	}
 }
 
@@ -700,36 +700,53 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 				te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 		}
 	}
+
 	if ( Goal->display_item_status1 )
 	{
 		te = Finditem( Goal->display_item_status1 );
 		if ( te != world )
-			DisplayItemStatus( Goal, Player, te );
-		else
+		{
+			if (!TF_MapHasFlagInfo || self->ignoremapflaginfo)
+	    		DisplayItemStatusDefaultFlagInfo( Player, te );
+	    	else
+	        	DisplayItemStatus( Goal, Player, te );
+		} else
 			G_sprint( Player, 2, "Item is missing.\n" );
 	}
 	if ( Goal->display_item_status2 )
 	{
 		te = Finditem( Goal->display_item_status2 );
 		if ( te != world )
-			DisplayItemStatus( Goal, Player, te );
-		else
+		{
+			if (!TF_MapHasFlagInfo || self->ignoremapflaginfo)
+	    		DisplayItemStatusDefaultFlagInfo( Player, te );
+	    	else
+	        	DisplayItemStatus( Goal, Player, te );
+		} else
 			G_sprint( Player, 2, "Item is missing.\n" );
 	}
 	if ( Goal->display_item_status3 )
 	{
 		te = Finditem( Goal->display_item_status3 );
 		if ( te != world )
-			DisplayItemStatus( Goal, Player, te );
-		else
+		{
+			if (!TF_MapHasFlagInfo || self->ignoremapflaginfo)
+	    		DisplayItemStatusDefaultFlagInfo( Player, te );
+	    	else
+	        	DisplayItemStatus( Goal, Player, te );
+		} else
 			G_sprint( Player, 2, "Item is missing.\n" );
 	}
 	if ( Goal->display_item_status4 )
 	{
 		te = Finditem( Goal->display_item_status4 );
 		if ( te != world )
-			DisplayItemStatus( Goal, Player, te );
-		else
+		{
+			if (!TF_MapHasFlagInfo || self->ignoremapflaginfo)
+	    		DisplayItemStatusDefaultFlagInfo( Player, te );
+	    	else
+	        	DisplayItemStatus( Goal, Player, te );
+		} else
 			G_sprint( Player, 2, "Item is missing.\n" );
 	}
 	if ( Goal->goal_result & TFGR_FORCE_RESPAWN )
@@ -2091,6 +2108,50 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 		}
 	}
 }
+
+const char *def_team_names[] = {
+	"",
+	"Blue",
+	"Red",
+	"Green",
+	"Yellow"
+};
+
+void DisplayItemStatusDefaultFlagInfo(gedict_t * Player, gedict_t *Item )
+{
+	int     flag_time = 0;
+
+	if ( Item->goal_state == TFGS_ACTIVE )
+	{
+		G_sprint( Player, 2, "%s's flag is carried by ", def_team_names[Item->owned_by] );
+
+    	if( !(Item->s.v.owner) ) //FIXME !!!!!
+    	{
+    	        G_sprint( Player, 2, ".\n");
+    		return;
+    	}
+
+		if ( Player == PROG_TO_EDICT( Item->s.v.owner ) )
+			G_sprint( Player, 2, "You.\n" );
+		else
+			G_sprint( Player, 2, "%s.\n", PROG_TO_EDICT( Item->s.v.owner )->s.v.netname );
+	} else
+	{
+		if ( !VectorCompare( Item->s.v.origin, Item->s.v.oldorigin ) )
+		{
+			G_sprint( Player, 2, "%s's flag is lying about. ", def_team_names[Item->owned_by] );
+
+			if ( tfset(flag_timer) )
+			{
+				flag_time = FlagTimeLeft(Item);
+				G_sprint( Player, 2, " :%3d\n", flag_time );
+			}
+		} else
+			G_sprint( Player, 2, "%s's flag is in the base.\n", def_team_names[Item->owned_by] );
+	}
+}
+
+
 void SP_info_player_team1(  )
 {
 	CTF_Map = 1;

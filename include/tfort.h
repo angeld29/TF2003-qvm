@@ -134,6 +134,7 @@ void    teamsprint( int tno, gedict_t * ignore, char *st );
 
 //tfortmap.c
 void    DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item );
+void    DisplayItemStatusDefaultFlagInfo( gedict_t * Player, gedict_t * Item );
 gedict_t *Finditem( int );
 gedict_t *Findgoal( int );
 int     Activated( gedict_t * Goal, gedict_t * AP );

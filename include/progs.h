@@ -306,6 +306,7 @@ typedef struct gedict_s {
 	int             settings_bits;
 	int             internal_settings_bits;
 	int             take_sshot;
+	int 		ignoremapflaginfo;
 //player settings end
 	int             tf_id;
 	int             teamkills;
@@ -367,7 +368,7 @@ extern	int             teammaxplayers[5];
 extern 	int 		teams_allied;
 
 extern  int             CTF_Map;
-extern  int             CTF_HasFlagInfo;                       
+extern  int             TF_MapHasFlagInfo;                       
 extern  float           rj;                     
 extern char           *team_menu_string;  
 
