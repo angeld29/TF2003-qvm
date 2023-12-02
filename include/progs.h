@@ -153,6 +153,7 @@ typedef struct gedict_s {
 	int             is_feigning;
 	int             is_unabletospy;
 	int             has_disconnected;
+	int 		can_give_goal;
 	int             tfstate;
 	struct gedict_s *linked_list, *observer_list;
 
@@ -193,6 +194,7 @@ typedef struct gedict_s {
 	float           heat;
 	float           immune_to_check;
 	float           last_saveme_sound;
+	float           last_goal_give;
 	int             no_active_nail_grens;
 	float		waitmin,waitmax;
 

@@ -56,6 +56,29 @@ void player_touch(  )
 			}
 		}
 	}
+	if ( self->can_give_goal && tf_data.cb_prematch_time < g_globalvars.time )
+	{
+		if ( streq( other->s.v.classname, "player" ) && other->playerclass && other->team_no == self->team_no )
+		{
+			te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
+			while ( te )
+			{
+				if ( te->s.v.owner == EDICT_TO_PROG( self ) )
+				{
+					if ( self->last_goal_give < g_globalvars.time )
+					{
+						gedict_t* Goal = trap_find( world, FOFS( s.v.classname ), "info_tfdetect" );
+						tfgoalitem_TransferToPlayer( te, self, other, Goal );
+						sound( self, 2, te->s.v.noise, 1, 1 );
+						self->last_goal_give = g_globalvars.time + 1;
+						break;
+					}
+				}
+				te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
+			}
+			te = NULL;
+		}
+	}
 	if ( ( self->tfstate & TFSTATE_INFECTED ) && tf_data.cb_prematch_time < g_globalvars.time )
 	{
 		if ( streq( other->s.v.classname, "player" ) && other->playerclass )

@@ -119,6 +119,7 @@ void TeamFortress_MOTD(  )
     }
     if ( self->motd == 45 )
     {
+        TeamFortress_Alias( "giveitems", TF_GIVEGOAL, 0 );
         TeamFortress_Alias( "dropkey", TF_DROPKEY, 0 );
         TeamFortress_Alias( "dropammo", TF_DROP_AMMO, 0 );
         TeamFortress_Alias( "dropitems", TF_DROPGOAL, 0 );

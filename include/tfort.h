@@ -77,6 +77,7 @@ void    TeamFortress_HelpMap(  );
 void    TF_MovePlayer(  );
 void    DumpClanScores(  );
 void    DropGoalItems(  );
+void    GiveGoalItems(  );
 
 //classes
 void    ConcussionGrenadeTimer(  );

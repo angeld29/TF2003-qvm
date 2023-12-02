@@ -2222,6 +2222,10 @@ void ImpulseCommands() {
     if (self->playerclass)
       DropGoalItems();
     break;
+  case TF_GIVEGOAL:
+    if (self->playerclass)
+      GiveGoalItems();
+    break;
   case TF_PB_DETONATE:
     TeamFortress_DetonatePipebombs();
     break;

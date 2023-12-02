@@ -1714,6 +1714,76 @@ void tfgoalitem_GiveToPlayer( gedict_t * Item, gedict_t * AP, gedict_t * Goal )
 	DoItemGroupWork( Item, AP );
 }
 
+void tfgoalitem_TransferToPlayer( gedict_t * Item, gedict_t * From, gedict_t * To, gedict_t * Goal)
+{
+	gedict_t *te;
+	float   lighton;
+	float   slowon;
+	float   key1on;
+	float   key2on;
+	float   spyoff;
+
+	if ( !Item || Item == world )
+	{
+		G_Error( "error: tfgoalitem_TransferToPlayer(): Item == world" );
+		return;
+	}
+	lighton = 0;
+	slowon = 0;
+	key1on = 0;
+	key2on = 0;
+	spyoff = 0;
+	te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
+	while ( te )
+	{
+		if ( te->s.v.owner == EDICT_TO_PROG( From ) && te != Item )
+		{
+			if ( te->goal_activation & TFGI_GLOW )
+				lighton = 1;
+			if ( te->goal_activation & TFGI_SLOW )
+				slowon = 1;
+			if ( ( int ) te->s.v.items & IT_KEY1 )
+				key1on = 1;
+			if ( ( int ) te->s.v.items & IT_KEY2 )
+				key2on = 1;
+			if ( te->goal_result & TFGR_REMOVE_DISGUISE )
+				spyoff = 1;
+		}
+		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
+	}
+	if ( !lighton )
+	{
+		if ( From->invincible_finished > g_globalvars.time + 3 )
+			lighton = 1;
+		else
+		{
+			if ( From->super_damage_finished > g_globalvars.time + 3 )
+				lighton = 1;
+		}
+	}
+	if ( !lighton )
+	{
+		From->s.v.effects = (int)From->s.v.effects - ((int)From->s.v.effects & (EF_DIMLIGHT | EF_BLUE | EF_RED ));
+	}
+	if ( Item->goal_activation & TFGI_ITEMGLOWS )
+		Item->s.v.effects = ( int ) Item->s.v.effects | EF_DIMLIGHT;
+	if ( !spyoff )
+		From->is_unabletospy = 0;
+	if ( !key1on )
+		From->s.v.items = (int)From->s.v.items - ((int)From->s.v.items & IT_KEY1);
+	if ( !key2on )
+		From->s.v.items = (int)From->s.v.items - ((int)From->s.v.items & IT_KEY2);
+	te = trap_find( world, FOFS( s.v.classname ), "player" );
+	while ( te )
+	{
+		if ( IsAffectedBy( Item, te, From ) )
+			RemoveResults( Item, te );
+		te = trap_find( te, FOFS( s.v.classname ), "player" );
+	}
+	
+	tfgoalitem_GiveToPlayer( Item, To, Goal);
+}
+
 void ReturnItem(  )
 {
 	gedict_t *te;
@@ -2389,4 +2459,38 @@ void DropGoalItems(  )
 		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 	}
 	dremove( newmis );
+}
+
+void GiveGoalItemsThink(  )
+{
+	gedict_t *owner = PROG_TO_EDICT( self->s.v.owner );
+	owner->can_give_goal = 0;
+	dremove( self );
+}
+
+void GiveGoalItems(  )
+{
+	gedict_t *te;
+	gedict_t *timer;
+	if (self->can_give_goal) return;
+
+	te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
+	while ( te )
+	{
+		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
+		{
+			if ( ( te->goal_activation & TFGI_ALLOW_GIVE ) || tfset(allow_give_goal) )
+			{
+				G_bprint( 2, "%s wants to pass the flag!\n", self->s.v.netname );
+				self->can_give_goal = 1;
+				timer = spawn();
+		        timer->s.v.classname = "timer";
+		        timer->s.v.owner = EDICT_TO_PROG(self);
+		        timer->s.v.nextthink = g_globalvars.time + 2;
+		        timer->s.v.think = (func_t)GiveGoalItemsThink;
+				return;
+			}
+		}
+		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
+	}
 }

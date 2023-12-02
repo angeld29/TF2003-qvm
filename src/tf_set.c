@@ -47,6 +47,7 @@ static const set_bits_t sv_settings_bits[] = {
   { "SG New Find", "sg_newfind", "", svsb_sg_newfind        , true  },
   { "SG New Rockets", "sg_rfire", "", svsb_sg_rfire        , true  },
   { "Pyro flame walls", "pyrotype", "", svsb_pyrotype        , false  },
+  { "Give Goals", "allow_give_goal", "agg", svsb_allow_give_goal    , true },
   { NULL, },
 };
 static const set_bits_t toggleflags_bits[] = {
@@ -653,6 +654,7 @@ void   TF_FinalizeSettings( )
         //                      team_top_colors[1] = 13;
         //                      team_top_colors[2] = 4;
         tfset_flagoff( allow_drop_goal );
+        tfset_flagon( allow_give_goal );
         tfset_flagon( add_pipe );
         tfset_flagon( new_flash );
         tfset_new_gas = GAS_DEFAULT;
