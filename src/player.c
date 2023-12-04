@@ -71,6 +71,7 @@ void player_touch(  )
 						tfgoalitem_TransferToPlayer( te, self, other, Goal );
 						sound( self, 2, te->s.v.noise, 1, 1 );
 						self->last_goal_give = g_globalvars.time + 1;
+						G_bprint( 1, "%s passed the flag to %s!\n", self->s.v.netname, other->s.v.netname );
 						break;
 					}
 				}

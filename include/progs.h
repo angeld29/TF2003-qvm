@@ -392,6 +392,13 @@ typedef enum arena_modes_e
 	ARENA_MODE_DUEL
 }arena_modes_t;
 
+typedef enum flag_drop_modes_e
+{
+	FLAG_DROP_DEFAULT = 0,
+	FLAG_DROP_DISABLED,
+	FLAG_DROP_ENABLED,
+	FLAG_DROP_PASS
+}flag_drop_modes_t;
 
 typedef struct tf_server_data_s {
     //int            toggleflags;

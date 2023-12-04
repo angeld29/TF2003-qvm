@@ -107,6 +107,7 @@ extern set_item_t tf_settings[];
 #define tfset_new_gas			(tf_settings[15].val._uint)
 #define tfset_gren2box			(tf_settings[16].val._uint)
 #define tfset_arena_mode         (tf_settings[17].val._int)
+#define tfset_drop_mode         (tf_settings[32].val._int)
 
 #define tfset_team_name(tno)    tf_settings[18 + (tno) -1 ].val._str
 #define tfset_classrestricted(pc)    (tf_settings[22 + (pc) -1 ].val._int)
@@ -118,7 +119,7 @@ extern set_item_t tf_settings[];
 #define svsb_old_grens          1<<4
 #define svsb_invis_only         1<<5
 #define svsb_svconc             1<<6
-#define svsb_allow_drop_goal    1<<7
+// #define svsb_allow_drop_goal    1<<7
 #define svsb_add_pipe           1<<8
 #define svsb_new_flash          1<<9
 #define svsb_disable_powerups   1<<10
@@ -135,7 +136,6 @@ extern set_item_t tf_settings[];
 #define svsb_sg_newfind         1<<21
 #define svsb_sg_rfire           1<<22
 #define svsb_pyrotype           1<<23
-#define svsb_allow_give_goal    1<<24
 
 #define TFSET_MOD_CONSOLE 2
 #define TFSET_LOCALINFO   1

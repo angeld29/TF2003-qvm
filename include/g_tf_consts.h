@@ -231,9 +231,6 @@
 #define TF_DROPKEY   175
 #define TF_DROPGOAL   194
 
-// give flag command
-#define TF_GIVEGOAL 200
-
 // Select Medikit
 #define TF_MEDIKIT   176
 
@@ -517,7 +514,6 @@
 #define TFGI_DROP_TO_FLOOR  2048 // If this bit is set, the Goal/Item drops to the ground when it first spawns.
 #define TFGI_ALLOW_DROP     4096 // If this bit is set, any player carrying this item can drop it using the "dropitems" command.
 #define TFGI_SOLID          8192 // If this bit is set, the GoalItem is Solid while not being carried by a player. This means it blocks bullets, grenades.
-#define TFGI_ALLOW_GIVE          16384 // If this bit is set, any player carrying this item can give it to teammate using the "giveitems" command.
 
 // Defines for TeamSpawnpoints : goal_activation (in teamspawns)
 #define TFSP_MULTIPLEITEMS 1  // Give out the GoalItem multiple times

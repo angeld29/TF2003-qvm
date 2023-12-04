@@ -1931,7 +1931,7 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 		{
 			if ( Item->goal_activation & TFGI_DROP )
 			{
-				if ( method == 2 && ( ( Item->goal_activation & TFGI_ALLOW_DROP ) || tfset(allow_drop_goal) ) )
+				if ( method == 2 && ( ( tfset_drop_mode == 2) || ( tfset_drop_mode == 0 && te->goal_activation & TFGI_ALLOW_DROP ) ) )
 					tfgoalitem_drop( Item, 1, AP );
 				else
 					tfgoalitem_drop( Item, 0, AP );
@@ -2437,6 +2437,17 @@ void ForceRespawn( gedict_t * P )
     self = oldself;
 }
 
+void DropOrGiveGoalItems()
+{
+	if ( tfset_drop_mode == FLAG_DROP_DEFAULT || tfset_drop_mode == FLAG_DROP_ENABLED )
+	{
+		DropGoalItems();
+	} else if (tfset_drop_mode == FLAG_DROP_PASS)
+	{
+		GiveGoalItems();
+	}
+}
+
 void DropGoalItems(  )
 {
 	gedict_t *te;
@@ -2453,7 +2464,7 @@ void DropGoalItems(  )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
-			if ( ( te->goal_activation & TFGI_ALLOW_DROP ) || tfset(allow_drop_goal) )
+			if ( (tfset_drop_mode == 2) || (tfset_drop_mode == 0 && te->goal_activation & TFGI_ALLOW_DROP) )
 				tfgoalitem_RemoveFromPlayer( te, self, 2 );
 		}
 		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
@@ -2471,6 +2482,7 @@ void GiveGoalItemsThink(  )
 void GiveGoalItems(  )
 {
 	gedict_t *te;
+	gedict_t *tl;
 	gedict_t *timer;
 	if (self->can_give_goal) return;
 
@@ -2479,17 +2491,40 @@ void GiveGoalItems(  )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
-			if ( ( te->goal_activation & TFGI_ALLOW_GIVE ) || tfset(allow_give_goal) )
+			self->can_give_goal = 1;
+			timer = spawn();
+	        timer->s.v.classname = "timer";
+	        timer->s.v.owner = EDICT_TO_PROG(self);
+	        timer->s.v.nextthink = g_globalvars.time + 5;
+	        timer->s.v.think = (func_t)GiveGoalItemsThink;
+
+			for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ) , "player" )); )
 			{
-				G_bprint( 2, "%s wants to pass the flag!\n", self->s.v.netname );
-				self->can_give_goal = 1;
-				timer = spawn();
-		        timer->s.v.classname = "timer";
-		        timer->s.v.owner = EDICT_TO_PROG(self);
-		        timer->s.v.nextthink = g_globalvars.time + 2;
-		        timer->s.v.think = (func_t)GiveGoalItemsThink;
-				return;
+				if ( self != te )
+				{
+					if ( ( self->team_no && TeamFortress_isTeamsAllied(te->team_no , self->team_no) ) )
+					{
+						if ( visible( te ) )
+						{
+							g_globalvars.msg_entity = EDICT_TO_PROG( te );
+							tl = spawn(  );	
+							VectorCopy( self->s.v.origin, tl->s.v.origin );
+							tl->s.v.origin[2] += 32;
+							trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
+							trap_WriteByte( MSG_ONE, TE_LIGHTNING2 );
+							WriteEntity( MSG_ONE, tl );
+							trap_WriteCoord( MSG_ONE, tl->s.v.origin[0] );
+							trap_WriteCoord( MSG_ONE, tl->s.v.origin[1] );
+							trap_WriteCoord( MSG_ONE, tl->s.v.origin[2] + 24 );
+							trap_WriteCoord( MSG_ONE, self->s.v.origin[0] );
+							trap_WriteCoord( MSG_ONE, self->s.v.origin[1] );
+							trap_WriteCoord( MSG_ONE, self->s.v.origin[2] );
+							dremove( tl );
+						}
+					}
+				}
 			}
+			return;
 		}
 		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 	}
