@@ -491,7 +491,7 @@ void TeamFortress_TeamShowMemberClasses( gedict_t * Player )
 	{
 		if ( ( e->team_no == Player->team_no || !e->team_no ) && e != Player )
 		{
-			if ( e->s.v.model && e->s.v.model[0] )
+			if ( !e->has_disconnected )
 			{
 				if ( !found )
 				{
@@ -517,7 +517,7 @@ void TeamFortress_TeamShowMemberClasses_New( gedict_t * Player )
 	{
 		if ( ( e->team_no == Player->team_no /*|| !e->team_no*/ ) && e != Player )
 		{
-			if ( e->s.v.model && e->s.v.model[0] )
+			if ( !e->has_disconnected )
 			{
 				if ( !found )
 				{

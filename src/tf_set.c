@@ -30,7 +30,6 @@ static const set_bits_t sv_settings_bits[] = {
   { "Old grenades", "old_grens", "og", svsb_old_grens          , true },
   { "Spy invis", "spyinvis", "s", svsb_invis_only         , false },
   { "Server conc grenade", "svconc", "", svsb_svconc             , true },
-  { "Drop Goals", "allow_drop_goal", "adg", svsb_allow_drop_goal    , false },
   { "Additional pipebomb", "add_pipe", "", svsb_add_pipe           , true },
   { "New flash", "new_flash", "nf", svsb_new_flash          , true  },
   { "Disable powerups", "disable_powerups", "dp", svsb_disable_powerups   , false },
@@ -112,6 +111,14 @@ static const set_set_t set_arena_mode[] = {
     { NULL, },
 };
 
+static const set_set_t set_flag_drop_mode[] = {
+    { "", "default", FLAG_DROP_DEFAULT,},
+    { "", "disabled", FLAG_DROP_DISABLED,},
+    { "", "enabled", FLAG_DROP_ENABLED,},
+    { "", "pass", FLAG_DROP_PASS,},
+    { NULL, },
+};
+
 set_item_t tf_settings[] = {
 /*0 */    { "Settings bits", "", "",  TFS_INT_BITS, 0, sv_settings_bits, NULL, "0" },
 /*1 */    { "Toggle flags", "", "",  TFS_INT_BITS, 0, toggleflags_bits, NULL, "0" },
@@ -145,6 +152,7 @@ set_item_t tf_settings[] = {
 /*29*/    {"Limit spy",     "cr_sp", "cr_spy", TFS_INT, 0, NULL, NULL, "0" },
 /*30*/    {"Limit engineer","cr_en", "cr_engineer", TFS_INT, 0, NULL, NULL, "0" },
 /*31*/    {"Limit random",  "cr_ra", "cr_random", TFS_INT, 0, NULL, NULL, "0" },
+/*32*/    {"Flag drop mode",  "fl_dr_md", "fl_drop_mode", TFS_INT_SET, 0, NULL, set_flag_drop_mode, "0" },
 /*  */    { NULL } 
 };
 
@@ -652,7 +660,7 @@ void   TF_FinalizeSettings( )
         tf_data.topcolor_check = 1;
         //                      team_top_colors[1] = 13;
         //                      team_top_colors[2] = 4;
-        tfset_flagoff( allow_drop_goal );
+
         tfset_flagon( add_pipe );
         tfset_flagon( new_flash );
         tfset_new_gas = GAS_DEFAULT;
@@ -677,6 +685,7 @@ void   TF_FinalizeSettings( )
         tfset_flagoff( tg_enabled );
         tfset_flagoff( enable_bot );
         tfset_arena_mode = ARENA_MODE_NONE;
+        tfset_drop_mode = FLAG_DROP_DEFAULT;
     } 
 
     //SETUP LAN CONSTANTS

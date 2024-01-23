@@ -24,7 +24,7 @@
 
 static int     item_list_bit;
 char   *team_menu_string = NULL;
-int     CTF_Map;
+int     CTF_Map, TF_MapHasFlagInfo;
 static void UpdateAbbreviations( gedict_t * Goal )
 {
 
@@ -393,6 +393,11 @@ void ParseTFDetect( gedict_t * AD )
 	}
 
 	teams_allied = AD->team_no;
+
+	if (!strnull(AD->non_team_str_home) || !strnull(AD->non_team_str_moved) || !strnull(AD->non_team_str_carried) 
+	  ||!strnull(AD->team_str_home) || !strnull(AD->team_str_moved) || !strnull(AD->team_str_carried)) {
+		TF_MapHasFlagInfo = 1;
+	}
 }
 
 gedict_t *Finditem( int ino )
@@ -695,36 +700,53 @@ void Apply_Results( gedict_t * Goal, gedict_t * Player, gedict_t * AP, float add
 				te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 		}
 	}
+
 	if ( Goal->display_item_status1 )
 	{
 		te = Finditem( Goal->display_item_status1 );
 		if ( te != world )
-			DisplayItemStatus( Goal, Player, te );
-		else
+		{
+			if (!TF_MapHasFlagInfo || self->ignoremapflaginfo)
+	    		DisplayItemStatusDefaultFlagInfo( Player, te );
+	    	else
+	        	DisplayItemStatus( Goal, Player, te );
+		} else
 			G_sprint( Player, 2, "Item is missing.\n" );
 	}
 	if ( Goal->display_item_status2 )
 	{
 		te = Finditem( Goal->display_item_status2 );
 		if ( te != world )
-			DisplayItemStatus( Goal, Player, te );
-		else
+		{
+			if (!TF_MapHasFlagInfo || self->ignoremapflaginfo)
+	    		DisplayItemStatusDefaultFlagInfo( Player, te );
+	    	else
+	        	DisplayItemStatus( Goal, Player, te );
+		} else
 			G_sprint( Player, 2, "Item is missing.\n" );
 	}
 	if ( Goal->display_item_status3 )
 	{
 		te = Finditem( Goal->display_item_status3 );
 		if ( te != world )
-			DisplayItemStatus( Goal, Player, te );
-		else
+		{
+			if (!TF_MapHasFlagInfo || self->ignoremapflaginfo)
+	    		DisplayItemStatusDefaultFlagInfo( Player, te );
+	    	else
+	        	DisplayItemStatus( Goal, Player, te );
+		} else
 			G_sprint( Player, 2, "Item is missing.\n" );
 	}
 	if ( Goal->display_item_status4 )
 	{
 		te = Finditem( Goal->display_item_status4 );
 		if ( te != world )
-			DisplayItemStatus( Goal, Player, te );
-		else
+		{
+			if (!TF_MapHasFlagInfo || self->ignoremapflaginfo)
+	    		DisplayItemStatusDefaultFlagInfo( Player, te );
+	    	else
+	        	DisplayItemStatus( Goal, Player, te );
+		} else
 			G_sprint( Player, 2, "Item is missing.\n" );
 	}
 	if ( Goal->goal_result & TFGR_FORCE_RESPAWN )
@@ -1692,6 +1714,76 @@ void tfgoalitem_GiveToPlayer( gedict_t * Item, gedict_t * AP, gedict_t * Goal )
 	DoItemGroupWork( Item, AP );
 }
 
+void tfgoalitem_TransferToPlayer( gedict_t * Item, gedict_t * From, gedict_t * To, gedict_t * Goal)
+{
+	gedict_t *te;
+	float   lighton;
+	float   slowon;
+	float   key1on;
+	float   key2on;
+	float   spyoff;
+
+	if ( !Item || Item == world )
+	{
+		G_Error( "error: tfgoalitem_TransferToPlayer(): Item == world" );
+		return;
+	}
+	lighton = 0;
+	slowon = 0;
+	key1on = 0;
+	key2on = 0;
+	spyoff = 0;
+	te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
+	while ( te )
+	{
+		if ( te->s.v.owner == EDICT_TO_PROG( From ) && te != Item )
+		{
+			if ( te->goal_activation & TFGI_GLOW )
+				lighton = 1;
+			if ( te->goal_activation & TFGI_SLOW )
+				slowon = 1;
+			if ( ( int ) te->s.v.items & IT_KEY1 )
+				key1on = 1;
+			if ( ( int ) te->s.v.items & IT_KEY2 )
+				key2on = 1;
+			if ( te->goal_result & TFGR_REMOVE_DISGUISE )
+				spyoff = 1;
+		}
+		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
+	}
+	if ( !lighton )
+	{
+		if ( From->invincible_finished > g_globalvars.time + 3 )
+			lighton = 1;
+		else
+		{
+			if ( From->super_damage_finished > g_globalvars.time + 3 )
+				lighton = 1;
+		}
+	}
+	if ( !lighton )
+	{
+		From->s.v.effects = (int)From->s.v.effects - ((int)From->s.v.effects & (EF_DIMLIGHT | EF_BLUE | EF_RED ));
+	}
+	if ( Item->goal_activation & TFGI_ITEMGLOWS )
+		Item->s.v.effects = ( int ) Item->s.v.effects | EF_DIMLIGHT;
+	if ( !spyoff )
+		From->is_unabletospy = 0;
+	if ( !key1on )
+		From->s.v.items = (int)From->s.v.items - ((int)From->s.v.items & IT_KEY1);
+	if ( !key2on )
+		From->s.v.items = (int)From->s.v.items - ((int)From->s.v.items & IT_KEY2);
+	te = trap_find( world, FOFS( s.v.classname ), "player" );
+	while ( te )
+	{
+		if ( IsAffectedBy( Item, te, From ) )
+			RemoveResults( Item, te );
+		te = trap_find( te, FOFS( s.v.classname ), "player" );
+	}
+	
+	tfgoalitem_GiveToPlayer( Item, To, Goal);
+}
+
 void ReturnItem(  )
 {
 	gedict_t *te;
@@ -1839,7 +1931,7 @@ void tfgoalitem_RemoveFromPlayer( gedict_t * Item, gedict_t * AP, int method )
 		{
 			if ( Item->goal_activation & TFGI_DROP )
 			{
-				if ( method == 2 && ( ( Item->goal_activation & TFGI_ALLOW_DROP ) || tfset(allow_drop_goal) ) )
+				if ( method == 2 && ( ( tfset_drop_mode == 2) || ( tfset_drop_mode == 0 && te->goal_activation & TFGI_ALLOW_DROP ) ) )
 					tfgoalitem_drop( Item, 1, AP );
 				else
 					tfgoalitem_drop( Item, 0, AP );
@@ -2018,6 +2110,20 @@ void tfgoalitem_checkgoalreturn( gedict_t * Item )
 	}
 }
 
+int FlagTimeLeft(gedict_t * Flag) {
+	if ( Flag->s.v.think == ( func_t ) tfgoalitem_remove )
+	{
+		return floor( Flag->s.v.nextthink - g_globalvars.time );
+	}
+
+	if ( Flag->s.v.think == ( func_t ) tfgoalitem_dropthink )
+	{
+		return ( Flag->s.v.nextthink - g_globalvars.time + Flag->pausetime );
+	}
+
+	return 0;
+}
+
 void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 {
 	int     flag_time = 0;
@@ -2056,18 +2162,8 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 
 				if ( tfset(flag_timer) )
 				{
-					if ( Item->s.v.think == ( func_t ) tfgoalitem_remove )
-					{
-						flag_time = floor( Item->s.v.nextthink - g_globalvars.time );
-					}
-
-					if ( Item->s.v.think == ( func_t ) tfgoalitem_dropthink )
-					{
-						flag_time =
-						    ( Item->s.v.nextthink - g_globalvars.time + Item->pausetime );
-					}
+					flag_time = FlagTimeLeft(Item);
 					G_sprint( Player, 2, " :%3d\n", flag_time );
-
 				}
 			}
 		} else
@@ -2082,6 +2178,50 @@ void DisplayItemStatus( gedict_t * Goal, gedict_t * Player, gedict_t * Item )
 		}
 	}
 }
+
+const char *def_team_names[] = {
+	"",
+	"Blue",
+	"Red",
+	"Green",
+	"Yellow"
+};
+
+void DisplayItemStatusDefaultFlagInfo(gedict_t * Player, gedict_t *Item )
+{
+	int     flag_time = 0;
+
+	if ( Item->goal_state == TFGS_ACTIVE )
+	{
+		G_sprint( Player, 2, "%s's flag is carried by ", def_team_names[Item->owned_by] );
+
+    	if( !(Item->s.v.owner) ) //FIXME !!!!!
+    	{
+    	        G_sprint( Player, 2, ".\n");
+    		return;
+    	}
+
+		if ( Player == PROG_TO_EDICT( Item->s.v.owner ) )
+			G_sprint( Player, 2, "You.\n" );
+		else
+			G_sprint( Player, 2, "%s.\n", PROG_TO_EDICT( Item->s.v.owner )->s.v.netname );
+	} else
+	{
+		if ( !VectorCompare( Item->s.v.origin, Item->s.v.oldorigin ) )
+		{
+			G_sprint( Player, 2, "%s's flag is lying about. ", def_team_names[Item->owned_by] );
+
+			if ( tfset(flag_timer) )
+			{
+				flag_time = FlagTimeLeft(Item);
+				G_sprint( Player, 2, " :%3d\n", flag_time );
+			}
+		} else
+			G_sprint( Player, 2, "%s's flag is in the base.\n", def_team_names[Item->owned_by] );
+	}
+}
+
+
 void SP_info_player_team1(  )
 {
 	CTF_Map = 1;
@@ -2297,6 +2437,17 @@ void ForceRespawn( gedict_t * P )
     self = oldself;
 }
 
+void DropOrGiveGoalItems()
+{
+	if ( tfset_drop_mode == FLAG_DROP_DEFAULT || tfset_drop_mode == FLAG_DROP_ENABLED )
+	{
+		DropGoalItems();
+	} else if (tfset_drop_mode == FLAG_DROP_PASS)
+	{
+		GiveGoalItems();
+	}
+}
+
 void DropGoalItems(  )
 {
 	gedict_t *te;
@@ -2313,10 +2464,85 @@ void DropGoalItems(  )
 	{
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
-			if ( ( te->goal_activation & TFGI_ALLOW_DROP ) || tfset(allow_drop_goal) )
+			if ( (tfset_drop_mode == 2) || (tfset_drop_mode == 0 && te->goal_activation & TFGI_ALLOW_DROP) )
 				tfgoalitem_RemoveFromPlayer( te, self, 2 );
 		}
 		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
 	}
 	dremove( newmis );
+}
+
+void GiveGoalItemsThink(  )
+{
+	gedict_t *owner = PROG_TO_EDICT( self->s.v.owner );
+	owner->can_give_goal = 0;
+	dremove( self );
+}
+
+void GiveGoalItemsEffectsThink()
+{
+	gedict_t *te, *tl, *owner;
+	if (self->heat == 10) {
+		dremove(self);
+		return;
+	}
+	self->heat++;
+	owner = PROG_TO_EDICT(self->s.v.owner);
+	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ) , "player" )); )
+	{
+		if ( owner != te )
+		{
+			if ( ( owner->team_no && TeamFortress_isTeamsAllied(owner->team_no , te->team_no) ) )
+			{
+				g_globalvars.msg_entity = EDICT_TO_PROG( te );
+				tl = spawn(  );	
+				VectorCopy( owner->s.v.origin, tl->s.v.origin );
+				tl->s.v.origin[2] += 32;
+				trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
+				trap_WriteByte( MSG_ONE, TE_LIGHTNING2 );
+				WriteEntity( MSG_ONE, tl );
+				trap_WriteCoord( MSG_ONE, tl->s.v.origin[0] );
+				trap_WriteCoord( MSG_ONE, tl->s.v.origin[1] );
+				trap_WriteCoord( MSG_ONE, tl->s.v.origin[2] + 24 );
+				trap_WriteCoord( MSG_ONE, owner->s.v.origin[0] );
+				trap_WriteCoord( MSG_ONE, owner->s.v.origin[1] );
+				trap_WriteCoord( MSG_ONE, owner->s.v.origin[2] );
+				dremove( tl );
+			}
+		}
+	}
+	self->s.v.nextthink = g_globalvars.time + 0.4;
+}
+
+void GiveGoalItems(  )
+{
+	gedict_t *te;
+	gedict_t *tl;
+	gedict_t *spawn_ent;
+	if (self->can_give_goal) return;
+
+	te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
+	while ( te )
+	{
+		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
+		{
+			self->can_give_goal = 1;
+			spawn_ent = spawn();
+	        spawn_ent->s.v.classname = "timer";
+	        spawn_ent->s.v.owner = EDICT_TO_PROG(self);
+	        spawn_ent->s.v.nextthink = g_globalvars.time + 4;
+	        spawn_ent->s.v.think = (func_t)GiveGoalItemsThink;
+
+	        spawn_ent = spawn();
+	        spawn_ent->s.v.owner = EDICT_TO_PROG(self);
+	        spawn_ent->heat = 0;
+	        spawn_ent->s.v.think = (func_t)GiveGoalItemsEffectsThink;
+	        spawn_ent->s.v.nextthink = g_globalvars.time + 0.25;
+
+	        G_sprint(self, 2, "Passing the flag...\n");
+
+			return;
+		}
+		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
+	}
 }

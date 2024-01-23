@@ -211,7 +211,7 @@ void TeamFortress_SaveMe(  )
 				if ( visible( te ) )
 				{
 					g_globalvars.msg_entity = EDICT_TO_PROG( te );
-					tl = spawn(  );
+					tl = spawn(  );	
 					VectorCopy( self->s.v.origin, tl->s.v.origin );
 					tl->s.v.origin[2] += 32;
 					trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );

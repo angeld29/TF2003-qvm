@@ -48,6 +48,7 @@ void    TeamFortress_Cmd_Discard(  );
 void    Engineer_RotateSG(  );
 void    TeamFortress_Cmd_Detpack(  );
 void    Admin_Cmd(  );
+void    DropOrGiveGoalItems(  );
 
 const static cmd_t   cmds[] = {
   {"kill", ClientKill},
@@ -60,6 +61,7 @@ const static cmd_t   cmds[] = {
   {"discard", TeamFortress_Cmd_Discard, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS | CMD_NOT_BUILD},
   {"sg_rotate", Engineer_RotateSG, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS | CMD_NOT_BUILD},
   {"detpack", TeamFortress_Cmd_Detpack, CMD_NOT_PREMATCH | CMD_NOT_DEAD | CMD_NOT_TEAM | CMD_NOT_CLASS },
+  {"dropitems", DropOrGiveGoalItems, CMD_NOT_PREMATCH | CMD_NOT_DEAD},
   {NULL, NULL, 0}
 };
 

@@ -153,6 +153,7 @@ typedef struct gedict_s {
 	int             is_feigning;
 	int             is_unabletospy;
 	int             has_disconnected;
+	int 		can_give_goal;
 	int             tfstate;
 	struct gedict_s *linked_list, *observer_list;
 
@@ -193,6 +194,7 @@ typedef struct gedict_s {
 	float           heat;
 	float           immune_to_check;
 	float           last_saveme_sound;
+	float           last_goal_give;
 	int             no_active_nail_grens;
 	float		waitmin,waitmax;
 
@@ -306,6 +308,7 @@ typedef struct gedict_s {
 	int             settings_bits;
 	int             internal_settings_bits;
 	int             take_sshot;
+	int 		ignoremapflaginfo;
 //player settings end
 	int             tf_id;
 	int             teamkills;
@@ -366,7 +369,8 @@ extern	int             teammaxplayers[5];
 //extern  float		teamadvantage[5];       
 extern 	int 		teams_allied;
 
-extern  int             CTF_Map;                
+extern  int             CTF_Map;
+extern  int             TF_MapHasFlagInfo;                       
 extern  float           rj;                     
 extern char           *team_menu_string;  
 
@@ -388,6 +392,13 @@ typedef enum arena_modes_e
 	ARENA_MODE_DUEL
 }arena_modes_t;
 
+typedef enum flag_drop_modes_e
+{
+	FLAG_DROP_DEFAULT = 0,
+	FLAG_DROP_DISABLED,
+	FLAG_DROP_ENABLED,
+	FLAG_DROP_PASS
+}flag_drop_modes_t;
 
 typedef struct tf_server_data_s {
     //int            toggleflags;
