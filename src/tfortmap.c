@@ -2479,11 +2479,46 @@ void GiveGoalItemsThink(  )
 	dremove( self );
 }
 
+void GiveGoalItemsEffectsThink()
+{
+	gedict_t *te, *tl, *owner;
+	if (self->heat == 10) {
+		dremove(self);
+		return;
+	}
+	self->heat++;
+	owner = PROG_TO_EDICT(self->s.v.owner);
+	for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ) , "player" )); )
+	{
+		if ( owner != te )
+		{
+			if ( ( owner->team_no && TeamFortress_isTeamsAllied(owner->team_no , te->team_no) ) )
+			{
+				g_globalvars.msg_entity = EDICT_TO_PROG( te );
+				tl = spawn(  );	
+				VectorCopy( owner->s.v.origin, tl->s.v.origin );
+				tl->s.v.origin[2] += 32;
+				trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
+				trap_WriteByte( MSG_ONE, TE_LIGHTNING2 );
+				WriteEntity( MSG_ONE, tl );
+				trap_WriteCoord( MSG_ONE, tl->s.v.origin[0] );
+				trap_WriteCoord( MSG_ONE, tl->s.v.origin[1] );
+				trap_WriteCoord( MSG_ONE, tl->s.v.origin[2] + 24 );
+				trap_WriteCoord( MSG_ONE, owner->s.v.origin[0] );
+				trap_WriteCoord( MSG_ONE, owner->s.v.origin[1] );
+				trap_WriteCoord( MSG_ONE, owner->s.v.origin[2] );
+				dremove( tl );
+			}
+		}
+	}
+	self->s.v.nextthink = g_globalvars.time + 0.4;
+}
+
 void GiveGoalItems(  )
 {
 	gedict_t *te;
 	gedict_t *tl;
-	gedict_t *timer;
+	gedict_t *spawn_ent;
 	if (self->can_give_goal) return;
 
 	te = trap_find( world, FOFS( s.v.classname ), "item_tfgoal" );
@@ -2492,38 +2527,20 @@ void GiveGoalItems(  )
 		if ( te->s.v.owner == EDICT_TO_PROG( self ) )
 		{
 			self->can_give_goal = 1;
-			timer = spawn();
-	        timer->s.v.classname = "timer";
-	        timer->s.v.owner = EDICT_TO_PROG(self);
-	        timer->s.v.nextthink = g_globalvars.time + 5;
-	        timer->s.v.think = (func_t)GiveGoalItemsThink;
+			spawn_ent = spawn();
+	        spawn_ent->s.v.classname = "timer";
+	        spawn_ent->s.v.owner = EDICT_TO_PROG(self);
+	        spawn_ent->s.v.nextthink = g_globalvars.time + 4;
+	        spawn_ent->s.v.think = (func_t)GiveGoalItemsThink;
 
-			for ( te = world; ( te = trap_find( te, FOFS( s.v.classname ) , "player" )); )
-			{
-				if ( self != te )
-				{
-					if ( ( self->team_no && TeamFortress_isTeamsAllied(te->team_no , self->team_no) ) )
-					{
-						if ( visible( te ) )
-						{
-							g_globalvars.msg_entity = EDICT_TO_PROG( te );
-							tl = spawn(  );	
-							VectorCopy( self->s.v.origin, tl->s.v.origin );
-							tl->s.v.origin[2] += 32;
-							trap_WriteByte( MSG_ONE, SVC_TEMPENTITY );
-							trap_WriteByte( MSG_ONE, TE_LIGHTNING2 );
-							WriteEntity( MSG_ONE, tl );
-							trap_WriteCoord( MSG_ONE, tl->s.v.origin[0] );
-							trap_WriteCoord( MSG_ONE, tl->s.v.origin[1] );
-							trap_WriteCoord( MSG_ONE, tl->s.v.origin[2] + 24 );
-							trap_WriteCoord( MSG_ONE, self->s.v.origin[0] );
-							trap_WriteCoord( MSG_ONE, self->s.v.origin[1] );
-							trap_WriteCoord( MSG_ONE, self->s.v.origin[2] );
-							dremove( tl );
-						}
-					}
-				}
-			}
+	        spawn_ent = spawn();
+	        spawn_ent->s.v.owner = EDICT_TO_PROG(self);
+	        spawn_ent->heat = 0;
+	        spawn_ent->s.v.think = (func_t)GiveGoalItemsEffectsThink;
+	        spawn_ent->s.v.nextthink = g_globalvars.time + 0.25;
+
+	        G_sprint(self, 2, "Passing the flag...\n");
+
 			return;
 		}
 		te = trap_find( te, FOFS( s.v.classname ), "item_tfgoal" );
