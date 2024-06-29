@@ -40,7 +40,7 @@ void TeamFortress_PlayerLostFlag(void);
 void PlayerSetDieFrames(int isdead);
 void _spy_up(  )
 {
-    self->s.v.nextthink += 0.1;
+    self->s.v.nextthink = g_globalvars.time + 0.1;
     self->s.v.think = (func_t)_spy_up;
     self->s.v.frame -= 1;
     if( self->s.v.frame <= self->frame_info.end ){

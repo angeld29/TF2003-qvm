@@ -113,6 +113,10 @@ foreach(file ${SRC_VM} )
     )
 endforeach(file)
 
+if( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64" )
+    add_definitions(-Didx64)
+endif()
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${DIR_SRC}/${SRC_VM_SYSCALL} ${VM_DIR}/${SRC_VM_SYSCALL} )
 file(APPEND ${QVM_LIST_FILE} "${VM_DIR}/${SRC_VM_SYSCALL}\n")
 message(STATUS ${QVM_LIST_FILE})
