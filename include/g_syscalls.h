@@ -119,10 +119,26 @@ intptr_t 	trap_FS_GetFileList(  const char *path, const char *extension, char *l
 
 intptr_t 	trap_Map_Extension( const char* ext_name, intptr_t mapto);
 /*  return:
-    0 	success maping
+    mapto 	success mapping
    -1	not found
    -2	cannot map
 */
+
+// Расширения G_Map_Extension (слоты >= 256, см. g_ext.h).
+void     trap_SetExtField( gedict_t *ed, const char *fieldname, intptr_t val );
+int      trap_GetExtField( gedict_t *ed, const char *fieldname );
+void     trap_changelevelHub( const char *name, const char *entityname, const char *startspot );
+int      trap_URI_Query( const char *uri, int vmentry, void *cbcontext, const char *mimetype, const char *data, intptr_t datasize );
+int      trap_particleeffectnum( const char *effectname );
+int      trap_trailparticles( int effecttype, int entnum, float start_x, float start_y, float start_z, float end_x, float end_y, float end_z );
+int      trap_pointparticles( int effecttype, float org_x, float org_y, float org_z, float vel_x, float vel_y, float vel_z, int count );
+int      trap_clientstat( int statidx, int stattype, int fieldoffset );
+int      trap_pointerstat( int statidx, int stattype, void *offset );
+intptr_t trap_MapExtFieldPtr( const char *fieldname );
+intptr_t trap_SetExtFieldPtr( gedict_t *ed, intptr_t fieldref, intptr_t *data, intptr_t size );
+intptr_t trap_GetExtFieldPtr( gedict_t *ed, intptr_t fieldref, intptr_t *data, intptr_t size );
+intptr_t trap_SetSendNeeded( intptr_t subject, intptr_t flags, intptr_t to );
+intptr_t trap_VisibleTo( intptr_t viewer, intptr_t viewee );
 
 intptr_t 	trap_AddBot( const char* name, intptr_t bottomcolor, intptr_t topcolor, const char* skin);
 intptr_t 	trap_RemoveBot( intptr_t edn );

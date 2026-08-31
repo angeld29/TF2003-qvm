@@ -109,6 +109,7 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
             {
                 gamedata.APIversion = api_ver;
             }
+            G_InitExtensions();
             G_InitGame( arg0, arg1 );
             RestoreGlobals();
             return ( intptr_t ) ( &gamedata );

@@ -415,6 +415,80 @@ intptr_t trap_Map_Extension( const char* ext_name, intptr_t mapto)
 	return syscall( G_Map_Extension, (intptr_t)ext_name, mapto );
 }
 
+void trap_SetExtField( gedict_t *ed, const char *fieldname, intptr_t val )
+{
+	syscall( G_SETEXTFIELD, (intptr_t)ed, (intptr_t)fieldname, val );
+}
+
+int trap_GetExtField( gedict_t *ed, const char *fieldname )
+{
+	return syscall( G_GETEXTFIELD, (intptr_t)ed, (intptr_t)fieldname );
+}
+
+void trap_changelevelHub( const char *name, const char *entityname, const char *startspot )
+{
+	syscall( G_CHANGELEVEL_HUB, (intptr_t)name, (intptr_t)entityname, (intptr_t)startspot );
+}
+
+int trap_URI_Query( const char *uri, int vmentry, void *cbcontext, const char *mimetype, const char *data, intptr_t datasize )
+{
+	return syscall( G_URI_QUERY, (intptr_t)uri, vmentry, (intptr_t)cbcontext, (intptr_t)mimetype, (intptr_t)data, datasize );
+}
+
+int trap_particleeffectnum( const char *effectname )
+{
+	return syscall( G_PARTICLEEFFECTNUM, (intptr_t)effectname );
+}
+
+int trap_trailparticles( int effecttype, int entnum, float start_x, float start_y, float start_z, float end_x, float end_y, float end_z )
+{
+	return syscall( G_TRAILPARTICLES, effecttype, entnum,
+		PASSFLOAT( start_x ), PASSFLOAT( start_y ), PASSFLOAT( start_z ),
+		PASSFLOAT( end_x ), PASSFLOAT( end_y ), PASSFLOAT( end_z ) );
+}
+
+int trap_pointparticles( int effecttype, float org_x, float org_y, float org_z, float vel_x, float vel_y, float vel_z, int count )
+{
+	return syscall( G_POINTPARTICLES, effecttype,
+		PASSFLOAT( org_x ), PASSFLOAT( org_y ), PASSFLOAT( org_z ),
+		PASSFLOAT( vel_x ), PASSFLOAT( vel_y ), PASSFLOAT( vel_z ), count );
+}
+
+int trap_clientstat( int statidx, int stattype, int fieldoffset )
+{
+	return syscall( G_CLIENTSTAT, statidx, stattype, fieldoffset );
+}
+
+int trap_pointerstat( int statidx, int stattype, void *offset )
+{
+	return syscall( G_POINTERSTAT, statidx, stattype, (intptr_t)offset );
+}
+
+intptr_t trap_MapExtFieldPtr( const char *fieldname )
+{
+	return syscall( G_MAPEXTFIELDPTR, (intptr_t)fieldname );
+}
+
+intptr_t trap_SetExtFieldPtr( gedict_t *ed, intptr_t fieldref, intptr_t *data, intptr_t size )
+{
+	return syscall( G_SETEXTFIELDPTR, (intptr_t)ed, fieldref, (intptr_t)data, size );
+}
+
+intptr_t trap_GetExtFieldPtr( gedict_t *ed, intptr_t fieldref, intptr_t *data, intptr_t size )
+{
+	return syscall( G_GETEXTFIELDPTR, (intptr_t)ed, fieldref, (intptr_t)data, size );
+}
+
+intptr_t trap_SetSendNeeded( intptr_t subject, intptr_t flags, intptr_t to )
+{
+	return syscall( G_SETSENDNEEDED, subject, flags, to );
+}
+
+intptr_t trap_VisibleTo( intptr_t viewer, intptr_t viewee )
+{
+	return syscall( G_VISIBLETO, viewer, viewee );
+}
+
 intptr_t 	trap_AddBot( const char* name, intptr_t bottomcolor, intptr_t topcolor, const char* skin)
 {
         return syscall( G_Add_Bot, (intptr_t)name, bottomcolor, topcolor, (intptr_t)skin );
