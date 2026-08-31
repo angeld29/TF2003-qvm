@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.4.0 )
 
-project(q3lcc)
+project(q3lcc C)
 
 add_executable(lburg lburg/gram.c lburg/lburg.c)       
 target_include_directories (lburg  PRIVATE "lburg ")

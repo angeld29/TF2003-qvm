@@ -455,12 +455,12 @@ void trap_makevectors( float *v )
 }
 
 #if defined( __linux__ ) || defined( _WIN32 ) /* || defined( __APPLE__ ) require?*/
-size_t strlcpy(char *dst, char *src, size_t siz)
+size_t strlcpy(char *__restrict dst, const char *__restrict src, size_t siz)
 {
 	return syscall( g_strlcpy, (intptr_t)dst, (intptr_t)src, (intptr_t)siz );
 }
 
-size_t strlcat(char *dst, char *src, size_t siz)
+size_t strlcat(char *__restrict dst, const char *__restrict src, size_t siz)
 {
 	return syscall( g_strlcat, (intptr_t)dst, (intptr_t)src, (intptr_t)siz );
 }
