@@ -29,11 +29,7 @@ typedef struct
 	float	frametime;
 	int	newmis;
 	float	force_retouch;
-#ifdef idx64
 	stringref_t	mapname_;
-#else
-	string_t	mapname;
-#endif
 	float	serverflags;
 	float	total_secrets;
 	float	total_monsters;
@@ -94,40 +90,24 @@ typedef struct
 	vec3_t	velocity;
 	vec3_t	angles;
 	vec3_t	avelocity;
-#ifdef idx64
 	stringref_t	classname_;
 	stringref_t	model_;
-#else
-	string_t	classname;
-	string_t	model;
-#endif
 	float	frame;
 	float	skin;
 	float	effects;
 	vec3_t	mins;
 	vec3_t	maxs;
 	vec3_t	size;
-#ifdef idx64
 	funcref_t	touch_;
 	funcref_t	use_;
 	funcref_t	think_;
 	funcref_t	blocked_;
-#else
-	func_t	touch;
-	func_t	use;
-	func_t	think;
-	func_t	blocked;
-#endif
 	float	nextthink;
 	int	groundentity;
 	float	health;
 	float	frags;
 	float	weapon;
-#ifdef idx64
 	stringref_t	weaponmodel_;
-#else
-	string_t	weaponmodel;
-#endif
 	float	weaponframe;
 	float	currentammo;
 	float	ammo_shells;
@@ -145,11 +125,7 @@ typedef struct
 	float	impulse;
 	float	fixangle;
 	vec3_t	v_angle;
-#ifdef idx64
 	stringref_t	netname_;
-#else
-	string_t	netname;
-#endif
 	int	enemy;
 	float	flags;
 	float	colormap;
@@ -165,36 +141,19 @@ typedef struct
 	int	aiment;
 	int	goalentity;
 	float	spawnflags;
-#ifdef idx64
 	stringref_t	target_;
 	stringref_t	targetname_;
-#else
-	string_t	target;
-	string_t	targetname;
-#endif
 	float	dmg_take;
 	float	dmg_save;
 	int	dmg_inflictor;
 	int	owner;
 	vec3_t	movedir;
-#ifdef idx64
 	stringref_t	message_;
-#else
-	string_t	message;
-#endif
 	float	sounds;
-#ifdef idx64
 	stringref_t	noise_;
 	stringref_t	noise1_;
 	stringref_t	noise2_;
 	stringref_t	noise3_;
-#else
-	string_t	noise;
-	string_t	noise1;
-	string_t	noise2;
-	string_t	noise3;
-#endif
-#ifdef idx64
 //fields that used to be pointers are now byte offsets to these pointers...
 	string_t    classname;
 	string_t    model;
@@ -211,7 +170,6 @@ typedef struct
 	string_t    noise1;
 	string_t    noise2;
 	string_t    noise3;
-#endif
 } entvars_t;
 
 #define PROGHEADER_CRC 54730

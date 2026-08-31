@@ -132,7 +132,7 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
         case GAME_CLIENT_CONNECT:
             self = PROG_TO_EDICT( g_globalvars.self );
             self->s.v.netname = netnames[NUM_FOR_EDICT(self)-1]; //Init client names
-            infokey( self, "netname", self->s.v.netname,  32);
+            infokey( self, "name", self->s.v.netname,  32);
             self->auth_time = g_globalvars.time + 10.0;
             self->isSpectator = arg0?1:0;
             if ( arg0 )
@@ -276,10 +276,8 @@ void G_InitGame( int levelTime, int randomSeed )
     framecount = 0;
     starttime = levelTime * 0.001;
     G_dprintf( "Init Game\n" );
-#ifdef idx64
             // We set references
             cvar_fset("sv_pr2references", 1);
-#endif
     //G_InitMemory();
     memset( g_edicts, 0, sizeof( gedict_t ) * MAX_EDICTS );
 
