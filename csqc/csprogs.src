@@ -1,0 +1,14 @@
+#pragma target fte_5768
+#pragma optimise 3
+#pragma flag enable subscope
+#pragma flag enable iffloat
+#pragma flag enable lo
+
+#pragma progs_dat "csprogs.dat"
+
+#includelist
+csdefs.qc
+csconsts.qc
+hud.qc
+main.qc
+#endlist

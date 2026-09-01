@@ -2,6 +2,7 @@
 #
 #   make              — QVM (по умолчанию)
 #   make qvm          — только QVM
+#   make csqc         — клиентский модуль csprogs.dat (csqc/, нужен fteqcc64 в PATH)
 #   make all          — все 5 платформ + QVM (релиз)
 #   make current      — native под текущую платформу
 #   make <платформа>  — linux-amd64 | linux-armhf | linux-i686 | windows-x64 | windows-x86
@@ -13,11 +14,14 @@ BUILD_DIR := _cmake
 PLATFORMS := linux-amd64 linux-armhf linux-i686 windows-x64 windows-x86
 
 .DEFAULT_GOAL := qvm
-.PHONY: qvm all current clean help $(PLATFORMS)
+.PHONY: qvm csqc all current clean help $(PLATFORMS)
 
 qvm:
 	$(CMAKE) -S . -B $(BUILD_DIR)/qvm -G Ninja
 	$(CMAKE) --build $(BUILD_DIR)/qvm --target qvm
+
+csqc:
+	$(MAKE) -C csqc install
 
 all: qvm $(PLATFORMS)
 
@@ -39,6 +43,7 @@ clean:
 help:
 	@echo 'make              — QVM (по умолчанию)'
 	@echo 'make qvm          — только QVM'
+	@echo 'make csqc         — клиентский модуль csprogs.dat (csqc/, нужен fteqcc64 в PATH)'
 	@echo 'make all          — все 5 платформ + QVM (релиз)'
 	@echo 'make current      — native под текущую платформу (хост, без кросс-тулчейна)'
 	@echo 'make <платформа>  — linux-amd64 | linux-armhf | linux-i686 | windows-x64 | windows-x86'

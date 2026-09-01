@@ -66,6 +66,7 @@
 //--- Статы: диапазон регистрируемых (0..31 заняты движком) ---
 #define GCSQC_STAT_FIRST               32   // первый свободный стат
 #define GCSQC_STAT_MAX                 255  // MAX_CL_STATS-1 (fteqw bothdefs.h:1088)
+#define GCSQC_STAT_WEAPON              35   // current_weapon (WEAP_* бит, точное оружие)
 
 //--- Стандартные QW-статы 0..31 (fteqw common/bothdefs.h) ---
 #define GCSQC_STAT_HEALTH              0

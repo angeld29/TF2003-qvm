@@ -235,6 +235,9 @@ void G_CSQC_Example_RegisterStats( void )
 	G_RegisterClientStat( GCSQC_STAT_FIRST + 0, GCSQC_EV_INTEGER, FOFS( playerclass ) );
 	G_RegisterClientStat( GCSQC_STAT_FIRST + 1, GCSQC_EV_INTEGER, FOFS( team_no ) );
 	G_RegisterClientStat( GCSQC_STAT_FIRST + 2, GCSQC_EV_INTEGER, FOFS( real_frags ) );
+	// Текущее оружие: точный WEAP_* бит (s.v.weapon в TF2003 = 0, STAT_ITEMS
+	// аккумулирует слоты, STAT_WEAPONMODELI не доставляется в QW-протоколе).
+	G_RegisterClientStat( GCSQC_STAT_WEAPON, GCSQC_EV_INTEGER, FOFS( current_weapon ) );
 
 	// Глобальные статы (общая память мода) — счёт команд.
 	G_RegisterPointerStat( GCSQC_STAT_FIRST + 8, GCSQC_EV_INTEGER, &teamscores[0] );

@@ -52,3 +52,10 @@ runs PVS-Studio analysis (optional, needs pvs-studio installed).
 ## Language
 
 Docs and comments are largely Russian (BUILD.md, Makefile, docs/, todo.txt).
+
+## Docs (root workspace)
+
+- `../docs/g_ext_plan.md` — `G_Map_Extension` mechanism (implemented: `src/g_ext.c`, `include/g_ext.h`); read before editing extensions/exports.
+- `../docs/csqc_ssqc_data_flow.md` — CSQC mechanisms (`src/g_csqc.c`, `include/g_csqc.h`, exports `GAME_EDICT_CSQCSEND`/`GAME_QCREQUEST`); §7 QVM adaptation; read before editing CSQC code.
+- `../docs/tf2003_csqc_client_plan.md` — plan for the client module (`csqc/`, `csprogs.dat`), phases 0–3, no prediction; read before working on `csqc/`.
+- `../docs/fo_qwprogs_csqc_entities.md` — fo-qwprogs entity/field inventory sent to the client and how the client uses them; reference for the `csqc/` port.
