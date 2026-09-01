@@ -102,6 +102,9 @@ void TF_PlaceItem(  )
 		item_list_bit = 1;
 	self->item_list = item_list_bit;
 	item_list_bit *= 2;
+
+	//CSQC (пример): флаги получают SendEntity
+	G_CSQC_Example_PlaceItem( self );
 }
 
 void TF_StartItem(  )

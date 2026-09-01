@@ -91,6 +91,8 @@ void initialise_spawned_ent(gedict_t* ent)
        PR2SetStringFieldOffset(ent, noise1);
        PR2SetStringFieldOffset(ent, noise2);
        PR2SetStringFieldOffset(ent, noise3);
+
+       ent->SendEntity = ( func_t )0; // CSQC: без сериализации по умолчанию
 }
 
 gedict_t *spawn(  )

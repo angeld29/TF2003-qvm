@@ -34,6 +34,7 @@
 #include "g_public.h"
 #include "g_syscalls.h"
 #include "g_ext.h"
+#include "g_csqc.h"
 #include "player.h"
 #include "tfort.h"
 #include "spy.h"

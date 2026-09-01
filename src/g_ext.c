@@ -228,7 +228,9 @@ qboolean G_Ext_GetExtFieldPtr(gedict_t *ed, intptr_t fieldref, void *data, intpt
 
 void G_Ext_SetSendNeeded(gedict_t *ed, intptr_t sendflags, gedict_t *to)
 {
-	if (!HAVEEXT(G_SETSENDNEEDED))
+	// Полная CSQC-поддержка обязательна: на mvdsv setsendneeded мапится,
+	// но его обработчик — SV_Error (заглушка), поэтому HAVEEXT недостаточно.
+	if (!G_CSQC_OK())
 	{
 		if (cvar("developer"))
 			G_dprintf("setsendneeded not available\n");

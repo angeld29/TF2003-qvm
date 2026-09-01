@@ -191,6 +191,12 @@ typedef enum
 	GAME_CLIENT_SAY,			// ( int isTeamSay );
     GAME_PAUSED_TIC,            // ( int duration_msec );   // duration is in msecs
     GAME_CLEAR_EDICT,           // (self)
+
+	// CSQC: фиксированные номера не сдвигают остальные экспорты.
+	// Вызывает движок при сериализации CSQC-сущности (fteqw SV_EmitCSQCUpdate,
+	// mvdsv PR2_SendEntity): self=ent, other=viewer, аргумент sendflags.
+	GAME_EDICT_CSQCSEND = 200,	// (self,other,int sendflags) — возвращает 0=не слать, !=0=слать
+	GAME_QCREQUEST,			// (self=client; eventname,argcount,argtypes; значения в parm1..parm6) — sendevent, задел
 } gameExport_t;
 
 

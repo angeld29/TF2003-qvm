@@ -41,6 +41,7 @@ set( SOURCE_LIB
     "${DIR_SRC}/engineer.c"
     "${DIR_SRC}/flare.c"
     "${DIR_SRC}/g_cmd.c"
+    "${DIR_SRC}/g_csqc.c"
     "${DIR_SRC}/g_ext.c"
     "${DIR_SRC}/g_mem.c"
     "${DIR_SRC}/g_mod_command.c"

@@ -257,6 +257,33 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
             RestoreGlobals();
             return 0;
 
+        case GAME_EDICT_CSQCSEND:
+            // CSQC-сериализация сущности (fteqw SV_EmitCSQCUpdate / mvdsv PR2_SendEntity).
+            // self=ent, other=viewer, arg0=sendflags. Колбек пишет payload через
+            // G_CSQC_Write* (MSG_CSQC), возврат 0=не слать, !=0=слать.
+            self = PROG_TO_EDICT( g_globalvars.self );
+            other = PROG_TO_EDICT( g_globalvars.other );
+            {
+                int ret = 0;
+                if ( self->SendEntity )
+                    ret = ( ( int ( * ) ( int ) ) ( self->SendEntity ) ) ( arg0 );
+                RestoreGlobals();
+                return ret;
+            }
+
+        case GAME_QCREQUEST:
+            // sendevent (клиент→сервер), задел: ни один движок пока не вызывает.
+            // self=client; eventname (строка в памяти мода), argcount, argtypes;
+            // значения аргументов — в глобальных parm-слотах. Возврат 1 = обработано.
+            self = PROG_TO_EDICT( g_globalvars.self );
+            {
+                int ret = 0;
+                if ( cvar( "developer" ) )
+                    G_dprintf( "GAME_QCREQUEST not handled yet\n" );
+                RestoreGlobals();
+                return ret;
+            }
+
     }
 
     return 0;
@@ -293,6 +320,10 @@ void G_InitGame( int levelTime, int randomSeed )
     memset( &tf_data, 0, sizeof(tf_data));
     memset( &tg_data, 0, sizeof(tg_data));
     localcmd("serverinfo status Standby\n");
+    //CSQC (пример): статы игрока/команд под cvar g_csqc
+    //(default 0; включается +g_csqc 1 или в консоли — здесь не форсим, иначе
+    //командная строка/консоль перезатрётся на каждой загрузке карты)
+    G_CSQC_Example_RegisterStats();
     //test
     /*        num = trap_FS_GetFileList( "SKINS" , ".pcx" , dirlist, sizeof(dirlist));
               dirptr=dirlist;
