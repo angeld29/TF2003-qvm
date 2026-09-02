@@ -272,14 +272,12 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
             }
 
         case GAME_QCREQUEST:
-            // sendevent (клиент→сервер), задел: ни один движок пока не вызывает.
-            // self=client; eventname (строка в памяти мода), argcount, argtypes;
-            // значения аргументов — в глобальных parm-слотах. Возврат 1 = обработано.
+            // sendevent (клиент→сервер), контракт docs/ezquake_csqc_pr2.md §5.2.
+            // self=client; arg0=eventname (строка в памяти мода), arg1=argcount,
+            // arg2=argtypes; значения аргументов — в глобальных parm-слотах.
             self = PROG_TO_EDICT( g_globalvars.self );
             {
-                int ret = 0;
-                if ( cvar( "developer" ) )
-                    G_dprintf( "GAME_QCREQUEST not handled yet\n" );
+                int ret = G_GameQCRequest( arg0, arg1, arg2 );
                 RestoreGlobals();
                 return ret;
             }

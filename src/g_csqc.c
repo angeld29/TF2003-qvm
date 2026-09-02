@@ -60,6 +60,85 @@ qboolean G_ClientCSQCActive( gedict_t *client )
 }
 
 //===========================================================================
+// GAME_QCREQUEST: sendevent клиент→сервер (референс-реализация).
+// Контракт (движок и мод совпадают) — docs/ezquake_csqc_pr2.md §5.2:
+//   self=client, eventname — строка события (адрес в памяти мода),
+//   argcount (0..6), argtypes — по 3 бита GCSQC_QCREQ_* на аргумент;
+//   значения аргументов — в parm-слотах parm1+i*3 (см. include/g_csqc.h).
+// Референс читает и логирует под cvar "developer"; возврат 1 = обработано.
+//===========================================================================
+
+int G_GameQCRequest( intptr_t eventname_off, int argcount, int argtypes )
+{
+	int i;
+	float *pv = &g_globalvars.parm1;
+	const char *evname;
+	gedict_t *cl;
+
+	if ( argcount < 0 || argcount > GCSQC_QCREQ_MAXARGS )
+		return 0;
+
+	cl = PROG_TO_EDICT( g_globalvars.self );
+	if ( !cl )
+		return 0;
+
+	if ( !cvar( "developer" ) )
+		return 1;	// принято; логирование не требуется
+
+#ifdef Q3_VM
+	// QVM: строка — адрес в памяти VM, читается напрямую
+	evname = ( const char * )eventname_off;
+#else
+	// Native PR2 (sv_progtype 1/3): аргументы VM_Call шириной 32 бита, поэтому
+	// хост-указатель строки в них не помещается — имя события недоступно.
+	evname = NULL;
+#endif
+
+	G_dprintf( "GAME_QCREQUEST client %d event \"%s\" argc=%d\n",
+		NUM_FOR_EDICT( cl ), evname ? evname : "(n/a)", argcount );
+
+	for ( i = 0; i < argcount; i++ )
+	{
+		int type = ( argtypes >> ( i * 3 ) ) & 7;
+
+		switch ( type )
+		{
+		case GCSQC_QCREQ_FLOAT:
+			G_dprintf( "  [%d] float %f\n", i, pv[i * 3] );
+			break;
+		case GCSQC_QCREQ_INT:
+			G_dprintf( "  [%d] int %d\n", i, *( ( int * )&pv[i * 3] ) );
+			break;
+		case GCSQC_QCREQ_VECTOR:
+			G_dprintf( "  [%d] vector %f %f %f\n", i,
+				pv[i * 3], pv[i * 3 + 1], pv[i * 3 + 2] );
+			break;
+		case GCSQC_QCREQ_ENTITY:
+			{
+				gedict_t *e = PROG_TO_EDICT( *( ( int * )&pv[i * 3] ) );
+				G_dprintf( "  [%d] entity %d\n", i, e ? NUM_FOR_EDICT( e ) : -1 );
+			}
+			break;
+		case GCSQC_QCREQ_STRING:
+#ifdef Q3_VM
+			{
+				const char *s = ( const char * )( intptr_t )( *( ( int * )&pv[i * 3] ) );
+				G_dprintf( "  [%d] string \"%s\"\n", i, s ? s : "(null)" );
+			}
+#else
+			G_dprintf( "  [%d] string (native: недоступно)\n", i );
+#endif
+			break;
+		default:
+			G_dprintf( "  [%d] unknown type %d\n", i, type );
+			break;
+		}
+	}
+
+	return 1;
+}
+
+//===========================================================================
 // SendEntity: назначение функции сериализации эдикта.
 // Колбек хранится в C-поле gedict_t.SendEntity (вызывается нашим обработчиком
 // GAME_EDICT_CSQCSEND), движку сообщается флаг через расширенное поле

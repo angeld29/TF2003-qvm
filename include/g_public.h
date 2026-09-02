@@ -196,7 +196,7 @@ typedef enum
 	// Вызывает движок при сериализации CSQC-сущности (fteqw SV_EmitCSQCUpdate,
 	// mvdsv PR2_SendEntity): self=ent, other=viewer, аргумент sendflags.
 	GAME_EDICT_CSQCSEND = 200,	// (self,other,int sendflags) — возвращает 0=не слать, !=0=слать
-	GAME_QCREQUEST,			// (self=client; eventname,argcount,argtypes; значения в parm1..parm6) — sendevent, задел
+	GAME_QCREQUEST,			// (self=client; eventname,argcount,argtypes; значения в parm1..parm6) — sendevent, см. g_csqc.c G_GameQCRequest
 } gameExport_t;
 
 
