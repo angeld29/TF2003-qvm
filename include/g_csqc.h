@@ -198,5 +198,6 @@ void G_SendCSQCEvent( vec3_t org, const char *name );
 void G_CSQC_Example_RegisterStats( void );
 int  G_CSQC_Example_FlagSendEntity( int sendflags );
 void G_CSQC_Example_PlaceItem( gedict_t *ent );
+void G_CSQC_Example_Frame( void );   // per-frame; периодический дирт CSQC-сущностей (~1 c)
 
 #endif

@@ -2,6 +2,9 @@
 // CSQC 2D-координаты: origin (0,0) = верхний левый угол, виртуальные пиксели.
 // Активное оружие — из STAT_ITEMS (бит слота); броня/powerups — тоже из STAT_ITEMS.
 
+// CSQC-тест: маркеры флагов/эхо/счёт команд (определена в main.qc).
+void Hud_DrawCSQC();
+
 // Аммо текущего оружия по имени типа (или 0).
 float ammo_by_type(string t) {
 	if (t == "SHELLS")  return getstatf(STAT_SHELLS);
@@ -49,4 +52,7 @@ void Hud_Draw() {
 	drawstring([cx - 150, y + 22, 0],
 		sprintf("S%g N%g R%g C%g", shells, nails, rockets, cells),
 		[12, 12], '1 1 1', 1, 0);
+
+	// CSQC-тест: маркеры флагов, эхо sendevent, счёт команд (main.qc).
+	Hud_DrawCSQC();
 }

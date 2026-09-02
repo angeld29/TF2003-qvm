@@ -373,4 +373,5 @@ void StartFrame( int time )
 //	old_time = g_globalvars.time;
 //	botFrame();
 	MatchTimer( false );
+	G_CSQC_Example_Frame();
 }

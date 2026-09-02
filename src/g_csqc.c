@@ -30,10 +30,19 @@
 static qboolean csqc_ok_initialized = false;
 static qboolean csqc_ok = false;
 
+// Канарейка pointerstat: тикает ~1/с в G_CSQC_Example_Frame (проверка канала).
+int g_csqc_tick;
+
+// Тестовые глобалы pointerstat с фиксированными значениями разных типов.
+static int   g_ps_int   = 123456789;  // 0x075BCD15
+static float g_ps_float = 12345.5f;   // 0x4640E600
+static float g_ps_vec[3] = {1.0f, 2.0f, 3.0f};
+
 // Полная поддержка CSQC движком = доступны clientstat+pointerstat+setsendneeded.
 // На mvdsv clientstat/pointerstat не мапятся вовсе, а setsendneeded хоть и
 // мапится, но его обработчик — SV_Error. Комбинация отличает fteqw от mvdsv
 // без риска краша.
+static qboolean any_client_csqc_active( void );	// определена ниже, нужна эху/фрейм-хуку
 qboolean G_CSQC_OK( void )
 {
 	if ( !csqc_ok_initialized )
@@ -70,6 +79,61 @@ qboolean G_ClientCSQCActive( gedict_t *client )
 // Референс читает и логирует под cvar "developer"; возврат 1 = обработано.
 //===========================================================================
 
+// Эхо-ответ на sendevent "csqc_echo": шлёт клиенту cgamepacket "echo" с теми
+// же аргументами (сырые значения: coord/long/string/entity), чтобы клиент
+// мог отобразить их и подтвердить сквозную передачу типов. Бинарное кодирование
+// (без форматирования float на сервере — QVM не дружит с %f в snprintf).
+void G_CSQC_Example_Echo( gedict_t *cl, int argcount )
+{
+	char buf[12];
+	int i;
+	int type;
+
+	if ( !cl || argcount < 0 || argcount > GCSQC_QCREQ_MAXARGS )
+		return;
+	if ( !G_CSQC_OK() || !any_client_csqc_active() )
+		return;
+
+	trap_WriteByte( MSG_MULTICAST, GCSQC_SVC_CGAMEPACKET );
+	trap_WriteString( MSG_MULTICAST, "echo" );
+	trap_WriteByte( MSG_MULTICAST, argcount );
+
+	for ( i = 0; i < argcount; i++ )
+	{
+		type = G_Ext_QCRequestArg( i, buf, sizeof( buf ) );
+		trap_WriteByte( MSG_MULTICAST, type );
+
+		switch ( type )
+		{
+		case GCSQC_QCREQ_FLOAT:
+			trap_WriteCoord( MSG_MULTICAST, *( float * )buf );
+			break;
+		case GCSQC_QCREQ_VECTOR:
+			trap_WriteCoord( MSG_MULTICAST, ( ( float * )buf )[0] );
+			trap_WriteCoord( MSG_MULTICAST, ( ( float * )buf )[1] );
+			trap_WriteCoord( MSG_MULTICAST, ( ( float * )buf )[2] );
+			break;
+		case GCSQC_QCREQ_INT:
+			trap_WriteLong( MSG_MULTICAST, *( int * )buf );
+			break;
+		case GCSQC_QCREQ_STRING:
+			trap_WriteString( MSG_MULTICAST, buf );
+			break;
+		case GCSQC_QCREQ_ENTITY:
+			{
+				gedict_t *e = PROG_TO_EDICT( *( int * )buf );
+				trap_WriteEntity( MSG_MULTICAST, e ? NUM_FOR_EDICT( e ) : 0 );
+			}
+			break;
+		default:
+			trap_WriteString( MSG_MULTICAST, "?" );
+			break;
+		}
+	}
+
+	trap_multicast( PASSVEC3( cl->s.v.origin ), MULTICAST_PHS );
+}
+
 int G_GameQCRequest( int argcount )
 {
 	int i;
@@ -86,6 +150,14 @@ int G_GameQCRequest( int argcount )
 
 	// событие: единственный raw argv(0) (движок ставит без токенизации)
 	trap_CmdArgv( 0, evname, sizeof( evname ) );
+
+	// тест-событие: замкнутый круг sendevent → qcrequestarg → cgamepacket
+	if ( !strcmp( evname, "csqc_echo" ) )
+	{
+		G_CSQC_Example_Echo( cl, argcount );
+		if ( !cvar( "developer" ) )
+			return 1;
+	}
 
 	if ( !cvar( "developer" ) )
 		return 1;	// принято; логирование не требуется
@@ -306,12 +378,19 @@ void G_CSQC_Example_RegisterStats( void )
 	// Текущее оружие: точный WEAP_* бит (s.v.weapon в TF2003 = 0, STAT_ITEMS
 	// аккумулирует слоты, STAT_WEAPONMODELI не доставляется в QW-протоколе).
 	G_RegisterClientStat( GCSQC_STAT_WEAPON, GCSQC_EV_INTEGER, FOFS( current_weapon ) );
+	// Канарейка clientstat: текущие патроны (всегда >0, пока есть оружие).
+	G_RegisterClientStat( GCSQC_STAT_FIRST + 4, GCSQC_EV_INTEGER, FOFS( s.v.currentammo ) );
 
-	// Глобальные статы (общая память мода) — счёт команд.
-	G_RegisterPointerStat( GCSQC_STAT_FIRST + 8, GCSQC_EV_INTEGER, &teamscores[0] );
+	// Глобальные статы (общая память мода): канарейка-тик + счёт команд.
+	G_RegisterPointerStat( GCSQC_STAT_FIRST + 8, GCSQC_EV_INTEGER, &g_csqc_tick );
 	G_RegisterPointerStat( GCSQC_STAT_FIRST + 9, GCSQC_EV_INTEGER, &teamscores[1] );
 	G_RegisterPointerStat( GCSQC_STAT_FIRST + 10, GCSQC_EV_INTEGER, &teamscores[2] );
 	G_RegisterPointerStat( GCSQC_STAT_FIRST + 11, GCSQC_EV_INTEGER, &teamscores[3] );
+
+	// Тест-глобалы фикс. значений (диагностика чтения памяти pointerstat).
+	G_RegisterPointerStat( GCSQC_STAT_FIRST + 18, GCSQC_EV_INTEGER, &g_ps_int );
+	G_RegisterPointerStat( GCSQC_STAT_FIRST + 19, GCSQC_EV_FLOAT, &g_ps_float );
+	G_RegisterPointerStat( GCSQC_STAT_FIRST + 20, GCSQC_EV_VECTOR, g_ps_vec );
 }
 
 // SendEntity-колбек для флага: пишет мини-payload для CSQC-клиента.
@@ -344,5 +423,33 @@ void G_CSQC_Example_PlaceItem( gedict_t *ent )
 		ExtFieldSetSendEntity( ent, ( func_t )G_CSQC_Example_FlagSendEntity );
 		if ( cvar( "developer" ) )
 			G_dprintf( "G_CSQC_Example_PlaceItem: SendEntity set on flag edict %d\n", NUM_FOR_EDICT( ent ) );
+	}
+}
+
+// Периодический дирт CSQC-сущностей (раз в ~1 c). На mvdsv эмиссия идёт только
+// по dirt (setsendneeded/SendFlags), поэтому клиент, включивший csqc после
+// спавна карты, без этого не увидел бы ни одной CSQC-сущности. Вызывается из
+// StartFrame; фактически работает только при g_csqc и наличии CSQC-клиента.
+void G_CSQC_Example_Frame( void )
+{
+	static float last_dirt = 0;
+	int n;
+	gedict_t *e;
+
+	if ( !cvar( "g_csqc" ) )
+		return;
+	if ( !any_client_csqc_active() )
+		return;
+	if ( g_globalvars.time - last_dirt < 1.0f )
+		return;
+	last_dirt = g_globalvars.time;
+
+	g_csqc_tick++;
+
+	for ( n = trap_nextent( 0 ); n; n = trap_nextent( n ) )
+	{
+		e = &g_edicts[n];
+		if ( e->SendEntity )
+			G_Ext_SetSendNeeded( e, GCSQC_SENDFLAG_STATE, NULL );
 	}
 }
