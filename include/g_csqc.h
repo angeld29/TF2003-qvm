@@ -64,10 +64,11 @@
 #define GCSQC_EV_INTEGER   8
 
 //--- Коды аргументов sendevent (экспорт GAME_QCREQUEST; движок и мод обязаны
-//    совпадать — docs/ezquake_csqc_pr2.md §5.2). В argtypes — по 3 бита на
-//    аргумент (биты 0..2 = arg0, 3..5 = arg1, ...), максимум
-//    GCSQC_QCREQ_MAXARGS аргументов; значения лежат в parm-слотах parm1+i*3
-//    (int/entity/string — в [i*3+0], vector — [i*3+0..2]). ---
+//    совпадать — docs/ezquake_csqc_pr2.md §5.2). Экспорт передаёт только
+//    argcount (0..GCSQC_QCREQ_MAXARGS); имя события движок кладёт в cmd-argv
+//    одним сырым аргументом (без токенизации) — читается trap_CmdArgv(0);
+//    значения аргументов движок отдаёт трапом qcrequestarg(idx, buf, size):
+//    копирует значение в buf и возвращает код типа GCSQC_QCREQ_*. ---
 #define GCSQC_QCREQ_FLOAT    0
 #define GCSQC_QCREQ_VECTOR   1
 #define GCSQC_QCREQ_STRING   2
@@ -152,11 +153,11 @@ qboolean G_CSQC_OK( void );
 qboolean G_ClientCSQCActive( gedict_t *client );
 
 // Разбор и обработка sendevent клиент→сервер (экспорт GAME_QCREQUEST,
-// вызывается движком: self=client). Коды аргументов/parm-слоты — см. выше.
-// Возврат !=0 = обработано. Референс-реализация читает eventname и значения
-// аргументов и логирует их под cvar "developer"; конкретные события мод
-// вешает на эту же точку входа.
-int G_GameQCRequest( intptr_t eventname, int argcount, int argtypes );
+// вызывается движком: self=client, arg0=argcount). Имя события — trap_CmdArgv(0);
+// значения аргументов — трап qcrequestarg (см. G_Ext_QCRequestArg).
+// Возврат !=0 = обработано. Референс-реализация логирует под cvar "developer";
+// конкретные события мод вешает на эту же точку входа.
+int G_GameQCRequest( int argcount );
 
 // Назначить эдикту функцию сериализации CSQC. Движок вызывает её через
 // экспорт GAME_EDICT_CSQCSEND: self=ent, other=viewer, аргумент sendflags.
