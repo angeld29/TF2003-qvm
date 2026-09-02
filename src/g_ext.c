@@ -50,6 +50,7 @@ static const g_exttrap_t g_exttraps[] =
 	{"GetExtFieldPtr",     G_GETEXTFIELDPTR,     false},
 	{"setsendneeded",      G_SETSENDNEEDED,      false},
 	{"VisibleTo",          G_VISIBLETO,          false},
+	{"qcrequestarg",       G_QCREQUESTARG,       false},
 };
 
 qboolean g_ext_available[G_EXTENSIONS_LAST - G_EXTENSIONS_FIRST];
@@ -248,6 +249,17 @@ qboolean G_Ext_VisibleTo(gedict_t *viewer, gedict_t *viewee)
 		return false;
 	}
 	return trap_VisibleTo(NUM_FOR_EDICT(viewer), NUM_FOR_EDICT(viewee)) != 0;
+}
+
+int G_Ext_QCRequestArg(int idx, void *buf, int size)
+{
+	if (!HAVEEXT(G_QCREQUESTARG))
+	{
+		if (cvar("developer"))
+			G_dprintf("qcrequestarg not available\n");
+		return -1;
+	}
+	return trap_QCRequestArg(idx, buf, size);
 }
 
 //===========================================================================

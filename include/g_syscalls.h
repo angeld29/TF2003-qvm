@@ -139,6 +139,7 @@ intptr_t trap_SetExtFieldPtr( gedict_t *ed, intptr_t fieldref, intptr_t *data, i
 intptr_t trap_GetExtFieldPtr( gedict_t *ed, intptr_t fieldref, intptr_t *data, intptr_t size );
 intptr_t trap_SetSendNeeded( intptr_t subject, intptr_t flags, intptr_t to );
 intptr_t trap_VisibleTo( intptr_t viewer, intptr_t viewee );
+int      trap_QCRequestArg( int idx, void *buf, int size );   // mvdsv sendevent: значение аргумента + тип
 
 intptr_t 	trap_AddBot( const char* name, intptr_t bottomcolor, intptr_t topcolor, const char* skin);
 intptr_t 	trap_RemoveBot( intptr_t edn );

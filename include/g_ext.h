@@ -47,6 +47,7 @@ enum
 	G_GETEXTFIELDPTR,                     // 267
 	G_SETSENDNEEDED,                      // 268
 	G_VISIBLETO,                          // 269
+	G_QCREQUESTARG,                       // 270: mvdsv — получение значения аргумента sendevent
 	G_EXTENSIONS_LAST
 };
 
@@ -84,6 +85,7 @@ qboolean  G_Ext_SetExtFieldPtr(gedict_t *ed, intptr_t fieldref, void *data, intp
 qboolean  G_Ext_GetExtFieldPtr(gedict_t *ed, intptr_t fieldref, void *data, intptr_t size);
 void      G_Ext_SetSendNeeded(gedict_t *ed, intptr_t sendflags, gedict_t *to);
 qboolean  G_Ext_VisibleTo(gedict_t *viewer, gedict_t *viewee);
+int       G_Ext_QCRequestArg(int idx, void *buf, int size);   // mvdsv sendevent: копирует аргумент, возвращает GCSQC_QCREQ_* / -1
 
 // Хелперы работы с расширенными полями сущностей.
 // Выбирают доступный путь: Ptr (MapExtFieldPtr/Set|GetExtFieldPtr),

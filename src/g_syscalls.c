@@ -489,6 +489,11 @@ intptr_t trap_VisibleTo( intptr_t viewer, intptr_t viewee )
 	return syscall( G_VISIBLETO, viewer, viewee );
 }
 
+int trap_QCRequestArg( int idx, void *buf, int size )
+{
+	return syscall( G_QCREQUESTARG, idx, (intptr_t)buf, size );
+}
+
 intptr_t 	trap_AddBot( const char* name, intptr_t bottomcolor, intptr_t topcolor, const char* skin)
 {
         return syscall( G_Add_Bot, (intptr_t)name, bottomcolor, topcolor, (intptr_t)skin );
