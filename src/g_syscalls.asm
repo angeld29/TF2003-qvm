@@ -120,3 +120,4 @@ equ		trap_GetExtFieldPtr    -268
 equ		trap_SetSendNeeded     -269
 equ		trap_VisibleTo         -270
 equ		trap_QCRequestArg      -271
+equ		trap_SetSendNeeded64   -272

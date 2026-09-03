@@ -138,6 +138,7 @@ intptr_t trap_MapExtFieldPtr( const char *fieldname );
 intptr_t trap_SetExtFieldPtr( gedict_t *ed, intptr_t fieldref, intptr_t *data, intptr_t size );
 intptr_t trap_GetExtFieldPtr( gedict_t *ed, intptr_t fieldref, intptr_t *data, intptr_t size );
 intptr_t trap_SetSendNeeded( intptr_t subject, intptr_t flags, intptr_t to );
+intptr_t trap_SetSendNeeded64( intptr_t subject, intptr_t flags_lo, intptr_t flags_hi, intptr_t to );
 intptr_t trap_VisibleTo( intptr_t viewer, intptr_t viewee );
 int      trap_QCRequestArg( int idx, void *buf, int size );   // mvdsv sendevent: значение аргумента + тип
 

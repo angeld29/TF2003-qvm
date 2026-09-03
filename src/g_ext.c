@@ -49,6 +49,7 @@ static const g_exttrap_t g_exttraps[] =
 	{"SetExtFieldPtr",     G_SETEXTFIELDPTR,     false},
 	{"GetExtFieldPtr",     G_GETEXTFIELDPTR,     false},
 	{"setsendneeded",      G_SETSENDNEEDED,      false},
+	{"setsendneeded64",    G_SETSENDNEEDED64,    false},
 	{"VisibleTo",          G_VISIBLETO,          false},
 	{"qcrequestarg",       G_QCREQUESTARG,       false},
 };
@@ -227,17 +228,28 @@ qboolean G_Ext_GetExtFieldPtr(gedict_t *ed, intptr_t fieldref, void *data, intpt
 	return trap_GetExtFieldPtr(ed, fieldref, data, size) != 0;
 }
 
-void G_Ext_SetSendNeeded(gedict_t *ed, intptr_t sendflags, gedict_t *to)
+// Грязевой дирт CSQC-сущности с 64-битной маской как двумя int
+// (lo = биты 0..31, hi = биты 32..61). mvdsv отдаёт всю маску через
+// трап "setsendneeded64"; fteqw умеет только младшее 32-битное слово
+// (границы его QVM 32-битны) — фолбэк на старый "setsendneeded".
+void G_Ext_SetSendNeeded(gedict_t *ed, int sendflags_lo, int sendflags_hi, gedict_t *to)
 {
-	// Полная CSQC-поддержка обязательна: на mvdsv setsendneeded мапится,
-	// но его обработчик — SV_Error (заглушка), поэтому HAVEEXT недостаточно.
-	if (!G_CSQC_OK())
+	intptr_t to_num = to ? NUM_FOR_EDICT(to) : 0;
+
+	if (!HAVEEXT(G_SETSENDNEEDED64))
 	{
-		if (cvar("developer"))
-			G_dprintf("setsendneeded not available\n");
+		if (!G_CSQC_OK())
+		{
+			if (cvar("developer"))
+				G_dprintf("setsendneeded not available\n");
+			return;
+		}
+		// fteqw: только младшие 32 бита маски доходят до SendEntity.
+		trap_SetSendNeeded(NUM_FOR_EDICT(ed), sendflags_lo, to_num);
 		return;
 	}
-	trap_SetSendNeeded(NUM_FOR_EDICT(ed), sendflags, to ? NUM_FOR_EDICT(to) : 0);
+
+	trap_SetSendNeeded64(NUM_FOR_EDICT(ed), sendflags_lo, sendflags_hi, to_num);
 }
 
 qboolean G_Ext_VisibleTo(gedict_t *viewer, gedict_t *viewee)

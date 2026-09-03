@@ -48,6 +48,7 @@ enum
 	G_SETSENDNEEDED,                      // 268
 	G_VISIBLETO,                          // 269
 	G_QCREQUESTARG,                       // 270: mvdsv — получение значения аргумента sendevent
+	G_SETSENDNEEDED64,                    // 271: mvdsv — setsendneeded с 64-битной маской (2 int)
 	G_EXTENSIONS_LAST
 };
 
@@ -83,7 +84,7 @@ void      G_Ext_PointerStat(int statidx, int stattype, void *ptr);
 qboolean  G_Ext_MapExtFieldPtr(const char *fieldname, intptr_t *out);            // false — недоступно
 qboolean  G_Ext_SetExtFieldPtr(gedict_t *ed, intptr_t fieldref, void *data, intptr_t size);
 qboolean  G_Ext_GetExtFieldPtr(gedict_t *ed, intptr_t fieldref, void *data, intptr_t size);
-void      G_Ext_SetSendNeeded(gedict_t *ed, intptr_t sendflags, gedict_t *to);
+void      G_Ext_SetSendNeeded(gedict_t *ed, int sendflags_lo, int sendflags_hi, gedict_t *to);
 qboolean  G_Ext_VisibleTo(gedict_t *viewer, gedict_t *viewee);
 int       G_Ext_QCRequestArg(int idx, void *buf, int size);   // mvdsv sendevent: копирует аргумент, возвращает GCSQC_QCREQ_* / -1
 

@@ -484,6 +484,11 @@ intptr_t trap_SetSendNeeded( intptr_t subject, intptr_t flags, intptr_t to )
 	return syscall( G_SETSENDNEEDED, subject, flags, to );
 }
 
+intptr_t trap_SetSendNeeded64( intptr_t subject, intptr_t flags_lo, intptr_t flags_hi, intptr_t to )
+{
+	return syscall( G_SETSENDNEEDED64, subject, flags_lo, flags_hi, to );
+}
+
 intptr_t trap_VisibleTo( intptr_t viewer, intptr_t viewee )
 {
 	return syscall( G_VISIBLETO, viewer, viewee );
