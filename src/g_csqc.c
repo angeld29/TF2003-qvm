@@ -23,9 +23,9 @@
 #include "g_local.h"
 
 // CSQC-механизмы сервера. Детали и ограничения — в include/g_csqc.h.
-// Полный конвейер (SendEntity-эмит, MSG_CSQC, статы 32..127) есть только в
-// fteqw QVM; на mvdsv всё guarded через G_CSQC_OK(), чтобы не дёргать
-// erroring-заглушки движка.
+// Полный конвейер (SendEntity-эмит, MSG_CSQC, статы 32..127) есть и в fteqw QVM,
+// и в mvdsv (csqc-ветка, PR2); код guarded через G_CSQC_OK(), чтобы на движке
+// без CSQC не дёргать заглушки.
 
 static qboolean csqc_ok_initialized = false;
 static qboolean csqc_ok = false;
@@ -39,9 +39,6 @@ static float g_ps_float = 12345.5f;   // 0x4640E600
 static float g_ps_vec[3] = {1.0f, 2.0f, 3.0f};
 
 // Полная поддержка CSQC движком = доступны clientstat+pointerstat+setsendneeded.
-// На mvdsv clientstat/pointerstat не мапятся вовсе, а setsendneeded хоть и
-// мапится, но его обработчик — SV_Error. Комбинация отличает fteqw от mvdsv
-// без риска краша.
 static qboolean any_client_csqc_active( void );	// определена ниже, нужна эху/фрейм-хуку
 qboolean G_CSQC_OK( void )
 {
@@ -394,21 +391,39 @@ void G_CSQC_Example_RegisterStats( void )
 }
 
 // SendEntity-колбек для флага: пишет мини-payload для CSQC-клиента.
-// self=flag-эдикт, other=viewer, arg0=sendflags (биты GCSQC_SENDFLAG_*).
+// self=flag-эдикт, other=viewer, sendflags_lo/hi = 64-битная маска изменений
+// (два int; биты GCSQC_SENDFLAG_*, hi — биты 32..61, реальный hi-бит TIMER =
+// абсолютный бит 40). Мод хранит свою маску в self->csendflags_lo/hi и
+// рассматривает объединение с доставленной движком дельтой.
 // Возврат 0=не слать, !=0=слать.
-int G_CSQC_Example_FlagSendEntity( int sendflags )
+int G_CSQC_Example_FlagSendEntity( int sendflags_lo, int sendflags_hi )
 {
+	int hi;
+
 	if ( !G_CSQC_OK() )
 		return 0;
 
-	// Экономия: если изменились только координаты и состояние не трогалось,
-	// всё равно шлём (флаг — маленькая сущность); STATE-бит — соглашение примера.
-	( void )sendflags;
+	hi = sendflags_hi | self->csendflags_hi;
 
+	if ( cvar( "developer" ) )
+		G_dprintf( "G_CSQC_Example_FlagSendEntity: ent %d lo=0x%x hi=0x%x%s\n",
+			NUM_FOR_EDICT( self ), sendflags_lo, sendflags_hi,
+			( hi & GCSQC_SENDFLAG_TIMER ) ? " (hi-bit40)" : "" );
+
+	// CSQC-payload (согласован с csqc/main.qc CSQC_Ent_Update):
+	//   WriteEntity(self), WriteShort(skin), WriteByte(frame),
+	//   WriteByte(flagf) — GCSQC_FLAGF_T40: дошёл hi-бит TIMER (бит 40),
+	//   если флаг стоит — ещё WriteLong(time*10) (таймер, 0.1с).
 	G_CSQC_WriteEntity( self );       // номер сущности
 	G_CSQC_WriteShort( ( int )self->s.v.skin );  // 1/2 = команда
 	G_CSQC_WriteByte( ( int )self->s.v.frame );  // 0=на базе, 1=несётся
-	G_CSQC_WriteLong( ( int )( g_globalvars.time * 10 ) ); // время в 0.1с
+	if ( hi & GCSQC_SENDFLAG_TIMER )
+	{
+		G_CSQC_WriteByte( GCSQC_FLAGF_T40 );
+		G_CSQC_WriteLong( ( int )( g_globalvars.time * 10 ) ); // время в 0.1с
+	}
+	else
+		G_CSQC_WriteByte( 0 );
 	return 1;
 }
 
@@ -430,6 +445,9 @@ void G_CSQC_Example_PlaceItem( gedict_t *ent )
 // по dirt (setsendneeded/SendFlags), поэтому клиент, включивший csqc после
 // спавна карты, без этого не увидел бы ни одной CSQC-сущности. Вызывается из
 // StartFrame; фактически работает только при g_csqc и наличии CSQC-клиента.
+// Пример реального hi-бита: вместе с STATE (lo) ставится GCSQC_SENDFLAG_TIMER
+// в hi-слово (абсолютный бит 40) — маска хранится в моде как 2 int и уходит
+// на mvdsv через setsendneeded64; под fteqw (нет трапа) диртится только lo.
 void G_CSQC_Example_Frame( void )
 {
 	static float last_dirt = 0;
@@ -450,6 +468,10 @@ void G_CSQC_Example_Frame( void )
 	{
 		e = &g_edicts[n];
 		if ( e->SendEntity )
-			G_Ext_SetSendNeeded( e, GCSQC_SENDFLAG_STATE, NULL );
+		{
+			e->csendflags_lo = GCSQC_SENDFLAG_STATE;
+			e->csendflags_hi = GCSQC_SENDFLAG_TIMER;
+			G_Ext_SetSendNeeded( e, e->csendflags_lo, e->csendflags_hi, NULL );
+		}
 	}
 }

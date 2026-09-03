@@ -54,7 +54,9 @@ typedef struct gedict_s {
 	float           vw_index;
 	int         hideentity;             // links to entity to hide in eye chasecam
 	int			trackent;			// pseudo spectating for players.
-	func_t      SendEntity;         // CSQC: функция сериализации эдикта (GAME_EDICT_CSQCSEND)
+	func_t      SendEntity;         // CSQC: функция сериализации эдикта (GAME_EDICT_CSQCSEND, см. g_csqc.h)
+	int         csendflags_lo;      // CSQC: грязевая маска эдикта, lo = биты 0..31
+	int         csendflags_hi;      // CSQC: грязевая маска эдикта, hi = биты 32..61 (2×int, см. g_csqc.h)
 	qboolean       hideplayers;            // if set, all players hidden (read by mvdsv)
 // { highlights which clients this entity was visible to
 	unsigned int visclients;

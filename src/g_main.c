@@ -259,14 +259,15 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 
         case GAME_EDICT_CSQCSEND:
             // CSQC-сериализация сущности (fteqw SV_EmitCSQCUpdate / mvdsv PR2_SendEntity).
-            // self=ent, other=viewer, arg0=sendflags. Колбек пишет payload через
-            // G_CSQC_Write* (MSG_CSQC), возврат 0=не слать, !=0=слать.
+            // self=ent, other=viewer, arg0=sendflags lo (биты 0..31),
+            // arg1=sendflags hi (биты 32..61; на fteqw всегда 0). Колбек пишет
+            // payload через G_CSQC_Write* (MSG_CSQC), возврат 0=не слать, !=0=слать.
             self = PROG_TO_EDICT( g_globalvars.self );
             other = PROG_TO_EDICT( g_globalvars.other );
             {
                 int ret = 0;
                 if ( self->SendEntity )
-                    ret = ( ( int ( * ) ( int ) ) ( self->SendEntity ) ) ( arg0 );
+                    ret = ( ( csqc_sendentity_t ) ( self->SendEntity ) ) ( arg0, arg1 );
                 RestoreGlobals();
                 return ret;
             }

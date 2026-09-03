@@ -122,10 +122,25 @@
 #define GCSQC_SENDFLAGS_PRESENT        0x1u   // эдикт присутствует у клиента
 #define GCSQC_SENDFLAGS_REMOVED        0x2u   // эдикт удалён (обработка потери пакета)
 #define GCSQC_SENDFLAGS_SHIFT          2u     // пользовательские биты начинаются с 0
+
 // Пользовательские биты для setsendneeded(subject,flags,to) и аргумента sendflags
 // в GAME_EDICT_CSQCSEND — на усмотрение мода (движок сдвигает их на SENDFLAGS_SHIFT).
+//
+// 64-битная маска на PR2-границах передаётся ДВУМЯ int (VM-границы 32-битны):
+//   lo = биты 0..31, hi = биты 32..61 (62 usable бита: движок держит
+//   PRESENT/REMOVED у себя, старшие 2 бита hi-слова мод не использует).
+//   fteqw (QVM) умеет только младшие 32 бита — hi всегда 0.
+// Хранится в моде парой int-полей эдикта (gedict_t.csendflags_lo/hi).
 // Соглашение для примера TF2003:
-#define GCSQC_SENDFLAG_STATE           0x1    // изменилось состояние флага
+#define GCSQC_SENDFLAG_STATE           0x1         // lo-слово: изменилось состояние флага
+#define GCSQC_SENDFLAG_TIMER           (1u << 8)   // hi-слово (абсолютный бит 40): изменился таймер флага
+
+// Маркеры CSQC-payload примера флага (согласованы с csqc/main.qc):
+#define GCSQC_FLAGF_T40                0x1         // в payload есть таймер — дошёл hi-бит TIMER (40)
+
+// Колбек сериализации CSQC-сущности: self=ent, other=viewer, аргументы
+// sendflags lo/hi (см. выше). Возврат 0=не слать, !=0=слать.
+typedef int (*csqc_sendentity_t)( int sendflags_lo, int sendflags_hi );
 
 //--- Инфокей клиента (движок выставляет для подключённых) ---
 #define GCSQC_INFOKEY_CSQCACTIVE       "csqcactive"
@@ -144,8 +159,8 @@
 // API
 //===========================================================================
 
-// Полная поддержка CSQC движком: true только на fteqw. clientstat/pointerstat
-// мапятся только там; на mvdsv их нет вовсе, а setsendneeded — заглушка-ошибка.
+// Полная поддержка CSQC движком (clientstat + pointerstat + setsendneeded).
+// true и на fteqw, и на mvdsv (csqc-ветка); false — движок без CSQC.
 qboolean G_CSQC_OK( void );
 
 // Есть ли у клиента активный csqc-модуль (infokey "csqcactive", 1/0).
@@ -160,9 +175,9 @@ qboolean G_ClientCSQCActive( gedict_t *client );
 int G_GameQCRequest( int argcount );
 
 // Назначить эдикту функцию сериализации CSQC. Движок вызывает её через
-// экспорт GAME_EDICT_CSQCSEND: self=ent, other=viewer, аргумент sendflags.
-// Колбек пишет payload через G_CSQC_Write* и возвращает 0=не слать, !=0=слать.
-// На mvdsv флаг эдикта выставить можно, но эмит отсутствует — безвредно.
+// экспорт GAME_EDICT_CSQCSEND: self=ent, other=viewer, аргументы sendflags_lo/hi
+// (тип csqc_sendentity_t). Колбек пишет payload через G_CSQC_Write* и возвращает
+// 0=не слать, !=0=слать.
 void ExtFieldSetSendEntity( gedict_t *ed, func_t callback );
 
 // Запись CSQC-payload. Допустимо только внутри SendEntity-колбека (движок
@@ -196,7 +211,7 @@ void G_SendCSQCEvent( vec3_t org, const char *name );
 // следующей загрузке карты):
 // регистрация статов игрока/команд и SendEntity для флагов (tf_flag.mdl).
 void G_CSQC_Example_RegisterStats( void );
-int  G_CSQC_Example_FlagSendEntity( int sendflags );
+int  G_CSQC_Example_FlagSendEntity( int sendflags_lo, int sendflags_hi );
 void G_CSQC_Example_PlaceItem( gedict_t *ent );
 void G_CSQC_Example_Frame( void );   // per-frame; периодический дирт CSQC-сущностей (~1 c)
 
