@@ -11,14 +11,19 @@
 string g_echo;
 float g_echo_time;
 
-// 2D-маркеры флагов (payload сервера: entnum, skin=team, frame=carried, time).
+// 2D-маркеры флагов (payload сервера: entnum, skin=team, frame=carried,
+// flagf-маркер hi-бита, [таймер]). Детали: docs/ezquake_csqc_pr2.md.
 const float CSQC_MAXFLAGS = 8;
+// flagf-бит: в payload есть таймер — доставлен hi-бит 40 сервера (зеркало
+// GCSQC_FLAGF_T40 в include/g_csqc.h).
+const float CSQC_FLAGF_T40 = 1;
 
 // Слоты (все поля — float; entnum уникален).
 float fm_entnum[CSQC_MAXFLAGS];
 float fm_team[CSQC_MAXFLAGS];
 float fm_carried[CSQC_MAXFLAGS];
 float fm_time[CSQC_MAXFLAGS];
+float fm_t40[CSQC_MAXFLAGS];
 float fm_used[CSQC_MAXFLAGS];
 
 float FlagIdxByEnt(float entnum) {
@@ -38,14 +43,18 @@ float FlagFreeSlot() {
 }
 
 void(float isnew) CSQC_Ent_Update = {
-	local float e, team, carried, t, idx;
+	local float e, team, carried, t, flagf, idx;
 
 	// payload сервера G_CSQC_Example_FlagSendEntity:
-	// WriteEntity(self), WriteShort(skin), WriteByte(frame), WriteLong(time)
+	// WriteEntity(self), WriteShort(skin), WriteByte(frame),
+	// WriteByte(flagf) [GCSQC_FLAGF_T40 = дошёл hi-бит 40], и если flagf — WriteLong(time)
 	e = readentitynum();
 	team = readshort();
 	carried = readbyte();
-	t = readlong();
+	flagf = readbyte();
+	t = -1;
+	if (flagf >= CSQC_FLAGF_T40)
+		t = readlong();
 
 	idx = FlagIdxByEnt(e);
 	if (idx < 0)
@@ -57,6 +66,7 @@ void(float isnew) CSQC_Ent_Update = {
 	fm_team[idx] = team;
 	fm_carried[idx] = carried;
 	fm_time[idx] = t;
+	fm_t40[idx] = flagf >= CSQC_FLAGF_T40;
 	fm_used[idx] = 1;
 };
 
@@ -159,8 +169,10 @@ void Hud_DrawCSQC() {
 	yy = 60;
 	for (i = 0; i < CSQC_MAXFLAGS; i = i + 1) {
 		if (fm_used[i]) {
-			s = sprintf("FLAG #%d T%d c%d t%.1f",
-				fm_entnum[i], fm_team[i], fm_carried[i], fm_time[i]);
+			s = sprintf("FLAG #%d T%d c%d%s %s",
+				fm_entnum[i], fm_team[i], fm_carried[i],
+				fm_t40[i] ? " *T40" : "",
+				fm_time[i] >= 0 ? sprintf("t%.1f", fm_time[i]) : "-");
 			drawstring([10, yy, 0], s, [12, 12], '1 1 1', 1, 0);
 			yy = yy + 14;
 		}
