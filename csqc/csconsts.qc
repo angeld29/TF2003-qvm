@@ -134,41 +134,49 @@ string weapon_slot_name(float bit) {
 	return ftos(bit);
 }
 
+// Бит-тесты STAT_ITEMS. Касты (int) намеренно НЕ ставятся: IT_*-маски — точные
+// целочисленные float (<=2^23), классический OP_BITAND даёт тот же результат,
+// а явный (int) заставляет fteqcc генерировать ext-опкоды CONV_FTOI/BITAND_I/
+// AND_I (за пределами классического набора ezquake PR1). Без кастов модуль
+// использует только классические опкоды (см. Фазу 3 плана PR1VM).
+
 // Слот активного оружия из STAT_ITEMS (старший установленный бит маски).
+// Условия — явно `!= 0`: результат сравнения int 0/1 → классический IF; голое
+// float-выражение в if fteqcc компилит в ext-опкод IFNOT_F (218).
 float active_weapon_slot(float items) {
 	float i, mask = IT_WEAPON_MASK, bit = 0;
 	for (i = 1; i <= IT_LIGHTNING; i *= 2)
-		if ((mask & (int)i) && ((int)items & (int)i))
+		if ((mask & i) != 0 && (items & i) != 0)
 			bit = i;
-	if ((int)items & (int)IT_AXE)
+	if ((items & IT_AXE) != 0)
 		bit = IT_AXE;
 	return bit;
 }
 
 // Тип аммо активного оружия из STAT_ITEMS (бит IT_*).
 string ammo_type_name(float items) {
-	if ((int)items & (int)IT_SHELLS)  return "SHELLS";
-	if ((int)items & (int)IT_NAILS)   return "NAILS";
-	if ((int)items & (int)IT_ROCKETS) return "ROCKETS";
-	if ((int)items & (int)IT_CELLS)   return "CELLS";
+	if ((items & IT_SHELLS) != 0)  return "SHELLS";
+	if ((items & IT_NAILS) != 0)   return "NAILS";
+	if ((items & IT_ROCKETS) != 0) return "ROCKETS";
+	if ((items & IT_CELLS) != 0)   return "CELLS";
 	return "";
 }
 
 // Тип брони из STAT_ITEMS.
 string armor_type_name(float items) {
-	if ((int)items & (int)IT_ARMOR3)  return "A3";
-	if ((int)items & (int)IT_ARMOR2)  return "A2";
-	if ((int)items & (int)IT_ARMOR1)  return "A1";
+	if ((items & IT_ARMOR3) != 0)  return "A3";
+	if ((items & IT_ARMOR2) != 0)  return "A2";
+	if ((items & IT_ARMOR1) != 0)  return "A1";
 	return "";
 }
 
 // Powerups, активные сейчас (короткие метки).
 string powerup_names(float items) {
 	string s = "";
-	if ((int)items & (int)IT_QUAD)            s = strcat(s, "Q");
-	if ((int)items & (int)IT_INVULNERABILITY) s = strcat(s, "I");
-	if ((int)items & (int)IT_INVISIBILITY)    s = strcat(s, "V");
-	if ((int)items & (int)IT_SUIT)            s = strcat(s, "S");
+	if ((items & IT_QUAD) != 0)            s = strcat(s, "Q");
+	if ((items & IT_INVULNERABILITY) != 0) s = strcat(s, "I");
+	if ((items & IT_INVISIBILITY) != 0)    s = strcat(s, "V");
+	if ((items & IT_SUIT) != 0)            s = strcat(s, "S");
 	return s;
 }
 
