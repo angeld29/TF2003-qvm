@@ -2,11 +2,15 @@
 // Этап 3 (тест всех аспектов CSQC-каналов mvdsv):
 //   - статы 32..127 (clientstat/pointerstat) — Hud_Draw (hud.qc);
 //   - CSQC-сущности (флаги сервера, svc_fte_csqcentities) — CSQC_Ent_Update/Remove,
-//     рисуются 2D-маркерами в Hud_Draw;
+//     рисуются 2D-маркерами в Hud_DrawCSQC;
 //   - sendevent клиент→сервер (clcfte_qcrequest) — команды csqc_sendevent
 //     и csqc_sendevent6 (6 аргументов — терминатор);
 //   - cgamepacket сервер→клиент — эхо "echo" разбирается в CSQC_Parse_Event.
 // Детали: docs/tf2003_csqc_client_plan.md + docs/ezquake_csqc_pr2.md.
+//
+// Примечание (PR1VM, Step 0): слоты флагов — явные глобалы, НЕ массивы fm_*[8]:
+// динамическая индексация массивов компилируется в GLOBALADDRESS/LOADA_F/
+// BOUNDCHECK, которых нет в классическом подмножестве опкодов ezquake-PR1.
 
 string g_echo;
 float g_echo_time;
@@ -18,18 +22,127 @@ const float CSQC_MAXFLAGS = 8;
 // GCSQC_FLAGF_T40 в include/g_csqc.h).
 const float CSQC_FLAGF_T40 = 1;
 
-// Слоты (все поля — float; entnum уникален).
-float fm_entnum[CSQC_MAXFLAGS];
-float fm_team[CSQC_MAXFLAGS];
-float fm_carried[CSQC_MAXFLAGS];
-float fm_time[CSQC_MAXFLAGS];
-float fm_t40[CSQC_MAXFLAGS];
-float fm_used[CSQC_MAXFLAGS];
+// Слоты (все поля — float; entnum уникален). Скалярные глобалы на слот:
+//  slot<N>_entnum / _team / _carried / _t40 / _time / _used.
+float slot0_entnum, slot0_team, slot0_carried, slot0_t40, slot0_time, slot0_used;
+float slot1_entnum, slot1_team, slot1_carried, slot1_t40, slot1_time, slot1_used;
+float slot2_entnum, slot2_team, slot2_carried, slot2_t40, slot2_time, slot2_used;
+float slot3_entnum, slot3_team, slot3_carried, slot3_t40, slot3_time, slot3_used;
+float slot4_entnum, slot4_team, slot4_carried, slot4_t40, slot4_time, slot4_used;
+float slot5_entnum, slot5_team, slot5_carried, slot5_t40, slot5_time, slot5_used;
+float slot6_entnum, slot6_team, slot6_carried, slot6_t40, slot6_time, slot6_used;
+float slot7_entnum, slot7_team, slot7_carried, slot7_t40, slot7_time, slot7_used;
+
+// Доступ к слоту — через сравнения с константой (без индексируемых массивов).
+float FlagSlot_used(float i) {
+	if (i == 0) return slot0_used;
+	if (i == 1) return slot1_used;
+	if (i == 2) return slot2_used;
+	if (i == 3) return slot3_used;
+	if (i == 4) return slot4_used;
+	if (i == 5) return slot5_used;
+	if (i == 6) return slot6_used;
+	return slot7_used;
+}
+
+float FlagSlot_entnum(float i) {
+	if (i == 0) return slot0_entnum;
+	if (i == 1) return slot1_entnum;
+	if (i == 2) return slot2_entnum;
+	if (i == 3) return slot3_entnum;
+	if (i == 4) return slot4_entnum;
+	if (i == 5) return slot5_entnum;
+	if (i == 6) return slot6_entnum;
+	return slot7_entnum;
+}
+
+float FlagSlot_team(float i) {
+	if (i == 0) return slot0_team;
+	if (i == 1) return slot1_team;
+	if (i == 2) return slot2_team;
+	if (i == 3) return slot3_team;
+	if (i == 4) return slot4_team;
+	if (i == 5) return slot5_team;
+	if (i == 6) return slot6_team;
+	return slot7_team;
+}
+
+float FlagSlot_carried(float i) {
+	if (i == 0) return slot0_carried;
+	if (i == 1) return slot1_carried;
+	if (i == 2) return slot2_carried;
+	if (i == 3) return slot3_carried;
+	if (i == 4) return slot4_carried;
+	if (i == 5) return slot5_carried;
+	if (i == 6) return slot6_carried;
+	return slot7_carried;
+}
+
+float FlagSlot_t40(float i) {
+	if (i == 0) return slot0_t40;
+	if (i == 1) return slot1_t40;
+	if (i == 2) return slot2_t40;
+	if (i == 3) return slot3_t40;
+	if (i == 4) return slot4_t40;
+	if (i == 5) return slot5_t40;
+	if (i == 6) return slot6_t40;
+	return slot7_t40;
+}
+
+float FlagSlot_time(float i) {
+	if (i == 0) return slot0_time;
+	if (i == 1) return slot1_time;
+	if (i == 2) return slot2_time;
+	if (i == 3) return slot3_time;
+	if (i == 4) return slot4_time;
+	if (i == 5) return slot5_time;
+	if (i == 6) return slot6_time;
+	return slot7_time;
+}
+
+void FlagSlot_set(float i, float entnum, float team, float carried, float t40, float t) {
+	if (i == 0) {
+		slot0_entnum = entnum; slot0_team = team; slot0_carried = carried;
+		slot0_t40 = t40; slot0_time = t; slot0_used = 1;
+	} else if (i == 1) {
+		slot1_entnum = entnum; slot1_team = team; slot1_carried = carried;
+		slot1_t40 = t40; slot1_time = t; slot1_used = 1;
+	} else if (i == 2) {
+		slot2_entnum = entnum; slot2_team = team; slot2_carried = carried;
+		slot2_t40 = t40; slot2_time = t; slot2_used = 1;
+	} else if (i == 3) {
+		slot3_entnum = entnum; slot3_team = team; slot3_carried = carried;
+		slot3_t40 = t40; slot3_time = t; slot3_used = 1;
+	} else if (i == 4) {
+		slot4_entnum = entnum; slot4_team = team; slot4_carried = carried;
+		slot4_t40 = t40; slot4_time = t; slot4_used = 1;
+	} else if (i == 5) {
+		slot5_entnum = entnum; slot5_team = team; slot5_carried = carried;
+		slot5_t40 = t40; slot5_time = t; slot5_used = 1;
+	} else if (i == 6) {
+		slot6_entnum = entnum; slot6_team = team; slot6_carried = carried;
+		slot6_t40 = t40; slot6_time = t; slot6_used = 1;
+	} else if (i == 7) {
+		slot7_entnum = entnum; slot7_team = team; slot7_carried = carried;
+		slot7_t40 = t40; slot7_time = t; slot7_used = 1;
+	}
+}
+
+void FlagSlot_clear(float i) {
+	if (i == 0) slot0_used = 0;
+	else if (i == 1) slot1_used = 0;
+	else if (i == 2) slot2_used = 0;
+	else if (i == 3) slot3_used = 0;
+	else if (i == 4) slot4_used = 0;
+	else if (i == 5) slot5_used = 0;
+	else if (i == 6) slot6_used = 0;
+	else if (i == 7) slot7_used = 0;
+}
 
 float FlagIdxByEnt(float entnum) {
 	local float i;
 	for (i = 0; i < CSQC_MAXFLAGS; i = i + 1)
-		if (fm_used[i] && fm_entnum[i] == entnum)
+		if (FlagSlot_used(i) == 1 && FlagSlot_entnum(i) == entnum)
 			return i;
 	return -1;
 }
@@ -37,7 +150,7 @@ float FlagIdxByEnt(float entnum) {
 float FlagFreeSlot() {
 	local float i;
 	for (i = 0; i < CSQC_MAXFLAGS; i = i + 1)
-		if (!fm_used[i])
+		if (FlagSlot_used(i) == 0)
 			return i;
 	return -1;
 }
@@ -62,12 +175,7 @@ void(float isnew) CSQC_Ent_Update = {
 	if (idx < 0)
 		return;	// слотов нет — игнорируем
 
-	fm_entnum[idx] = e;
-	fm_team[idx] = team;
-	fm_carried[idx] = carried;
-	fm_time[idx] = t;
-	fm_t40[idx] = flagf >= CSQC_FLAGF_T40;
-	fm_used[idx] = 1;
+	FlagSlot_set(idx, e, team, carried, flagf >= CSQC_FLAGF_T40, t);
 };
 
 void() CSQC_Ent_Remove = {
@@ -75,7 +183,7 @@ void() CSQC_Ent_Remove = {
 
 	idx = FlagIdxByEnt(self.entnum);
 	if (idx >= 0)
-		fm_used[idx] = 0;
+		FlagSlot_clear(idx);
 };
 
 void() CSQC_Parse_Event = {
@@ -168,11 +276,11 @@ void Hud_DrawCSQC() {
 	// маркеры флагов
 	yy = 60;
 	for (i = 0; i < CSQC_MAXFLAGS; i = i + 1) {
-		if (fm_used[i]) {
+		if (FlagSlot_used(i) == 1) {
 			s = sprintf("FLAG #%d T%d c%d%s %s",
-				fm_entnum[i], fm_team[i], fm_carried[i],
-				fm_t40[i] ? " *T40" : "",
-				fm_time[i] >= 0 ? sprintf("t%.1f", fm_time[i]) : "-");
+				FlagSlot_entnum(i), FlagSlot_team(i), FlagSlot_carried(i),
+				FlagSlot_t40(i) == 1 ? " *T40" : "",
+				FlagSlot_time(i) >= 0 ? sprintf("t%.1f", FlagSlot_time(i)) : "-");
 			drawstring([10, yy, 0], s, [12, 12], '1 1 1', 1, 0);
 			yy = yy + 14;
 		}
