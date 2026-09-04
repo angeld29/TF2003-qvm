@@ -179,9 +179,12 @@ void(float isnew) CSQC_Ent_Update = {
 };
 
 void() CSQC_Ent_Remove = {
-	local float idx;
+	local float e, idx;
 
-	idx = FlagIdxByEnt(self.entnum);
+	// Временное решение (до edict-модели клиента): entnum передаётся движком
+	// через builtin-стрим (readentitynum), а не через self.entnum.
+	e = readentitynum();
+	idx = FlagIdxByEnt(e);
 	if (idx >= 0)
 		FlagSlot_clear(idx);
 };
