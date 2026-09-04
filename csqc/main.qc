@@ -238,6 +238,10 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 };
 
 void() CSQC_WorldLoaded = {
+	// Новая карта: слоты флагов пусты (движок вызывает это на каждый вход в мир).
+	local float i;
+	for (i = 0; i < CSQC_MAXFLAGS; i = i + 1)
+		FlagSlot_clear(i);
 };
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -273,8 +277,11 @@ void Hud_DrawCSQC() {
 	local float i, yy;
 	local string s;
 
-	// маркеры флагов / эхо — ниже канарейки hud.qc (канарейка ~y=162)
-	yy = 190;
+	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
+	// всегда; строки флагов — по слотам ниже.
+	yy = 176;
+	drawstring([10, yy, 0], "FLAGS:", [12, 12], '1 1 1', 1, 0);
+	yy = yy + 22;
 	for (i = 0; i < CSQC_MAXFLAGS; i = i + 1) {
 		if (FlagSlot_used(i) == 1) {
 			s = sprintf("FLAG #%d T%d c%d%s %s",
@@ -282,13 +289,13 @@ void Hud_DrawCSQC() {
 				FlagSlot_t40(i) == 1 ? " *T40" : "",
 				FlagSlot_time(i) >= 0 ? sprintf("t%.1f", FlagSlot_time(i)) : "-");
 			drawstring([10, yy, 0], s, [12, 12], '1 1 1', 1, 0);
-			yy = yy + 14;
+			yy = yy + 22;
 		}
 	}
 
 	// эхо sendevent → cgamepacket (гаснет через 5 c)
 	if (time - g_echo_time < 5) {
 		drawstring([10, yy, 0], g_echo, [12, 12], '1 1 0', 1, 0);
-		yy = yy + 14;
+		yy = yy + 22;
 	}
 }
