@@ -32,24 +32,19 @@ void Hud_Draw() {
 	string armor_name = armor_type_name(items);
 	string pups = powerup_names(items);
 
-	vector ss = (vector)getproperty(VF_SCREENVSIZE);
-	float cx = ss.x / 2;
-	// Выше полосы движкового sbar (SBAR_HEIGHT=24).
-	float y = ss.y - 70;
-
-	// Верхний левый: активное оружие (слот).
+	// Каждая строка — отдельная (левая колонка сверху): изменяемые значения
+	// (%g/%s) не должны перекрывать следующие строки.
+	float y = 46;
 	drawstring([10, 30, 0], wname, [16, 16], '1 1 1', 1, 0);
-
-	// Нижняя панель: HP / броня / powerups / аммо активного оружия.
-	drawstring([cx - 150, y, 0], sprintf("HP %g", hp), [16, 16], '0 1 0', 1, 0);
-	drawstring([cx - 40, y, 0],
-		sprintf("A %g %s", armor, armor_name), [16, 16], '1 1 0', 1, 0);
-	drawstring([cx + 60, y, 0],
+	drawstring([10, y, 0], sprintf("HP %g", hp), [16, 16], '0 1 0', 1, 0);
+	y += 22;
+	drawstring([10, y, 0], sprintf("A %g %s", armor, armor_name), [16, 16], '1 1 0', 1, 0);
+	y += 22;
+	drawstring([10, y, 0],
 		sprintf("AM %g %s%s", ammo_by_type(ammo_name), ammo_name, pups),
 		[16, 16], '0 1 1', 1, 0);
-
-	// Типы аммо.
-	drawstring([cx - 150, y + 22, 0],
+	y += 22;
+	drawstring([10, y, 0],
 		sprintf("S%g N%g R%g C%g", shells, nails, rockets, cells),
 		[12, 12], '1 1 1', 1, 0);
 

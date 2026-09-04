@@ -273,8 +273,8 @@ void Hud_DrawCSQC() {
 
 	ss = (vector)getproperty(VF_SCREENVSIZE);
 
-	// маркеры флагов
-	yy = 60;
+	// маркеры флагов — ниже основного блока hud.qc (который до y~112)
+	yy = 150;
 	for (i = 0; i < CSQC_MAXFLAGS; i = i + 1) {
 		if (FlagSlot_used(i) == 1) {
 			s = sprintf("FLAG #%d T%d c%d%s %s",
@@ -292,8 +292,9 @@ void Hud_DrawCSQC() {
 		yy = yy + 14;
 	}
 
-	// канарейки: hp(0)/items(15) стандартные, ps50(50) фикс, tick(40) — тест getstatf
+	// канарейки: hp(0)/items(15) стандартные, ps50(50) фикс, tick(40) — тест getstatf.
+	// Отдельная строка у нижнего края, чтобы не перекрывать блок слева.
 	s = sprintf("t%d hp%g it%g ps50%g tk%g",
 		time, getstatf(0), getstatf(15), getstatf(50), getstatf(40));
-	drawstring([10, ss.y * 0.5 - 40, 0], s, [12, 12], '0 1 0', 1, 0);
+	drawstring([10, ss.y - 46, 0], s, [12, 12], '0 1 0', 1, 0);
 }
