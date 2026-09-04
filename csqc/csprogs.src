@@ -1,5 +1,7 @@
 #pragma target fte_5768
 #pragma optimise 3
+// CALLxH-off: прагма стоит в csdefs.qc ПОСЛЕ "#pragma target FTE" — размещённая
+// здесь она сбрасывается этим target-прагмой (см. фазу 0 плана PR1VM).
 #pragma flag enable subscope
 #pragma flag enable iffloat
 #pragma flag enable lo

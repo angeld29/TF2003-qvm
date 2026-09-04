@@ -18,6 +18,10 @@ Available options:
 #pragma warning enable F301 /*non-utf-8 strings*/
 #pragma warning enable F302 /*uninitialised locals*/
 #pragma target FTE
+// CSQC-VM (ezquake PR1-движок): отключаем CALLxH-варианты вызова, чтобы модуль
+// оставался в классическом подмножестве опкодов. Стоит ПОСЛЕ "#pragma target",
+// т.к. target-прагма сбрасывает OPF_VALID всех опкодов.
+#pragma opcode disable CALL1H CALL2H CALL3H CALL4H CALL5H CALL6H CALL7H CALL8H
 #ifndef CSQC
 #define CSQC
 #endif
