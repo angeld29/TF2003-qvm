@@ -32,22 +32,29 @@ void Hud_Draw() {
 	string armor_name = armor_type_name(items);
 	string pups = powerup_names(items);
 
-	// Каждая строка — отдельная (левая колонка сверху): изменяемые значения
-	// (%g/%s) не должны перекрывать следующие строки.
-	float y = 46;
-	drawstring([10, 30, 0], wname, [16, 16], '1 1 1', 1, 0);
+	// Левая колонка сверху, одна строка на элемент. Метка перед значением,
+	// поля разделены пробелами (значения фикс-ширины не нужны — строка одна).
+	float y = 30;
+	drawstring([10, y, 0], sprintf("Weapon %s", wname), [16, 16], '1 1 1', 1, 0);
+	y += 22;
 	drawstring([10, y, 0], sprintf("HP %g", hp), [16, 16], '0 1 0', 1, 0);
 	y += 22;
-	drawstring([10, y, 0], sprintf("A %g %s", armor, armor_name), [16, 16], '1 1 0', 1, 0);
+	drawstring([10, y, 0], sprintf("Armor %g %s", armor, armor_name), [16, 16], '1 1 0', 1, 0);
 	y += 22;
 	drawstring([10, y, 0],
-		sprintf("AM %g %s%s", ammo_by_type(ammo_name), ammo_name, pups),
+		sprintf("Ammo %g %s %s", ammo_by_type(ammo_name), ammo_name, pups),
 		[16, 16], '0 1 1', 1, 0);
 	y += 22;
 	drawstring([10, y, 0],
 		sprintf("S%g N%g R%g C%g", shells, nails, rockets, cells),
 		[12, 12], '1 1 1', 1, 0);
+	y += 22;
 
-	// CSQC-тест: маркеры флагов, эхо sendevent, счёт команд (main.qc).
+	// Канарейка: t/hp/it/ps50/tk, поля через пробел.
+	drawstring([10, y, 0],
+		sprintf("t%d hp%g it%g ps50 %g tk %g", time, hp, items, getstatf(50), getstatf(40)),
+		[12, 12], '0 1 0', 1, 0);
+
+	// CSQC-тест: маркеры флагов, эхо sendevent (main.qc).
 	Hud_DrawCSQC();
 }

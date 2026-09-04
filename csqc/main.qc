@@ -267,14 +267,11 @@ void() CSQC_Shutdown = {
 // Дополнительные HUD-элементы CSQC-теста (вызывается из Hud_Draw в hud.qc):
 // 2D-маркеры флагов (entity-канал), эхо sendevent, счёт команд (pointerstat 40..43).
 void Hud_DrawCSQC() {
-	local vector ss;
 	local float i, yy;
 	local string s;
 
-	ss = (vector)getproperty(VF_SCREENVSIZE);
-
-	// маркеры флагов — ниже основного блока hud.qc (который до y~112)
-	yy = 150;
+	// маркеры флагов / эхо — ниже канарейки hud.qc (канарейка ~y=162)
+	yy = 190;
 	for (i = 0; i < CSQC_MAXFLAGS; i = i + 1) {
 		if (FlagSlot_used(i) == 1) {
 			s = sprintf("FLAG #%d T%d c%d%s %s",
@@ -291,10 +288,4 @@ void Hud_DrawCSQC() {
 		drawstring([10, yy, 0], g_echo, [12, 12], '1 1 0', 1, 0);
 		yy = yy + 14;
 	}
-
-	// канарейки: hp(0)/items(15) стандартные, ps50(50) фикс, tick(40) — тест getstatf.
-	// Отдельная строка у нижнего края, чтобы не перекрывать блок слева.
-	s = sprintf("t%d hp%g it%g ps50%g tk%g",
-		time, getstatf(0), getstatf(15), getstatf(50), getstatf(40));
-	drawstring([10, ss.y - 46, 0], s, [12, 12], '0 1 0', 1, 0);
 }
