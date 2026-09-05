@@ -323,7 +323,7 @@ void() CSQC_Input_Frame = {
 // Дополнительные HUD-элементы CSQC-теста (вызывается из Hud_Draw в hud.qc):
 // 2D-маркеры флагов (entity-канал), эхо sendevent, счёт команд (pointerstat 40..43).
 void Hud_DrawCSQC() {
-	local float i, yy;
+	local float i, yy, tw;
 	local string s;
 
 	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
@@ -359,5 +359,19 @@ void Hud_DrawCSQC() {
 		drawstring([10, 158, 0],
 			sprintf("in b%g i%g c%g", g_if_btns, g_if_imp, g_if_cnt),
 			[12, 12], '0 1 0', 1, 0);
+	}
+
+	// Слой D шаг 1: демо 2D-примитивов (постоянно, под cvar csqc_d2d):
+	// stringwidth-замер -> drawfill-бэкдроп -> drawstring по ширине, drawline-рамка,
+	// drawpic (gfx/ttl_main), drawcharacter. В левой колонке (x=10) — видно и в
+	// малых окнах ftew.
+	if (cvar("csqc_d2d") == 1) {
+		tw = stringwidth("LayerD 2D test", 0, [12, 12]);
+		drawfill([220, 110, 0], [tw + 16, 20, 0], '0 0 0', 0.6, 0);
+		drawstring([228, 113, 0], "LayerD 2D test", [12, 12], '1 1 1', 1, 0);
+		drawline(1, [220, 110, 0], [220 + tw + 15, 110, 0], '1 0 0', 1, 0);
+		drawpic([220, 140, 0], "gfx/ttl_main", [96, 24, 0], '1 1 1', 1, 0);
+		drawcharacter([220, 175, 0], 'A', [12, 12], '0 1 1', 1, 0);
+		drawstring([238, 175, 0], "drawcharacter", [12, 12], '0 1 1', 1, 0);
 	}
 }
