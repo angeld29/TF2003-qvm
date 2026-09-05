@@ -417,6 +417,14 @@ void Hud_DrawCSQC() {
 				getplayerkeyvalue(i, "frags"), getplayerkeyvalue(i, "ping"));
 			drawstring([60, 696, 0], s, [12, 12], '1 1 1', 1, 0);
 		}
+		// A7: #309 getproperty — размер экрана (204), FOV (9/10), viewport (7).
+		mp = getproperty(204);
+		drawstring([60, 718, 0],
+			sprintf("scr %g %g", mp_x, mp_y), [12, 12], '1 1 1', 1, 0);
+		mp = getproperty(7);
+		drawstring([60, 740, 0],
+			sprintf("fov %g %g vp %g %g", getproperty(9), getproperty(10), mp_x, mp_y),
+			[12, 12], '1 1 1', 1, 0);
 	}
 	else {
 		// Канарейка выключена: вернуть мышь движку, если была активна.
