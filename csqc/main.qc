@@ -399,8 +399,9 @@ void Hud_DrawCSQC() {
 		drawstring([60, 652, 0],
 			sprintf("isdemo %g host %s", isdemo(), serverkey("hostname")),
 			[12, 12], '1 1 1', 1, 0);
-		// A3.1/A3.2: курсор модуля (небольшой ttl_main у указателя) + позиция.
-		setcursormode(1, "gfx/ttl_main", '0 0 0', 0.15);
+		// A3.1/A3.2: курсор модуля + позиция. Масштаб, как в FTE, — hotspot.z
+		// (0 -> нативный размер ttl_main); отдельный float-арг не передаём.
+		setcursormode(1, "gfx/ttl_main", '0 0 0');
 		mp = getmousepos();
 		drawstring([60, 674, 0],
 			sprintf("mouse %g %g", mp_x, mp_y), [12, 12], '0 1 1', 1, 0);
