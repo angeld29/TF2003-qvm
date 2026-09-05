@@ -1,22 +1,30 @@
-csqc/csprogs.dat
-_old/
-.cache/
+# build artifacts
+csqc/*.dat
+*.bak
+*.qvm
+*.so
+*.dll
+*.exe
+*.sh
+
+# sources of legacy native builds
 src/Makefile.dl
 src/Makefile.vm
 *.asm
+*.o
+
+# build trees / IDE
 _cmake/
 _build/
 _*/
 _buildout/
 bin/
 VM/
+.vs/
+CMakeBuilds/
 Release
 Debug
 qwprogs.vcxproj.user
-
-*.o
+_old/
+.cache/
 tags
-VM/
-.vs/
-CMakeBuilds/
-bin/
