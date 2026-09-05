@@ -22,6 +22,14 @@ float g_echo_n;
 float g_echo_argmask;
 float g_echo_has;
 
+// CSQC_Input_Frame debug-канарейка (постоянная, под cvar csqc_inputdebug через
+// builtin cvar #45; движок ezquake вызывает Input_Frame перед отправкой каждого
+// usercmd, заполняя input_* глобалы). Скаляры: последние buttons/impulse +
+// счётчик вызовов (≈ частоте отправки команд).
+float g_if_btns;
+float g_if_imp;
+float g_if_cnt;
+
 // 2D-маркеры флагов (payload сервера: entnum, skin=team, frame=carried,
 // flagf-маркер hi-бита, [таймер]). Детали: docs/ezquake_csqc_pr2.md.
 const float CSQC_MAXFLAGS = 8;
@@ -251,6 +259,9 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_echo_n = 0;
 	g_echo_argmask = 0;
 	g_echo_has = 0;
+	g_if_btns = 0;
+	g_if_imp = 0;
+	g_if_cnt = 0;
 	registercommand("csqc_sendevent");
 	registercommand("csqc_sendevent6");
 };
@@ -265,6 +276,9 @@ void() CSQC_WorldLoaded = {
 	g_echo_n = 0;
 	g_echo_argmask = 0;
 	g_echo_has = 0;
+	g_if_btns = 0;
+	g_if_imp = 0;
+	g_if_cnt = 0;
 };
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -292,6 +306,18 @@ float(string cmd) CSQC_ConsoleCommand = {
 };
 
 void() CSQC_Shutdown = {
+};
+
+// CSQC_Input_Frame (без предикции): движок (ezquake) вызывает перед отправкой
+// каждого usercmd и заполняет input_* (timelength/angles/movevalues/buttons/
+// impulse) — модуль может читать кнопки/импульсы и (позже, для меню) менять
+// их. Сейчас — только канарейка под csqc_inputdebug; usercmd не изменяем.
+void() CSQC_Input_Frame = {
+	if (cvar("csqc_inputdebug") == 0)
+		return;
+	g_if_btns = input_buttons;
+	g_if_imp = input_impulse;
+	g_if_cnt = g_if_cnt + 1;
 };
 
 // Дополнительные HUD-элементы CSQC-теста (вызывается из Hud_Draw в hud.qc):
@@ -323,5 +349,15 @@ void Hud_DrawCSQC() {
 		drawstring([460, 30, 0],
 			sprintf("ECHO ev%d m%g", g_echo_n, g_echo_argmask),
 			[12, 12], '1 1 0', 1, 0);
+	}
+
+	// CSQC_Input_Frame debug (постоянная, под cvar csqc_inputdebug): последние
+	// buttons/impulse из отправляемого usercmd и счётчик вызовов (≈ частоте
+	// отправки команд). См. void() CSQC_Input_Frame выше. В левой колонке
+	// (x=10) — малые окна ftew не показывают правый край (x=460 за экраном).
+	if (cvar("csqc_inputdebug") == 1 && g_if_cnt > 0) {
+		drawstring([10, 158, 0],
+			sprintf("in b%g i%g c%g", g_if_btns, g_if_imp, g_if_cnt),
+			[12, 12], '0 1 0', 1, 0);
 	}
 }
