@@ -29,7 +29,7 @@ A new engine call touches three files that must stay in sync:
 - `src/g_syscalls.c` — native trampolines (DLL only)
 - `src/g_syscalls.asm` — QVM `equ` numbers (used instead of the .c under `Q3_VM`)
 
-## Compiler/VM constraints (full list in README)
+## Compiler/VM constraints (full list in `README.md`)
 
 - 32-bit VM: no `double`; `float` doesn't promote as a param; avoid `short`/`unsigned char`.
 - `switch` run-on `case` labels produce unsafe code — each case must break or have no logic before the next label.
@@ -53,9 +53,23 @@ runs PVS-Studio analysis (optional, needs pvs-studio installed).
 
 Docs and comments are largely Russian (BUILD.md, Makefile, docs/, todo.txt).
 
-## Docs (root workspace)
+## Docs — what to load before editing (task-type markers)
 
-- `../docs/g_ext_plan.md` — `G_Map_Extension` mechanism (implemented: `src/g_ext.c`, `include/g_ext.h`); read before editing extensions/exports.
-- `../docs/csqc_ssqc_data_flow.md` — CSQC mechanisms (`src/g_csqc.c`, `include/g_csqc.h`, exports `GAME_EDICT_CSQCSEND`/`GAME_QCREQUEST`); §7 QVM adaptation; read before editing CSQC code.
-- `../docs/tf2003_csqc_client_plan.md` — plan for the client module (`csqc/`, `csprogs.dat`), phases 0–3, no prediction; read before working on `csqc/`.
-- `../docs/fo_qwprogs_csqc_entities.md` — fo-qwprogs entity/field inventory sent to the client and how the client uses them; reference for the `csqc/` port.
+References below are workspace-root canonical `docs/<file>.md` (workspace = `qwtfllm/`, not this repo).
+Load the file(s) listed for your task type before editing code:
+
+- **Any mod code change (start here)**: `README.md` / `README.ru.md` — project description, features,
+  development constraints (compiler/VM quirks, hard rules).
+- **Build / artifacts**: `docs/adr/0001-tf2003-build.md` (build process, binary scope per task —
+  default QVM only) + `BUILD.md` (per-platform prerequisites).
+- **Exports / extensions (`g_ext.c`, `g_ext.h`, syscall/API surface)**: `docs/adr/0005-g-map-extension.md`
+  — `G_Map_Extension` slots ≥ 256 (implemented, 16 extensions, slots 256–271); extend via slots, not export enums.
+- **CSQC server-side (`src/g_csqc.c`, `include/g_csqc.h`, exports `GAME_EDICT_CSQCSEND`/`GAME_QCREQUEST`)**:
+  `docs/adr/0007-csqc-ssqc-data-flow.md` — ssqc↔csqc data-flow channels and QVM adaptation (§7).
+- **CSQC client (`csqc/` → `csprogs.dat`)**: `docs/tf2003_csqc_client_plan.md` — module plan
+  (phases 0–8, stage 1 done, no prediction); entity reference for the port —
+  `docs/adr/0008-fo-qwprogs-entities.md`.
+- **Server run / verification**: `docs/adr/0011-mvdsv-build-run.md` (mvdsv launch, `sv_progtype`,
+  CSQC PR1/PR2 gate), `docs/adr/0014-qwtf-testbench.md` (`qwtf/` bench, scenarios).
+
+Full workspace-wide task×project index — root `AGENTS.md`.
