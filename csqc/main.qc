@@ -325,6 +325,9 @@ void() CSQC_Input_Frame = {
 void Hud_DrawCSQC() {
 	local float i, yy, tw;
 	local string s;
+	local float k;
+	local string ks;
+	local vector mp;
 
 	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
 	// всегда; строки флагов — по слотам ниже.
@@ -381,5 +384,29 @@ void Hud_DrawCSQC() {
 		drawstring([132, 576, 0], "subpic", [12, 12], '0 1 0', 1, 0);
 		drawcharacter([60, 606, 0], 'A', [12, 12], '0 1 1', 1, 0);
 		drawstring([78, 606, 0], "drawcharacter", [12, 12], '0 1 1', 1, 0);
+	}
+
+	// Слой D шаг 3 — ввод/интерфейс (A4-канарейка; тот же cvar csqc_d2d, без
+	// нового): round-trip #341->#340, isdemo/serverkey, курсор модуля + #344.
+	if (cvar("csqc_d2d") == 1) {
+		// A1: round-trip по имени ("ESCAPE"); не-совпадение — "tokfail".
+		k = stringtokeynum("ESCAPE");
+		ks = keynumtostring(k);
+		drawstring([60, 630, 0],
+			sprintf("key %s (%d)", (ks == "ESCAPE") ? ks : "tokfail", k),
+			[12, 12], (ks == "ESCAPE") ? '0 1 0' : '1 0 0', 1, 0);
+		// A2: isdemo (0/1/2) + serverkey("hostname").
+		drawstring([60, 652, 0],
+			sprintf("isdemo %g host %s", isdemo(), serverkey("hostname")),
+			[12, 12], '1 1 1', 1, 0);
+		// A3.1/A3.2: курсор модуля (небольшой ttl_main у указателя) + позиция.
+		setcursormode(1, "gfx/ttl_main", '0 0 0', 0.15);
+		mp = getmousepos();
+		drawstring([60, 674, 0],
+			sprintf("mouse %g %g", mp_x, mp_y), [12, 12], '0 1 1', 1, 0);
+	}
+	else {
+		// Канарейка выключена: вернуть мышь движку, если была активна.
+		setcursormode(0);
 	}
 }
