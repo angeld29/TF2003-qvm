@@ -178,6 +178,13 @@ void(float isnew) CSQC_Ent_Update = {
 	if (flagf >= CSQC_FLAGF_T40)
 		t = readlong();
 
+	// P3-канарейка entity-опкодов (ADR 0017, временно; снимается в P6):
+	// STORE+LOAD поля через self на клиентской edict-арене.
+	self.skin = team;
+	g_p3_skin = self.skin;
+	if (g_p3_skin != team)
+		dprint("CSQC: P3 field canary MISMATCH\n");
+
 	idx = FlagIdxByEnt(e);
 	if (idx < 0)
 		idx = FlagFreeSlot();
@@ -251,6 +258,7 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_echo_n = 0;
 	g_echo_argmask = 0;
 	g_echo_has = 0;
+	g_p3_skin = -1;
 	registercommand("csqc_sendevent");
 	registercommand("csqc_sendevent6");
 };
@@ -265,6 +273,7 @@ void() CSQC_WorldLoaded = {
 	g_echo_n = 0;
 	g_echo_argmask = 0;
 	g_echo_has = 0;
+	g_p3_skin = -1;
 };
 
 void(float width, float height, float menushown) CSQC_UpdateView = {

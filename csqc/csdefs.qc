@@ -22,6 +22,10 @@ Available options:
 // оставался в классическом подмножестве опкодов. Стоит ПОСЛЕ "#pragma target",
 // т.к. target-прагма сбрасывает OPF_VALID всех опкодов.
 #pragma opcode disable CALL1H CALL2H CALL3H CALL4H CALL5H CALL6H CALL7H CALL8H
+// P3 (временно): STOREF_F (220, FTE ext) генерируется записью поля сущности
+// (self.skin = team); отключаем — компилятор должен свести к классике
+// (ADDRESS/STORE_F). Если останется — разобрать отдельно.
+#pragma opcode disable STOREF_F
 #ifndef CSQC
 #define CSQC
 #endif

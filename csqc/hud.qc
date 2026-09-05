@@ -5,6 +5,11 @@
 // CSQC-тест: маркеры флагов/эхо/счёт команд (определена в main.qc).
 void Hud_DrawCSQC();
 
+// P3-канарейка entity-опкодов (ADR 0017, временно; снимается в P6): значение
+// поля self.skin, записанное/прочитанное в CSQC_Ent_Update (main.qc). -1 = нет
+// события. Объявлена здесь (hud.qc до main.qc в csprogs.src).
+float g_p3_skin;
+
 // Аммо текущего оружия по имени типа (или 0).
 float ammo_by_type(string t) {
 	if (t == "SHELLS")  return getstatf(STAT_SHELLS);
@@ -50,9 +55,10 @@ void Hud_Draw() {
 		[12, 12], '1 1 1', 1, 0);
 	y += 22;
 
-	// Канарейка: t/hp/it/ps50/tk, поля через пробел.
+	// Канарейка: t/hp/it/ps50/tk, поля через пробел; sk — P3-канарейка
+	// entity-поля (self.skin, main.qc; -1 = нет события).
 	drawstring([10, y, 0],
-		sprintf("t%d hp%g it%g ps50 %g tk %g", time, hp, items, getstatf(50), getstatf(40)),
+		sprintf("t%d hp%g it%g ps50 %g tk %g sk%g", time, hp, items, getstatf(50), getstatf(40), g_p3_skin),
 		[12, 12], '0 1 0', 1, 0);
 
 	// CSQC-тест: маркеры флагов, эхо sendevent (main.qc).
