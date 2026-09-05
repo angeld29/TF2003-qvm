@@ -68,7 +68,9 @@ Load the file(s) listed for your task type before editing code:
   `docs/adr/0007-csqc-ssqc-data-flow.md` — ssqc↔csqc data-flow channels and QVM adaptation (§7).
 - **CSQC client (`csqc/` → `csprogs.dat`)**: `docs/tf2003_csqc_client_plan.md` — module plan
   (phases 0–8, stage 1 done, no prediction); entity reference for the port —
-  `docs/adr/0008-fo-qwprogs-entities.md`.
+  `docs/adr/0008-fo-qwprogs-entities.md`. Движковые builtins 2D-отрисовки модуля
+  (drawfill/drawpic/stringwidth и др., cvar `csqc_d2d`) — план `docs/ezquake_csqc_client_layerd_2d_plan.md`
+  (ezquake-клиент; читать перед использованием в csprogs).
 - **Server run / verification**: `docs/adr/0011-mvdsv-build-run.md` (mvdsv launch, `sv_progtype`,
   CSQC PR1/PR2 gate), `docs/adr/0014-qwtf-testbench.md` (`qwtf/` bench, scenarios).
 
