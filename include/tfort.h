@@ -183,9 +183,6 @@ void    NormalGrenadeTouch(  );
 void    NormalGrenadeExplode(  );
 void    ConcussionGrenadeTouch(  );
 void    ConcussionGrenadeExplode(  );
-// Единая точка создания гранатных снарядов (спавн/бросок/установка).
-// Экспонирована для CSQC debug-хука (g_csqc.c, GAME_QCREQUEST "csqc_dbg_grenade").
-gedict_t *spawnGrenade( gedict_t *user, int type, int isthrow );
 void    NailGrenadeTouch(  );
 void    NailGrenadeExplode(  );
 void    MirvGrenadeTouch(  );

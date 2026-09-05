@@ -993,7 +993,7 @@ void TeamFortress_PrimeGrenade(  )
 	tGrenade->s.v.think = ( func_t ) TeamFortress_GrenadePrimed;
 }
 
-gedict_t* spawnGrenade( gedict_t* user, int type, int isthrow )
+static gedict_t* spawnGrenade( gedict_t* user, int type, int isthrow )
 {
 	qboolean printthrowmsg = true;
     gedict_t* newmis;
