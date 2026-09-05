@@ -12,8 +12,15 @@
 // динамическая индексация массивов компилируется в GLOBALADDRESS/LOADA_F/
 // BOUNDCHECK, которых нет в классическом подмножестве опкодов ezquake-PR1.
 
-string g_echo;
+// Эхо sendevent → cgamepacket (E1). Текст собираем и выводим dprint-ом в момент
+// приёма (валидация всех argtypes); кросс-кадрово храним только скаляры (счётчик,
+// маска типов, время). Полный текстовый echo «пережил» бы кадр лишь с
+// persistent-строками движка — кольцо PR1VM даёт стабильность внутри вызова,
+// не между кадрами (см. ezquake csqc_client/PR1VM temp-ring; ограничение E1).
 float g_echo_time;
+float g_echo_n;
+float g_echo_argmask;
+float g_echo_has;
 
 // 2D-маркеры флагов (payload сервера: entnum, skin=team, frame=carried,
 // flagf-маркер hi-бита, [таймер]). Детали: docs/ezquake_csqc_pr2.md.
@@ -212,9 +219,16 @@ void() CSQC_Parse_Event = {
 				s = strcat(s, sprintf("%.0f ", readlong()));
 			else                   // UNKNOWN / не доставлено
 				s = strcat(s, "? ");
+			// маска типов аргументов (десятичный «цифровой код», t+1 на арг.)
+			g_echo_argmask = g_echo_argmask * 10 + t + 1;
 		}
-		g_echo = strcat(s, ")");
+		s = strcat(s, ")");
+		// Валидация полного текста (все argtypes) — в консоль; на экран — только
+		// скалярный индикатор (см. Hud_DrawCSQC).
+		dprint(strcat("CSQC echo: ", strcat(s, "\n")));
+		g_echo_n = g_echo_n + 1;
 		g_echo_time = time;
+		g_echo_has = 1;
 		return;
 	}
 };
@@ -231,17 +245,24 @@ void SendEchoEvent6() {
 }
 
 void(float apiver, string enginename, float enginever) CSQC_Init = {
-	g_echo = "";
 	g_echo_time = 0;
+	g_echo_n = 0;
+	g_echo_argmask = 0;
+	g_echo_has = 0;
 	registercommand("csqc_sendevent");
 	registercommand("csqc_sendevent6");
 };
 
 void() CSQC_WorldLoaded = {
-	// Новая карта: слоты флагов пусты (движок вызывает это на каждый вход в мир).
+	// Новая карта: слоты флагов пусты, эхо-индикатор сброшен (движок вызывает
+	// это на каждый вход в мир).
 	local float i;
 	for (i = 0; i < CSQC_MAXFLAGS; i = i + 1)
 		FlagSlot_clear(i);
+	g_echo_time = 0;
+	g_echo_n = 0;
+	g_echo_argmask = 0;
+	g_echo_has = 0;
 };
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -293,9 +314,12 @@ void Hud_DrawCSQC() {
 		}
 	}
 
-	// эхо sendevent → cgamepacket (гаснет через 5 c)
-	if (time - g_echo_time < 5) {
-		drawstring([10, yy, 0], g_echo, [12, 12], '1 1 0', 1, 0);
-		yy = yy + 22;
+	// Эхо sendevent → cgamepacket: индикатор в фиксированной зоне (не зависит от
+	// числа флагов, не уходит за экран). Полный текст — в консоли (dprint в
+	// CSQC_Parse_Event); на экране — счётчик событий + код типов аргументов.
+	if (g_echo_has == 1 && time - g_echo_time < 5) {
+		drawstring([460, 30, 0],
+			sprintf("ECHO ev%d m%g", g_echo_n, g_echo_argmask),
+			[12, 12], '1 1 0', 1, 0);
 	}
 }
