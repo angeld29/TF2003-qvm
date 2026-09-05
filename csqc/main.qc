@@ -405,6 +405,18 @@ void Hud_DrawCSQC() {
 		mp = getmousepos();
 		drawstring([60, 674, 0],
 			sprintf("mouse %g %g", mp_x, mp_y), [12, 12], '0 1 1', 1, 0);
+		// A6: scoreboard игрока (первый непустой слот 0..3): name frags ping.
+		i = 0;
+		ks = getplayerkeyvalue(0, "name");
+		while (i < 4 && ks == "") {
+			i = i + 1;
+			ks = getplayerkeyvalue(i, "name");
+		}
+		if (ks != "") {
+			s = sprintf("P%d %s %s %s", i, ks,
+				getplayerkeyvalue(i, "frags"), getplayerkeyvalue(i, "ping"));
+			drawstring([60, 696, 0], s, [12, 12], '1 1 1', 1, 0);
+		}
 	}
 	else {
 		// Канарейка выключена: вернуть мышь движку, если была активна.
