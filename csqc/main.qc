@@ -30,6 +30,11 @@ float g_if_btns;
 float g_if_imp;
 float g_if_cnt;
 
+// C1.2: счётчики событий CSQC_InputEvent (модуль возвращает 0 — не блокирует).
+float g_ie_mabs;	// IE_MOUSEABS (3)
+float g_ie_mdelta;	// IE_MOUSEDELTA (2)
+float g_ie_keys;	// IE_KEYDOWN/IE_KEYUP (0/1)
+
 // 2D-маркеры флагов (payload сервера: entnum, skin=team, frame=carried,
 // flagf-маркер hi-бита, [таймер]). Детали: docs/ezquake_csqc_pr2.md.
 const float CSQC_MAXFLAGS = 8;
@@ -320,6 +325,18 @@ void() CSQC_Input_Frame = {
 	g_if_cnt = g_if_cnt + 1;
 };
 
+// C1.2: события ввода от движка (csdefs.qc:159; типы IE_* 0..6). Канарейка —
+// только счётчики; возврат 0 (события не блокируем, управление как обычно).
+float CSQC_InputEvent(float evtype, float scanx, float chary, float devid) {
+	if (evtype == 3)
+		g_ie_mabs = g_ie_mabs + 1;		// IE_MOUSEABS
+	else if (evtype == 2)
+		g_ie_mdelta = g_ie_mdelta + 1;	// IE_MOUSEDELTA
+	else if (evtype == 0 || evtype == 1)
+		g_ie_keys = g_ie_keys + 1;		// IE_KEYDOWN/UP
+	return 0;
+}
+
 // Дополнительные HUD-элементы CSQC-теста (вызывается из Hud_Draw в hud.qc):
 // 2D-маркеры флагов (entity-канал), эхо sendevent, счёт команд (pointerstat 40..43).
 void Hud_DrawCSQC() {
@@ -424,6 +441,10 @@ void Hud_DrawCSQC() {
 		mp = getproperty(7);
 		drawstring([60, 740, 0],
 			sprintf("fov %g %g vp %g %g", getproperty(9), getproperty(10), mp_x, mp_y),
+			[12, 12], '1 1 1', 1, 0);
+		// C1.2: счётчики CSQC_InputEvent (mabs/mdelta/keys).
+		drawstring([60, 762, 0],
+			sprintf("ie a%g d%g k%g", g_ie_mabs, g_ie_mdelta, g_ie_keys),
 			[12, 12], '1 1 1', 1, 0);
 	}
 	else {
