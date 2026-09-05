@@ -411,10 +411,11 @@ int G_CSQC_Example_FlagSendEntity( int sendflags_lo, int sendflags_hi )
 			( hi & GCSQC_SENDFLAG_TIMER ) ? " (hi-bit40)" : "" );
 
 	// CSQC-payload (согласован с csqc/main.qc CSQC_Ent_Update):
-	//   WriteEntity(self), WriteShort(skin), WriteByte(frame),
-	//   WriteByte(flagf) — GCSQC_FLAGF_T40: дошёл hi-бит TIMER (бит 40),
+	// identity сущности НЕ пишется — клиентский движок знает entnum и даёт его
+	// модулю через self.entnum (ADR 0017, D5; csqc_client.c SetEntityContext):
+	//   WriteShort(skin), WriteByte(frame), WriteByte(flagf)
+	//   — GCSQC_FLAGF_T40: дошёл hi-бит TIMER (бит 40),
 	//   если флаг стоит — ещё WriteLong(time*10) (таймер, 0.1с).
-	G_CSQC_WriteEntity( self );       // номер сущности
 	G_CSQC_WriteShort( ( int )self->s.v.skin );  // 1/2 = команда
 	G_CSQC_WriteByte( ( int )self->s.v.frame );  // 0=на базе, 1=несётся
 	if ( hi & GCSQC_SENDFLAG_TIMER )

@@ -165,10 +165,12 @@ float FlagFreeSlot() {
 void(float isnew) CSQC_Ent_Update = {
 	local float e, team, carried, t, flagf, idx;
 
-	// payload сервера G_CSQC_Example_FlagSendEntity:
-	// WriteEntity(self), WriteShort(skin), WriteByte(frame),
-	// WriteByte(flagf) [GCSQC_FLAGF_T40 = дошёл hi-бит 40], и если flagf — WriteLong(time)
-	e = readentitynum();
+	// Параметры функции — нет; контекст сущности задаёт движок: self.entnum
+	// (ADR 0017 P2/D3). payload сервера G_CSQC_Example_FlagSendEntity (без
+	// WriteEntity — identity через self.entnum):
+	// WriteShort(skin), WriteByte(frame), WriteByte(flagf)
+	// [GCSQC_FLAGF_T40 = дошёл hi-бит 40], и если flagf — WriteLong(time).
+	e = self.entnum;
 	team = readshort();
 	carried = readbyte();
 	flagf = readbyte();
@@ -188,9 +190,9 @@ void(float isnew) CSQC_Ent_Update = {
 void() CSQC_Ent_Remove = {
 	local float e, idx;
 
-	// Временное решение (до edict-модели клиента): entnum передаётся движком
-	// через builtin-стрим (readentitynum), а не через self.entnum.
-	e = readentitynum();
+	// Контекст сущности — движок (self.entnum); builtin-стрим не используется
+	// (ADR 0017 P2/D3).
+	e = self.entnum;
 	idx = FlagIdxByEnt(e);
 	if (idx >= 0)
 		FlagSlot_clear(idx);
