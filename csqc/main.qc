@@ -185,6 +185,15 @@ void(float isnew) CSQC_Ent_Update = {
 	if (g_p3_skin != team)
 		dprint("CSQC: P3 field canary MISMATCH\n");
 
+	// P4-счётчики lifecycle (ADR 0017, временно; снимаются в P6): isnew == 1
+	// = первый показ сущности (движок считает по seen[]); спавн печатаем
+	// (не спам — только первые появления), обычные обновления только считаем.
+	g_p4_upd = g_p4_upd + 1;
+	if (isnew == 1) {
+		g_p4_spawn = g_p4_spawn + 1;
+		dprint(strcat("CSQC: P4 spawn entnum=", sprintf("%d", e)));
+	}
+
 	idx = FlagIdxByEnt(e);
 	if (idx < 0)
 		idx = FlagFreeSlot();
@@ -259,8 +268,11 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_echo_argmask = 0;
 	g_echo_has = 0;
 	g_p3_skin = -1;
+	g_p4_upd = 0;
+	g_p4_spawn = 0;
 	registercommand("csqc_sendevent");
 	registercommand("csqc_sendevent6");
+	registercommand("csqc_dbg_grenade");
 };
 
 void() CSQC_WorldLoaded = {
@@ -274,6 +286,8 @@ void() CSQC_WorldLoaded = {
 	g_echo_argmask = 0;
 	g_echo_has = 0;
 	g_p3_skin = -1;
+	g_p4_upd = 0;
+	g_p4_spawn = 0;
 };
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -297,6 +311,11 @@ float(string cmd) CSQC_ConsoleCommand = {
 		SendEchoEvent6();
 		return 1;
 	}
+	if (argv(0) == "csqc_dbg_grenade") {
+		// P4-хук: просим сервер спавнить CSQC-гранату (lifecycle spawn→взрыв→remove).
+		sendevent("csqc_dbg_grenade", "f", 1.0);
+		return 1;
+	}
 	return 0;
 };
 
@@ -307,17 +326,19 @@ void() CSQC_Shutdown = {
 // 2D-маркеры флагов (entity-канал), эхо sendevent, счёт команд (pointerstat 40..43).
 void Hud_DrawCSQC() {
 	local float i, yy;
-	local string s;
+	local string s, lbl;
 
-	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
-	// всегда; строки флагов — по слотам ниже.
+	// Блок сущностей — ниже всех строк hud.qc (после канарейки). Метка видна
+	// всегда; строки — по слотам ниже. Префикс: "Gren" для team==0 (debug-граната
+	// сервера, csqc_dbg_grenade; skin=0), иначе "FLAG" (реальные флаги T1/T2).
 	yy = 176;
 	drawstring([10, yy, 0], "FLAGS:", [12, 12], '1 1 1', 1, 0);
 	yy = yy + 22;
 	for (i = 0; i < CSQC_MAXFLAGS; i = i + 1) {
 		if (FlagSlot_used(i) == 1) {
-			s = sprintf("FLAG #%d T%d c%d%s %s",
-				FlagSlot_entnum(i), FlagSlot_team(i), FlagSlot_carried(i),
+			lbl = FlagSlot_team(i) == 0 ? "Gren" : "FLAG";
+			s = sprintf("%s #%d T%d c%d%s %s",
+				lbl, FlagSlot_entnum(i), FlagSlot_team(i), FlagSlot_carried(i),
 				FlagSlot_t40(i) == 1 ? " *T40" : "",
 				FlagSlot_time(i) >= 0 ? sprintf("t%.1f", FlagSlot_time(i)) : "-");
 			drawstring([10, yy, 0], s, [12, 12], '1 1 1', 1, 0);

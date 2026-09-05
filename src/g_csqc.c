@@ -21,6 +21,7 @@
  */
 
 #include "g_local.h"
+#include "tfort.h"
 
 // CSQC-механизмы сервера. Детали и ограничения — в include/g_csqc.h.
 // Полный конвейер (SendEntity-эмит, MSG_CSQC, статы 32..127) есть и в fteqw QVM,
@@ -29,6 +30,9 @@
 
 static qboolean csqc_ok_initialized = false;
 static qboolean csqc_ok = false;
+
+// P4-хук (временный, снимается в P6): GAME_QCREQUEST "csqc_dbg_grenade".
+static void G_CSQC_Example_DbgSpawnGrenade( gedict_t *user );
 
 // Канарейка pointerstat: тикает ~1/с в G_CSQC_Example_Frame (проверка канала).
 int g_csqc_tick;
@@ -154,6 +158,12 @@ int G_GameQCRequest( int argcount )
 		G_CSQC_Example_Echo( cl, argcount );
 		if ( !cvar( "developer" ) )
 			return 1;
+	}
+	else if ( !strcmp( evname, "csqc_dbg_grenade" ) )
+	{
+		// P4-хук: спавнит CSQC-гранату рядом с игроком (lifecycle spawn→взрыв→remove).
+		G_CSQC_Example_DbgSpawnGrenade( cl );
+		return 1;
 	}
 
 	if ( !cvar( "developer" ) )
@@ -426,6 +436,41 @@ int G_CSQC_Example_FlagSendEntity( int sendflags_lo, int sendflags_hi )
 	else
 		G_CSQC_WriteByte( 0 );
 	return 1;
+}
+
+// P4-хук (временный, снимается в P6): спавнит лёгкую гранату (concussion — без
+// урона, только пинок/вспышка) рядом с игроком и вешает CSQC SendEntity →
+// естественный lifecycle: spawn (isnew=1) → полёт → взрыв (free) → remove.
+static void G_CSQC_Example_DbgSpawnGrenade( gedict_t *user )
+{
+	gedict_t *g;
+
+	if ( !user || !cvar( "g_csqc" ) )
+		return;
+
+	trap_makevectors( user->s.v.v_angle );
+	g = spawnGrenade( user, GR_TYPE_CONCUSSION, true );
+	if ( !g )
+		return;
+
+	// skin=0 → маркер клиента "T0" (отличим от реальных флагов T1/T2).
+	g->s.v.skin = 0;
+
+	// Лёгкий бросок вперёд/вверх от игрока.
+	g->s.v.velocity[0] = g_globalvars.v_forward[0] * 200 + g_globalvars.v_up[0] * 100;
+	g->s.v.velocity[1] = g_globalvars.v_forward[1] * 200 + g_globalvars.v_up[1] * 100;
+	g->s.v.velocity[2] = g_globalvars.v_forward[2] * 200 + g_globalvars.v_up[2] * 100 + 150;
+	g->s.v.nextthink = g_globalvars.time + 1.6f;
+
+	// CSQC: SendEntity + немедленный дирт → клиент видит spawn (взрыв → free → remove).
+	ExtFieldSetSendEntity( g, ( func_t )G_CSQC_Example_FlagSendEntity );
+	g->csendflags_lo = GCSQC_SENDFLAG_STATE;
+	g->csendflags_hi = 0;
+	G_Ext_SetSendNeeded( g, g->csendflags_lo, g->csendflags_hi, NULL );
+
+	if ( cvar( "developer" ) )
+		G_dprintf( "G_CSQC_Example_DbgSpawnGrenade: edict %d (concussion)\n",
+			NUM_FOR_EDICT( g ) );
 }
 
 // Назначает SendEntity флагам (goal-сущности с моделью tf_flag.mdl).
