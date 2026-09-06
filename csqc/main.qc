@@ -35,6 +35,21 @@ float g_ie_mabs;	// IE_MOUSEABS (3)
 float g_ie_mdelta;	// IE_MOUSEDELTA (2)
 float g_ie_keys;	// IE_KEYDOWN/IE_KEYUP (0/1)
 
+// C6.1: сводная верификация builtins — эффект-пикер (видимые: звук/dlight/частицы/
+// te_*/beams) + smoke-статусы (невидимые: #459/#345/#346/#347/buf_*). Только под
+// cvar csqc_d2d 1 (см. CSQC_Fx_Do/CSQC_Fx_Smoke/Hud_DrawCSQC). Реестр «не проверено»
+// в docs/ezquake_csqc_client_roadmap.md §C6 закрывается этим шагом.
+const float CSQC_FXMAX = 32;
+float g_fx_sel;		// текущий индекс эффекта (0..31)
+float g_fx_fire;	// срабатываний LMB с момента включения d2d
+float g_fx_count;	// всего IE_KEYDOWN под d2d (для отладки доставки)
+float g_sm_run;		// smoke выполнен для текущего включения d2d (0/1)
+float g_sm459;		// edict_num(1) — entity-handle (≥0; 0 только вне арены)
+float g_sm345;		// getinputstate(input_sequence) — 0/1
+float g_sm346;		// setsensitivityscaler(1) — 1 (void, вызвано)
+float g_sm347;		// runstandardplayerphysics(edict_num(0)) — 1 (не краш)
+float g_sm_buf;		// buf-цепочка #460..469 — число успешных шагов
+
 // 2D-маркеры флагов (payload сервера: entnum, skin=team, frame=carried,
 // flagf-маркер hi-бита, [таймер]). Детали: docs/ezquake_csqc_pr2.md.
 const float CSQC_MAXFLAGS = 8;
@@ -267,6 +282,19 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_if_btns = 0;
 	g_if_imp = 0;
 	g_if_cnt = 0;
+	g_ie_mabs = 0;
+	g_ie_mdelta = 0;
+	g_ie_keys = 0;
+	// C6.1: состояние пикера/smoke чистое на старте модуля.
+	g_fx_sel = 0;
+	g_fx_fire = 0;
+	g_fx_count = 0;
+	g_sm_run = 0;
+	g_sm459 = 0;
+	g_sm345 = 0;
+	g_sm346 = 0;
+	g_sm347 = 0;
+	g_sm_buf = 0;
 	registercommand("csqc_sendevent");
 	registercommand("csqc_sendevent6");
 };
@@ -284,6 +312,16 @@ void() CSQC_WorldLoaded = {
 	g_if_btns = 0;
 	g_if_imp = 0;
 	g_if_cnt = 0;
+	g_ie_mabs = 0;
+	g_ie_mdelta = 0;
+	g_ie_keys = 0;
+	// C6.1: новая карта — smoke переиграется при включении csqc_d2d.
+	g_sm_run = 0;
+	g_sm459 = 0;
+	g_sm345 = 0;
+	g_sm346 = 0;
+	g_sm347 = 0;
+	g_sm_buf = 0;
 };
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -325,15 +363,277 @@ void() CSQC_Input_Frame = {
 	g_if_cnt = g_if_cnt + 1;
 };
 
-// C1.2: события ввода от движка (csdefs.qc:159; типы IE_* 0..6). Канарейка —
-// только счётчики; возврат 0 (события не блокируем, управление как обычно).
+// C6.1: имя эффекта каталога по индексу (для HUD-строки fx#). Полный набор
+// эффектов ezquake CSQC (реестр docs/ezquake_csqc_client_roadmap.md §C6): звук/
+// dlight/частицы/te_* #405-#430 (кроме не-зарегистрированных #426/#433 и
+// #431 te_beam — требует progs/beam.mdl, которого в стенде нет).
+string CSQC_FxName(float idx) {
+	if (idx == 0)  return "sound railgun";
+	if (idx == 1)  return "sound flmgr";
+	if (idx == 2)  return "sound detpack";
+	if (idx == 3)  return "dlight red";
+	if (idx == 4)  return "parts blood";
+	if (idx == 5)  return "parts spark";
+	if (idx == 6)  return "parts explosion";
+	if (idx == 7)  return "te_blood";
+	if (idx == 8)  return "te_bloodshower";
+	if (idx == 9)  return "te_explosionrgb";
+	if (idx == 10) return "te_particlecube";
+	if (idx == 11) return "te_particlerain";
+	if (idx == 12) return "te_particlesnow";
+	if (idx == 13) return "te_spark";
+	if (idx == 14) return "te_gunshotquad";
+	if (idx == 15) return "te_spikequad";
+	if (idx == 16) return "te_superspikequad";
+	if (idx == 17) return "te_explosionquad";
+	if (idx == 18) return "te_smallflash";
+	if (idx == 19) return "te_customflash";
+	if (idx == 20) return "te_gunshot";
+	if (idx == 21) return "te_spike";
+	if (idx == 22) return "te_superspike";
+	if (idx == 23) return "te_explosion";
+	if (idx == 24) return "te_tarexplosion";
+	if (idx == 25) return "te_wizspike";
+	if (idx == 26) return "te_knightspike";
+	if (idx == 27) return "te_lavasplash";
+	if (idx == 28) return "te_explosion2";
+	if (idx == 29) return "te_lightning1";
+	if (idx == 30) return "te_lightning2";
+	if (idx == 31) return "te_lightning3";
+	return "?";
+}
+
+// C6.1: запуск текущего эффекта каталога (0..CSQC_FXMAX-1). Точка — по
+// направлению взгляда, как у выстрела: makevectors(viewangles) -> v_forward;
+// org = vieworg + v_forward*64; направленные эффекты летят по v_forward.
+// bbox-эффекты (bloodshower/particlecube/rain/snow) — куб org±24; beams —
+// отрезок org..org+v_forward*64. Движковый #1 makevectors регистрируется
+// ezquake (FTE-паритет, C6.1); #431 te_beam из канарейки убран (нужен
+// progs/beam.mdl, в стенде нет — маппинг движка не меняется).
+void CSQC_Fx_Do(float idx) {
+	local vector org, end, dir, mn, mx;
+	local float p;
+
+	if (idx < 0 || idx >= CSQC_FXMAX)
+		return;
+	makevectors(getproperty(15));		// #1: v_forward/v_right/v_up из viewangles
+	org = getproperty(11) + v_forward * 64;	// vieworg + 64 по взгляду
+	end = org + v_forward * 64;			// beams: org..org+64 по взгляду
+	dir = v_forward;					// направление — как выстрел
+	mn = org - '24 24 24';				// bbox для #406/#408/#409/#410
+	mx = org + '24 24 24';
+
+	if (idx == 0) {
+		localsound("weapons/railgun.wav");
+		return;
+	}
+	if (idx == 1) {
+		localsound("weapons/flmgrexp.wav");
+		return;
+	}
+	if (idx == 2) {
+		localsound("weapons/detpack.wav");
+		return;
+	}
+	if (idx == 3) {
+		dynamiclight_add(org, 200, '1 0 0');
+		return;
+	}
+	// частицы: #335 particleeffectnum -> #337 pointparticles
+	p = particleeffectnum("blood");
+	if (p > 0 && idx == 4) {
+		pointparticles(p, org, dir, 50);
+		return;
+	}
+	p = particleeffectnum("spark");
+	if (p > 0 && idx == 5) {
+		pointparticles(p, org, dir, 50);
+		return;
+	}
+	p = particleeffectnum("explosion");
+	if (p > 0 && idx == 6) {
+		pointparticles(p, org, dir, 50);
+		return;
+	}
+	if (idx == 7) {
+		te_blood(org, dir, 40);
+		return;
+	}
+	if (idx == 8) {
+		te_bloodshower(mn, mx, 100, 40);
+		return;
+	}
+	if (idx == 9) {
+		te_explosionrgb(org, '1 0 0');
+		return;
+	}
+	if (idx == 10) {
+		te_particlecube(mn, mx, dir, 40, 73, 0, 0);
+		return;
+	}
+	if (idx == 11) {
+		te_particlerain(mn, mx, '0 0 -160', 60, 0);
+		return;
+	}
+	if (idx == 12) {
+		te_particlesnow(mn, mx, '0 0 -80', 60, 0);
+		return;
+	}
+	if (idx == 13) {
+		te_spark(org, dir, 30);
+		return;
+	}
+	if (idx == 14) {
+		te_gunshotquad(org);
+		return;
+	}
+	if (idx == 15) {
+		te_spikequad(org);
+		return;
+	}
+	if (idx == 16) {
+		te_superspikequad(org);
+		return;
+	}
+	if (idx == 17) {
+		te_explosionquad(org);
+		return;
+	}
+	if (idx == 18) {
+		te_smallflash(org);
+		return;
+	}
+	if (idx == 19) {
+		te_customflash(org, 200, 0.2, '1 0 0');
+		return;
+	}
+	if (idx == 20) {
+		te_gunshot(org);
+		return;
+	}
+	if (idx == 21) {
+		te_spike(org);
+		return;
+	}
+	if (idx == 22) {
+		te_superspike(org);
+		return;
+	}
+	if (idx == 23) {
+		te_explosion(org);
+		return;
+	}
+	if (idx == 24) {
+		te_tarexplosion(org);
+		return;
+	}
+	if (idx == 25) {
+		te_wizspike(org);
+		return;
+	}
+	if (idx == 26) {
+		te_knightspike(org);
+		return;
+	}
+	if (idx == 27) {
+		te_lavasplash(org);
+		return;
+	}
+	if (idx == 28) {
+		te_explosion2(org, 255, 0.1);
+		return;
+	}
+	if (idx == 29) {
+		te_lightning1(edict_num(1), org, end);
+		return;
+	}
+	if (idx == 30) {
+		te_lightning2(edict_num(1), org, end);
+		return;
+	}
+	if (idx == 31) {
+		te_lightning3(edict_num(1), org, end);
+		return;
+	}
+}
+
+// C6.1: smoke-статусы «невидимых» builtins — однократно на включение csqc_d2d.
+// Только скалярные результаты (строки между кадрами не храним; PR1VM temp-ring).
+// #459 edict_num(1), #345 getinputstate(input_sequence), #346 setsensitivityscaler(1),
+// #347 runstandardplayerphysics(edict_num(0)) (не краш; суть — C5/EXT_CSQC_1),
+// buf-цепочка #460..469. g_sm_buf — число успешных шагов (max 7).
+void CSQC_Fx_Smoke() {
+	local entity e;
+	local float b, ok;
+
+	// #459 edict_num(1): валидная entity не-world (0 вне арены). entity->float
+	// qcc-каст запрещён — статус 1/0.
+	e = edict_num(1);
+	g_sm459 = (e != world) ? 1 : 0;
+	g_sm345 = getinputstate(input_sequence);
+	setsensitivityscaler(1);
+	g_sm346 = 1;
+	runstandardplayerphysics(edict_num(0));
+	g_sm347 = 1;
+
+	// buf-цепочка: create -> add x2 -> getsize -> set/get -> sort -> implode ->
+	// free -> del. Семантика ezquake C2.2: add order<=0 — append.
+	ok = 0;
+	b = buf_create();
+	if (b > 0) {
+		ok = ok + 1;					// create
+		bufstr_add(b, "zz", 0);
+		bufstr_add(b, "aa", 0);			// [zz, aa]
+		if (buf_getsize(b) == 2)
+			ok = ok + 1;				// add x2 / getsize
+		bufstr_set(b, 1, "mm");			// [zz, mm]
+		if (bufstr_get(b, 1) == "mm")
+			ok = ok + 1;				// set / get
+		buf_sort(b, 0, 0);				// -> [mm, zz]
+		if (bufstr_get(b, 0) == "mm")
+			ok = ok + 1;				// sort
+		if (buf_implode(b, ",") == "mm,zz")
+			ok = ok + 1;				// implode
+		bufstr_free(b, 0);				// -> [zz]
+		if (buf_getsize(b) == 1)
+			ok = ok + 1;				// free
+		buf_del(b);
+		ok = ok + 1;					// del
+	}
+	g_sm_buf = ok;
+}
+
+// C1.2: события ввода от движка (csdefs.qc:159; типы IE_* 0..6). Счётчики —
+// канарейка C1.2; возврат 0 (события не блокируем) кроме C6.1-пикера под
+// csqc_d2d 1: MOUSE1 -> эффект, MOUSE2 -> следующий (handled 1 — управление/
+// атаку этими кнопками под тестом не трогаем).
 float CSQC_InputEvent(float evtype, float scanx, float chary, float devid) {
+	local string k;
+
 	if (evtype == 3)
 		g_ie_mabs = g_ie_mabs + 1;		// IE_MOUSEABS
 	else if (evtype == 2)
 		g_ie_mdelta = g_ie_mdelta + 1;	// IE_MOUSEDELTA
 	else if (evtype == 0 || evtype == 1)
 		g_ie_keys = g_ie_keys + 1;		// IE_KEYDOWN/UP
+
+	// C6.1: эффект-пикер — только клавиатурные/мышиные key-события и только под
+	// csqc_d2d 1; KEYUP тех же клавиш тоже handled (чтобы не долетал до биндов).
+	if (evtype == 0 || evtype == 1) {
+		k = keynumtostring(scanx);
+		if (k == "MOUSE1" || k == "MOUSE2") {
+			if (evtype == 0) {
+				g_fx_count = g_fx_count + 1;
+				if (k == "MOUSE1") {
+					CSQC_Fx_Do(g_fx_sel);
+					g_fx_fire = g_fx_fire + 1;
+				} else {
+					g_fx_sel = (g_fx_sel + 1) % CSQC_FXMAX;
+				}
+			}
+			return 1;
+		}
+	}
 	return 0;
 }
 
@@ -446,9 +746,25 @@ void Hud_DrawCSQC() {
 		drawstring([60, 762, 0],
 			sprintf("ie a%g d%g k%g", g_ie_mabs, g_ie_mdelta, g_ie_keys),
 			[12, 12], '1 1 1', 1, 0);
+		// C6.1: эффект-пикер + smoke-статусы (см. CSQC_Fx_Do/Smoke). Smoke —
+		// однократно на включение d2d (else-ветка сбрасывает g_sm_run).
+		if (g_sm_run == 0) {
+			CSQC_Fx_Smoke();
+			g_sm_run = 1;
+		}
+		drawstring([60, 784, 0],
+			sprintf("fx#%d %s n%g", g_fx_sel, CSQC_FxName(g_fx_sel), g_fx_fire),
+			[12, 12], '1 0 1', 1, 0);
+		drawstring([60, 806, 0],
+			sprintf("smoke 459:%g 345:%g 346:%g 347:%g buf:%g",
+				g_sm459, g_sm345, g_sm346, g_sm347, g_sm_buf),
+			[12, 12], (g_sm345 == 1 && g_sm_buf == 7) ? '0 1 0' : '1 1 0', 1, 0);
+		drawstring([60, 828, 0], "LMB fx | RMB next", [12, 12], '1 1 1', 1, 0);
 	}
 	else {
 		// Канарейка выключена: вернуть мышь движку, если была активна.
 		setcursormode(0);
+		// C6.1: следующий цикл csqc_d2d 1 — новый smoke.
+		g_sm_run = 0;
 	}
 }

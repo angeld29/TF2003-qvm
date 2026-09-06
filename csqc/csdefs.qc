@@ -61,6 +61,7 @@ vector input_angles;
 vector input_movevalues;
 float input_buttons;
 float input_impulse;
+float input_sequence;	/* Последняя отправленная команда; движок пишет при RecordInput (#345, C1.3). */
 void end_sys_globals;
 float pmove_onground;
 vector pmove_vel;
