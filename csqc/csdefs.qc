@@ -27,6 +27,9 @@ Available options:
 // Disable сводит к классике FLDADDRESS/STOREP_F. Оставляем ПОСТОЯННО: модуль
 // пишет entity-поля (канарейка P3 снята в P6, но будущий entity-код нуждается).
 #pragma opcode disable STOREF_F
+// fteqcc (FTE-таргет) сворачивает random() в ext-опкод RAND0 (92), которого нет
+// в ezquake-PR1VM. Отключаем — random() компилируется обычным вызовом builtin #7.
+#pragma opcode disable RAND0
 #ifndef CSQC
 #define CSQC
 #endif

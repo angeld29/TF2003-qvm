@@ -44,6 +44,8 @@ float g_fx_sel;		// текущий индекс эффекта (0..31)
 float g_fx_fire;	// срабатываний LMB с момента включения d2d
 float g_fx_count;	// всего IE_KEYDOWN под d2d (для отладки доставки)
 float g_sm_run;		// smoke выполнен для текущего включения d2d (0/1)
+float g_p1a_r;		// P1a: фикс. сэмпл random() (обновляется на включение d2d)
+vector g_p1a_rv;	// P1a: фикс. сэмпл randomvec() (иначе каждая строка скачет)
 float g_sm459;		// edict_num(1) — entity-handle (≥0; 0 только вне арены)
 float g_sm345;		// getinputstate(input_sequence) — 0/1
 float g_sm346;		// setsensitivityscaler(1) — 1 (void, вызвано)
@@ -756,6 +758,9 @@ void Hud_DrawCSQC() {
 		// однократно на включение d2d (else-ветка сбрасывает g_sm_run).
 		if (g_sm_run == 0) {
 			CSQC_Fx_Smoke();
+			// P1a: фикс. сэмплы random/randomvec на сессию d2d (стабильный вывод).
+			g_p1a_r = random();
+			g_p1a_rv = randomvec();
 			g_sm_run = 1;
 		}
 		drawstring([60, 784, 0],
@@ -766,6 +771,26 @@ void Hud_DrawCSQC() {
 				g_sm459, g_sm345, g_sm346, g_sm347, g_sm_buf),
 			[12, 12], (g_sm345 == 1 && g_sm_buf == 7) ? '0 1 0' : '1 1 0', 1, 0);
 		drawstring([60, 828, 0], "LMB fx | RMB next", [12, 12], '1 1 1', 1, 0);
+		// Phase 1 L1 P1a: реюз float/vector builtins (random/normalize/vlen/
+		// vectoyaw/rint/floor/ceil/fabs/vectoangles/sin/cos/sqrt/pow/bound/min/
+		// max/randomvec). Проверка attach: аргументы/возврат идут через pr_globals
+		// исполняемой (клиентской) VM.
+		mp = normalize('0 3 4');
+		drawstring([60, 848, 0],
+			sprintf("p1a r%g vlen%g yaw%g mx%g nrm %g %g %g",
+				g_p1a_r, vlen('0 3 4'), vectoyaw('0 1 0'), max(3, 1, 2),
+				mp_x, mp_y, mp_z),
+			[12, 12], '1 1 1', 1, 0);
+		drawstring([60, 866, 0],
+			sprintf("p1a ri%g fl%g ce%g fa%g pw%g bd%g mn%g",
+				rint(1.6), floor(1.6), ceil(1.6), fabs(-3),
+				pow(2, 10), bound(1, 5, 10), min(3, 1, 2)),
+			[12, 12], '1 1 1', 1, 0);
+		drawstring([60, 884, 0],
+			sprintf("p1a si%g co%g sq%g rv %g %g %g",
+				sin(1.0), cos(0), sqrt(16),
+				g_p1a_rv_x, g_p1a_rv_y, g_p1a_rv_z),
+			[12, 12], '1 1 1', 1, 0);
 	}
 	else {
 		// Канарейка выключена: вернуть мышь движку, если была активна.
