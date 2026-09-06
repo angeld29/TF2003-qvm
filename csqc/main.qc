@@ -52,6 +52,17 @@ float g_sm346;		// setsensitivityscaler(1) — 1 (void, вызвано)
 float g_sm347;		// runstandardplayerphysics(edict_num(0)) — 1 (не краш)
 float g_sm_buf;		// buf-цепочка #460..469 — число успешных шагов
 
+// Шаг 2 (ADR 0019-план): debug-уровень модуля живёт в модульном cvar csqc_dbg
+// (registercvar #93, создаётся в CSQC_Init; движковых csqc_d2d/csqc_inputdebug
+// больше нет). Уровень: 0 — выкл; 1 — графика+курсор; 2 — текст «до ie»;
+// 3 — остальное (экраны, каждый <= 10 строк).
+float DbgLevel() {
+	return cvar("csqc_dbg");
+}
+float DbgAt(float lvl) {
+	return cvar("csqc_dbg") >= lvl;
+}
+
 // 2D-маркеры флагов (payload сервера: entnum, skin=team, frame=carried,
 // flagf-маркер hi-бита, [таймер]). Детали: docs/ezquake_csqc_pr2.md.
 const float CSQC_MAXFLAGS = 8;
@@ -299,6 +310,9 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_sm_buf = 0;
 	registercommand("csqc_sendevent");
 	registercommand("csqc_sendevent6");
+	// Шаг 2: модульный debug-уровень (0..3); движковых csqc_d2d/csqc_inputdebug
+	// нет — экраны читают csqc_dbg (см. DbgLevel/DbgAt).
+	registercvar("csqc_dbg", "0");
 };
 
 void() CSQC_WorldLoaded = {
@@ -358,7 +372,7 @@ void() CSQC_Shutdown = {
 // impulse) — модуль может читать кнопки/импульсы и (позже, для меню) менять
 // их. Сейчас — только канарейка под csqc_inputdebug; usercmd не изменяем.
 void() CSQC_Input_Frame = {
-	if (cvar("csqc_inputdebug") == 0)
+	if (DbgAt(1) == 0)
 		return;
 	g_if_btns = input_buttons;
 	g_if_imp = input_impulse;
@@ -672,6 +686,7 @@ void Hud_DrawCSQC() {
 	local float k;
 	local string ks;
 	local vector mp;
+	local float D;
 
 	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
 	// всегда; строки флагов — по слотам ниже.
@@ -698,26 +713,30 @@ void Hud_DrawCSQC() {
 			[12, 12], '1 1 0', 1, 0);
 	}
 
-	// CSQC_Input_Frame debug (постоянная, под cvar csqc_inputdebug): последние
-	// buttons/impulse из отправляемого usercmd и счётчик вызовов (≈ частоте
-	// отправки команд). См. void() CSQC_Input_Frame выше. В левой колонке
-	// (x=10) — малые окна ftew не показывают правый край (x=460 за экраном).
-	if (cvar("csqc_inputdebug") == 1 && g_if_cnt > 0) {
-		drawstring([10, 158, 0],
-			sprintf("in b%g i%g c%g", g_if_btns, g_if_imp, g_if_cnt),
-			[12, 12], '0 1 0', 1, 0);
+	// Debug-экраны модуля (cvar csqc_dbg): 0 — выкл; 1 — графика+курсор;
+	// 2 — текст «до ie»; 3 — остальное (по группам). Каждый экран рисуется от
+	// верхнего якоря y=470 (там, где картинки), строк на экран <= 10.
+	// ECHO/FLAGS выше — не debug.
+	D = cvar("csqc_dbg");
+	if (D != 0 && g_sm_run == 0) {
+		// однократно на включение debug: smoke-статусы + p1a-сэмплы.
+		CSQC_Fx_Smoke();
+		g_p1a_r = random();
+		g_p1a_rv = randomvec();
+		g_sm_run = 1;
+	}
+	if (D == 0) {
+		setcursormode(0);
+		g_sm_run = 0;
 	}
 
-	// Слой D шаг 1/2: демо 2D-примитивов (постоянно, под cvar csqc_d2d). Блок
-	// внизу слева (x=60, y>=470) — ниже основного HUD (левая колонка до ~y360,
-	// эхо x460/y30), чтобы не накладываться на текст.
-	if (cvar("csqc_d2d") == 1) {
-		// size [12]: текст + бокс по stringwidth([12]).
+	// --- экран 1: графика (LayerD) + курсор модуля ---
+	if (D == 1) {
+		setcursormode(1, "gfx/ttl_main", '0 0 0');
 		tw = stringwidth("LayerD 2D test", 0, [12, 12]);
 		drawfill([60, 470, 0], [tw + 16, 20, 0], '0 0 0', 0.6, 0);
 		drawstring([68, 473, 0], "LayerD 2D test", [12, 12], '1 1 1', 1, 0);
 		drawline(1, [60, 470, 0], [60 + tw + 15, 470, 0], '1 0 0', 1, 0);
-		// size [16]: та же строка — должна быть ровно в 16/12 = 4/3 шире бокса.
 		tw = stringwidth("LayerD 2D test", 0, [16, 16]);
 		drawfill([60, 500, 0], [tw + 16, 26, 0], '0 0 0', 0.6, 0);
 		drawstring([68, 503, 0], "LayerD 2D test", [16, 16], '1 1 1', 1, 0);
@@ -729,27 +748,27 @@ void Hud_DrawCSQC() {
 		drawcharacter([60, 606, 0], 'A', [12, 12], '0 1 1', 1, 0);
 		drawstring([78, 606, 0], "drawcharacter", [12, 12], '0 1 1', 1, 0);
 	}
+	else {
+		setcursormode(0);
+	}
 
-	// Слой D шаг 3 — ввод/интерфейс (A4-канарейка; тот же cvar csqc_d2d, без
-	// нового): round-trip #341->#340, isdemo/serverkey, курсор модуля + #344.
-	if (cvar("csqc_d2d") == 1) {
-		// A1: round-trip по имени ("ESCAPE"); не-совпадение — "tokfail".
+	// --- экран 2: текст «до ie» (A4-A7, C1.2) ---
+	if (D == 2) {
+		yy = 470;
 		k = stringtokeynum("ESCAPE");
 		ks = keynumtostring(k);
-		drawstring([60, 630, 0],
+		drawstring([60, yy, 0],
 			sprintf("key %s (%d)", (ks == "ESCAPE") ? ks : "tokfail", k),
 			[12, 12], (ks == "ESCAPE") ? '0 1 0' : '1 0 0', 1, 0);
-		// A2: isdemo (0/1/2) + serverkey("hostname").
-		drawstring([60, 652, 0],
+		yy = yy + 18;
+		drawstring([60, yy, 0],
 			sprintf("isdemo %g host %s", isdemo(), serverkey("hostname")),
 			[12, 12], '1 1 1', 1, 0);
-		// A3.1/A3.2: курсор модуля + позиция. Масштаб, как в FTE, — hotspot.z
-		// (0 -> нативный размер ttl_main); отдельный float-арг не передаём.
-		setcursormode(1, "gfx/ttl_main", '0 0 0');
+		yy = yy + 18;
 		mp = getmousepos();
-		drawstring([60, 674, 0],
+		drawstring([60, yy, 0],
 			sprintf("mouse %g %g", mp_x, mp_y), [12, 12], '0 1 1', 1, 0);
-		// A6: scoreboard игрока (первый непустой слот 0..3): name frags ping.
+		yy = yy + 18;
 		i = 0;
 		ks = getplayerkeyvalue(0, "name");
 		while (i < 4 && ks == "") {
@@ -757,64 +776,63 @@ void Hud_DrawCSQC() {
 			ks = getplayerkeyvalue(i, "name");
 		}
 		if (ks != "") {
-			s = sprintf("P%d %s %s %s", i, ks,
-				getplayerkeyvalue(i, "frags"), getplayerkeyvalue(i, "ping"));
-			drawstring([60, 696, 0], s, [12, 12], '1 1 1', 1, 0);
+			drawstring([60, yy, 0],
+				sprintf("P%d %s %s %s", i, ks,
+					getplayerkeyvalue(i, "frags"), getplayerkeyvalue(i, "ping")),
+				[12, 12], '1 1 1', 1, 0);
+			yy = yy + 18;
 		}
-		// A7: #309 getproperty — размер экрана (204), FOV (9/10), viewport (7).
 		mp = getproperty(204);
-		drawstring([60, 718, 0],
+		drawstring([60, yy, 0],
 			sprintf("scr %g %g", mp_x, mp_y), [12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
 		mp = getproperty(7);
-		drawstring([60, 740, 0],
+		drawstring([60, yy, 0],
 			sprintf("fov %g %g vp %g %g", getproperty(9), getproperty(10), mp_x, mp_y),
 			[12, 12], '1 1 1', 1, 0);
-		// C1.2: счётчики CSQC_InputEvent (mabs/mdelta/keys).
-		drawstring([60, 762, 0],
+		yy = yy + 18;
+		drawstring([60, yy, 0],
 			sprintf("ie a%g d%g k%g", g_ie_mabs, g_ie_mdelta, g_ie_keys),
 			[12, 12], '1 1 1', 1, 0);
-		// C6.1: эффект-пикер + smoke-статусы (см. CSQC_Fx_Do/Smoke). Smoke —
-		// однократно на включение d2d (else-ветка сбрасывает g_sm_run).
-		if (g_sm_run == 0) {
-			CSQC_Fx_Smoke();
-			// P1a: фикс. сэмплы random/randomvec на сессию d2d (стабильный вывод).
-			g_p1a_r = random();
-			g_p1a_rv = randomvec();
-			g_sm_run = 1;
+	}
+
+	// --- экран 3: остальное (по группам: input, fx/smoke, p1a) ---
+	if (D == 3) {
+		yy = 470;
+		if (g_if_cnt > 0) {
+			drawstring([60, yy, 0],
+				sprintf("in b%g i%g c%g", g_if_btns, g_if_imp, g_if_cnt),
+				[12, 12], '0 1 0', 1, 0);
+			yy = yy + 18;
 		}
-		drawstring([60, 784, 0],
+		drawstring([60, yy, 0],
 			sprintf("fx#%d %s n%g", g_fx_sel, CSQC_FxName(g_fx_sel), g_fx_fire),
 			[12, 12], '1 0 1', 1, 0);
-		drawstring([60, 806, 0],
+		yy = yy + 18;
+		drawstring([60, yy, 0],
 			sprintf("smoke 459:%g 345:%g 346:%g 347:%g buf:%g",
 				g_sm459, g_sm345, g_sm346, g_sm347, g_sm_buf),
 			[12, 12], (g_sm345 == 1 && g_sm_buf == 7) ? '0 1 0' : '1 1 0', 1, 0);
-		drawstring([60, 828, 0], "LMB fx | RMB next", [12, 12], '1 1 1', 1, 0);
-		// Phase 1 L1 P1a: реюз float/vector builtins (random/normalize/vlen/
-		// vectoyaw/rint/floor/ceil/fabs/vectoangles/sin/cos/sqrt/pow/bound/min/
-		// max/randomvec). Проверка attach: аргументы/возврат идут через pr_globals
-		// исполняемой (клиентской) VM.
+		yy = yy + 18;
+		drawstring([60, yy, 0], "LMB fx | RMB next", [12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
 		mp = normalize('0 3 4');
-		drawstring([60, 848, 0],
+		drawstring([60, yy, 0],
 			sprintf("p1a r%g vlen%g yaw%g mx%g nrm %g %g %g",
 				g_p1a_r, vlen('0 3 4'), vectoyaw('0 1 0'), max(3, 1, 2),
 				mp_x, mp_y, mp_z),
 			[12, 12], '1 1 1', 1, 0);
-		drawstring([60, 866, 0],
+		yy = yy + 18;
+		drawstring([60, yy, 0],
 			sprintf("p1a ri%g fl%g ce%g fa%g pw%g bd%g mn%g",
 				rint(1.6), floor(1.6), ceil(1.6), fabs(-3),
 				pow(2, 10), bound(1, 5, 10), min(3, 1, 2)),
 			[12, 12], '1 1 1', 1, 0);
-		drawstring([60, 884, 0],
+		yy = yy + 18;
+		drawstring([60, yy, 0],
 			sprintf("p1a si%g co%g sq%g rv %g %g %g",
 				sin(1.0), cos(0), sqrt(16),
 				g_p1a_rv_x, g_p1a_rv_y, g_p1a_rv_z),
 			[12, 12], '1 1 1', 1, 0);
-	}
-	else {
-		// Канарейка выключена: вернуть мышь движку, если была активна.
-		setcursormode(0);
-		// C6.1: следующий цикл csqc_d2d 1 — новый smoke.
-		g_sm_run = 0;
 	}
 }
