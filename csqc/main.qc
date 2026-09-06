@@ -590,6 +590,8 @@ void CSQC_Fx_Smoke() {
 	local float r, c1, c2, e1, e2;	// P1c: registercvar/cvar/cvar_set/checkextension
 	local vector mv;				// P1b: stov
 	local string z;					// P1b: strzone/strunzone
+	local entity ce, cf;			// P1d: spawn-тест
+	local float nu, nf, nfind;		// P1d: счётчики
 
 	// #459 edict_num(1): валидная entity не-world (0 вне арены). entity->float
 	// qcc-каст запрещён — статус 1/0.
@@ -664,6 +666,49 @@ void CSQC_Fx_Smoke() {
 	particle('0 0 0', '0 1 0', 73, 8);
 	lightstyle(1, "a");
 	ambientsound('0 0 0', "weapons/detpack.wav", 0.15, 0);
+
+	// P1d C1 (functional, не канарейка): spawn->setorigin/setmodel/setsize,
+	// обход nextent/find/findradius по модульному резерву, eprint/coredump,
+	// remove без утечки слотов.
+	nu = 0;
+	while (nu < 5) {
+		ce = spawn();
+		if (ce == world)
+			break;
+		setorigin(ce, '16 16 16' + '0 32 0' * nu);
+		setmodel(ce, "progs/tf_flag.mdl");
+		setsize(ce, '-8 -8 -8', '8 8 8');
+		nu = nu + 1;
+	}
+	nf = 0;
+	ce = world;
+	while (1) {
+		ce = nextent(ce);
+		if (ce == world)
+			break;
+		nf = nf + 1;
+		if (nf == 1)
+			eprint(ce);
+	}
+	nfind = 0;
+	ce = world;
+	while (1) {
+		ce = find(ce, model, "progs/tf_flag.mdl");
+		if (ce == world)
+			break;
+		nfind = nfind + 1;
+	}
+	cf = findradius('16 16 16', 300);
+	coredump();
+	dprint(sprintf("P1D spawn %g next %g find %g rad %s\n",
+		nu, nf, nfind, (cf == world) ? "none" : "yes"));
+	while (1) {
+		ce = nextent(world);
+		if (ce == world)
+			break;
+		remove(ce);
+	}
+	coredump();
 }
 
 // C1.2: события ввода от движка (csdefs.qc:159; типы IE_* 0..6). Счётчики —
