@@ -573,6 +573,7 @@ void CSQC_Fx_Do(float idx) {
 void CSQC_Fx_Smoke() {
 	local entity e;
 	local float b, ok;
+	local float r, c1, c2, e1, e2;	// P1c: registercvar/cvar/cvar_set/checkextension
 
 	// #459 edict_num(1): валидная entity не-world (0 вне арены). entity->float
 	// qcc-каст запрещён — статус 1/0.
@@ -609,6 +610,24 @@ void CSQC_Fx_Smoke() {
 		ok = ok + 1;					// del
 	}
 	g_sm_buf = ok;
+
+	// P1c: cvar/exec/ошибки smoke — результат в консоль клиента (dprint).
+	// registercvar: 1 на первом включении d2d (создаёт движковый cvar csqc_p1c),
+	// далее 0 (уже есть); cvar_set ставит 7. calltimeofday — функция "timeofday"
+	// в модуле не объявлена -> no-op (не краш). objerror/localcmd — печать/echo.
+	r = registercvar("csqc_p1c", "1");
+	c1 = cvar("csqc_p1c");
+	cvar_set("csqc_p1c", "7");
+	c2 = cvar("csqc_p1c");
+	e1 = checkextension("DP_REGISTERCVAR");
+	e2 = checkextension("NOSUCH_EXT");
+	dprint(sprintf("P1C reg %g cv %g->%g ext %g/%g\n", r, c1, c2, e1, e2));
+	calltimeofday();
+	objerror("csqc_p1c objerror smoke");
+	// #46 localcmd — echo в консоль клиента. Ведущий \n изолирует от остатка
+	// буфера команд движка; терминатор обязателен не в самой строке (парсер
+	// буфера делит по \n/;, см. cmd.c Cbuf_ExecuteEx), а для чистоты вывода.
+	localcmd("\necho csqc-p1c localcmd\n");
 }
 
 // C1.2: события ввода от движка (csdefs.qc:159; типы IE_* 0..6). Счётчики —

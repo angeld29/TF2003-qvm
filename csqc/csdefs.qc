@@ -646,7 +646,7 @@ vector() randomvec = #91; /* Part of DP_QC_RANDOMVEC
 		Returns a vector with random values. Each axis is independantly a value between -1 and 1 inclusive. */
 
 vector(vector org) getlight = #92;
-void(string cvarname, string defaultvalue) registercvar = #93; /* Part of DP_REGISTERCVAR
+float(string cvarname, string defaultvalue) registercvar = #93; /* Part of DP_REGISTERCVAR
 		Creates a new cvar on the fly. If it does not already exist, it will be given the specified value. If it does exist, this is a no-op.
 		This builtin has the limitation that it does not apply to configs or commandlines. Such configs will need to use the set or seta command causing this builtin to be a noop.
 		In engines that support it, you will generally find the autocvar feature easier and more efficient to use. */
