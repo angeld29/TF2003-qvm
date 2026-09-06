@@ -592,6 +592,7 @@ void CSQC_Fx_Smoke() {
 	local string z;					// P1b: strzone/strunzone
 	local entity ce, cf;			// P1d: spawn-тест
 	local float nu, nf, nfind;		// P1d: счётчики
+	local float df, wm, pc, pc2;		// P1d C2: droptofloor/walkmove/pointcontents
 
 	// #459 edict_num(1): валидная entity не-world (0 вне арены). entity->float
 	// qcc-каст запрещён — статус 1/0.
@@ -709,6 +710,27 @@ void CSQC_Fx_Smoke() {
 		remove(ce);
 	}
 	coredump();
+
+	// P1d C2 (functional): трассы/физика мир-only. traceline вниз от точки над
+	// игроком (fraction<1, endpos_z), pointcontents ниже, droptofloor/walkmove на
+	// спавн-сущности через self (потом self возвращаем в world).
+	mv = getproperty(11) + '0 0 96';
+	traceline(mv, mv + '0 0 -600', 0, world);
+	dprint(sprintf("C2 tr frac %g endz %g\n", trace_fraction, trace_endpos_z));
+	pc = pointcontents(getproperty(11));
+	pc2 = pointcontents(mv + '0 0 -400');
+	dprint(sprintf("C2 pc eye %g below %g\n", pc, pc2));
+	ce = spawn();
+	if (ce != world) {
+		setorigin(ce, mv);
+		self = ce;
+		df = droptofloor();
+		dprint(sprintf("C2 drop %g z %g\n", df, ce.origin_z));
+		wm = walkmove(0, 16);
+		dprint(sprintf("C2 walk %g z %g\n", wm, ce.origin_z));
+		self = world;
+		remove(ce);
+	}
 }
 
 // C1.2: события ввода от движка (csdefs.qc:159; типы IE_* 0..6). Счётчики —
