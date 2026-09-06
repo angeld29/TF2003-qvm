@@ -588,6 +588,8 @@ void CSQC_Fx_Smoke() {
 	local entity e;
 	local float b, ok;
 	local float r, c1, c2, e1, e2;	// P1c: registercvar/cvar/cvar_set/checkextension
+	local vector mv;				// P1b: stov
+	local string z;					// P1b: strzone/strunzone
 
 	// #459 edict_num(1): валидная entity не-world (0 вне арены). entity->float
 	// qcc-каст запрещён — статус 1/0.
@@ -642,6 +644,16 @@ void CSQC_Fx_Smoke() {
 	// буфера команд движка; терминатор обязателен не в самой строке (парсер
 	// буфера делит по \n/;, см. cmd.c Cbuf_ExecuteEx), а для чистоты вывода.
 	localcmd("\necho csqc-p1c localcmd\n");
+
+	// P1b: строки/конверсии smoke (консоль). Ожидания: v "'1.0 2.0 3.0'",
+	// l 3, f 1.5, sub "ell", stov 1 2 3, cv "\"0\"", z "zoned" (ring; unzone no-op).
+	dprint(sprintf("P1B v %s l %g f %g sub %s\n",
+		vtos('1 2 3'), strlen("abc"), stof("1.5"), substring("hello", 1, 3)));
+	mv = stov("1 2 3");
+	z = strzone("zoned");
+	dprint(sprintf("P1B stov %g %g %g cv \"%s\" z %s\n",
+		mv_x, mv_y, mv_z, cvar_string("csqc_dbg"), z));
+	strunzone(z);
 }
 
 // C1.2: события ввода от движка (csdefs.qc:159; типы IE_* 0..6). Счётчики —
