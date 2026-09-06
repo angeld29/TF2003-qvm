@@ -654,6 +654,16 @@ void CSQC_Fx_Smoke() {
 	dprint(sprintf("P1B stov %g %g %g cv \"%s\" z %s\n",
 		mv_x, mv_y, mv_z, cvar_string("csqc_dbg"), z));
 	strunzone(z);
+
+	// P1e: подсистемы — прекеши (возврат имени), particle (#48), lightstyle (#35,
+	// no-op), ambientsound (#74, тихо). sound/breakpoint/setpause — регистрация.
+	dprint(sprintf("P1E pm %s ps %s pf %s\n",
+		precache_model("progs/tf_flag.mdl"),
+		precache_sound("weapons/railgun.wav"),
+		precache_file("maps/bastion.bsp")));
+	particle('0 0 0', '0 1 0', 73, 8);
+	lightstyle(1, "a");
+	ambientsound('0 0 0', "weapons/detpack.wav", 0.15, 0);
 }
 
 // C1.2: события ввода от движка (csdefs.qc:159; типы IE_* 0..6). Счётчики —
