@@ -39,7 +39,7 @@ float g_ie_keys;	// IE_KEYDOWN/IE_KEYUP (0/1)
 // te_*/beams) + smoke-статусы (невидимые: #459/#345/#346/#347/buf_*). Только под
 // cvar csqc_d2d 1 (см. CSQC_Fx_Do/CSQC_Fx_Smoke/Hud_DrawCSQC). Реестр «не проверено»
 // в docs/ezquake_csqc_client_roadmap.md §C6 закрывается этим шагом.
-const float CSQC_FXMAX = 32;
+const float CSQC_FXMAX = 33;
 float g_fx_sel;		// текущий индекс эффекта (0..31)
 float g_fx_fire;	// срабатываний LMB с момента включения d2d
 float g_fx_count;	// всего IE_KEYDOWN под d2d (для отладки доставки)
@@ -400,6 +400,7 @@ string CSQC_FxName(float idx) {
 	if (idx == 29) return "te_lightning1";
 	if (idx == 30) return "te_lightning2";
 	if (idx == 31) return "te_lightning3";
+	if (idx == 32) return "te_beam";
 	return "?";
 }
 
@@ -408,8 +409,9 @@ string CSQC_FxName(float idx) {
 // org = vieworg + v_forward*64; направленные эффекты летят по v_forward.
 // bbox-эффекты (bloodshower/particlecube/rain/snow) — куб org±24; beams —
 // отрезок org..org+v_forward*64. Движковый #1 makevectors регистрируется
-// ezquake (FTE-паритет, C6.1); #431 te_beam из канарейки убран (нужен
-// progs/beam.mdl, в стенде нет — маппинг движка не меняется).
+// ezquake (FTE-паритет, C6.1). #431 te_beam присутствует (idx 32): при
+// отсутствии модели (progs/beam.mdl) ezquake пишет варн в консоль и делает
+// no-op — без дисконнекта (движковый фикс C6.1).
 void CSQC_Fx_Do(float idx) {
 	local vector org, end, dir, mn, mx;
 	local float p;
@@ -553,6 +555,10 @@ void CSQC_Fx_Do(float idx) {
 	}
 	if (idx == 31) {
 		te_lightning3(edict_num(1), org, end);
+		return;
+	}
+	if (idx == 32) {
+		te_beam(edict_num(1), org, end);	// нет beam.mdl → варн+no-op (движок)
 		return;
 	}
 }
