@@ -988,6 +988,9 @@ void(float x, float y, float width, float height) drawsetcliparea = #324; /*
 void(void) drawresetcliparea = #325; /*
 		Reverts the scissor/clip area to the whole screen. */
 
+void(vector pivot, string picname, vector size, vector mins, float angle, vector rgb, float alpha, optional float drawflag) drawrotpic_dp = #329; /*
+		Draws a rotated pic. No-op в ezq (нет GL-ротации 2D-quad; отклонение). */
+
 float(vector position, string text, vector size, vector rgb, float alpha, float drawflag) drawstring = #326; /*
 		Draws a string, interpreting markup and recolouring as appropriate. */
 

@@ -56,6 +56,10 @@ float g_t5_iss;		// T5: isserver() (считается на включение �
 float g_t5_slot;	// T5: num_for_edict(spawn-сущности) — слот
 float g_t5_free0;	// T5: wasfreed(до remove)
 float g_t5_free1;	// T5: wasfreed(после remove)
+float g_2d_isc0;	// 2D-доп: iscachedpic до freepic
+float g_2d_isc1;	// 2D-доп: iscachedpic после freepic
+float g_2d_isz_x;	// 2D-доп: drawgetimagesize x
+float g_2d_isz_y;	// 2D-доп: drawgetimagesize y
 
 // Шаг 2 (ADR 0019-план): debug-уровень модуля живёт в модульном cvar csqc_dbg
 // (registercvar #93, создаётся в CSQC_Init; движковых csqc_d2d/csqc_inputdebug
@@ -329,6 +333,10 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_t5_slot = 0;
 	g_t5_free0 = 0;
 	g_t5_free1 = 0;
+	g_2d_isc0 = 0;
+	g_2d_isc1 = 0;
+	g_2d_isz_x = 0;
+	g_2d_isz_y = 0;
 	registercommand("csqc_sendevent");
 	registercommand("csqc_sendevent6");
 	// P1c фатальный probe (objerror) — отдельной командой, не в общем смоуке.
@@ -927,6 +935,7 @@ void Hud_DrawCSQC() {
 	local vector mp;
 	local float D;
 	local entity t5e;	// T5: временный spawn для etos/num_for_edict/wasfreed
+	local float cx, cy;	// 2D-доп: правый верхний угол от размера экрана
 
 	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
 	// всегда; строки флагов — по слотам ниже.
@@ -1008,6 +1017,18 @@ void Hud_DrawCSQC() {
 			infoget(infoadd("", "k", "v"), "k")));
 		dprint(sprintf("T5 iss%g ent entity%g num%g fr%g/%g\n",
 			g_t5_iss, g_t5_slot, g_t5_slot, g_t5_free0, g_t5_free1));
+		// 2D-доп: precache→iscachedpic 1→размер→freepic (no-op, как FTE)→isc остаётся 1.
+		precache_pic("gfx/ttl_main");
+		g_2d_isc0 = iscachedpic("gfx/ttl_main");
+		mp = drawgetimagesize("gfx/ttl_main");
+		g_2d_isz_x = mp_x;
+		g_2d_isz_y = mp_y;
+		freepic("gfx/ttl_main");
+		g_2d_isc1 = iscachedpic("gfx/ttl_main");
+		// #329 drawrotpic_dp — smoke (no-op, не краш).
+		drawrotpic_dp([0, 0, 0], "gfx/ttl_main", [96, 24, 0], [0, 0, 0], 0, [1, 1, 1], 1);
+		dprint(sprintf("2D isc %g/%g sz %gx%g\n",
+			g_2d_isc0, g_2d_isc1, g_2d_isz_x, g_2d_isz_y));
 		// cprint — центр-экран (видимая проверка; как FTE).
 		cprint("CSQC T5 cprint");
 	}
@@ -1173,5 +1194,21 @@ void Hud_DrawCSQC() {
 			sprintf("t5 iss%g ent entity%g num%g fr%g/%g",
 				g_t5_iss, g_t5_slot, g_t5_slot, g_t5_free0, g_t5_free1),
 			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("2d isc %g/%g sz %gx%g",
+				g_2d_isc0, g_2d_isc1, g_2d_isz_x, g_2d_isz_y),
+			[12, 12], '1 1 1', 1, 0);
+		// 2D-доп визуально (правый верхний угол — от размера экрана getproperty
+		// 204): cliparea обрезает drawpic (пикча центрирована по clip, видна
+		// центральная часть), raw vs colored.
+		mp = getproperty(204);
+		cx = mp_x - 16 - 90;	// margin 16 + clipw 90
+		cy = 16;
+		drawsetcliparea(cx, cy, 90, 24);
+		drawpic([cx - 35, cy - 8], "gfx/ttl_main", [160, 40], '1 1 1', 1);
+		drawresetcliparea();
+		drawstring([cx, cy + 30], "&cF00col", [12, 12], '1 1 1', 1, 0);
+		drawrawstring([cx, cy + 52], "&cF00raw", [12, 12], '1 1 1', 1);
 	}
 }
