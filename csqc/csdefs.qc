@@ -783,6 +783,7 @@ float(string shadername, optional string defaultshader, ...) shaderforname = #23
 void(vector org, optional float count) te_bloodqw = #239; /* Part of FTE_TE_STANDARDEFFECTBUILTINS*/
 float(vector viewpos, entity entity) checkpvs = #240; /* Part of FTE_QC_CHECKPVS*/
 vector(entity ent, float tagnum) rotatevectorsbytag = #244;
+float(float a, float b) mod = #245; /* a - b*(int)(a/b); b=0 -> 0 */
 int(string) stoi = #259; /* Part of FTE_QC_INTCONV
 		Converts the given string into an integer. Base 8, 10, or 16 is determined based upon the format of the string. */
 
@@ -1291,6 +1292,7 @@ void(string s) loadfromfile = #530; /*
 
 float(entity e, float channel) getsoundtime = #533;
 float(string sample) soundlength = #534;
+float(float value, optional float base) log = #532; /* ln(x); при base — log_base(x) */
 float(string filename, strbuf bufhandle) buf_loadfile = #535;
 float(filestream filehandle, strbuf bufhandle, optional float startpos, optional float numstrings) buf_writefile = #536;
 void(entity e, float physics_enabled) physics_enable = #540; /*

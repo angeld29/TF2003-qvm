@@ -943,9 +943,9 @@ void Hud_DrawCSQC() {
 	}
 
 	// Debug-экраны модуля (cvar csqc_dbg): 0 — выкл; 1 — графика+курсор;
-	// 2 — текст «до ie»; 3 — остальное (по группам). Каждый экран рисуется от
-	// верхнего якоря y=470 (там, где картинки), строк на экран <= 10.
-	// ECHO/FLAGS выше — не debug.
+	// 2 — текст «до ie»; 3 — остальное (по группам); 4 — L2-тривиалы T1 (математика).
+	// Каждый экран рисуется от верхнего якоря y=470 (там, где картинки), строк на
+	// экран <= 10. ECHO/FLAGS выше — не debug.
 	D = cvar("csqc_dbg");
 	if (D != 0 && g_sm_run == 0) {
 		// однократно на включение debug: smoke-статусы + p1a-сэмплы.
@@ -1062,6 +1062,28 @@ void Hud_DrawCSQC() {
 			sprintf("p1a si%g co%g sq%g rv %g %g %g",
 				sin(1.0), cos(0), sqrt(16),
 				g_p1a_rv_x, g_p1a_rv_y, g_p1a_rv_z),
+			[12, 12], '1 1 1', 1, 0);
+	}
+
+	// --- экран 4: L2-тривиалы T1 (математика, 2026-09-07). Значения считаются
+	// каждый кадр (детерминированные); ожидания: asin1=1.57 acos0=1.57 atan1=0.785
+	// atan2(1,1)=0.785 tan0=0 log(e)=1; anglemod(450)=90 mod(7,3)=1 bs(3,2)=12
+	// bs(1,-1)=0; crc16(0,"ABC")=62728 crc16(1,"ABC")=20810; gettime() растёт.
+	if (D == 4) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("t1 asin%g acos%g atan%g atan2%g tan%g log%g",
+				asin(1), acos(0), atan(1), atan2(1, 1), tan(0), log(2.718282)),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("t1 am%g mod%g bs%g/bs%g",
+				anglemod(450), mod(7, 3), bitshift(3, 2), bitshift(1, -1)),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("t1 crc16 %g/%g t%g",
+				crc16(0, "ABC"), crc16(1, "ABC"), gettime()),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }
