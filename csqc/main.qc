@@ -596,45 +596,19 @@ void CSQC_Fx_Do(float idx) {
 	}
 }
 
-// FTE-пул Шаг 7 (часть 2): handle своего зеркала-игрока (для forent-самоисключения
-// трасс из/через своё тело). Скан nextent по .entnum == player_localentnum (строковый
-// find #18 в ezquake — только по string-полям, поэтому скан). Мир, если зеркала нет.
-entity CSQC_SelfEnt() {
-	local entity e;
-	e = world;
-	while (1) {
-		e = nextent(e);
-		if (e == world)
-			break;
-		if (e.entnum == player_localentnum)
-			return e;
-	}
-	return world;
-}
-
-// FTE-пул Шаг 7 (часть 2): канарейки entity-слоя трасс (dispatch MOVE_* + forent/owner
-// + зеркало игроков). Тест-сущности — spawn/setsize с .solid (обязательно после
-// классификации) и опционально .flags=FL_MONSTER; каждая сразу удаляется. Точки трасс
-// — по направлению взгляда от глаза (через своё тело идём forent=sm). Все статусы в
-// консоль (dprint); сам-тест значим при зеркале себя (sm != world).
-void CSQC_Fx_Trace7(entity sm) {
+// FTE-пул Шаг 7 (часть 2): канарейки entity-слоя трасс (dispatch MOVE_* + forent).
+// Окружение «как в FTE»: ezquake сущности игроков НЕ фабрикует (сервер mvdsv+TF
+// игроков в CSQC не шлёт) — поэтому зеркально-зависимых тестов (C7 self/selfsk/play)
+// нет, они N/A до серверной эмиссии игроков модом. Тест-сущности — spawn/setsize
+// с .solid (обязательно после классификации) и опционально .flags=FL_MONSTER;
+// каждая сразу удаляется. Все статусы в консоль (dprint).
+void CSQC_Fx_Trace7() {
 	local vector eye, above, tgt;
 	local entity ce;
-	local float h;
 
 	eye = getproperty(11);
 	above = eye + '0 0 96';
 	makevectors(getproperty(15));
-
-	// --- самоисключение: из глаза вперёд без forent бьёт зеркало себя ---
-	if (sm != world) {
-		traceline(eye, eye + v_forward * 140, 0, world);
-		dprint(sprintf("C7 self frac %g me %s ent %g\n", trace_fraction,
-			(trace_ent == sm) ? "yes" : "no", trace_ent.entnum));
-		traceline(eye, eye + v_forward * 140, 0, sm);
-		dprint(sprintf("C7 selfsk frac %g me %s\n", trace_fraction,
-			(trace_ent == sm) ? "yes" : "no"));
-	}
 
 	// --- dispatch: стена-solid (solid=SOLID_BBOX) ---
 	tgt = eye + v_forward * 96;
@@ -645,10 +619,10 @@ void CSQC_Fx_Trace7(entity sm) {
 		ce.solid = SOLID_BBOX;
 
 		// NORMAL (0): бьёт стену; NOMONSTERS (1): сущности игнорирует.
-		traceline(eye, eye + v_forward * 140, MOVE_NORMAL, sm);
+		traceline(eye, eye + v_forward * 140, MOVE_NORMAL, world);
 		dprint(sprintf("C7 nrm frac %g wall %s\n", trace_fraction,
 			(trace_ent == ce) ? "yes" : "no"));
-		traceline(eye, eye + v_forward * 140, MOVE_NOMONSTERS, sm);
+		traceline(eye, eye + v_forward * 140, MOVE_NOMONSTERS, world);
 		dprint(sprintf("C7 nom frac %g wall %s world %s\n", trace_fraction,
 			(trace_ent == ce) ? "yes" : "no",
 			(trace_ent == world) ? "yes" : "no"));
@@ -661,10 +635,10 @@ void CSQC_Fx_Trace7(entity sm) {
 		setorigin(ce, tgt);
 		setsize(ce, '-8 -8 -8', '8 8 8');
 		ce.solid = SOLID_NOT;
-		traceline(eye, eye + v_forward * 140, MOVE_NORMAL, sm);
+		traceline(eye, eye + v_forward * 140, MOVE_NORMAL, world);
 		dprint(sprintf("C7 notn frac %g wall %s\n", trace_fraction,
 			(trace_ent == ce) ? "yes" : "no"));
-		traceline(eye, eye + v_forward * 140, MOVE_EVERYTHING, sm);
+		traceline(eye, eye + v_forward * 140, MOVE_EVERYTHING, world);
 		dprint(sprintf("C7 evry frac %g wall %s\n", trace_fraction,
 			(trace_ent == ce) ? "yes" : "no"));
 		remove(ce);
@@ -676,7 +650,7 @@ void CSQC_Fx_Trace7(entity sm) {
 		setorigin(ce, tgt);
 		setsize(ce, '-8 -8 -8', '8 8 8');
 		ce.solid = SOLID_TRIGGER;
-		traceline(eye, eye + v_forward * 140, MOVE_TRIGGERS, sm);
+		traceline(eye, eye + v_forward * 140, MOVE_TRIGGERS, world);
 		dprint(sprintf("C7 trig frac %g wall %s\n", trace_fraction,
 			(trace_ent == ce) ? "yes" : "no"));
 		remove(ce);
@@ -689,16 +663,16 @@ void CSQC_Fx_Trace7(entity sm) {
 		setsize(ce, '-8 -8 -8', '8 8 8');
 		ce.solid = SOLID_BBOX;
 		ce.flags = FL_MONSTER;
-		traceline(eye, eye + v_forward * 140, MOVE_MISSILE, sm);
+		traceline(eye, eye + v_forward * 140, MOVE_MISSILE, world);
 		dprint(sprintf("C7 miss frac %g wall %s\n", trace_fraction,
 			(trace_ent == ce) ? "yes" : "no"));
 		remove(ce);
 	}
 
-	// --- forent-skip: трасса из точки НАД головой (вне своего зеркала) с
-	// forent=ce не бьёт саму стену ce — «не бьёт себя» у своего спавна.
-	// (owner-игнор в движке есть, но канарейка снимается: запись .owner даёт
-	// opcode STOREF_I (#222), который PR1VM пока не исполняет — отдельный шаг.)
+	// --- forent-skip: трасса из точки НАД головой с forent=ce не бьёт саму
+	// стену ce — «не бьёт себя» у своего спавна. (owner-игнор в движке есть,
+	// но канарейка снимается: запись .owner даёт opcode STOREF_I (#222), который
+	// PR1VM пока не исполняет — отдельный шаг.)
 	ce = spawn();
 	if (ce != world) {
 		setorigin(ce, above + v_forward * 96);
@@ -708,29 +682,6 @@ void CSQC_Fx_Trace7(entity sm) {
 		dprint(sprintf("C7 foe frac %g wall %s ent %g\n", trace_fraction,
 			(trace_ent == ce) ? "yes" : "no", trace_ent.entnum));
 		remove(ce);
-	}
-
-	// --- зеркало другого игрока (второй клиент/ftew): трасса ПО ВЗГЛЯДУ (как
-	// выстрел), forent=sm — своё зеркало не мешает. Попадёт только если игрок
-	// в луче впереди; ent в выводе — что реально поймано (мир=0). ---
-	ce = world;
-	while (1) {
-		ce = nextent(ce);
-		if (ce == world)
-			break;
-		if (ce.entnum > 0 && ce.entnum != player_localentnum && ce.flags == FL_MONSTER)
-			break;
-	}
-	if (ce != world) {
-		traceline(eye, eye + v_forward * 140, MOVE_NORMAL, sm);
-		dprint(sprintf("C7 play tgt %g frac %g hit %s me %s ent %g\n",
-			ce.entnum, trace_fraction,
-			(trace_ent == ce) ? "yes" : "no",
-			(trace_ent == sm) ? "yes" : "no",
-			trace_ent.entnum));
-	}
-	else {
-		dprint("C7 play none\n");
 	}
 }
 
@@ -749,7 +700,6 @@ void CSQC_Fx_Smoke() {
 	local entity pe0, pe1, pe2, pe3, pe4;	// P1d: 5 явных spawn-сущностей (без массивов)
 	local float nu, nf, nfind;		// P1d: счётчики
 	local float df, wm, pc, pc2;		// P1d C2: droptofloor/walkmove/pointcontents
-	local entity sm;				// P1d C2 / Шаг 7: своё зеркало-игрок (forent)
 
 	// #459 edict_num(1): валидная entity не-world (0 вне арены). entity->float
 	// qcc-каст запрещён — статус 1/0.
@@ -817,12 +767,16 @@ void CSQC_Fx_Smoke() {
 		mv_x, mv_y, mv_z, cvar_string("csqc_dbg"), z));
 	strunzone(z);
 
-	// P1e: подсистемы — прекеши (возврат имени), particle (#48), lightstyle (#35,
+	// P1e: подсистемы — прекеши (side-effect), particle (#48), lightstyle (#35,
 	// no-op), ambientsound (#74, тихо). sound/breakpoint/setpause — регистрация.
+	// Возврат precache_sound/precache_file не печатаем: на FTE он не-строковый
+	// (PF_cs_PrecacheSound не пишет OFS_RETURN, precachefile — число download);
+	// на ezquake возвращает имя. Печатаем константные имена.
+	precache_model("progs/tf_flag.mdl");
+	precache_sound("weapons/railgun.wav");
+	precache_file("maps/bastion.bsp");
 	dprint(sprintf("P1E pm %s ps %s pf %s\n",
-		precache_model("progs/tf_flag.mdl"),
-		precache_sound("weapons/railgun.wav"),
-		precache_file("maps/bastion.bsp")));
+		"progs/tf_flag.mdl", "weapons/railgun.wav", "maps/bastion.bsp"));
 	particle('0 0 0', '0 1 0', 73, 8);
 	lightstyle(1, "a");
 	ambientsound('0 0 0', "weapons/detpack.wav", 0.15, 0);
@@ -872,11 +826,9 @@ void CSQC_Fx_Smoke() {
 
 	// P1d C2 (functional): трассы/физика. traceline вниз от точки над игроком
 	// (fraction<1, endpos_z), pointcontents ниже, droptofloor/walkmove на
-	// спавн-сущности через self (потом self возвращаем в world). Трассы из/через
-	// своё тело исключают зеркало себя forent=sm (Шаг 7, часть 2).
-	sm = CSQC_SelfEnt();
+	// спавн-сущности через self (потом self возвращаем в world).
 	mv = getproperty(11) + '0 0 96';
-	traceline(mv, mv + '0 0 -600', 0, sm);
+	traceline(mv, mv + '0 0 -600', 0, world);
 	dprint(sprintf("C2 tr frac %g endz %g\n", trace_fraction, trace_endpos_z));
 	pc = pointcontents(getproperty(11));
 	pc2 = pointcontents(mv + '0 0 -400');
@@ -896,15 +848,14 @@ void CSQC_Fx_Smoke() {
 	// P1d C2 entity-слой (Шаг 7): стена-спавн впереди по взгляду; traceline должен
 	// попасть в неё (trace_ent==ce), после remove — снова в мир. Вывод идентичности:
 	// entnum (0 у своих), classname/model полей найденной сущности. Со Шага 7
-	// (часть 2) стена требует solid=SOLID_BBOX (классификация MOVE_*); трасса из
-	// глаза — forent=sm (иначе бьёт зеркало себя).
+	// (часть 2) стена требует solid=SOLID_BBOX (классификация MOVE_*).
 	makevectors(getproperty(15));
 	ce = spawn();
 	if (ce != world) {
 		setorigin(ce, getproperty(11) + v_forward * 48);
 		setsize(ce, '-8 -8 -8', '8 8 8');
 		ce.solid = SOLID_BBOX;
-		traceline(getproperty(11), getproperty(11) + v_forward * 96, 0, sm);
+		traceline(getproperty(11), getproperty(11) + v_forward * 96, 0, world);
 		dprint(sprintf("C2E tr %g wall %s entnum %g class \"%s\" model \"%s\" world %s\n",
 			trace_fraction,
 			(trace_ent == ce) ? "yes" : "no",
@@ -913,13 +864,13 @@ void CSQC_Fx_Smoke() {
 			trace_ent.model,
 			(trace_ent == world) ? "yes" : "no"));
 		remove(ce);
-		traceline(getproperty(11), getproperty(11) + v_forward * 96, 0, sm);
+		traceline(getproperty(11), getproperty(11) + v_forward * 96, 0, world);
 		dprint(sprintf("C2E2 tr %g world %s\n", trace_fraction,
 			(trace_ent == world) ? "yes" : "no"));
 	}
 
-	// FTE-пул Шаг 7 (часть 2): канарейки dispatch MOVE_*/owner + зеркало игроков.
-	CSQC_Fx_Trace7(sm);
+	// FTE-пул Шаг 7 (часть 2): канарейки dispatch MOVE_* + forent-skip.
+	CSQC_Fx_Trace7();
 }
 
 // C1.2: события ввода от движка (csdefs.qc:159; типы IE_* 0..6). Счётчики —
