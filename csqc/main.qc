@@ -52,6 +52,10 @@ float g_sm346;		// setsensitivityscaler(1) — 1 (void, вызвано)
 float g_sm347;		// runstandardplayerphysics(edict_num(0)) — 1 (не краш)
 float g_sm_buf;		// buf-цепочка #460..469 — число успешных шагов
 float g_dbg_prev;	// предыдущий csqc_dbg (консоль-смоук T1/T2 при включении экрана 4)
+float g_t5_iss;		// T5: isserver() (считается на включение экрана 4)
+float g_t5_slot;	// T5: num_for_edict(spawn-сущности) — слот
+float g_t5_free0;	// T5: wasfreed(до remove)
+float g_t5_free1;	// T5: wasfreed(после remove)
 
 // Шаг 2 (ADR 0019-план): debug-уровень модуля живёт в модульном cvar csqc_dbg
 // (registercvar #93, создаётся в CSQC_Init; движковых csqc_d2d/csqc_inputdebug
@@ -321,6 +325,10 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_sm347 = 0;
 	g_sm_buf = 0;
 	g_dbg_prev = 0;
+	g_t5_iss = 0;
+	g_t5_slot = 0;
+	g_t5_free0 = 0;
+	g_t5_free1 = 0;
 	registercommand("csqc_sendevent");
 	registercommand("csqc_sendevent6");
 	// P1c фатальный probe (objerror) — отдельной командой, не в общем смоуке.
@@ -918,6 +926,7 @@ void Hud_DrawCSQC() {
 	local string ks;
 	local vector mp;
 	local float D;
+	local entity t5e;	// T5: временный spawn для etos/num_for_edict/wasfreed
 
 	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
 	// всегда; строки флагов — по слотам ниже.
@@ -966,6 +975,19 @@ void Hud_DrawCSQC() {
 	// чтобы сверять их по qconsole.log (визуальные строки — ниже в D==4).
 	// Строки <= 8 аргументов sprintf (varargs-лимит).
 	if (D == 4 && g_dbg_prev != 4) {
+		// T5: spawn→etos/num/for_edict/wasfreed → remove → wasfreed; isserver.
+		g_t5_iss = isserver();
+		t5e = spawn();
+		if (t5e != world) {
+			g_t5_slot = num_for_edict(t5e);
+			g_t5_free0 = wasfreed(t5e);
+			remove(t5e);
+			g_t5_free1 = wasfreed(t5e);
+		} else {
+			g_t5_slot = 0;
+			g_t5_free0 = 0;
+			g_t5_free1 = 0;
+		}
 		dprint(sprintf("T1 asin%g acos%g atan%g atan2%g tan%g log%g\n",
 			asin(1), acos(0), atan(1), atan2(1, 1), tan(0), log(2.718282)));
 		dprint(sprintf("T1 am%g mod%g bs%g/%g crc16 %g/%g t%g\n",
@@ -984,6 +1006,10 @@ void Hud_DrawCSQC() {
 		dprint(sprintf("T4 rep[%s] irep[%s] ig[%s]\n",
 			strreplace("a", "X", "banana"), strireplace("A", "X", "banana"),
 			infoget(infoadd("", "k", "v"), "k")));
+		dprint(sprintf("T5 iss%g ent entity%g num%g fr%g/%g\n",
+			g_t5_iss, g_t5_slot, g_t5_slot, g_t5_free0, g_t5_free1));
+		// cprint — центр-экран (видимая проверка; как FTE).
+		cprint("CSQC T5 cprint");
 	}
 	g_dbg_prev = D;
 
@@ -1141,6 +1167,11 @@ void Hud_DrawCSQC() {
 			sprintf("t4 rep[%s] irep[%s] ig[%s]",
 				strreplace("a", "X", "banana"), strireplace("A", "X", "banana"),
 				infoget(infoadd("", "k", "v"), "k")),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("t5 iss%g ent entity%g num%g fr%g/%g",
+				g_t5_iss, g_t5_slot, g_t5_slot, g_t5_free0, g_t5_free1),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }
