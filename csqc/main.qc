@@ -1029,6 +1029,16 @@ void Hud_DrawCSQC() {
 		drawrotpic_dp([0, 0, 0], "gfx/ttl_main", [96, 24, 0], [0, 0, 0], 0, [1, 1, 1], 1);
 		dprint(sprintf("2D isc %g/%g sz %gx%g\n",
 			g_2d_isc0, g_2d_isc1, g_2d_isz_x, g_2d_isz_y));
+		dprint(sprintf("T7 tf[%s]/[%s]\n",
+			strftime(1, "%H:%M:%S"), strftime(0, "%H:%M:%S")));
+		dprint(sprintf("T7 tc %g a1[%s] s0 %g/%g s1 %g/%g\n",
+			tokenize_console("aa bb cc"), argv(1),
+			argv_start_index(0), argv_end_index(0),
+			argv_start_index(1), argv_end_index(1)));
+		dprint(sprintf("T7 sep %g s0 %g/%g s2 %g/%g\n",
+			tokenizebyseparator("a;b;;c", ";"),
+			argv_start_index(0), argv_end_index(0),
+			argv_start_index(2), argv_end_index(2)));
 		// cprint — центр-экран (видимая проверка; как FTE).
 		cprint("CSQC T5 cprint");
 	}
@@ -1198,6 +1208,26 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("2d isc %g/%g sz %gx%g",
 				g_2d_isc0, g_2d_isc1, g_2d_isz_x, g_2d_isz_y),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		// ST: strftime (локальное/GMT) + tokenize_console + tokenizebyseparator.
+		drawstring([60, yy, 0],
+			sprintf("t7 l[%s] g[%s]",
+				strftime(1, "%H:%M:%S"), strftime(0, "%H:%M:%S")),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		tw = tokenize_console("aa bb cc");
+		drawstring([60, yy, 0],
+			sprintf("t7 tc%g a1[%s] s0 %g/%g s1 %g/%g",
+				tw, argv(1), argv_start_index(0), argv_end_index(0),
+				argv_start_index(1), argv_end_index(1)),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		tw = tokenizebyseparator("a;b;;c", ";");
+		drawstring([60, yy, 0],
+			sprintf("t7 sep%g s0 %g/%g s2 %g/%g",
+				tw, argv_start_index(0), argv_end_index(0),
+				argv_start_index(2), argv_end_index(2)),
 			[12, 12], '1 1 1', 1, 0);
 		// 2D-доп визуально (правый верхний угол — от размера экрана getproperty
 		// 204): cliparea обрезает drawpic (пикча центрирована по clip, видна
