@@ -1054,6 +1054,11 @@ void Hud_DrawCSQC() {
 		dynamiclight_get(0, -1);
 		dynamiclight_set(0, 0, 0);
 		dprint("T11 light/decal/skin noop ok\n");
+		// Интроспекция/кон: checkcommand (status=1, developer=cvar=3), argescape,
+		// isfunction (Hud_DrawCSQC=1, нет=0); con_* — no-op (не вызываются).
+		dprint(sprintf("T12 cc%g/%g esc[%s] is%g/%g\n",
+			checkcommand("status"), checkcommand("developer"),
+			argescape("a b c"), isfunction("Hud_DrawCSQC"), isfunction("zzz_none")));
 		dprint(sprintf("T7 tf[%s]/[%s]\n",
 			strftime(1, "%H:%M:%S"), strftime(0, "%H:%M:%S")));
 		dprint(sprintf("T7 tc %g a1[%s] s0 %g/%g s1 %g/%g\n",
@@ -1294,6 +1299,12 @@ void Hud_DrawCSQC() {
 			[12, 12], '1 1 1', 1, 0);
 		yy = yy + 18;
 		drawstring([60, yy, 0], "t11 light/decal/skin noop", [12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("t12 cc%g/%g esc[%s] is%g/%g",
+				checkcommand("status"), checkcommand("developer"),
+				argescape("a b c"), isfunction("Hud_DrawCSQC"), isfunction("zzz_none")),
+			[12, 12], '1 1 1', 1, 0);
 		// 2D-доп визуально (правый верхний угол — от размера экрана getproperty
 		// 204): cliparea обрезает drawpic (пикча центрирована по clip, видна
 		// центральная часть), raw vs colored.
