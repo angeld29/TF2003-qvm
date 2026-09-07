@@ -732,6 +732,28 @@ void CSQC_Fx_Smoke() {
 		self = world;
 		remove(ce);
 	}
+
+	// P1d C2 entity-слой (Шаг 7): стена-спавн впереди по взгляду; traceline должен
+	// попасть в неё (trace_ent==ce), после remove — снова в мир. Вывод идентичности:
+	// entnum (0 у своих), classname/model полей найденной сущности.
+	makevectors(getproperty(15));
+	ce = spawn();
+	if (ce != world) {
+		setorigin(ce, getproperty(11) + v_forward * 48);
+		setsize(ce, '-8 -8 -8', '8 8 8');
+		traceline(getproperty(11), getproperty(11) + v_forward * 96, 0, world);
+		dprint(sprintf("C2E tr %g wall %s entnum %g class \"%s\" model \"%s\" world %s\n",
+			trace_fraction,
+			(trace_ent == ce) ? "yes" : "no",
+			trace_ent.entnum,
+			trace_ent.classname,
+			trace_ent.model,
+			(trace_ent == world) ? "yes" : "no"));
+		remove(ce);
+		traceline(getproperty(11), getproperty(11) + v_forward * 96, 0, world);
+		dprint(sprintf("C2E2 tr %g world %s\n", trace_fraction,
+			(trace_ent == world) ? "yes" : "no"));
+	}
 }
 
 // C1.2: события ввода от движка (csdefs.qc:159; типы IE_* 0..6). Счётчики —
