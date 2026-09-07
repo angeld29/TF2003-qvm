@@ -1048,6 +1048,12 @@ void Hud_DrawCSQC() {
 		pointsound(getproperty(11), "weapons/railgun.wav", 1, 1);
 		SetListener(getproperty(11), [0, 0, 0], [0, 0, 0], [0, 0, 0]);
 		dprint("T10 sound pointsound/SetListener ok\n");
+		// Свет/decals/скины: no-op (нет аналогов) — вызовы без краша.
+		adddecal("progs/none.mdl", getproperty(11), [0, 0, 1], [1, 0, 0], [1, 1, 1], 1);
+		setcustomskin(world, "");
+		dynamiclight_get(0, -1);
+		dynamiclight_set(0, 0, 0);
+		dprint("T11 light/decal/skin noop ok\n");
 		dprint(sprintf("T7 tf[%s]/[%s]\n",
 			strftime(1, "%H:%M:%S"), strftime(0, "%H:%M:%S")));
 		dprint(sprintf("T7 tc %g a1[%s] s0 %g/%g s1 %g/%g\n",
@@ -1286,6 +1292,8 @@ void Hud_DrawCSQC() {
 			sprintf("t10 gst%g sl%g",
 				getsoundtime(world, 0), soundlength("weapons/railgun.wav")),
 			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0], "t11 light/decal/skin noop", [12, 12], '1 1 1', 1, 0);
 		// 2D-доп визуально (правый верхний угол — от размера экрана getproperty
 		// 204): cliparea обрезает drawpic (пикча центрирована по clip, видна
 		// центральная часть), raw vs colored.
