@@ -967,7 +967,7 @@ void CSQC_Stub_Check() {
 	te_lightningblood('0 0 0');
 	stmp = strconv(0,0,0,"");
 	if (stmp != "") { dprint(sprintf("STUB bad #%d %s !=empty\n",224,"strconv")); bad = bad + 1; } else oks = oks + 1;
-	if (isbackbuffered() != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",234,"isbackbuffered")); bad = bad + 1; } else okf = okf + 1;
+	if (isbackbuffered(world) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",234,"isbackbuffered")); bad = bad + 1; } else okf = okf + 1;
 	rotatevectorsbyangle('0 0 0');
 	rotatevectorsbyvectors('0 0 0','0 0 0','0 0 0');
 	if (skinforname(0,"") != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",237,"skinforname")); bad = bad + 1; } else okf = okf + 1;
@@ -988,8 +988,8 @@ void CSQC_Stub_Check() {
 	vtmp = skel_get_boneabs(0,0);
 	if (vtmp_x != 0 || vtmp_y != 0 || vtmp_z != 0) { dprint(sprintf("STUB bad #%d %s !=0v\n",270,"skel_get_boneabs")); bad = bad + 1; } else okv = okv + 1;
 	skel_set_bone(0,0,'0 0 0','0 0 0','0 0 0','0 0 0');
-	skel_mul_bone(0,0,'0 0 0','0 0 0','0 0 0','0 0 0');
-	skel_mul_bones(0,0,0,'0 0 0','0 0 0','0 0 0','0 0 0');
+	skel_premul_bone(0,0,'0 0 0','0 0 0','0 0 0','0 0 0');
+	skel_premul_bones(0,0,0,'0 0 0','0 0 0','0 0 0','0 0 0');
 	skel_copybones(0,0,0,0);
 	skel_delete(0);
 	if (frameforname(0,"") != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",276,"frameforname")); bad = bad + 1; } else okf = okf + 1;
@@ -1201,7 +1201,7 @@ void Hud_DrawCSQC() {
 			asin(1), acos(0), atan(1), atan2(1, 1), tan(0), log(2.718282)));
 		dprint(sprintf("T1 am%g mod%g bs%g/%g crc16 %g/%g t%g\n",
 			anglemod(450), mod(7, 3), bitshift(3, 2), bitshift(1, -1),
-			crc16(0, "ABC"), crc16(1, "ABC"), gettime()));
+			crc16(0, "ABC"), crc16(1, "ABC"), gettimef()));
 		dprint(sprintf("T2 itos%s/%s htos%s/%s\n",
 			itos(-7), itos(stoi("42")), htos(42), htos(stoh("ff"))));
 		dprint(sprintf("T3 def\"%s\" type%g des\"%s\"\n",
@@ -1414,7 +1414,7 @@ void Hud_DrawCSQC() {
 	// --- экран 4: L2-тривиалы T1 (математика, 2026-09-07). Значения считаются
 	// каждый кадр (детерминированные); ожидания: asin1=1.57 acos0=1.57 atan1=0.785
 	// atan2(1,1)=0.785 tan0=0 log(e)=1; anglemod(450)=90 mod(7,3)=1 bs(3,2)=12
-	// bs(1,-1)=0; crc16(0,"ABC")=62728 crc16(1,"ABC")=20810; gettime() растёт.
+	// bs(1,-1)=0; crc16(0,"ABC")=62728 crc16(1,"ABC")=20810; gettimef() растёт.
 	// T2: stoi("42")=42 itos(-7)="-7" stoh("ff")=255 htos(42)="0000002a".
 	if (D == 4) {
 		yy = 470;
@@ -1430,7 +1430,7 @@ void Hud_DrawCSQC() {
 		yy = yy + 18;
 		drawstring([60, yy, 0],
 			sprintf("t1 crc16 %g/%g t%g",
-				crc16(0, "ABC"), crc16(1, "ABC"), gettime()),
+				crc16(0, "ABC"), crc16(1, "ABC"), gettimef()),
 			[12, 12], '1 1 1', 1, 0);
 		yy = yy + 18;
 		drawstring([60, yy, 0],

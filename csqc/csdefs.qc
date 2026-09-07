@@ -826,10 +826,10 @@ vector(float skel, float bonenum) skel_get_boneabs = #270; /* Part of FTE_CSQC_S
 void(float skel, float bonenum, vector org, optional vector fwd, optional vector right, optional vector up) skel_set_bone = #271; /* Part of FTE_CSQC_SKELETONOBJECTS
 		Sets a bone position relative to its parent. If the orientation arguments are not specified, v_forward+v_right+v_up are used instead. */
 
-void(float skel, float bonenum, vector org, optional vector fwd, optional vector right, optional vector up) skel_mul_bone = #272; /* Part of FTE_CSQC_SKELETONOBJECTS
+void(float skel, float bonenum, vector org, optional vector fwd, optional vector right, optional vector up) skel_premul_bone = #272; /* Part of FTE_CSQC_SKELETONOBJECTS
 		Transforms a single bone by a matrix. You can use makevectors to generate a rotation matrix from an angle. */
 
-void(float skel, float startbone, float endbone, vector org, optional vector fwd, optional vector right, optional vector up) skel_mul_bones = #273; /* Part of FTE_CSQC_SKELETONOBJECTS
+void(float skel, float startbone, float endbone, vector org, optional vector fwd, optional vector right, optional vector up) skel_premul_bones = #273; /* Part of FTE_CSQC_SKELETONOBJECTS
 		Transforms an entire consecutive range of bones by a matrix. You can use makevectors to generate a rotation matrix from an angle, but you'll probably want to divide the angle by the number of bones. */
 
 void(float skeldst, float skelsrc, float startbone, float entbone) skel_copybones = #274; /* Part of FTE_CSQC_SKELETONOBJECTS
@@ -1284,7 +1284,7 @@ float(float idx) argv_start_index = #515;
 float(float idx) argv_end_index = #516;
 void(strbuf strbuf) buf_cvarlist = #517;
 string(string cvarname) cvar_description = #518;
-float(optional float timetype) gettime = #519;
+float(optional float timetype) gettimef = #519;
 string(float keynum) keynumtostring_omgwtf = #520;
 string(string command, optional float bindmap) findkeysforcommand = #521;
 void(string s) loadfromdata = #529; /*
@@ -1318,7 +1318,7 @@ void(filestream fh, entity e) writetofile = #606; /*
 float(string s) isfunction = #607;
 vector(float vidmode, optional float forfullscreen) getresolution = #608;
 string(float keynum) keynumtostring_menu = #609;
-string(string command, optional float bindmap) findkeysforcommand_dp = #610;
+string(string command, optional float bindmap) findkeysforcommand_menu = #610;
 float(float type) gethostcachevalue = #611; /* Part of FTE_CSQC_SERVERBROWSER*/
 string(float type, float hostnr) gethostcachestring = #612; /* Part of FTE_CSQC_SERVERBROWSER*/
 void(entity e, string s) parseentitydata = #613; /*
@@ -1465,7 +1465,7 @@ string(string digest, string data, ...) digest_hex = #639;
 float() externrefcall = #205;
 void() fork = #210;
 void() sleep = #212;
-float() isbackbuffered = #234;
+float(entity ent) isbackbuffered = #234;
 float() sendpacket = #242;
 void() hash_getcb = #293;
 void() te_flamejet = #457;
