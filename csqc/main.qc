@@ -1043,6 +1043,11 @@ void Hud_DrawCSQC() {
 			g_vm_fo = -2;
 		}
 		dprint(sprintf("T9 findfloat slot %g\n", g_vm_fo));
+		// Звук: pointsound/SetListener разово при включении (в стенде -nosound,
+		// проверка — не-краш); getsoundtime/soundlength — no-op (-1/0).
+		pointsound(getproperty(11), "weapons/railgun.wav", 1, 1);
+		SetListener(getproperty(11), [0, 0, 0], [0, 0, 0], [0, 0, 0]);
+		dprint("T10 sound pointsound/SetListener ok\n");
 		dprint(sprintf("T7 tf[%s]/[%s]\n",
 			strftime(1, "%H:%M:%S"), strftime(0, "%H:%M:%S")));
 		dprint(sprintf("T7 tc %g a1[%s] s0 %g/%g s1 %g/%g\n",
@@ -1275,6 +1280,11 @@ void Hud_DrawCSQC() {
 		yy = yy + 18;
 		drawstring([60, yy, 0],
 			sprintf("t9 findfloat slot %g", g_vm_fo),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("t10 gst%g sl%g",
+				getsoundtime(world, 0), soundlength("weapons/railgun.wav")),
 			[12, 12], '1 1 1', 1, 0);
 		// 2D-доп визуально (правый верхний угол — от размера экрана getproperty
 		// 204): cliparea обрезает drawpic (пикча центрирована по clip, видна
