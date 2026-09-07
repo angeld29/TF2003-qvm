@@ -61,6 +61,8 @@ float g_2d_isc1;	// 2D-доп: iscachedpic после freepic
 float g_2d_isz_x;	// 2D-доп: drawgetimagesize x
 float g_2d_isz_y;	// 2D-доп: drawgetimagesize y
 float g_vm_fo;		// VM-остаток: findfloat(.solid==SOLID_BBOX) найденный слот/-1/-2
+float g_rf_n, g_rf_is, g_rf_ic, g_rf_io;	// рефлексия: num/idx solid/classname/origin
+float g_rf_v, g_rf_cls;	// рефлексия: solid-значение (stof), класс после put
 
 // Шаг 2 (ADR 0019-план): debug-уровень модуля живёт в модульном cvar csqc_dbg
 // (registercvar #93, создаётся в CSQC_Init; движковых csqc_d2d/csqc_inputdebug
@@ -339,6 +341,12 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_2d_isz_x = 0;
 	g_2d_isz_y = 0;
 	g_vm_fo = -2;
+	g_rf_n = 0;
+	g_rf_is = -1;
+	g_rf_ic = -1;
+	g_rf_io = -1;
+	g_rf_v = 0;
+	g_rf_cls = 0;
 	registercommand("csqc_sendevent");
 	registercommand("csqc_sendevent6");
 	// P1c фатальный probe (objerror) — отдельной командой, не в общем смоуке.
@@ -927,6 +935,15 @@ float CSQC_InputEvent(float evtype, float scanx, float chary, float devid) {
 	return 0;
 }
 
+// Рефлексия: индекс поля модуля по имени (entityfieldname), -1 если нет.
+float CSQC_FieldIdx(string nm) {
+	local float i;
+	for (i = 0; i < numentityfields(); i = i + 1)
+		if (entityfieldname(i) == nm)
+			return i;
+	return -1;
+}
+
 // Дополнительные HUD-элементы CSQC-теста (вызывается из Hud_Draw в hud.qc):
 // 2D-маркеры флагов (entity-канал), эхо sendevent, счёт команд (pointerstat 40..43).
 void Hud_DrawCSQC() {
@@ -966,7 +983,8 @@ void Hud_DrawCSQC() {
 	}
 
 	// Debug-экраны модуля (cvar csqc_dbg): 0 — выкл; 1 — графика+курсор;
-	// 2 — текст «до ie»; 3 — остальное (по группам); 4 — L2-тривиалы T1 (математика).
+	// 2 — текст «до ie»; 3 — остальное (по группам); 4 — сводные L2-смоки
+	// (T1..T12/2D); 5 — Entity-рефлексия (#496-500).
 	// Каждый экран рисуется от верхнего якоря y=470 (там, где картинки), строк на
 	// экран <= 10. ECHO/FLAGS выше — не debug.
 	D = cvar("csqc_dbg");
@@ -1082,6 +1100,28 @@ void Hud_DrawCSQC() {
 			tw, k, getmousetarget(), mp_x, mp_y, mp_z));
 		// cprint — центр-экран (видимая проверка; как FTE).
 		cprint("CSQC T5 cprint");
+	}
+
+	// Экран 5 (Entity-рефлексия #496-500): при включении — вычисление + консоль.
+	if (D == 5 && g_dbg_prev != 5) {
+		g_rf_n = numentityfields();
+		g_rf_is = CSQC_FieldIdx("solid");
+		g_rf_ic = CSQC_FieldIdx("classname");
+		g_rf_io = CSQC_FieldIdx("origin");
+		vme = spawn();
+		if (vme != world) {
+			vme.solid = SOLID_BBOX;
+			setorigin(vme, '1 2 3');
+			if (g_rf_is >= 0)
+				g_rf_v = stof(getentityfieldstring(g_rf_is, vme));
+			if (g_rf_ic >= 0) {
+				putentityfieldstring(g_rf_ic, vme, "rf_set");
+				g_rf_cls = (getentityfieldstring(g_rf_ic, vme) == "rf_set") ? 1 : 0;
+			}
+			remove(vme);
+		}
+		dprint(sprintf("T13 rf n%g i%g/%g/%g v%g cls%g\n",
+			g_rf_n, g_rf_is, g_rf_ic, g_rf_io, g_rf_v, g_rf_cls));
 	}
 	g_dbg_prev = D;
 
@@ -1316,5 +1356,14 @@ void Hud_DrawCSQC() {
 		drawresetcliparea();
 		drawstring([cx, cy + 30], "&cF00col", [12, 12], '1 1 1', 1, 0);
 		drawrawstring([cx, cy + 52], "&cF00raw", [12, 12], '1 1 1', 1);
+	}
+
+	// --- экран 5: Entity-рефлексия (#496-500) ---
+	if (D == 5) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("t13 rf n%g i%g/%g/%g v%g cls%g",
+				g_rf_n, g_rf_is, g_rf_ic, g_rf_io, g_rf_v, g_rf_cls),
+			[12, 12], '1 1 1', 1, 0);
 	}
 }
