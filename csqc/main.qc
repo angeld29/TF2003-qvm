@@ -51,6 +51,7 @@ float g_sm345;		// getinputstate(input_sequence) — 0/1
 float g_sm346;		// setsensitivityscaler(1) — 1 (void, вызвано)
 float g_sm347;		// runstandardplayerphysics(edict_num(0)) — 1 (не краш)
 float g_sm_buf;		// buf-цепочка #460..469 — число успешных шагов
+float g_dbg_prev;	// предыдущий csqc_dbg (консоль-смоук T1/T2 при включении экрана 4)
 
 // Шаг 2 (ADR 0019-план): debug-уровень модуля живёт в модульном cvar csqc_dbg
 // (registercvar #93, создаётся в CSQC_Init; движковых csqc_d2d/csqc_inputdebug
@@ -319,6 +320,7 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_sm346 = 0;
 	g_sm347 = 0;
 	g_sm_buf = 0;
+	g_dbg_prev = 0;
 	registercommand("csqc_sendevent");
 	registercommand("csqc_sendevent6");
 	// P1c фатальный probe (objerror) — отдельной командой, не в общем смоуке.
@@ -947,8 +949,9 @@ void Hud_DrawCSQC() {
 	// Каждый экран рисуется от верхнего якоря y=470 (там, где картинки), строк на
 	// экран <= 10. ECHO/FLAGS выше — не debug.
 	D = cvar("csqc_dbg");
-	if (D != 0 && g_sm_run == 0) {
-		// однократно на включение debug: smoke-статусы + p1a-сэмплы.
+	// Экран 3: при включении — старые smoke-статусы/сэмплы и их консоль-выводы
+	// (P1D/C2E/C7/smoke 459-347-buf) — только у этого экрана (у 1/2/4 их нет).
+	if (D == 3 && g_sm_run == 0) {
 		CSQC_Fx_Smoke();
 		g_p1a_r = random();
 		g_p1a_rv = randomvec();
@@ -958,6 +961,20 @@ void Hud_DrawCSQC() {
 		setcursormode(0);
 		g_sm_run = 0;
 	}
+
+	// Экран 4 (L2-тривиалы): при включении — значения и в консоль (dprint),
+	// чтобы сверять их по qconsole.log (визуальные строки — ниже в D==4).
+	// Строки <= 8 аргументов sprintf (varargs-лимит).
+	if (D == 4 && g_dbg_prev != 4) {
+		dprint(sprintf("T1 asin%g acos%g atan%g atan2%g tan%g log%g\n",
+			asin(1), acos(0), atan(1), atan2(1, 1), tan(0), log(2.718282)));
+		dprint(sprintf("T1 am%g mod%g bs%g/%g crc16 %g/%g t%g\n",
+			anglemod(450), mod(7, 3), bitshift(3, 2), bitshift(1, -1),
+			crc16(0, "ABC"), crc16(1, "ABC"), gettime()));
+		dprint(sprintf("T2 itos%s/%s htos%s/%s\n",
+			itos(-7), itos(stoi("42")), htos(42), htos(stoh("ff"))));
+	}
+	g_dbg_prev = D;
 
 	// --- экран 1: графика (LayerD) + курсор модуля ---
 	if (D == 1) {
@@ -1069,6 +1086,7 @@ void Hud_DrawCSQC() {
 	// каждый кадр (детерминированные); ожидания: asin1=1.57 acos0=1.57 atan1=0.785
 	// atan2(1,1)=0.785 tan0=0 log(e)=1; anglemod(450)=90 mod(7,3)=1 bs(3,2)=12
 	// bs(1,-1)=0; crc16(0,"ABC")=62728 crc16(1,"ABC")=20810; gettime() растёт.
+	// T2: stoi("42")=42 itos(-7)="-7" stoh("ff")=255 htos(42)="0000002a".
 	if (D == 4) {
 		yy = 470;
 		drawstring([60, yy, 0],
@@ -1084,6 +1102,11 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("t1 crc16 %g/%g t%g",
 				crc16(0, "ABC"), crc16(1, "ABC"), gettime()),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("t2 itos%s/%s htos%s/%s",
+				itos(-7), itos(stoi("42")), htos(42), htos(stoh("ff"))),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }
