@@ -1039,6 +1039,17 @@ void Hud_DrawCSQC() {
 			tokenizebyseparator("a;b;;c", ";"),
 			argv_start_index(0), argv_end_index(0),
 			argv_start_index(2), argv_end_index(2)));
+		k = stringtokeynum_menu("ESCAPE");
+		ks = keynumtostring_omgwtf(k);
+		dprint(sprintf("T8 esc%s(%d) bind[%s] keys[%s]\n",
+			(ks == "ESCAPE") ? "ESCAPE" : "?", k,
+			getkeybind(k), findkeysforcommand(getkeybind(k))));
+		mp = getresolution(0);
+		tw = mp_x;
+		k = mp_y;
+		mp = getbindmaps();
+		dprint(sprintf("T8 res %gx%g mt%g bm %g %g %g\n",
+			tw, k, getmousetarget(), mp_x, mp_y, mp_z));
 		// cprint — центр-экран (видимая проверка; как FTE).
 		cprint("CSQC T5 cprint");
 	}
@@ -1228,6 +1239,24 @@ void Hud_DrawCSQC() {
 			sprintf("t7 sep%g s0 %g/%g s2 %g/%g",
 				tw, argv_start_index(0), argv_end_index(0),
 				argv_start_index(2), argv_end_index(2)),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		// Ввод/меню: keynum round-trip, getkeybind/findkeysforcommand, res/mt/bm.
+		k = stringtokeynum_menu("ESCAPE");
+		ks = keynumtostring_omgwtf(k);
+		drawstring([60, yy, 0],
+			sprintf("t8 esc%s(%d) bind[%s] keys[%s]",
+				(ks == "ESCAPE") ? "ESCAPE" : "?", k,
+				getkeybind(k), findkeysforcommand(getkeybind(k))),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		mp = getresolution(0);
+		tw = mp_x;
+		k = mp_y;
+		mp = getbindmaps();
+		drawstring([60, yy, 0],
+			sprintf("t8 res %gx%g mt%g bm %g %g %g",
+				tw, k, getmousetarget(), mp_x, mp_y, mp_z),
 			[12, 12], '1 1 1', 1, 0);
 		// 2D-доп визуально (правый верхний угол — от размера экрана getproperty
 		// 204): cliparea обрезает drawpic (пикча центрирована по clip, видна

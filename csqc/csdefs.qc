@@ -1325,6 +1325,9 @@ void(entity e, string s) parseentitydata = #613; /*
 		Reads a single entity's fields into an already-spawned entity. s should contain field pairs like in a saved game: {"foo1" "bar" "foo2" "5"}  */
 
 float(string key) stringtokeynum_menu = #614;
+void(float keynum, string binding, optional float bindmap) setkeybind = #630;
+vector() getbindmaps = #631;
+float(vector bindmaps) setbindmaps = #632;
 void() resethostcachemasks = #615; /* Part of FTE_CSQC_SERVERBROWSER*/
 void(float mask, float fld, string str, float op) sethostcachemaskstring = #616; /* Part of FTE_CSQC_SERVERBROWSER*/
 void(float mask, float fld, float num, float op) sethostcachemasknumber = #617; /* Part of FTE_CSQC_SERVERBROWSER*/
