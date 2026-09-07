@@ -973,6 +973,8 @@ void Hud_DrawCSQC() {
 			crc16(0, "ABC"), crc16(1, "ABC"), gettime()));
 		dprint(sprintf("T2 itos%s/%s htos%s/%s\n",
 			itos(-7), itos(stoi("42")), htos(42), htos(stoh("ff"))));
+		dprint(sprintf("T3 def\"%s\" type%g des\"%s\"\n",
+			cvar_defstring("csqc_dbg"), cvar_type("csqc_dbg"), cvar_description("csqc_dbg")));
 	}
 	g_dbg_prev = D;
 
@@ -1107,6 +1109,11 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("t2 itos%s/%s htos%s/%s",
 				itos(-7), itos(stoi("42")), htos(42), htos(stoh("ff"))),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("t3 def\"%s\" type%g",
+				cvar_defstring("csqc_dbg"), cvar_type("csqc_dbg")),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }
