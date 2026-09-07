@@ -1459,4 +1459,26 @@ string(string digest, string data, ...) digest_hex = #639;
 #define K_BACKQUOTE	96
 #define K_BACKSLASH	92
 #endif
+// L2-заглушки (2026-09-07): минимальные прототипы для вызова в CSQC_Stub_Check.
+// Реальная FTE-сигнатура этих номеров может отличаться (аргументы не читаются
+// заглушкой); no-arg форма — только для смоука.
+float() externrefcall = #205;
+void() fork = #210;
+void() sleep = #212;
+float() isbackbuffered = #234;
+float() sendpacket = #242;
+void() hash_getcb = #293;
+void() te_flamejet = #457;
+float() bufstr_find = #537;
+string() getgamedirinfo = #626;
+float() CL_RotateMoves = #638;
+float() V_CalcRefdef = #640;
+void() fcopy = #650;
+void() frename = #651;
+void() fremove = #652;
+float() fexists = #653;
+void() rmtree = #654;
+float() controller_query = #740;
+void() controller_rumble = #741;
+void() controller_rumbletriggers = #742;
 #pragma noref 0
