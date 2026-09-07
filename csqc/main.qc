@@ -60,6 +60,7 @@ float g_2d_isc0;	// 2D-доп: iscachedpic до freepic
 float g_2d_isc1;	// 2D-доп: iscachedpic после freepic
 float g_2d_isz_x;	// 2D-доп: drawgetimagesize x
 float g_2d_isz_y;	// 2D-доп: drawgetimagesize y
+float g_vm_fo;		// VM-остаток: findfloat(.solid==SOLID_BBOX) найденный слот/-1/-2
 
 // Шаг 2 (ADR 0019-план): debug-уровень модуля живёт в модульном cvar csqc_dbg
 // (registercvar #93, создаётся в CSQC_Init; движковых csqc_d2d/csqc_inputdebug
@@ -337,6 +338,7 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_2d_isc1 = 0;
 	g_2d_isz_x = 0;
 	g_2d_isz_y = 0;
+	g_vm_fo = -2;
 	registercommand("csqc_sendevent");
 	registercommand("csqc_sendevent6");
 	// P1c фатальный probe (objerror) — отдельной командой, не в общем смоуке.
@@ -935,6 +937,7 @@ void Hud_DrawCSQC() {
 	local vector mp;
 	local float D;
 	local entity t5e;	// T5: временный spawn для etos/num_for_edict/wasfreed
+	local entity vme;	// VM-остаток: spawn для findfloat-канарейки
 	local float cx, cy;	// 2D-доп: правый верхний угол от размера экрана
 
 	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
@@ -1029,6 +1032,17 @@ void Hud_DrawCSQC() {
 		drawrotpic_dp([0, 0, 0], "gfx/ttl_main", [96, 24, 0], [0, 0, 0], 0, [1, 1, 1], 1);
 		dprint(sprintf("2D isc %g/%g sz %gx%g\n",
 			g_2d_isc0, g_2d_isc1, g_2d_isz_x, g_2d_isz_y));
+		// VM-остаток: findfloat по .solid == SOLID_BBOX (находит свой спавн).
+		vme = spawn();
+		if (vme != world) {
+			vme.solid = SOLID_BBOX;
+			t5e = findfloat(world, solid, SOLID_BBOX);
+			g_vm_fo = (t5e == vme) ? num_for_edict(t5e) : -1;
+			remove(vme);
+		} else {
+			g_vm_fo = -2;
+		}
+		dprint(sprintf("T9 findfloat slot %g\n", g_vm_fo));
 		dprint(sprintf("T7 tf[%s]/[%s]\n",
 			strftime(1, "%H:%M:%S"), strftime(0, "%H:%M:%S")));
 		dprint(sprintf("T7 tc %g a1[%s] s0 %g/%g s1 %g/%g\n",
@@ -1257,6 +1271,10 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("t8 res %gx%g mt%g bm %g %g %g",
 				tw, k, getmousetarget(), mp_x, mp_y, mp_z),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("t9 findfloat slot %g", g_vm_fo),
 			[12, 12], '1 1 1', 1, 0);
 		// 2D-доп визуально (правый верхний угол — от размера экрана getproperty
 		// 204): cliparea обрезает drawpic (пикча центрирована по clip, видна
