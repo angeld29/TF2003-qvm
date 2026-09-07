@@ -590,7 +590,8 @@ void CSQC_Fx_Smoke() {
 	local float r, c1, c2, e1, e2;	// P1c: registercvar/cvar/cvar_set/checkextension
 	local vector mv;				// P1b: stov
 	local string z;					// P1b: strzone/strunzone
-	local entity ce, cf;			// P1d: spawn-тест
+	local entity ce, cf;			// P1d: обход/одиночные spawn
+	local entity pe0, pe1, pe2, pe3, pe4;	// P1d: 5 явных spawn-сущностей (без массивов)
 	local float nu, nf, nfind;		// P1d: счётчики
 	local float df, wm, pc, pc2;		// P1d C2: droptofloor/walkmove/pointcontents
 
@@ -668,19 +669,20 @@ void CSQC_Fx_Smoke() {
 	lightstyle(1, "a");
 	ambientsound('0 0 0', "weapons/detpack.wav", 0.15, 0);
 
-	// P1d C1 (functional, не канарейка): spawn->setorigin/setmodel/setsize,
-	// обход nextent/find/findradius по модульному резерву, eprint/coredump,
-	// remove без утечки слотов.
+	// P1d C1 (functional): 5 явных spawn → set*/обход/remove. nextent идёт по
+	// всему пулу (сетевые+свои) — в очистке НЕ используем «nextent→remove всех»
+	// (на сетевой сущности remove игнор → бесконечный цикл при живых сетевых).
 	nu = 0;
-	while (nu < 5) {
-		ce = spawn();
-		if (ce == world)
-			break;
-		setorigin(ce, '16 16 16' + '0 32 0' * nu);
-		setmodel(ce, "progs/tf_flag.mdl");
-		setsize(ce, '-8 -8 -8', '8 8 8');
-		nu = nu + 1;
-	}
+	pe0 = spawn();
+	if (pe0 != world) { nu = nu + 1; setorigin(pe0, '16 16 16'); setmodel(pe0, "progs/tf_flag.mdl"); setsize(pe0, '-8 -8 -8', '8 8 8'); }
+	pe1 = spawn();
+	if (pe1 != world) { nu = nu + 1; setorigin(pe1, '16 48 16'); setmodel(pe1, "progs/tf_flag.mdl"); setsize(pe1, '-8 -8 -8', '8 8 8'); }
+	pe2 = spawn();
+	if (pe2 != world) { nu = nu + 1; setorigin(pe2, '16 80 16'); setmodel(pe2, "progs/tf_flag.mdl"); setsize(pe2, '-8 -8 -8', '8 8 8'); }
+	pe3 = spawn();
+	if (pe3 != world) { nu = nu + 1; setorigin(pe3, '16 112 16'); setmodel(pe3, "progs/tf_flag.mdl"); setsize(pe3, '-8 -8 -8', '8 8 8'); }
+	pe4 = spawn();
+	if (pe4 != world) { nu = nu + 1; setorigin(pe4, '16 144 16'); setmodel(pe4, "progs/tf_flag.mdl"); setsize(pe4, '-8 -8 -8', '8 8 8'); }
 	nf = 0;
 	ce = world;
 	while (1) {
@@ -703,12 +705,11 @@ void CSQC_Fx_Smoke() {
 	coredump();
 	dprint(sprintf("P1D spawn %g next %g find %g rad %s\n",
 		nu, nf, nfind, (cf == world) ? "none" : "yes"));
-	while (1) {
-		ce = nextent(world);
-		if (ce == world)
-			break;
-		remove(ce);
-	}
+	if (pe0 != world) remove(pe0);
+	if (pe1 != world) remove(pe1);
+	if (pe2 != world) remove(pe2);
+	if (pe3 != world) remove(pe3);
+	if (pe4 != world) remove(pe4);
 	coredump();
 
 	// P1d C2 (functional): трассы/физика мир-only. traceline вниз от точки над
@@ -747,9 +748,9 @@ float CSQC_InputEvent(float evtype, float scanx, float chary, float devid) {
 	else if (evtype == 0 || evtype == 1)
 		g_ie_keys = g_ie_keys + 1;		// IE_KEYDOWN/UP
 
-	// C6.1: эффект-пикер — только клавиатурные/мышиные key-события и только под
-	// csqc_d2d 1; KEYUP тех же клавиш тоже handled (чтобы не долетал до биндов).
-	if (evtype == 0 || evtype == 1) {
+	// C6.1: эффект-пикер — потребляем MOUSE1/2 (return 1) ТОЛЬКО на экране 3
+	// (csqc_dbg 3), иначе клики уходят движку (атака/бинды работают в игре).
+	if (DbgAt(3) == 1 && (evtype == 0 || evtype == 1)) {
 		k = keynumtostring(scanx);
 		if (k == "MOUSE1" || k == "MOUSE2") {
 			if (evtype == 0) {
