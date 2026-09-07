@@ -287,6 +287,17 @@ void SendEchoEvent6() {
 	sendevent("csqc_echo", "fsvfif", 1.1, "abc", [5, 6, 7], 2.2, 42, 3.3);
 }
 
+// P1c фатальный probe: objerror #11. НЕ вызывается из общих авто-тестов
+// (CSQC_Fx_Smoke при csqc_dbg) — семантика движкозависима: FTE и ezquake
+// (паритет) при cvar developer 0 фатальны (дисконнект клиента: FTE —
+// CSQC_Abort/EndGame, ezquake — CSQC_Client_Abort), при developer 1 —
+// нефатальны (печать, модуль жив). Команда нужна для ручной проверки этой
+// семантики на обоих движках.
+void ObjErrorProbe() {
+	dprint("P1C objerror smoke (cmd csqc_objerror)\n");
+	objerror("csqc_p1c objerror smoke");
+}
+
 void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_echo_time = 0;
 	g_echo_n = 0;
@@ -310,6 +321,8 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_sm_buf = 0;
 	registercommand("csqc_sendevent");
 	registercommand("csqc_sendevent6");
+	// P1c фатальный probe (objerror) — отдельной командой, не в общем смоуке.
+	registercommand("csqc_objerror");
 	// Шаг 2: модульный debug-уровень (0..3); движковых csqc_d2d/csqc_inputdebug
 	// нет — экраны читают csqc_dbg (см. DbgLevel/DbgAt).
 	registercvar("csqc_dbg", "0");
@@ -359,6 +372,10 @@ float(string cmd) CSQC_ConsoleCommand = {
 	}
 	if (argv(0) == "csqc_sendevent6") {
 		SendEchoEvent6();
+		return 1;
+	}
+	if (argv(0) == "csqc_objerror") {
+		ObjErrorProbe();
 		return 1;
 	}
 	return 0;
@@ -631,10 +648,13 @@ void CSQC_Fx_Smoke() {
 	}
 	g_sm_buf = ok;
 
-	// P1c: cvar/exec/ошибки smoke — результат в консоль клиента (dprint).
+	// P1c: cvar/exec smoke — результат в консоль клиента (dprint).
 	// registercvar: 1 на первом включении d2d (создаёт движковый cvar csqc_p1c),
 	// далее 0 (уже есть); cvar_set ставит 7. calltimeofday — функция "timeofday"
-	// в модуле не объявлена -> no-op (не краш). objerror/localcmd — печать/echo.
+	// в модуле не объявлена -> no-op (не краш). Фатальный objerror (#11) из
+	// общего смоука вынесен: семантика зависит от движка/cvar developer
+	// (FTE/ezquake-паритет: developer 0 — фатальна), дёргается отдельной
+	// командой csqc_objerror (см. ObjErrorProbe).
 	r = registercvar("csqc_p1c", "1");
 	c1 = cvar("csqc_p1c");
 	cvar_set("csqc_p1c", "7");
@@ -643,7 +663,6 @@ void CSQC_Fx_Smoke() {
 	e2 = checkextension("NOSUCH_EXT");
 	dprint(sprintf("P1C reg %g cv %g->%g ext %g/%g\n", r, c1, c2, e1, e2));
 	calltimeofday();
-	objerror("csqc_p1c objerror smoke");
 	// #46 localcmd — echo в консоль клиента. Ведущий \n изолирует от остатка
 	// буфера команд движка; терминатор обязателен не в самой строке (парсер
 	// буфера делит по \n/;, см. cmd.c Cbuf_ExecuteEx), а для чистоты вывода.
