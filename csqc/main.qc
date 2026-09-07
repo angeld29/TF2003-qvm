@@ -284,7 +284,7 @@ void SendEchoEvent() {
 
 void SendEchoEvent6() {
 	// float, string, vector, float, int, float — ровно 6 аргументов (терминатор)
-	sendevent("csqc_echo", "fsvfif", 1.1, "abc", [5, 6, 7], 2.2, 42, 3.3);
+	sendevent("csqc_echo", "fsvfif", 1.1, "abc", [5, 6, 7], 2.2, (int)42, 3.3); // (int)-каст: спецификатор 'i' (иначе F333)
 }
 
 // P1c фатальный probe: objerror #11. НЕ вызывается из общих авто-тестов
