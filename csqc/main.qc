@@ -975,6 +975,15 @@ void Hud_DrawCSQC() {
 			itos(-7), itos(stoi("42")), htos(42), htos(stoh("ff"))));
 		dprint(sprintf("T3 def\"%s\" type%g des\"%s\"\n",
 			cvar_defstring("csqc_dbg"), cvar_type("csqc_dbg"), cvar_description("csqc_dbg")));
+		dprint(sprintf("T4 s2c %g/%g/%g chr[%s] pad[%s]/[%s]\n",
+			str2chr("abc", 1), str2chr("abc", -1), str2chr("abc", 5),
+			chr2str(65, 66, 67), strpad(6, "ab"), strpad(-6, "ab")));
+		dprint(sprintf("T4 cmp %g/%g/%g low[%s] up[%s]\n",
+			strncmp("abc", "abd"), strcasecmp("AbC", "abc"),
+			strncasecmp("Abc", "abb", 2), strtolower("AbC"), strtoupper("aBc")));
+		dprint(sprintf("T4 rep[%s] irep[%s] ig[%s]\n",
+			strreplace("a", "X", "banana"), strireplace("A", "X", "banana"),
+			infoget(infoadd("", "k", "v"), "k")));
 	}
 	g_dbg_prev = D;
 
@@ -1114,6 +1123,24 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("t3 def\"%s\" type%g",
 				cvar_defstring("csqc_dbg"), cvar_type("csqc_dbg")),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("t4 s2c %g/%g/%g chr[%s] pad[%s]/[%s]",
+				str2chr("abc", 1), str2chr("abc", -1), str2chr("abc", 5),
+				chr2str(65, 66, 67), strpad(6, "ab"), strpad(-6, "ab")),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("t4 cmp %g/%g/%g low[%s] up[%s]",
+				strncmp("abc", "abd"), strcasecmp("AbC", "abc"),
+				strncasecmp("Abc", "abb", 2), strtolower("AbC"), strtoupper("aBc")),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("t4 rep[%s] irep[%s] ig[%s]",
+				strreplace("a", "X", "banana"), strireplace("A", "X", "banana"),
+				infoget(infoadd("", "k", "v"), "k")),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }
