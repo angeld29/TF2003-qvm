@@ -51,6 +51,11 @@ float g_sm345;		// getinputstate(input_sequence) — 0/1
 float g_sm346;		// setsensitivityscaler(1) — 1 (void, вызвано)
 float g_sm347;		// runstandardplayerphysics(edict_num(0)) — 1 (не краш)
 float g_sm_buf;		// buf-цепочка #460..469 — число успешных шагов
+// C5-A (предикция EXT_CSQC_1): окно модуля — live под csqc_dbg 3.
+float g_c5_sc;		// servercommandframe (ack сервера; движок пишет каждый кадр)
+float g_c5_cc;		// clientcommandframe (следующий отправляемый кадр)
+float g_c5_iseq;	// input_sequence (последняя отправленная команда)
+float g_c5_345;		// getinputstate(input_sequence) — 0/1 (живой probe #345)
 float g_dbg_prev;	// предыдущий csqc_dbg (консоль-смоук T1/T2 при включении экрана 4)
 float g_t5_iss;		// T5: isserver() (считается на включение экрана 4)
 float g_t5_slot;	// T5: num_for_edict(spawn-сущности) — слот
@@ -1388,6 +1393,17 @@ void Hud_DrawCSQC() {
 			sprintf("smoke 459:%g 345:%g 346:%g 347:%g buf:%g",
 				g_sm459, g_sm345, g_sm346, g_sm347, g_sm_buf),
 			[12, 12], (g_sm345 == 1 && g_sm_buf == 7) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		// C5-A: окно предикции (движок ezq csqc_client PatchFrames). Ожидание live:
+		// sc < cc (есть необработанные кадры), iseq — последняя отправленная,
+		// #345(input_sequence) == 1; при движении cc растёт.
+		g_c5_sc = servercommandframe;
+		g_c5_cc = clientcommandframe;
+		g_c5_iseq = input_sequence;
+		g_c5_345 = getinputstate(input_sequence);
+		drawstring([60, yy, 0],
+			sprintf("c5 sc%g cc%g is%g 345:%g", g_c5_sc, g_c5_cc, g_c5_iseq, g_c5_345),
+			[12, 12], (g_c5_sc < g_c5_cc && g_c5_345 == 1) ? '0 1 0' : '1 0 0', 1, 0);
 		yy = yy + 18;
 		drawstring([60, yy, 0], "LMB fx | RMB next", [12, 12], '1 1 1', 1, 0);
 		yy = yy + 18;
