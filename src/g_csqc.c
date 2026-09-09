@@ -479,16 +479,17 @@ void G_CSQC_Example_PlaceItem( gedict_t *ent )
 	}
 }
 
-// Периодический дирт CSQC-сущностей (раз в ~1 c). На mvdsv эмиссия идёт только
+// Периодический дирт CSQC-сущностей. На mvdsv эмиссия идёт только
 // по dirt (setsendneeded/SendFlags), поэтому клиент, включивший csqc после
 // спавна карты, без этого не увидел бы ни одной CSQC-сущности. Вызывается из
 // StartFrame; фактически работает только при g_csqc и наличии CSQC-клиента.
-// Пример реального hi-бита: вместе с STATE (lo) ставится GCSQC_SENDFLAG_TIMER
-// в hi-слово (абсолютный бит 40) — маска хранится в моде как 2 int и уходит
-// на mvdsv через setsendneeded64; под fteqw (нет трапа) диртится только lo.
+// Интервал dirt задаётся cvar "g_csqc_dirt" (секунды; default 1.0) - для
+// loss-сценария PR228 rev [3] частоту поднимают, чтобы отличать повторную
+// эмиссию после потери пакета от очередного dirt-тика.
 void G_CSQC_Example_Frame( void )
 {
 	static float last_dirt = 0;
+	float dirt_interval;
 	int n;
 	gedict_t *e;
 
@@ -496,7 +497,10 @@ void G_CSQC_Example_Frame( void )
 		return;
 	if ( !any_client_csqc_active() )
 		return;
-	if ( g_globalvars.time - last_dirt < 1.0f )
+	dirt_interval = cvar( "g_csqc_dirt" );
+	if ( dirt_interval <= 0 )
+		dirt_interval = 1.0f;
+	if ( g_globalvars.time - last_dirt < dirt_interval )
 		return;
 	last_dirt = g_globalvars.time;
 
