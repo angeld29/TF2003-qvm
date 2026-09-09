@@ -378,6 +378,12 @@ void G_CSQC_Example_RegisterStats( void )
 	// Канарейка clientstat: текущие патроны (всегда >0, пока есть оружие).
 	G_RegisterClientStat( GCSQC_STAT_FIRST + 4, GCSQC_EV_INTEGER, FOFS( s.v.currentammo ) );
 
+	// Регресс-канарейка (PR228 rev. [2]): clientstat с CSQC_EV_ENTITY на float-поле.
+	// У живого игрока s.v.health = 100.0f, чьи биты (0x42C80000) как edict-индекс
+	// далеко за пределами sv.num_edicts. Движок обязан вернуть такой стат как 0
+	// (мир), а не уронить сервер (NUM_FOR_EDICT/PROG_TO_EDICT на мусорном значении).
+	G_RegisterClientStat( GCSQC_STAT_FIRST + 5, GCSQC_EV_ENTITY, FOFS( s.v.health ) );
+
 	// Глобальные статы (общая память мода): канарейка-тик + счёт команд.
 	G_RegisterPointerStat( GCSQC_STAT_FIRST + 8, GCSQC_EV_INTEGER, &g_csqc_tick );
 	G_RegisterPointerStat( GCSQC_STAT_FIRST + 9, GCSQC_EV_INTEGER, &teamscores[1] );
