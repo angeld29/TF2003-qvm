@@ -70,7 +70,10 @@ Load the file(s) listed for your task type before editing code:
   (phases 0–8, stage 1 done, no prediction); entity reference for the port —
   `docs/adr/0008-fo-qwprogs-entities.md`. Движковые builtins 2D-отрисовки модуля
   (drawfill/drawpic/stringwidth и др., cvar `csqc_d2d`) — план `docs/ezquake_csqc_client_layerd_2d_plan.md`
-  (ezquake-клиент; читать перед использованием в csprogs).
+  (ezquake-клиент; читать перед использованием в csprogs). Граница классической (v6) сборки модуля
+  и классификация CSQC-builtins (что нереализуемо в v6) — `docs/adr/0020-csqc-v6-classic-capability.md`.
+  План перевода `csprogs.dat` на классику v6 (`#pragma target id`) и снятия v7-функционала
+  загрузчика — `docs/ezquake_csqc_v6_migration_plan.md` (читать перед правками сборки модуля).
 - **Server run / verification**: `docs/adr/0011-mvdsv-build-run.md` (mvdsv launch, `sv_progtype`,
   CSQC PR1/PR2 gate), `docs/adr/0014-qwtf-testbench.md` (`qwtf/` bench, scenarios).
 

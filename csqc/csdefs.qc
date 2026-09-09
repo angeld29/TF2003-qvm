@@ -17,19 +17,9 @@ Available options:
 #pragma warning error Q105 /*too few parms*/
 #pragma warning enable F301 /*non-utf-8 strings*/
 #pragma warning enable F302 /*uninitialised locals*/
-#pragma target FTE
-// CSQC-VM (ezquake PR1-движок): отключаем CALLxH-варианты вызова, чтобы модуль
-// оставался в классическом подмножестве опкодов. Стоит ПОСЛЕ "#pragma target",
-// т.к. target-прагма сбрасывает OPF_VALID всех опкодов.
-#pragma opcode disable CALL1H CALL2H CALL3H CALL4H CALL5H CALL6H CALL7H CALL8H
-// Запись поля сущности (self.X = val) у fteqcc даёт ext-опкод STOREF_F (220),
-// которого нет в ezquake-PR1VM (движку новые опкоды не добавляем, ADR 0017 P3).
-// Disable сводит к классике FLDADDRESS/STOREP_F. Оставляем ПОСТОЯННО: модуль
-// пишет entity-поля (канарейка P3 снята в P6, но будущий entity-код нуждается).
-#pragma opcode disable STOREF_F
-// fteqcc (FTE-таргет) сворачивает random() в ext-опкод RAND0 (92), которого нет
-// в ezquake-PR1VM. Отключаем — random() компилируется обычным вызовом builtin #7.
-#pragma opcode disable RAND0
+#pragma target id
+// Классика QW v6 (docs/ezquake_csqc_v6_migration_plan.md): disable-прагмы CALLxH/
+// STOREF_F/RAND0 и флаг iffloat не нужны — id-таргет не эмитит ext-опкоды.
 #ifndef CSQC
 #define CSQC
 #endif
@@ -496,8 +486,7 @@ void(entity e, float chan, string samp, float vol, float atten, optional float s
 void(string soundname, optional float channel, optional float volume) localsound = #177; /*
 		Plays a sound... locally... probably best not to call this from ssqc. Also disables reverb. */
 
-float(entity e, float channel, string newsample, float volume, float attenuation, float pitchpct, float flags, float timeoffset) soundupdate = #0:soundupdate; /*
-		Changes the properties of the current sound being played on the given entity channel. newsample may be empty, and will be ignored in this case. timeoffset is relative to the current position (subtract the result of getsoundtime for absolute positions). Negative volume can be used to stop the sound. Return value is a fractional value based upon the number of audio devices that could be updated - test against TRUE rather than non-zero. */
+//float(entity e, float channel, string newsample, float volume, float attenuation, float pitchpct, float flags, float timeoffset) soundupdate = #0:soundupdate; /* v6: name-builtin #0 недоступен в классике (NM, ADR 0020); не используется. */
 
 vector(vector v) normalize = #9; /*
 		Shorten or lengthen a direction vector such that it is only one quake unit long. */
@@ -684,27 +673,28 @@ float(string modelname, optional float queryonly) getmodelindex = #200; /*
 		Acts as an alternative to precache_model(foo);setmodel(bar, foo); return bar.modelindex;
 		If queryonly is set and the model was not previously precached, the builtin will return 0 without needlessly precaching the model. */
 
-__variant(float prnum, string funcname, ...) externcall = #201; /* Part of FTE_MULTIPROGS
-		Directly call a function in a different/same progs by its name.
-		prnum=0 is the 'default' or 'main' progs.
-		prnum=-1 means current progs.
-		prnum=-2 will scan through the active progs and will use the first it finds. */
+// v6 no-op (ADR 0020): multiprogs variant-обмен — типов нет в v6 (см. docs/adr/0020).
+//__variant(float prnum, string funcname, ...) externcall = #201; /* Part of FTE_MULTIPROGS
+//		Directly call a function in a different/same progs by its name.
+//		prnum=0 is the 'default' or 'main' progs.
+//		prnum=-1 means current progs.
+//		prnum=-2 will scan through the active progs and will use the first it finds. */
 
 float(string progsname) addprogs = #202; /* Part of FTE_MULTIPROGS
 		Loads an additional .dat file into the current qcvm. The returned handle can be used with any of the externcall/externset/externvalue builtins.
 		There are cvars that allow progs to be loaded automatically. */
 
-__variant(float prnum, string varname) externvalue = #203; /* Part of FTE_MULTIPROGS
-		Reads a global in the named progs by the name of that global.
-		prnum=0 is the 'default' or 'main' progs.
-		prnum=-1 means current progs.
-		prnum=-2 will scan through the active progs and will use the first it finds. */
+//__variant(float prnum, string varname) externvalue = #203; /* Part of FTE_MULTIPROGS
+//		Reads a global in the named progs by the name of that global.
+//		prnum=0 is the 'default' or 'main' progs.
+//		prnum=-1 means current progs.
+//		prnum=-2 will scan through the active progs and will use the first it finds. */
 
-void(float prnum, __variant newval, string varname) externset = #204; /* Part of FTE_MULTIPROGS
-		Sets a global in the named progs by name.
-		prnum=0 is the 'default' or 'main' progs.
-		prnum=-1 means current progs.
-		prnum=-2 will scan through the active progs and will use the first it finds. */
+//void(float prnum, __variant newval, string varname) externset = #204; /* Part of FTE_MULTIPROGS
+//		Sets a global in the named progs by name.
+//		prnum=0 is the 'default' or 'main' progs.
+//		prnum=-1 means current progs.
+//		prnum=-2 will scan through the active progs and will use the first it finds. */
 
 float(string input, string token) instr = #206; /* Part of FTE_MULTIPROGS
 		Returns substring(input, strstrpos(input, token), -1), or the null string if token was not found in input. You're probably better off using strstrpos. */
@@ -863,8 +853,8 @@ float(entity skelent, string dollcmd, float animskel) skel_ragupdate = #281; /*
 		 animatebody somebody 0.5 : specifies the strength of the ragdoll on a specific body (0 will disable ragdoll animations on that body).
 		 enablejoint somejoint 1 : enables (or disables) a joint. Disabling joints will allow the doll to shatter. */
 
-float*(float skel) skel_mmap = #282; /*
-		Map the bones in VM memory. They can then be accessed via pointers. Each bone is 12 floats, the four vectors interleaved (sadly). */
+//float*(float skel) skel_mmap = #282; /* v6 no-op (ADR 0020): нативный указатель на данные скелета — нет pointer в v6.
+//		Map the bones in VM memory. They can then be accessed via pointers. Each bone is 12 floats, the four vectors interleaved (sadly). */
 
 void(entity ent, float bonenum, vector org, optional vector angorfwd, optional vector right, optional vector up) skel_set_bone_world = #283; /*
 		Sets the world position of a bone within the given entity's attached skeletal object. The world position is dependant upon the owning entity's position. If no orientation argument is specified, v_forward+v_right+v_up are used for the orientation instead. If 1 is specified, it is understood as angles. If 3 are specified, they are the forawrd/right/up vectors to use. */
@@ -1130,26 +1120,28 @@ void(entity e, string skinfilename, optional string skindata) setcustomskin = #3
 		replace "surfacename" "shadername" - same.
 		compose "surfacename" "shader" "imagename@x,y:w,h?r,g,b,a" - compose a skin texture from multiple images. The texture is determined to be sufficient to hold the first named image, additional images can be named as extra tokens on the same line. Use a + at the end of the line to continue reading image tokens from the next line also, the named shader must use 'map $diffuse' to read the composed texture (compatible with the defaultskin shader). */
 
-__variant*(int size) memalloc = #384; /* Part of FTE_MEMALLOC
-		Allocate an arbitary block of memory */
+// v6 no-op (ADR 0020): FTE_MEMALLOC — типизированные указатели/адресная память (нет pointer-модели и
+// runtime-типа значения в v6; в движке ezquake зарегистрированы как no-op). Прототипы отключены.
+//__variant*(int size) memalloc = #384; /* Part of FTE_MEMALLOC
+//		Allocate an arbitary block of memory */
 
-void(__variant *ptr) memfree = #385; /* Part of FTE_MEMALLOC
-		Frees a block of memory that was allocated with memfree */
+//void(__variant *ptr) memfree = #385; /* Part of FTE_MEMALLOC
+//		Frees a block of memory that was allocated with memfree */
 
-void(__variant *dst, __variant *src, int size) memcpy = #386; /* Part of FTE_MEMALLOC
-		Copys memory from one location to another */
+//void(__variant *dst, __variant *src, int size) memcpy = #386; /* Part of FTE_MEMALLOC
+//		Copys memory from one location to another */
 
-void(__variant *dst, int val, int size) memfill8 = #387; /* Part of FTE_MEMALLOC
-		Sets an entire block of memory to a specified value. Pretty much always 0. */
+//void(__variant *dst, int val, int size) memfill8 = #387; /* Part of FTE_MEMALLOC
+//		Sets an entire block of memory to a specified value. Pretty much always 0. */
 
-__variant(__variant *dst, float ofs) memgetval = #388; /*
-		Looks up the 32bit value stored at a pointer-with-offset. */
+//__variant(__variant *dst, float ofs) memgetval = #388; /*
+//		Looks up the 32bit value stored at a pointer-with-offset. */
 
-void(__variant *dst, float ofs, __variant val) memsetval = #389; /*
-		Changes the 32bit value stored at the specified pointer-with-offset. */
+//void(__variant *dst, float ofs, __variant val) memsetval = #389; /*
+//		Changes the 32bit value stored at the specified pointer-with-offset. */
 
-__variant*(__variant *base, float ofs) memptradd = #390; /*
-		Perform some pointer maths. Woo. */
+//__variant*(__variant *base, float ofs) memptradd = #390; /*
+//		Perform some pointer maths. Woo. */
 
 string(string conname, string field, optional string newvalue) con_getset = #391; /* Part of FTE_CSQC_ALTCONSOLES_WIP
 		Reads or sets a property from a console object. The old value is returned. Iterrate through consoles with the 'next' field. Valid properties: 	title, name, next, unseen, markup, forceutf8, close, clear, hidden, linecount */

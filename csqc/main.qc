@@ -22,10 +22,10 @@ float g_echo_n;
 float g_echo_argmask;
 float g_echo_has;
 
-// CSQC_Input_Frame debug-канарейка (постоянная, под cvar csqc_inputdebug через
-// builtin cvar #45; движок ezquake вызывает Input_Frame перед отправкой каждого
-// usercmd, заполняя input_* глобалы). Скаляры: последние buttons/impulse +
-// счётчик вызовов (≈ частоте отправки команд).
+// CSQC_Input_Frame debug-канарейка (постоянная, под csqc_dbg — экран 3; движок
+// ezquake вызывает Input_Frame перед отправкой каждого usercmd, заполняя input_*
+// глобалы). Скаляры: последние buttons/impulse + счётчик вызовов (≈ частоте
+// отправки команд).
 float g_if_btns;
 float g_if_imp;
 float g_if_cnt;
@@ -70,8 +70,8 @@ float g_rf_n, g_rf_is, g_rf_ic, g_rf_io;	// рефлексия: num/idx solid/cl
 float g_rf_v, g_rf_cls;	// рефлексия: solid-значение (stof), класс после put
 
 // Шаг 2 (ADR 0019-план): debug-уровень модуля живёт в модульном cvar csqc_dbg
-// (registercvar #93, создаётся в CSQC_Init; движковых csqc_d2d/csqc_inputdebug
-// больше нет). Уровень: 0 — выкл; 1 — графика+курсор; 2 — текст «до ie»;
+// (registercvar #93, создаётся в CSQC_Init; движковых debug-cvars нет).
+// Уровень: 0 — выкл; 1 — графика+курсор; 2 — текст «до ie»;
 // 3 — остальное (экраны, каждый <= 10 строк).
 float DbgLevel() {
 	return cvar("csqc_dbg");
@@ -356,8 +356,8 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	registercommand("csqc_sendevent6");
 	// P1c фатальный probe (objerror) — отдельной командой, не в общем смоуке.
 	registercommand("csqc_objerror");
-	// Шаг 2: модульный debug-уровень (0..3); движковых csqc_d2d/csqc_inputdebug
-	// нет — экраны читают csqc_dbg (см. DbgLevel/DbgAt).
+	// Шаг 2: модульный debug-уровень (0..3); движковых debug-cvars нет — экраны
+	// читают csqc_dbg (см. DbgLevel/DbgAt).
 	registercvar("csqc_dbg", "0");
 };
 
@@ -420,7 +420,7 @@ void() CSQC_Shutdown = {
 // CSQC_Input_Frame (без предикции): движок (ezquake) вызывает перед отправкой
 // каждого usercmd и заполняет input_* (timelength/angles/movevalues/buttons/
 // impulse) — модуль может читать кнопки/импульсы и (позже, для меню) менять
-// их. Сейчас — только канарейка под csqc_inputdebug; usercmd не изменяем.
+// их. Сейчас — только канарейка под csqc_dbg (экран 3); usercmd не изменяем.
 void() CSQC_Input_Frame = {
 	if (DbgAt(1) == 0)
 		return;
@@ -956,10 +956,11 @@ void CSQC_Stub_Check() {
 	if (stmp != "") { dprint(sprintf("STUB bad #%d %s !=empty\n",112,"fgets")); bad = bad + 1; } else oks = oks + 1;
 	fputs(0,"","","","","","","");
 	if (getmodelindex("",0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",200,"getmodelindex")); bad = bad + 1; } else okf = okf + 1;
-	if (externcall(0,"") != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",201,"externcall")); bad = bad + 1; } else okf = okf + 1;
+	// v6 no-op (ADR 0020): multiprogs/вариант — нереализуемо в классике; прототипы отключены в csdefs.qc.
+	//if (externcall(0,"") != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",201,"externcall")); bad = bad + 1; } else okf = okf + 1;
 	if (addprogs("") != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",202,"addprogs")); bad = bad + 1; } else okf = okf + 1;
-	if (externvalue(0,"") != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",203,"externvalue")); bad = bad + 1; } else okf = okf + 1;
-	externset(0,0,"");
+	//if (externvalue(0,"") != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",203,"externvalue")); bad = bad + 1; } else okf = okf + 1;
+	//externset(0,0,"");
 	if (externrefcall() != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",205,"externrefcall")); bad = bad + 1; } else okf = okf + 1;
 	if (instr("","") != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",206,"instr")); bad = bad + 1; } else okf = okf + 1;
 	openportal(world,0);
@@ -1000,7 +1001,7 @@ void CSQC_Stub_Check() {
 	if (frameforname(0,"") != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",276,"frameforname")); bad = bad + 1; } else okf = okf + 1;
 	if (frameduration(0,0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",277,"frameduration")); bad = bad + 1; } else okf = okf + 1;
 	if (skel_ragupdate(world,"",0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",281,"skel_ragupdate")); bad = bad + 1; } else okf = okf + 1;
-	if (skel_mmap(0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",282,"skel_mmap")); bad = bad + 1; } else okf = okf + 1;
+	//if (skel_mmap(0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",282,"skel_mmap")); bad = bad + 1; } else okf = okf + 1;	// v6 no-op (ADR 0020)
 	skel_set_bone_world(world,0,'0 0 0','0 0 0','0 0 0','0 0 0');
 	stmp = frametoname(0,0);
 	if (stmp != "") { dprint(sprintf("STUB bad #%d %s !=empty\n",284,"frametoname")); bad = bad + 1; } else oks = oks + 1;
@@ -1030,13 +1031,14 @@ void CSQC_Stub_Check() {
 	if (loadfont("","","",0,0,0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",357,"loadfont")); bad = bad + 1; } else okf = okf + 1;
 	stmp = particleeffectquery(0,0);
 	if (stmp != "") { dprint(sprintf("STUB bad #%d %s !=empty\n",374,"particleeffectquery")); bad = bad + 1; } else oks = oks + 1;
-	if (memalloc(0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",384,"memalloc")); bad = bad + 1; } else okf = okf + 1;
-	memfree(0);
-	memcpy(0,0,0);
-	memfill8(0,0,0);
-	if (memgetval(0,0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",388,"memgetval")); bad = bad + 1; } else okf = okf + 1;
-	memsetval(0,0,0);
-	if (memptradd(0,0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",390,"memptradd")); bad = bad + 1; } else okf = okf + 1;
+	// v6 no-op (ADR 0020): FTE_MEMALLOC — pointer-модель нереализуема в классике; прототипы отключены в csdefs.qc.
+	//if (memalloc(0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",384,"memalloc")); bad = bad + 1; } else okf = okf + 1;
+	//memfree(0);
+	//memcpy(0,0,0);
+	//memfill8(0,0,0);
+	//if (memgetval(0,0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",388,"memgetval")); bad = bad + 1; } else okf = okf + 1;
+	//memsetval(0,0,0);
+	//if (memptradd(0,0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",390,"memptradd")); bad = bad + 1; } else okf = okf + 1;
 	copyentity(world,world);
 	if (findchain(classname,"") != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",402,"findchain")); bad = bad + 1; } else okf = okf + 1;
 	if (findchainfloat(solid,0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",403,"findchainfloat")); bad = bad + 1; } else okf = okf + 1;

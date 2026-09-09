@@ -1,9 +1,8 @@
-#pragma target fte_5768
+#pragma target id
 #pragma optimise 3
-// CALLxH-off: прагма стоит в csdefs.qc ПОСЛЕ "#pragma target FTE" — размещённая
-// здесь она сбрасывается этим target-прагмой (см. фазу 0 плана PR1VM).
+// Классика QW v6 (docs/ezquake_csqc_v6_migration_plan.md). Прагмы opcode-disable
+// (CALLxH и др.) и flag iffloat сняты — id-таргет их не требует.
 #pragma flag enable subscope
-#pragma flag enable iffloat
 #pragma flag enable lo
 
 #pragma progs_dat "csprogs.dat"

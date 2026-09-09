@@ -1,0 +1,536 @@
+version=6 crc=27299 size=74314
+statements=4980  functions=424  globaldefs=600  fielddefs=123  globals=1304  entityfields=108
+--- global opcode histogram (statements=4980) ---
+    31 STORE_F            2119  classic
+    32 STORE_V             393  classic
+    52 CALL1               383  classic
+    50 IFNOT               365  classic
+     6 ADD_F               215  classic
+    43 RETURN              204  classic
+    10 EQ_F                202  classic
+    53 CALL2               152  classic
+    54 CALL3               144  classic
+    61 GOTO                114  classic
+    15 NE_F                 95  classic
+    51 CALL0                82  classic
+    57 CALL6                74  classic
+    33 STORE_S              62  classic
+    55 CALL4                40  classic
+     0 DONE                 34  classic
+    63 OR_F                 28  classic
+    18 NE_E                 25  classic
+    56 CALL5                25  classic
+    34 STORE_ENT            24  classic
+    12 EQ_S                 22  classic
+     7 ADD_V                19  classic
+    17 NE_S                 19  classic
+    58 CALL7                16  classic
+    13 EQ_E                 15  classic
+     4 MUL_VF               14  classic
+    64 BITAND               14  classic
+    62 AND_F                13  classic
+    22 LT_F                 12  classic
+    30 FLDADDRESS            9  classic
+    37 STOREP_F              9  classic
+    21 GE_F                  8  classic
+    24 LOADF_F               8  classic
+    59 CALL8                 7  classic
+     8 SUB_F                 5  classic
+    23 GT_F                  5  classic
+     1 MUL_F                 2  classic
+     9 SUB_V                 1  classic
+    20 LE_F                  1  classic
+    49 IF                    1  classic
+
+--- functions with code (first_statement >= 0): 43 ---
+  #0 <unnamed>              stmts 0..1 (1)  parm_start=0 locals=0 numparms=0
+      DONE(1)
+  #382 weapon_name            stmts 1..64 (63)  parm_start=1252 locals=1 numparms=1
+      EQ_F(20), STORE_F(1), RETURN(21), IFNOT(20), CALL1(1)
+  #383 weapon_ammo            stmts 64..95 (31)  parm_start=1252 locals=1 numparms=1
+      EQ_F(13), RETURN(5), IFNOT(4), OR_F(9)
+  #384 weapon_slot_name       stmts 95..122 (27)  parm_start=1252 locals=1 numparms=1
+      EQ_F(8), STORE_F(1), RETURN(9), IFNOT(8), CALL1(1)
+  #385 active_weapon_slot     stmts 122..142 (20)  parm_start=1252 locals=4 numparms=1
+      MUL_F(1), NE_F(3), LE_F(1), STORE_F(5), RETURN(1), IFNOT(4), GOTO(1), AND_F(1), BITAND(3)
+  #386 ammo_type_name         stmts 142..159 (17)  parm_start=1252 locals=1 numparms=1
+      NE_F(4), RETURN(5), IFNOT(4), BITAND(4)
+  #387 armor_type_name        stmts 159..172 (13)  parm_start=1252 locals=1 numparms=1
+      NE_F(3), RETURN(4), IFNOT(3), BITAND(3)
+  #388 powerup_names          stmts 172..202 (30)  parm_start=1252 locals=2 numparms=1
+      NE_F(4), STORE_F(8), STORE_S(5), RETURN(1), IFNOT(4), CALL2(4), BITAND(4)
+  #389 weapon_name_by_model   stmts 202..311 (109)  parm_start=1252 locals=1 numparms=1
+      NE_F(18), STORE_F(36), RETURN(19), IFNOT(18), CALL2(18)
+  #390 ammo_by_type           stmts 311..332 (21)  parm_start=1252 locals=1 numparms=1
+      EQ_S(4), STORE_F(4), RETURN(5), IFNOT(4), CALL1(4)
+  #391 Hud_Draw               stmts 332..482 (150)  parm_start=1252 locals=16 numparms=0
+      DONE(1), ADD_F(5), EQ_F(1), EQ_S(1), STORE_F(85), STORE_V(18), STORE_S(5), IF(1), IFNOT(1), CALL0(1), CALL1(18), CALL2(2), CALL3(1), CALL4(1), CALL5(1), CALL6(7), OR_F(1)
+  #392 DbgLevel               stmts 482..485 (3)  parm_start=0 locals=0 numparms=0
+      STORE_F(1), RETURN(1), CALL1(1)
+  #393 DbgAt                  stmts 485..489 (4)  parm_start=1252 locals=1 numparms=1
+      GE_F(1), STORE_F(1), RETURN(1), CALL1(1)
+  #394 FlagSlot_used          stmts 489..511 (22)  parm_start=1252 locals=1 numparms=1
+      EQ_F(7), RETURN(8), IFNOT(7)
+  #395 FlagSlot_entnum        stmts 511..533 (22)  parm_start=1252 locals=1 numparms=1
+      EQ_F(7), RETURN(8), IFNOT(7)
+  #396 FlagSlot_team          stmts 533..555 (22)  parm_start=1252 locals=1 numparms=1
+      EQ_F(7), RETURN(8), IFNOT(7)
+  #397 FlagSlot_carried       stmts 555..577 (22)  parm_start=1252 locals=1 numparms=1
+      EQ_F(7), RETURN(8), IFNOT(7)
+  #398 FlagSlot_t40           stmts 577..599 (22)  parm_start=1252 locals=1 numparms=1
+      EQ_F(7), RETURN(8), IFNOT(7)
+  #399 FlagSlot_time          stmts 599..621 (22)  parm_start=1252 locals=1 numparms=1
+      EQ_F(7), RETURN(8), IFNOT(7)
+  #400 FlagSlot_set           stmts 621..693 (72)  parm_start=1252 locals=6 numparms=6
+      DONE(8), EQ_F(8), STORE_F(48), IFNOT(8)
+  #401 FlagSlot_clear         stmts 693..725 (32)  parm_start=1252 locals=1 numparms=1
+      DONE(8), EQ_F(8), STORE_F(8), IFNOT(8)
+  #402 FlagIdxByEnt           stmts 725..741 (16)  parm_start=1252 locals=3 numparms=1
+      ADD_F(1), EQ_F(2), LT_F(1), STORE_F(3), RETURN(2), IFNOT(3), CALL1(2), GOTO(1), AND_F(1)
+  #403 FlagFreeSlot           stmts 741..752 (11)  parm_start=1252 locals=1 numparms=0
+      ADD_F(1), EQ_F(1), LT_F(1), STORE_F(2), RETURN(2), IFNOT(2), CALL1(1), GOTO(1)
+  #404 CSQC_Ent_Update        stmts 752..783 (31)  parm_start=1252 locals=7 numparms=1
+      DONE(1), GE_F(2), LT_F(2), LOADF_F(1), STORE_F(14), RETURN(1), IFNOT(3), CALL0(5), CALL1(1), CALL6(1)
+  #405 CSQC_Ent_Remove        stmts 783..792 (9)  parm_start=1252 locals=2 numparms=0
+      DONE(1), GE_F(1), LOADF_F(1), STORE_F(3), IFNOT(1), CALL1(2)
+  #406 CSQC_Parse_Event       stmts 792..891 (99)  parm_start=1252 locals=7 numparms=0
+      DONE(1), MUL_F(1), ADD_F(4), EQ_F(5), EQ_S(1), LT_F(1), STORE_F(38), STORE_S(9), RETURN(1), IFNOT(7), CALL0(10), CALL1(1), CALL2(13), CALL4(1), GOTO(6)
+  #407 SendEchoEvent          stmts 891..898 (7)  parm_start=0 locals=0 numparms=0
+      DONE(1), STORE_F(4), STORE_V(1), CALL5(1)
+  #408 SendEchoEvent6         stmts 898..908 (10)  parm_start=0 locals=0 numparms=0
+      DONE(1), STORE_F(7), STORE_V(1), CALL8(1)
+  #409 ObjErrorProbe          stmts 908..913 (5)  parm_start=0 locals=0 numparms=0
+      DONE(1), STORE_F(2), CALL1(2)
+  #410 CSQC_Init              stmts 913..958 (45)  parm_start=1252 locals=3 numparms=3
+      DONE(1), STORE_F(40), CALL1(3), CALL2(1)
+  #411 CSQC_WorldLoaded       stmts 958..982 (24)  parm_start=1252 locals=1 numparms=0
+      DONE(1), ADD_F(1), LT_F(1), STORE_F(18), IFNOT(1), CALL1(1), GOTO(1)
+  #412 CSQC_UpdateView        stmts 982..997 (15)  parm_start=1252 locals=3 numparms=3
+      DONE(1), STORE_F(7), CALL0(3), CALL1(1), CALL2(3)
+  #413 CSQC_ConsoleCommand    stmts 997..1018 (21)  parm_start=1252 locals=1 numparms=1
+      EQ_S(3), STORE_F(4), RETURN(4), IFNOT(3), CALL0(3), CALL1(4)
+  #414 CSQC_Shutdown          stmts 1018..1019 (1)  parm_start=0 locals=0 numparms=0
+      DONE(1)
+  #415 CSQC_Input_Frame       stmts 1019..1028 (9)  parm_start=0 locals=0 numparms=0
+      DONE(1), ADD_F(1), EQ_F(1), STORE_F(3), RETURN(1), IFNOT(1), CALL1(1)
+  #416 CSQC_FxName            stmts 1028..1128 (100)  parm_start=1252 locals=1 numparms=1
+      EQ_F(33), RETURN(34), IFNOT(33)
+  #417 CSQC_Fx_Do             stmts 1128..1381 (253)  parm_start=1252 locals=17 numparms=1
+      DONE(1), MUL_VF(2), ADD_V(3), SUB_V(1), EQ_F(33), GE_F(1), LT_F(1), GT_F(3), STORE_F(42), STORE_V(51), RETURN(34), IFNOT(34), CALL1(26), CALL2(1), CALL3(8), CALL4(5), CALL5(2), CALL7(1), AND_F(3), OR_F(1)
+  #418 CSQC_Fx_Trace7         stmts 1381..1604 (223)  parm_start=1252 locals=18 numparms=0
+      DONE(1), MUL_VF(9), ADD_V(10), EQ_E(8), NE_E(5), LOADF_F(1), FLDADDRESS(6), STORE_F(68), STORE_V(31), STORE_S(8), STORE_ENT(5), STOREP_F(6), IFNOT(13), CALL0(5), CALL1(15), CALL2(5), CALL3(10), CALL4(9), GOTO(8)
+  #419 CSQC_Fx_Smoke          stmts 1604..2051 (447)  parm_start=1252 locals=38 numparms=0
+      DONE(1), MUL_VF(3), ADD_F(14), ADD_V(6), EQ_F(3), EQ_S(3), EQ_E(6), NE_E(13), GT_F(1), LOADF_F(5), FLDADDRESS(1), STORE_F(186), STORE_V(35), STORE_S(5), STORE_ENT(15), STOREP_F(1), IFNOT(26), CALL0(13), CALL1(52), CALL2(21), CALL3(17), CALL4(6), CALL5(2), CALL6(2), CALL7(1), GOTO(9)
+  #420 CSQC_InputEvent        stmts 2051..2095 (44)  parm_start=1252 locals=5 numparms=4
+      ADD_F(6), EQ_F(8), EQ_S(3), STORE_F(5), STORE_S(1), RETURN(3), IFNOT(8), CALL1(3), CALL2(1), GOTO(2), AND_F(1), OR_F(3)
+  #421 CSQC_Stub_Check        stmts 2095..3312 (1217)  parm_start=1252 locals=11 numparms=0
+      DONE(1), ADD_F(138), NE_F(61), NE_S(18), NE_E(4), STORE_F(501), STORE_V(54), STORE_S(18), IFNOT(69), CALL0(23), CALL1(103), CALL2(42), CALL3(80), CALL4(8), CALL5(5), CALL6(5), CALL7(2), CALL8(2), GOTO(69), OR_F(14)
+  #422 CSQC_FieldIdx          stmts 3312..3324 (12)  parm_start=1252 locals=2 numparms=1
+      ADD_F(1), EQ_S(1), LT_F(1), STORE_F(2), RETURN(2), IFNOT(2), CALL0(1), CALL1(1), GOTO(1)
+  #423 Hud_DrawCSQC           stmts 3324..4980 (1656)  parm_start=1252 locals=44 numparms=0
+      DONE(1), ADD_F(43), SUB_F(5), EQ_F(16), EQ_S(6), EQ_E(1), NE_F(2), NE_S(1), NE_E(3), GE_F(3), LT_F(4), GT_F(1), FLDADDRESS(2), STORE_F(972), STORE_V(202), STORE_S(11), STORE_ENT(4), STOREP_F(2), IFNOT(31), CALL0(18), CALL1(138), CALL2(41), CALL3(28), CALL4(10), CALL5(14), CALL6(59), CALL7(12), CALL8(4), GOTO(15), AND_F(7)
+
+--- extended opcodes present (num > 65), candidates to implement/rewrite ---
+  (none)
+
+--- builtin wrappers (first_statement = -N): 381 funcs, 381 unique numbers ---
+  builtin 1  (wrappers: 1)
+  builtin 2  (wrappers: 1)
+  builtin 3  (wrappers: 1)
+  builtin 4  (wrappers: 1)
+  builtin 7  (wrappers: 1)
+  builtin 8  (wrappers: 1)
+  builtin 9  (wrappers: 1)
+  builtin 10  (wrappers: 1)
+  builtin 11  (wrappers: 1)
+  builtin 12  (wrappers: 1)
+  builtin 13  (wrappers: 1)
+  builtin 14  (wrappers: 1)
+  builtin 15  (wrappers: 1)
+  builtin 16  (wrappers: 1)
+  builtin 18  (wrappers: 1)
+  builtin 19  (wrappers: 1)
+  builtin 20  (wrappers: 1)
+  builtin 22  (wrappers: 1)
+  builtin 25  (wrappers: 1)
+  builtin 26  (wrappers: 1)
+  builtin 27  (wrappers: 1)
+  builtin 28  (wrappers: 1)
+  builtin 29  (wrappers: 1)
+  builtin 30  (wrappers: 1)
+  builtin 31  (wrappers: 1)
+  builtin 32  (wrappers: 1)
+  builtin 34  (wrappers: 1)
+  builtin 35  (wrappers: 1)
+  builtin 36  (wrappers: 1)
+  builtin 37  (wrappers: 1)
+  builtin 38  (wrappers: 1)
+  builtin 40  (wrappers: 1)
+  builtin 41  (wrappers: 1)
+  builtin 43  (wrappers: 1)
+  builtin 45  (wrappers: 1)
+  builtin 46  (wrappers: 1)
+  builtin 47  (wrappers: 1)
+  builtin 48  (wrappers: 1)
+  builtin 49  (wrappers: 1)
+  builtin 51  (wrappers: 1)
+  builtin 60  (wrappers: 1)
+  builtin 61  (wrappers: 1)
+  builtin 62  (wrappers: 1)
+  builtin 63  (wrappers: 1)
+  builtin 64  (wrappers: 1)
+  builtin 65  (wrappers: 1)
+  builtin 67  (wrappers: 1)
+  builtin 68  (wrappers: 1)
+  builtin 69  (wrappers: 1)
+  builtin 72  (wrappers: 1)
+  builtin 74  (wrappers: 1)
+  builtin 75  (wrappers: 1)
+  builtin 76  (wrappers: 1)
+  builtin 77  (wrappers: 1)
+  builtin 81  (wrappers: 1)
+  builtin 90  (wrappers: 1)
+  builtin 91  (wrappers: 1)
+  builtin 92  (wrappers: 1)
+  builtin 93  (wrappers: 1)
+  builtin 94  (wrappers: 1)
+  builtin 95  (wrappers: 1)
+  builtin 96  (wrappers: 1)
+  builtin 97  (wrappers: 1)
+  builtin 98  (wrappers: 1)
+  builtin 99  (wrappers: 1)
+  builtin 102  (wrappers: 1)
+  builtin 110  (wrappers: 1)
+  builtin 111  (wrappers: 1)
+  builtin 112  (wrappers: 1)
+  builtin 113  (wrappers: 1)
+  builtin 114  (wrappers: 1)
+  builtin 115  (wrappers: 1)
+  builtin 116  (wrappers: 1)
+  builtin 117  (wrappers: 1)
+  builtin 118  (wrappers: 1)
+  builtin 119  (wrappers: 1)
+  builtin 177  (wrappers: 1)
+  builtin 200  (wrappers: 1)
+  builtin 202  (wrappers: 1)
+  builtin 205  (wrappers: 1)
+  builtin 206  (wrappers: 1)
+  builtin 207  (wrappers: 1)
+  builtin 210  (wrappers: 1)
+  builtin 211  (wrappers: 1)
+  builtin 212  (wrappers: 1)
+  builtin 215  (wrappers: 1)
+  builtin 216  (wrappers: 1)
+  builtin 217  (wrappers: 1)
+  builtin 218  (wrappers: 1)
+  builtin 219  (wrappers: 1)
+  builtin 221  (wrappers: 1)
+  builtin 222  (wrappers: 1)
+  builtin 223  (wrappers: 1)
+  builtin 224  (wrappers: 1)
+  builtin 225  (wrappers: 1)
+  builtin 226  (wrappers: 1)
+  builtin 227  (wrappers: 1)
+  builtin 228  (wrappers: 1)
+  builtin 229  (wrappers: 1)
+  builtin 230  (wrappers: 1)
+  builtin 231  (wrappers: 1)
+  builtin 234  (wrappers: 1)
+  builtin 235  (wrappers: 1)
+  builtin 236  (wrappers: 1)
+  builtin 237  (wrappers: 1)
+  builtin 238  (wrappers: 1)
+  builtin 239  (wrappers: 1)
+  builtin 240  (wrappers: 1)
+  builtin 242  (wrappers: 1)
+  builtin 244  (wrappers: 1)
+  builtin 245  (wrappers: 1)
+  builtin 259  (wrappers: 1)
+  builtin 260  (wrappers: 1)
+  builtin 261  (wrappers: 1)
+  builtin 262  (wrappers: 1)
+  builtin 263  (wrappers: 1)
+  builtin 264  (wrappers: 1)
+  builtin 265  (wrappers: 1)
+  builtin 266  (wrappers: 1)
+  builtin 267  (wrappers: 1)
+  builtin 268  (wrappers: 1)
+  builtin 269  (wrappers: 1)
+  builtin 270  (wrappers: 1)
+  builtin 271  (wrappers: 1)
+  builtin 272  (wrappers: 1)
+  builtin 273  (wrappers: 1)
+  builtin 274  (wrappers: 1)
+  builtin 275  (wrappers: 1)
+  builtin 276  (wrappers: 1)
+  builtin 277  (wrappers: 1)
+  builtin 278  (wrappers: 1)
+  builtin 279  (wrappers: 1)
+  builtin 281  (wrappers: 1)
+  builtin 283  (wrappers: 1)
+  builtin 284  (wrappers: 1)
+  builtin 285  (wrappers: 1)
+  builtin 286  (wrappers: 1)
+  builtin 287  (wrappers: 1)
+  builtin 288  (wrappers: 1)
+  builtin 289  (wrappers: 1)
+  builtin 290  (wrappers: 1)
+  builtin 291  (wrappers: 1)
+  builtin 292  (wrappers: 1)
+  builtin 293  (wrappers: 1)
+  builtin 294  (wrappers: 1)
+  builtin 295  (wrappers: 1)
+  builtin 300  (wrappers: 1)
+  builtin 301  (wrappers: 1)
+  builtin 302  (wrappers: 1)
+  builtin 303  (wrappers: 1)
+  builtin 304  (wrappers: 1)
+  builtin 305  (wrappers: 1)
+  builtin 306  (wrappers: 1)
+  builtin 307  (wrappers: 1)
+  builtin 308  (wrappers: 1)
+  builtin 309  (wrappers: 1)
+  builtin 310  (wrappers: 1)
+  builtin 311  (wrappers: 1)
+  builtin 315  (wrappers: 1)
+  builtin 316  (wrappers: 1)
+  builtin 317  (wrappers: 1)
+  builtin 318  (wrappers: 1)
+  builtin 319  (wrappers: 1)
+  builtin 320  (wrappers: 1)
+  builtin 321  (wrappers: 1)
+  builtin 322  (wrappers: 1)
+  builtin 323  (wrappers: 1)
+  builtin 324  (wrappers: 1)
+  builtin 325  (wrappers: 1)
+  builtin 326  (wrappers: 1)
+  builtin 327  (wrappers: 1)
+  builtin 328  (wrappers: 1)
+  builtin 329  (wrappers: 1)
+  builtin 330  (wrappers: 1)
+  builtin 331  (wrappers: 1)
+  builtin 332  (wrappers: 1)
+  builtin 333  (wrappers: 1)
+  builtin 334  (wrappers: 1)
+  builtin 335  (wrappers: 1)
+  builtin 336  (wrappers: 1)
+  builtin 337  (wrappers: 1)
+  builtin 338  (wrappers: 1)
+  builtin 339  (wrappers: 1)
+  builtin 340  (wrappers: 1)
+  builtin 341  (wrappers: 1)
+  builtin 342  (wrappers: 1)
+  builtin 343  (wrappers: 1)
+  builtin 344  (wrappers: 1)
+  builtin 345  (wrappers: 1)
+  builtin 346  (wrappers: 1)
+  builtin 347  (wrappers: 1)
+  builtin 348  (wrappers: 1)
+  builtin 349  (wrappers: 1)
+  builtin 350  (wrappers: 1)
+  builtin 351  (wrappers: 1)
+  builtin 352  (wrappers: 1)
+  builtin 353  (wrappers: 1)
+  builtin 354  (wrappers: 1)
+  builtin 355  (wrappers: 1)
+  builtin 356  (wrappers: 1)
+  builtin 357  (wrappers: 1)
+  builtin 359  (wrappers: 1)
+  builtin 360  (wrappers: 1)
+  builtin 361  (wrappers: 1)
+  builtin 362  (wrappers: 1)
+  builtin 363  (wrappers: 1)
+  builtin 364  (wrappers: 1)
+  builtin 365  (wrappers: 1)
+  builtin 366  (wrappers: 1)
+  builtin 367  (wrappers: 1)
+  builtin 368  (wrappers: 1)
+  builtin 371  (wrappers: 1)
+  builtin 372  (wrappers: 1)
+  builtin 373  (wrappers: 1)
+  builtin 374  (wrappers: 1)
+  builtin 375  (wrappers: 1)
+  builtin 376  (wrappers: 1)
+  builtin 391  (wrappers: 1)
+  builtin 392  (wrappers: 1)
+  builtin 393  (wrappers: 1)
+  builtin 394  (wrappers: 1)
+  builtin 400  (wrappers: 1)
+  builtin 402  (wrappers: 1)
+  builtin 403  (wrappers: 1)
+  builtin 404  (wrappers: 1)
+  builtin 405  (wrappers: 1)
+  builtin 406  (wrappers: 1)
+  builtin 407  (wrappers: 1)
+  builtin 408  (wrappers: 1)
+  builtin 409  (wrappers: 1)
+  builtin 410  (wrappers: 1)
+  builtin 411  (wrappers: 1)
+  builtin 412  (wrappers: 1)
+  builtin 413  (wrappers: 1)
+  builtin 414  (wrappers: 1)
+  builtin 415  (wrappers: 1)
+  builtin 416  (wrappers: 1)
+  builtin 417  (wrappers: 1)
+  builtin 418  (wrappers: 1)
+  builtin 419  (wrappers: 1)
+  builtin 420  (wrappers: 1)
+  builtin 421  (wrappers: 1)
+  builtin 422  (wrappers: 1)
+  builtin 423  (wrappers: 1)
+  builtin 424  (wrappers: 1)
+  builtin 425  (wrappers: 1)
+  builtin 426  (wrappers: 1)
+  builtin 427  (wrappers: 1)
+  builtin 428  (wrappers: 1)
+  builtin 429  (wrappers: 1)
+  builtin 430  (wrappers: 1)
+  builtin 431  (wrappers: 1)
+  builtin 432  (wrappers: 1)
+  builtin 433  (wrappers: 1)
+  builtin 434  (wrappers: 1)
+  builtin 435  (wrappers: 1)
+  builtin 436  (wrappers: 1)
+  builtin 437  (wrappers: 1)
+  builtin 438  (wrappers: 1)
+  builtin 439  (wrappers: 1)
+  builtin 441  (wrappers: 1)
+  builtin 442  (wrappers: 1)
+  builtin 443  (wrappers: 1)
+  builtin 444  (wrappers: 1)
+  builtin 445  (wrappers: 1)
+  builtin 446  (wrappers: 1)
+  builtin 447  (wrappers: 1)
+  builtin 448  (wrappers: 1)
+  builtin 449  (wrappers: 1)
+  builtin 450  (wrappers: 1)
+  builtin 451  (wrappers: 1)
+  builtin 452  (wrappers: 1)
+  builtin 457  (wrappers: 1)
+  builtin 459  (wrappers: 1)
+  builtin 460  (wrappers: 1)
+  builtin 461  (wrappers: 1)
+  builtin 462  (wrappers: 1)
+  builtin 463  (wrappers: 1)
+  builtin 464  (wrappers: 1)
+  builtin 465  (wrappers: 1)
+  builtin 466  (wrappers: 1)
+  builtin 467  (wrappers: 1)
+  builtin 468  (wrappers: 1)
+  builtin 469  (wrappers: 1)
+  builtin 471  (wrappers: 1)
+  builtin 472  (wrappers: 1)
+  builtin 473  (wrappers: 1)
+  builtin 474  (wrappers: 1)
+  builtin 475  (wrappers: 1)
+  builtin 476  (wrappers: 1)
+  builtin 477  (wrappers: 1)
+  builtin 478  (wrappers: 1)
+  builtin 479  (wrappers: 1)
+  builtin 480  (wrappers: 1)
+  builtin 481  (wrappers: 1)
+  builtin 482  (wrappers: 1)
+  builtin 483  (wrappers: 1)
+  builtin 484  (wrappers: 1)
+  builtin 485  (wrappers: 1)
+  builtin 486  (wrappers: 1)
+  builtin 487  (wrappers: 1)
+  builtin 488  (wrappers: 1)
+  builtin 489  (wrappers: 1)
+  builtin 490  (wrappers: 1)
+  builtin 491  (wrappers: 1)
+  builtin 492  (wrappers: 1)
+  builtin 493  (wrappers: 1)
+  builtin 494  (wrappers: 1)
+  builtin 495  (wrappers: 1)
+  builtin 496  (wrappers: 1)
+  builtin 497  (wrappers: 1)
+  builtin 498  (wrappers: 1)
+  builtin 499  (wrappers: 1)
+  builtin 500  (wrappers: 1)
+  builtin 502  (wrappers: 1)
+  builtin 503  (wrappers: 1)
+  builtin 504  (wrappers: 1)
+  builtin 510  (wrappers: 1)
+  builtin 511  (wrappers: 1)
+  builtin 512  (wrappers: 1)
+  builtin 513  (wrappers: 1)
+  builtin 514  (wrappers: 1)
+  builtin 515  (wrappers: 1)
+  builtin 516  (wrappers: 1)
+  builtin 517  (wrappers: 1)
+  builtin 518  (wrappers: 1)
+  builtin 519  (wrappers: 1)
+  builtin 520  (wrappers: 1)
+  builtin 521  (wrappers: 1)
+  builtin 529  (wrappers: 1)
+  builtin 530  (wrappers: 1)
+  builtin 532  (wrappers: 1)
+  builtin 533  (wrappers: 1)
+  builtin 534  (wrappers: 1)
+  builtin 535  (wrappers: 1)
+  builtin 536  (wrappers: 1)
+  builtin 537  (wrappers: 1)
+  builtin 540  (wrappers: 1)
+  builtin 541  (wrappers: 1)
+  builtin 542  (wrappers: 1)
+  builtin 603  (wrappers: 1)
+  builtin 604  (wrappers: 1)
+  builtin 605  (wrappers: 1)
+  builtin 606  (wrappers: 1)
+  builtin 607  (wrappers: 1)
+  builtin 608  (wrappers: 1)
+  builtin 609  (wrappers: 1)
+  builtin 610  (wrappers: 1)
+  builtin 611  (wrappers: 1)
+  builtin 612  (wrappers: 1)
+  builtin 613  (wrappers: 1)
+  builtin 614  (wrappers: 1)
+  builtin 615  (wrappers: 1)
+  builtin 616  (wrappers: 1)
+  builtin 617  (wrappers: 1)
+  builtin 618  (wrappers: 1)
+  builtin 619  (wrappers: 1)
+  builtin 620  (wrappers: 1)
+  builtin 621  (wrappers: 1)
+  builtin 622  (wrappers: 1)
+  builtin 623  (wrappers: 1)
+  builtin 624  (wrappers: 1)
+  builtin 625  (wrappers: 1)
+  builtin 626  (wrappers: 1)
+  builtin 627  (wrappers: 1)
+  builtin 628  (wrappers: 1)
+  builtin 629  (wrappers: 1)
+  builtin 630  (wrappers: 1)
+  builtin 631  (wrappers: 1)
+  builtin 632  (wrappers: 1)
+  builtin 638  (wrappers: 1)
+  builtin 639  (wrappers: 1)
+  builtin 640  (wrappers: 1)
+  builtin 650  (wrappers: 1)
+  builtin 651  (wrappers: 1)
+  builtin 652  (wrappers: 1)
+  builtin 653  (wrappers: 1)
+  builtin 654  (wrappers: 1)
+  builtin 740  (wrappers: 1)
+  builtin 741  (wrappers: 1)
+  builtin 742  (wrappers: 1)
+
+--- defs sample: first 8 globaldefs / first 8 fielddefs ---
+  globaldef #0  type=0 ofs=0 name=''
+  globaldef #1  type=32772 ofs=28 name='self'
+  globaldef #2  type=32772 ofs=29 name='other'
+  globaldef #3  type=32772 ofs=30 name='world'
+  globaldef #4  type=32770 ofs=31 name='time'
+  globaldef #5  type=32770 ofs=32 name='cltime'
+  globaldef #6  type=32770 ofs=33 name='frametime'
+  globaldef #7  type=32770 ofs=34 name='player_localentnum'
+  fielddef #0  type=0 ofs=0 name=''
+  fielddef #1  type=2 ofs=0 name='modelindex'
+  fielddef #2  type=3 ofs=1 name='absmin'
+  fielddef #3  type=2 ofs=1 name='absmin_x'
+  fielddef #4  type=2 ofs=2 name='absmin_y'
+  fielddef #5  type=2 ofs=3 name='absmin_z'
+  fielddef #6  type=3 ofs=4 name='absmax'
+  fielddef #7  type=2 ofs=4 name='absmax_x'
+uncovered statements: 0
