@@ -38,6 +38,27 @@ static int   g_ps_int   = 123456789;  // 0x075BCD15
 static float g_ps_float = 12345.5f;   // 0x4640E600
 static float g_ps_vec[3] = {1.0f, 2.0f, 3.0f};
 
+// PR228-rev regression canaries, gated by cvar "g_csqc_test":
+//   g_csqc_test = 1 -> [13]: plain 32-bit trap_SetSendNeeded with bit31 (0x80000000)
+//     exercises EXT_SetSendNeeded sign-extension; the engine must NOT deliver
+//     garbage sendflags_hi (pre-fix it delivers 0x3FFFFFFF upper-word pollution).
+//   g_csqc_test = 2 -> [14]: FlagSendEntity writes a >1450-byte string into
+//     MSG_CSQC; the engine must survive (pre-fix SZ_GetSpace Sys_Errors).
+// The canaries live in the test-mod (server side) and are confirmed live.
+static int g_csqc_canary_filled = 0;
+static char g_csqc_bigstr[1600];
+
+static void G_CSQC_Canary_FillBigStr( void )
+{
+	int i;
+	if ( g_csqc_canary_filled )
+		return;
+	g_csqc_canary_filled = 1;
+	for ( i = 0; i < ( int )sizeof( g_csqc_bigstr ) - 1; i++ )
+		g_csqc_bigstr[i] = 'A' + ( i % 26 );
+	g_csqc_bigstr[sizeof( g_csqc_bigstr ) - 1] = 0;
+}
+
 // Полная поддержка CSQC движком = доступны clientstat+pointerstat+setsendneeded.
 static qboolean any_client_csqc_active( void );	// определена ниже, нужна эху/фрейм-хуку
 qboolean G_CSQC_OK( void )
@@ -424,6 +445,16 @@ int G_CSQC_Example_FlagSendEntity( int sendflags_lo, int sendflags_hi )
 	//   если флаг стоит — ещё WriteLong(time*10) (таймер, 0.1с).
 	G_CSQC_WriteShort( ( int )self->s.v.skin );  // 1/2 = команда
 	G_CSQC_WriteByte( ( int )self->s.v.frame );  // 0=на базе, 1=несётся
+
+	if ( ( int )cvar( "g_csqc_test" ) == 2 )
+	{	// PR228-rev [14]: single WriteString longer than MAX_DATAGRAM (1450) into
+		// MSG_CSQC. Pre-fix the engine Sys_Errors (SZ_GetSpace single-write > maxsize);
+		// post-fix it must survive (drop/overflow the entity update).
+		G_CSQC_Canary_FillBigStr();
+		G_CSQC_WriteString( g_csqc_bigstr );
+		return 1;
+	}
+
 	if ( hi & GCSQC_SENDFLAG_TIMER )
 	{
 		G_CSQC_WriteByte( GCSQC_FLAGF_T40 );
@@ -470,6 +501,19 @@ void G_CSQC_Example_Frame( void )
 	last_dirt = g_globalvars.time;
 
 	g_csqc_tick++;
+
+	if ( ( int )cvar( "g_csqc_test" ) == 1 )
+	{	// PR228-rev [13]: plain 32-bit trap_SetSendNeeded with bit31 (0x80000000).
+		// The engine must deliver sendflags_hi == 0; pre-fix EXT_SetSendNeeded
+		// sign-extends args[2], polluting the upper word (hi = 0x3FFFFFFF).
+		for ( n = trap_nextent( 0 ); n; n = trap_nextent( n ) )
+		{
+			e = &g_edicts[n];
+			if ( e->SendEntity )
+				trap_SetSendNeeded( NUM_FOR_EDICT( e ), 0x80000000, 0 );
+		}
+		return;
+	}
 
 	for ( n = trap_nextent( 0 ); n; n = trap_nextent( n ) )
 	{
