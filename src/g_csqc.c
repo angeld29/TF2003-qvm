@@ -44,6 +44,10 @@ static float g_ps_vec[3] = {1.0f, 2.0f, 3.0f};
 //     garbage sendflags_hi (pre-fix it delivers 0x3FFFFFFF upper-word pollution).
 //   g_csqc_test = 2 -> [14]: FlagSendEntity writes a >1450-byte string into
 //     MSG_CSQC; the engine must survive (pre-fix SZ_GetSpace Sys_Errors).
+//   g_csqc_test = 3 -> [15b]: FlagSendEntity writes g_csqc_test_size filler
+//     bytes; with the sized-92 variant (sv_csqcdebug 1) a payload landing on the
+//     datagram limit overflows the trailing short in the client datagram
+//     (server log "SZ_GetSpace: overflow: ... len = 2") pre-fix; absent post-fix.
 // The canaries live in the test-mod (server side) and are confirmed live.
 static int g_csqc_canary_filled = 0;
 static char g_csqc_bigstr[1600];
@@ -426,6 +430,7 @@ void G_CSQC_Example_RegisterStats( void )
 int G_CSQC_Example_FlagSendEntity( int sendflags_lo, int sendflags_hi )
 {
 	int hi;
+	int n, size;
 
 	if ( !G_CSQC_OK() )
 		return 0;
@@ -452,6 +457,22 @@ int G_CSQC_Example_FlagSendEntity( int sendflags_lo, int sendflags_hi )
 		// post-fix it must survive (drop/overflow the entity update).
 		G_CSQC_Canary_FillBigStr();
 		G_CSQC_WriteString( g_csqc_bigstr );
+		return 1;
+	}
+
+	if ( ( int )cvar( "g_csqc_test" ) == 3 )
+	{	// PR228-rev [15b] canary: testfill marker + count + filler, so the client
+		// module consumes the whole payload (no underread warning). With the
+		// sized-92 variant (sv_csqcdebug 1) a payload landing on the datagram
+		// limit overflows the trailing short pre-fix
+		// (server log "SZ_GetSpace: overflow: ... len = 2"); absent post-fix.
+		size = ( int )cvar( "g_csqc_test_size" );
+		G_CSQC_WriteByte( ( hi & GCSQC_SENDFLAG_TIMER ) ? ( GCSQC_FLAGF_T40 | GCSQC_FLAGF_TESTFILL ) : GCSQC_FLAGF_TESTFILL );
+		if ( hi & GCSQC_SENDFLAG_TIMER )
+			G_CSQC_WriteLong( ( int )( g_globalvars.time * 10 ) );
+		G_CSQC_WriteLong( size );
+		for ( n = 0; n < size; n++ )
+			G_CSQC_WriteByte( 0x41 );
 		return 1;
 	}
 

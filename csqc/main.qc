@@ -86,6 +86,9 @@ const float CSQC_MAXFLAGS = 8;
 // flagf-бит: в payload есть таймер — доставлен hi-бит 40 сервера (зеркало
 // GCSQC_FLAGF_T40 в include/g_csqc.h).
 const float CSQC_FLAGF_T40 = 1;
+// flagf-бит: далее WriteLong(count)+count filler-байт (канарейка PR228 [15b]);
+// модуль дочитывает их, чтобы не было underread (зеркало GCSQC_FLAGF_TESTFILL).
+const float CSQC_FLAGF_TESTFILL = 128;
 
 // Слоты (все поля — float; entnum уникален). Скалярные глобалы на слот:
 //  slot<N>_entnum / _team / _carried / _t40 / _time / _used.
@@ -221,7 +224,7 @@ float FlagFreeSlot() {
 }
 
 void(float isnew) CSQC_Ent_Update = {
-	local float e, team, carried, t, flagf, idx;
+	local float e, team, carried, t, flagf, idx, frn, fri;
 
 	// Параметры функции — нет; контекст сущности задаёт движок: self.entnum
 	// (ADR 0017 P2/D3). payload сервера G_CSQC_Example_FlagSendEntity (без
@@ -233,8 +236,15 @@ void(float isnew) CSQC_Ent_Update = {
 	carried = readbyte();
 	flagf = readbyte();
 	t = -1;
-	if (flagf >= CSQC_FLAGF_T40)
+	if (flagf & CSQC_FLAGF_T40)
 		t = readlong();
+	if (flagf & CSQC_FLAGF_TESTFILL)
+	{	// PR228 [15b] canary filler: WriteLong(count)+count bytes; consume all
+		// so the client engine does not report underread.
+		frn = readlong();
+		for (fri = 0; fri < frn; fri++)
+			readbyte();
+	}
 
 	idx = FlagIdxByEnt(e);
 	if (idx < 0)
@@ -242,7 +252,7 @@ void(float isnew) CSQC_Ent_Update = {
 	if (idx < 0)
 		return;	// слотов нет — игнорируем
 
-	FlagSlot_set(idx, e, team, carried, flagf >= CSQC_FLAGF_T40, t);
+	FlagSlot_set(idx, e, team, carried, (flagf & CSQC_FLAGF_T40) != 0, t);
 };
 
 void() CSQC_Ent_Remove = {

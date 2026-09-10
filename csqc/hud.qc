@@ -5,6 +5,12 @@
 // CSQC-тест: маркеры флагов/эхо/счёт команд (определена в main.qc).
 void Hud_DrawCSQC();
 
+// Время сборки этого csprogs (fteqcc __DATE__/__TIME__) — показывается на HUD
+// всегда, чтобы подтвердить, какую ревизию клиентского модуля загрузил клиент.
+string csqc_buildtime() {
+	return sprintf("%s %s", __DATE__, __TIME__);
+}
+
 // Аммо текущего оружия по имени типа (или 0).
 float ammo_by_type(string t) {
 	if (t == "SHELLS")  return getstatf(STAT_SHELLS);
@@ -35,7 +41,7 @@ void Hud_Draw() {
 	// Левая колонка сверху, одна строка на элемент. Метка перед значением,
 	// поля разделены пробелами (значения фикс-ширины не нужны — строка одна).
 	float y = 30;
-	drawstring([10, y, 0], sprintf("Weapon %s", wname), [16, 16], '1 1 1', 1, 0);
+	drawstring([10, y, 0], sprintf("[%s] Weapon %s", csqc_buildtime(), wname), [16, 16], '1 1 1', 1, 0);
 	y += 22;
 	drawstring([10, y, 0], sprintf("HP %g", hp), [16, 16], '0 1 0', 1, 0);
 	y += 22;

@@ -137,6 +137,7 @@
 
 // Маркеры CSQC-payload примера флага (согласованы с csqc/main.qc):
 #define GCSQC_FLAGF_T40                0x1         // в payload есть таймер — дошёл hi-бит TIMER (40)
+#define GCSQC_FLAGF_TESTFILL           0x80        // PR228 [15b] канарейка: далее WriteLong(count)+count filler-байт (модуль дочитывает)
 
 // Колбек сериализации CSQC-сущности: self=ent, other=viewer, аргументы
 // sendflags lo/hi (см. выше). Возврат 0=не слать, !=0=слать.
