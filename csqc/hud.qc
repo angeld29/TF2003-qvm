@@ -60,6 +60,12 @@ void Hud_Draw() {
 	drawstring([10, y, 0],
 		sprintf("t%d hp%g it%g ps50 %g tk %g", time, hp, items, getstatf(50), getstatf(40)),
 		[12, 12], '0 1 0', 1, 0);
+	y += 14;
+
+	// PR228 [18]: float-стат 51 (должен быть 12345.5, не 12345) и string-стат 53.
+	drawstring([10, y, 0],
+		sprintf("ps51 %g s53 %s", getstatf(51), getstats(53)),
+		[12, 12], '0 1 1', 1, 0);
 
 	// CSQC-тест: маркеры флагов, эхо sendevent (main.qc).
 	Hud_DrawCSQC();

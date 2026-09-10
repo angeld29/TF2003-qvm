@@ -423,6 +423,9 @@ void G_CSQC_Example_RegisterStats( void )
 	G_RegisterPointerStat( GCSQC_STAT_FIRST + 18, GCSQC_EV_INTEGER, &g_ps_int );
 	G_RegisterPointerStat( GCSQC_STAT_FIRST + 19, GCSQC_EV_FLOAT, &g_ps_float );
 	G_RegisterPointerStat( GCSQC_STAT_FIRST + 20, GCSQC_EV_VECTOR, g_ps_vec );
+	// PR228 [18]: string-стат на строковом поле игрока (netname) — движок должен
+	// слать svcfte_updatestatstring, клиент видит её через getstats().
+	G_RegisterClientStat( GCSQC_STAT_FIRST + 21, GCSQC_EV_STRING, FOFS( s.v.netname ) );
 }
 
 // SendEntity-колбек для флага: пишет мини-payload для CSQC-клиента.
