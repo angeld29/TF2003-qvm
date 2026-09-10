@@ -48,9 +48,13 @@ static float g_ps_vec[3] = {1.0f, 2.0f, 3.0f};
 //     bytes; with the sized-92 variant (sv_csqcdebug 1) a payload landing on the
 //     datagram limit overflows the trailing short in the client datagram
 //     (server log "SZ_GetSpace: overflow: ... len = 2") pre-fix; absent post-fix.
+//   g_csqc_test = 4 -> [4]: the first spawned flag is dirtied ONCE at spawn and
+//     excluded from the periodic dirt, so only the engine's force-resend of a
+//     visible entity without SENDFLAGS_PRESENT (late joiner) can deliver it.
 // The canaries live in the test-mod (server side) and are confirmed live.
 static int g_csqc_canary_filled = 0;
 static char g_csqc_bigstr[1600];
+static gedict_t *g_csqc_test_late;	// [4] canary: flag flagged once, never re-dirtied
 
 static void G_CSQC_Canary_FillBigStr( void )
 {
@@ -495,6 +499,20 @@ void G_CSQC_Example_PlaceItem( gedict_t *ent )
 	if ( ent->mdl && streq( ent->mdl, "progs/tf_flag.mdl" ) )
 	{
 		ExtFieldSetSendEntity( ent, ( func_t )G_CSQC_Example_FlagSendEntity );
+
+		if ( ( int )cvar( "g_csqc_test" ) == 4 && !g_csqc_test_late )
+		{	// PR228 [4] canary: flag this one ONCE at spawn; the dirt loop below
+			// never re-flags it, so after the first client consumed the sendflags
+			// only the engine's force-resend (visible entity without PRESENT) can
+			// deliver it to a later client.
+			g_csqc_test_late = ent;
+			ent->csendflags_lo = GCSQC_SENDFLAG_STATE;
+			ent->csendflags_hi = GCSQC_SENDFLAG_TIMER;
+			G_Ext_SetSendNeeded( ent, ent->csendflags_lo, ent->csendflags_hi, NULL );
+			if ( cvar( "developer" ) )
+				G_dprintf( "G_CSQC_Example_PlaceItem: test4 late-join flag ent %d\n", NUM_FOR_EDICT( ent ) );
+		}
+
 		if ( cvar( "developer" ) )
 			G_dprintf( "G_CSQC_Example_PlaceItem: SendEntity set on flag edict %d\n", NUM_FOR_EDICT( ent ) );
 	}
@@ -545,6 +563,8 @@ void G_CSQC_Example_Frame( void )
 		e = &g_edicts[n];
 		if ( e->SendEntity )
 		{
+			if ( e == g_csqc_test_late )
+				continue;	// PR228 [4] canary: this one is flagged once only
 			e->csendflags_lo = GCSQC_SENDFLAG_STATE;
 			e->csendflags_hi = GCSQC_SENDFLAG_TIMER;
 			G_Ext_SetSendNeeded( e, e->csendflags_lo, e->csendflags_hi, NULL );
