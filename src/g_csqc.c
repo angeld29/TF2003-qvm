@@ -56,6 +56,12 @@ static float g_ps_vec[3] = {1.0f, 2.0f, 3.0f};
 //     unlinked. Both carry PVSF_IGNOREPVS. Pre-fix (A) is culled by the model
 //     test and (B) by the PVS test, so neither emits; post-fix the engine emits
 //     both (server log "CSQC-EMIT e=..."). Confirmed via sv_csqcdebug 2.
+//   g_csqc_test = 6 -> [R2-7]: cgamepacket (svc 83 first byte) sent through
+//     trap_multicast; must reach CSQC clients only, never a stock client.
+//   g_csqc_test = 7 -> [R2-7 negative]: svc 83 written to a fresh MSG_ALL; the
+//     engine must reject it (contract error) instead of broadcasting it.
+//   g_csqc_test = 8 -> [R2-7 unflushed]: a stray byte in MSG_MULTICAST with no
+//     trap_multicast(); the engine frame-start check must drop it and log.
 // The canaries live in the test-mod (server side) and are confirmed live.
 static int g_csqc_canary_filled = 0;
 static char g_csqc_bigstr[1600];
@@ -116,6 +122,8 @@ qboolean G_ClientCSQCActive( gedict_t *client )
 // же аргументами (сырые значения: coord/long/string/entity), чтобы клиент
 // мог отобразить их и подтвердить сквозную передачу типов. Бинарное кодирование
 // (без форматирования float на сервере — QVM не дружит с %f в snprintf).
+// cgamepacket: 83 первым байтом MSG_MULTICAST + trap_multicast в этой же функции
+// (см. контракт svc 83 в include/g_csqc.h).
 void G_CSQC_Example_Echo( gedict_t *cl, int argcount )
 {
 	char buf[12];
@@ -374,6 +382,8 @@ static qboolean any_client_csqc_active( void )
 	return false;
 }
 
+// Отправка CSQC-события: cgamepacket (83 первым байтом MSG_MULTICAST) +
+// trap_multicast в этой же функции (см. контракт svc 83 в include/g_csqc.h).
 void G_SendCSQCEvent( vec3_t org, const char *name )
 {
 	if ( !G_CSQC_OK() )
@@ -579,6 +589,32 @@ void G_CSQC_Example_Frame( void )
 		g_csqc_test_ignorepvs->csendflags_lo = GCSQC_SENDFLAG_STATE;
 		g_csqc_test_ignorepvs->csendflags_hi = GCSQC_SENDFLAG_TIMER;
 		G_Ext_SetSendNeeded( g_csqc_test_ignorepvs, g_csqc_test_ignorepvs->csendflags_lo, g_csqc_test_ignorepvs->csendflags_hi, NULL );
+		return;
+	}
+
+	if ( ( int )cvar( "g_csqc_test" ) == 6 )
+	{	// R2-7 (positive): svc 83 first byte + trap_multicast. The engine must
+		// route the packet only to CSQC-active clients; a stock client must never
+		// receive it. Replaces the periodic dirt so this is the only CSQC traffic.
+		trap_WriteByte( MSG_MULTICAST, GCSQC_SVC_CGAMEPACKET );
+		trap_WriteString( MSG_MULTICAST, "csqc_test6" );
+		trap_multicast( 0, 0, 0, MULTICAST_ALL );
+		return;
+	}
+
+	if ( ( int )cvar( "g_csqc_test" ) == 7 )
+	{	// R2-7 (negative): svc 83 written to a fresh broadcast destination must be
+		// rejected by the engine. Pre-fix the byte reaches every client (stock
+		// clients error on it); post-fix the trap aborts with a contract error.
+		trap_WriteByte( MSG_ALL, GCSQC_SVC_CGAMEPACKET );
+		return;
+	}
+
+	if ( ( int )cvar( "g_csqc_test" ) == 8 )
+	{	// R2-7 (unflushed): a stray byte in MSG_MULTICAST with no trap_multicast()
+		// would merge into the next multicast from any source. The engine's
+		// frame-start check must drop it and log "unflushed multicast".
+		trap_WriteByte( MSG_MULTICAST, 1 );
 		return;
 	}
 
