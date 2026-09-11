@@ -51,10 +51,17 @@ static float g_ps_vec[3] = {1.0f, 2.0f, 3.0f};
 //   g_csqc_test = 4 -> [4]: the first spawned flag is dirtied ONCE at spawn and
 //     excluded from the periodic dirt, so only the engine's force-resend of a
 //     visible entity without SENDFLAGS_PRESENT (late joiner) can deliver it.
+//   g_csqc_test = 5 -> [R2-1]+[R2-5]: two extra SendEntity entities spawned and
+//     dirtied every tick: (A) model-less at an origin, (B) with a model but
+//     unlinked. Both carry PVSF_IGNOREPVS. Pre-fix (A) is culled by the model
+//     test and (B) by the PVS test, so neither emits; post-fix the engine emits
+//     both (server log "CSQC-EMIT e=..."). Confirmed via sv_csqcdebug 2.
 // The canaries live in the test-mod (server side) and are confirmed live.
 static int g_csqc_canary_filled = 0;
 static char g_csqc_bigstr[1600];
 static gedict_t *g_csqc_test_late;	// [4] canary: flag flagged once, never re-dirtied
+static gedict_t *g_csqc_test_nomodel;	// [R2-1] model-less + IGNOREPVS SendEntity entity
+static gedict_t *g_csqc_test_ignorepvs;	// [R2-5] model + IGNOREPVS, unlinked entity
 
 static void G_CSQC_Canary_FillBigStr( void )
 {
@@ -547,6 +554,33 @@ void G_CSQC_Example_Frame( void )
 	last_dirt = g_globalvars.time;
 
 	g_csqc_tick++;
+
+	if ( ( int )cvar( "g_csqc_test" ) == 5 )
+	{	// [R2-1]/[R2-5]: model-less and IGNOREPVS CSQC entities.
+		if ( !g_csqc_test_nomodel )
+		{
+			g_csqc_test_nomodel = spawn();
+			setorigin( g_csqc_test_nomodel, 0, 0, 0 );	// linked, but no model
+			ExtFieldSetPvsFlags( g_csqc_test_nomodel, GCSQC_PVSF_IGNOREPVS );
+			ExtFieldSetSendEntity( g_csqc_test_nomodel, ( func_t )G_CSQC_Example_FlagSendEntity );
+			// B has a model (so only the PVS gate applies) but is never linked:
+			// num_leafs == 0, so pre-fix it is culled by the PVS test.
+			g_csqc_test_ignorepvs = spawn();
+			setmodel( g_csqc_test_ignorepvs, "progs/tf_flag.mdl" );
+			ExtFieldSetPvsFlags( g_csqc_test_ignorepvs, GCSQC_PVSF_IGNOREPVS );
+			ExtFieldSetSendEntity( g_csqc_test_ignorepvs, ( func_t )G_CSQC_Example_FlagSendEntity );
+			if ( cvar( "developer" ) )
+				G_dprintf( "G_CSQC_Example_Frame: test5 canaries nomodel=%d ignorepvs=%d\n",
+					NUM_FOR_EDICT( g_csqc_test_nomodel ), NUM_FOR_EDICT( g_csqc_test_ignorepvs ) );
+		}
+		g_csqc_test_nomodel->csendflags_lo = GCSQC_SENDFLAG_STATE;
+		g_csqc_test_nomodel->csendflags_hi = GCSQC_SENDFLAG_TIMER;
+		G_Ext_SetSendNeeded( g_csqc_test_nomodel, g_csqc_test_nomodel->csendflags_lo, g_csqc_test_nomodel->csendflags_hi, NULL );
+		g_csqc_test_ignorepvs->csendflags_lo = GCSQC_SENDFLAG_STATE;
+		g_csqc_test_ignorepvs->csendflags_hi = GCSQC_SENDFLAG_TIMER;
+		G_Ext_SetSendNeeded( g_csqc_test_ignorepvs, g_csqc_test_ignorepvs->csendflags_lo, g_csqc_test_ignorepvs->csendflags_hi, NULL );
+		return;
+	}
 
 	if ( ( int )cvar( "g_csqc_test" ) == 1 )
 	{	// PR228-rev [13]: plain 32-bit trap_SetSendNeeded with bit31 (0x80000000).
