@@ -1140,8 +1140,40 @@ float CSQC_FieldIdx(string nm) {
 	return -1;
 }
 
+// Агрегат несовпадений стат-канарейки (csqc_dbg 6): число бит/значений, отличных
+// от ожидаемых. Биты INTEGER-стата 55 = 0x12345678 (nib 8..1): 8 nibble-групп
+// покрывают все 32 бита, count<=24 -> значения точны в float32. Плюс фикс-значения
+// типов: float 51=12345.5, vector 52=1/54=3, entity 37=0. (string 53 — динамич.
+// netname, только информативно.) bad==0 <=> все биты доставлены корректно.
+float CSQC_StatWire_Bad() {
+	local float b;
+	b = 0;
+	b = b + (getstatf(55, 0, 4) != 8);
+	b = b + (getstatf(55, 4, 4) != 7);
+	b = b + (getstatf(55, 8, 4) != 6);
+	b = b + (getstatf(55, 12, 4) != 5);
+	b = b + (getstatf(55, 16, 4) != 4);
+	b = b + (getstatf(55, 20, 4) != 3);
+	b = b + (getstatf(55, 24, 4) != 2);
+	b = b + (getstatf(55, 28, 4) != 1);
+	b = b + (getstatf(55, 0, 8) != 120);
+	b = b + (getstatf(55, 8, 8) != 86);
+	b = b + (getstatf(55, 16, 8) != 52);
+	b = b + (getstatf(55, 24, 8) != 18);
+	b = b + (getstatf(55, 0, 16) != 22136);
+	b = b + (getstatf(55, 16, 16) != 4660);
+	b = b + (getstatf(55, 0, 24) != 3430008);
+	b = b + (getstatf(55, 8, 24) != 1193046);
+	b = b + (getstatf(51) != 12345.5);
+	b = b + (getstatf(52) != 1);
+	b = b + (getstatf(54) != 3);
+	b = b + (getstati(37) != 0);
+	return b;
+}
+
 // Дополнительные HUD-элементы CSQC-теста (вызывается из Hud_Draw в hud.qc):
-// 2D-маркеры флагов (entity-канал), эхо sendevent, счёт команд (pointerstat 40..43).
+// 2D-маркеры флагов (entity-канал), эхо sendevent, счёт команд (pointerstat 40..43)
+// + debug-экраны (csqc_dbg 1..6; стат-канарейки — экран 6).
 void Hud_DrawCSQC() {
 	local float i, yy, tw;
 	local string s;
@@ -1152,6 +1184,7 @@ void Hud_DrawCSQC() {
 	local entity t5e;	// T5: временный spawn для etos/num_for_edict/wasfreed
 	local entity vme;	// VM-остаток: spawn для findfloat-канарейки
 	local float cx, cy;	// 2D-доп: правый верхний угол от размера экрана
+	local float bad;	// экран 6: агрегат стат-канарейки (CSQC_StatWire_Bad)
 
 	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
 	// всегда; строки флагов — по слотам ниже.
@@ -1180,7 +1213,8 @@ void Hud_DrawCSQC() {
 
 	// Debug-экраны модуля (cvar csqc_dbg): 0 — выкл; 1 — графика+курсор;
 	// 2 — текст «до ie»; 3 — остальное (по группам); 4 — сводные L2-смоки
-	// (T1..T12/2D); 5 — Entity-рефлексия (#496-500).
+	// (T1..T12/2D); 5 — Entity-рефлексия (#496-500); 6 — CSQC stat wire
+	// 78/79 + бит-целостность #331/#332 (int/float/string/vector/entity).
 	// Каждый экран рисуется от верхнего якоря y=470 (там, где картинки), строк на
 	// экран <= 10. ECHO/FLAGS выше — не debug.
 	D = cvar("csqc_dbg");
@@ -1319,6 +1353,14 @@ void Hud_DrawCSQC() {
 		}
 		dprint(sprintf("T13 rf n%g i%g/%g/%g v%g cls%g\n",
 			g_rf_n, g_rf_is, g_rf_ic, g_rf_io, g_rf_v, g_rf_cls));
+	}
+
+	// Экран 6 (CSQC stat wire 78/79): сводка в консоль (qconsole.log).
+	if (D == 6 && g_dbg_prev != 6) {
+		bad = CSQC_StatWire_Bad();
+		dprint(sprintf("SW78/79 stat55 0x12345678 bad %g\n", bad));
+		dprint(sprintf("SW f51 %g s53 %s v %g/%g e37 %g\n",
+			getstatf(51), getstats(53), getstatf(52), getstatf(54), getstati(37)));
 	}
 	g_dbg_prev = D;
 
@@ -1572,6 +1614,50 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("t13 rf n%g i%g/%g/%g v%g cls%g",
 				g_rf_n, g_rf_is, g_rf_ic, g_rf_io, g_rf_v, g_rf_cls),
+			[12, 12], '1 1 1', 1, 0);
+	}
+
+	// --- экран 6: CSQC stat wire 78/79 + бит-целостность #331/#332 ---
+	// stat 55 = 0x12345678 (nib 8..1, byte 120/86/52/18): 8 nibble-групп покрывают
+	// все 32 бита; count<=24 -> точны в float32. Шапка green/red по агрегату bad.
+	if (D == 6) {
+		yy = 470;
+		bad = CSQC_StatWire_Bad();
+		drawstring([60, yy, 0],
+			sprintf("SW78/79 stat55 0x12345678 bad %g", bad),
+			[12, 12], (bad == 0) ? '0 1 0' : '1 0 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("nib %d/%d/%d/%d",
+				getstatf(55, 0, 4), getstatf(55, 4, 4), getstatf(55, 8, 4), getstatf(55, 12, 4)),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("nib %d/%d/%d/%d",
+				getstatf(55, 16, 4), getstatf(55, 20, 4), getstatf(55, 24, 4), getstatf(55, 28, 4)),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("b8 %d/%d/%d/%d c16 %d/%d",
+				getstatf(55, 0, 8), getstatf(55, 8, 8), getstatf(55, 16, 8), getstatf(55, 24, 8),
+				getstatf(55, 0, 16), getstatf(55, 16, 16)),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("c24 %d/%d", getstatf(55, 0, 24), getstatf(55, 8, 24)),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("i ps50 %g tk %g g40 %g", getstatf(50), getstatf(40), getstati(40)),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("f51 %g s53 %s", getstatf(51), getstats(53)),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("v %g/%g e37 %g i50 %g",
+				getstatf(52), getstatf(54), getstati(37), getstati(50)),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }

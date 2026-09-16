@@ -37,6 +37,9 @@ int g_csqc_tick;
 static int   g_ps_int   = 123456789;  // 0x075BCD15
 static float g_ps_float = 12345.5f;   // 0x4640E600
 static float g_ps_vec[3] = {1.0f, 2.0f, 3.0f};
+// Бит-целостность (stat 55): все нибблы ненулевые/различные (8..1) — любой потерянный
+// или лишний бит меняет свою nibble-группу. int, шлётся svc_updatestatlong (32 бита).
+static int   g_ps_bits  = 0x12345678; // nib 8,7,6,5,4,3,2,1; byte 78,56,34,12
 
 // PR228-rev regression canaries, gated by cvar "g_csqc_test":
 //   g_csqc_test = 1 -> [13]: plain 32-bit trap_SetSendNeeded with bit31 (0x80000000)
@@ -443,6 +446,10 @@ void G_CSQC_Example_RegisterStats( void )
 	// PR228 [18]: string-стат на строковом поле игрока (netname) — движок должен
 	// слать svcfte_updatestatstring, клиент видит её через getstats().
 	G_RegisterClientStat( GCSQC_STAT_FIRST + 21, GCSQC_EV_STRING, FOFS( s.v.netname ) );
+
+	// Бит-целостность (csqc_dbg 6): INTEGER-стат 0x12345678 — все 32 бита проверяются
+	// клиентским getstatbits (GETSTATF #331) группами (nibble/byte/16/24).
+	G_RegisterPointerStat( GCSQC_STAT_FIRST + 23, GCSQC_EV_INTEGER, &g_ps_bits );
 }
 
 // SendEntity-колбек для флага: пишет мини-payload для CSQC-клиента.
