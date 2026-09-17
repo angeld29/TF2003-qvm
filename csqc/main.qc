@@ -56,6 +56,13 @@ float g_c5_sc;		// servercommandframe (ack сервера; движок пише
 float g_c5_cc;		// clientcommandframe (следующий отправляемый кадр)
 float g_c5_iseq;	// input_sequence (последняя отправленная команда)
 float g_c5_345;		// getinputstate(input_sequence) — 0/1 (живой probe #345)
+// C5-B (канарейка-механика #347, экран csqc_dbg 7): синтетический арена-энт.
+float g_c5b_bad;	// агрегат (число провалов) — цель 0
+float g_c5b_fall;	// падение: z_start - z_min (>0 = гравитация)
+float g_c5b_land;	// FL_ONGROUND после посадки — 0/1
+float g_c5b_sink;	// дрейф z на земле (|z_idle - z_land|; ~0 = не проваливается)
+float g_c5b_move;	// горизонтальное смещение на входе (>0 = input_* читаются)
+float g_c5b_stop;	// горизонтальная скорость после обнуления входа (затухание)
 float g_dbg_prev;	// предыдущий csqc_dbg (консоль-смоук T1/T2 при включении экрана 4)
 float g_t5_iss;		// T5: isserver() (считается на включение экрана 4)
 float g_t5_slot;	// T5: num_for_edict(spawn-сущности) — слот
@@ -1171,9 +1178,100 @@ float CSQC_StatWire_Bad() {
 	return b;
 }
 
+// C5-B: канарейка-механика #347 (csqc_dbg 7). Арена-энт ставится в view origin
+// игрока (стоящий игрок -> энт сразу на его полу), синтетический вход input_*
+// (forward=300, msec=50, angles = view angles игрока), серия #347:
+//   land  — FL_ONGROUND (solid-набор собран, B2);
+//   sink  — z стабилен на земле (не проваливается сквозь мир);
+//   move  — скорость/смещение вперёд (input_* реально читаются, B1);
+//   stop  — после обнуления входа скорость затухает (friction).
+//   fall  — информативно (z-дельта при оседании).
+// Запускать стоя на полу (в воздухе/у стены land/move могут не сойтись).
+// Возврат/глобал g_c5b_bad — число провалов (0 = ok). input_* не восстанавливаем:
+// CSQC_Input_Frame перезаписывает их из cmd перед каждым кадром.
+float CSQC_C5B_Run() {
+	local entity e;
+	local vector o, o0;
+	local float i, bad, z0, zmin, zland, zidle, sp_move, sp_stop, eslot;
+
+	bad = 0;
+	e = spawn();
+	if (e == world)
+		return 1;
+	// #347 принимает entity. ВНИМАНИЕ (live-находка C5-B): передача *локальной*
+	// entity-переменной в #347 приходит в движок как 0 (для #512/#309/#2 та же
+	// локальная e работает; байткод идентичен). Обход — кэш слота и вызов через
+	// edict_num(slot). Задокументировано как отклонение (parity-audit C1.4/ADR 0019).
+	eslot = num_for_edict(e);
+
+	// Якорь — view origin игрока (без подъёма): у стоящего игрока энт сразу
+	// садится на его пол (проверка solid/world), не зависит от ямы под +64.
+	o = getproperty(VF_ORIGIN);
+	e.origin = o;
+	e.velocity = '0 0 0';
+	e.movetype = MOVETYPE_WALK;
+	e.mins = '-16 -16 -24';
+	e.maxs = '16 16 32';
+	e.flags = 0;
+	e.pmove_flags = 0;
+
+	input_timelength = 0.05;
+	input_angles = getproperty(VF_ANGLES);	// вперёд — куда смотрит игрок
+	input_movevalues = '300 0 0';
+	input_buttons = 0;
+	input_impulse = 0;
+
+	// Фаза 1: осесть на пол (8 шагов x 50 мс) — ожидание FL_ONGROUND.
+	z0 = e.origin_z;
+	zmin = z0;
+	for (i = 0; i < 8; i = i + 1) {
+		runstandardplayerphysics(edict_num(eslot));
+		if (e.origin_z < zmin)
+			zmin = e.origin_z;
+	}
+	g_c5b_fall = z0 - zmin;	// информативно
+	g_c5b_land = (e.flags & FL_ONGROUND) ? 1 : 0;
+	if (g_c5b_land != 1)
+		bad = bad + 1;
+
+	// Фаза 2: простой на земле (5 шагов) — не проваливаемся (мир в solid-наборе).
+	zland = e.origin_z;
+	for (i = 0; i < 5; i = i + 1)
+		runstandardplayerphysics(edict_num(eslot));
+	zidle = e.origin_z;
+	g_c5b_sink = fabs(zidle - zland);
+	if (g_c5b_sink > 4)
+		bad = bad + 1;
+
+	// Фаза 3: движение вперёд (10 шагов) — input_* читаются (скорость/смещение).
+	o0 = e.origin;
+	for (i = 0; i < 10; i = i + 1)
+		runstandardplayerphysics(edict_num(eslot));
+	o = e.origin;
+	g_c5b_move = sqrt((o_x - o0_x) * (o_x - o0_x) + (o_y - o0_y) * (o_y - o0_y));
+	sp_move = sqrt(e.velocity_x * e.velocity_x + e.velocity_y * e.velocity_y);
+	if (g_c5b_move <= 1 && sp_move <= 10)
+		bad = bad + 1;
+
+	// Фаза 4: остановка (вход 0, 20 шагов) — скорость затухает.
+	input_movevalues = '0 0 0';
+	for (i = 0; i < 20; i = i + 1)
+		runstandardplayerphysics(edict_num(eslot));
+	sp_stop = sqrt(e.velocity_x * e.velocity_x + e.velocity_y * e.velocity_y);
+	g_c5b_stop = sp_stop;
+	if (sp_stop >= sp_move)
+		bad = bad + 1;
+
+	remove(e);
+	g_c5b_bad = bad;
+	dprint(sprintf("C5B347 bad %g fall %g land %g sink %g move %g stop %g\n",
+		bad, g_c5b_fall, g_c5b_land, g_c5b_sink, g_c5b_move, g_c5b_stop));
+	return bad;
+}
+
 // Дополнительные HUD-элементы CSQC-теста (вызывается из Hud_Draw в hud.qc):
 // 2D-маркеры флагов (entity-канал), эхо sendevent, счёт команд (pointerstat 40..43)
-// + debug-экраны (csqc_dbg 1..6; стат-канарейки — экран 6).
+// + debug-экраны (csqc_dbg 1..7; стат-канарейки — экран 6; C5-B #347 — экран 7).
 void Hud_DrawCSQC() {
 	local float i, yy, tw;
 	local string s;
@@ -1214,7 +1312,8 @@ void Hud_DrawCSQC() {
 	// Debug-экраны модуля (cvar csqc_dbg): 0 — выкл; 1 — графика+курсор;
 	// 2 — текст «до ie»; 3 — остальное (по группам); 4 — сводные L2-смоки
 	// (T1..T12/2D); 5 — Entity-рефлексия (#496-500); 6 — CSQC stat wire
-	// 78/79 + бит-целостность #331/#332 (int/float/string/vector/entity).
+	// 78/79 + бит-целостность #331/#332 (int/float/string/vector/entity);
+	// 7 — C5-B канарейка-механика #347 runstandardplayerphysics.
 	// Каждый экран рисуется от верхнего якоря y=470 (там, где картинки), строк на
 	// экран <= 10. ECHO/FLAGS выше — не debug.
 	D = cvar("csqc_dbg");
@@ -1362,6 +1461,10 @@ void Hud_DrawCSQC() {
 		dprint(sprintf("SW f51 %g s53 %s v %g/%g e37 %g\n",
 			getstatf(51), getstats(53), getstatf(52), getstatf(54), getstati(37)));
 	}
+
+	// Экран 7 (C5-B #347): одноразовый прогон канарейки-механики + консоль.
+	if (D == 7 && g_dbg_prev != 7)
+		CSQC_C5B_Run();
 	g_dbg_prev = D;
 
 	// --- экран 1: графика (LayerD) + курсор модуля ---
@@ -1658,6 +1761,21 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("v %g/%g e37 %g i50 %g",
 				getstatf(52), getstatf(54), getstati(37), getstati(50)),
+			[12, 12], '1 1 1', 1, 0);
+	}
+
+	// --- экран 7: C5-B канарейка-механика #347 ---
+	// Ожидание: bad 0, fall>0, land1, sink~0, move>0, stop<move.
+	if (D == 7) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("C5B347 bad %g fall %g land %g sink %g",
+				g_c5b_bad, g_c5b_fall, g_c5b_land, g_c5b_sink),
+			[12, 12], (g_c5b_bad == 0) ? '0 1 0' : '1 0 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("move %g stop %g  (need move>1 or v>10, stop<v)",
+				g_c5b_move, g_c5b_stop),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }

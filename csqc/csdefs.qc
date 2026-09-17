@@ -272,6 +272,10 @@ const float FL_PARTIALGROUND = 1024;
 const float FL_WATERJUMP = 2048;
 const float FL_JUMPRELEASED = 4096;
 const float FL_FINDABLE_NONSOLID = 16384;	/* Allows this entity to be found with findradius */
+/* pmove_flags (.pmove_flags): FTE fteqw/engine/common/pmove.h:36-37.
+   PMF_LADDER в ezq недостижим (в pmove нет onladder) — константа для совместимости. */
+const float PMF_JUMP_HELD = 1;
+const float PMF_LADDER = 2;
 const float MOVE_NORMAL = 0;
 const float MOVE_NOMONSTERS = 1;	/* The trace will ignore all non-solid_bsp entities. */
 const float MOVE_MISSILE = 2;	/* The trace will use a bbox size of +/- 15 against entities with FL_MONSTER set. */
