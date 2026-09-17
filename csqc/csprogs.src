@@ -1,6 +1,6 @@
 #pragma target id
 #pragma optimise 3
-// Классика QW v6 (docs/ezquake_csqc_v6_migration_plan.md). Прагмы opcode-disable
+// Классика QW v6 (docs/plans/ezquake_csqc_v6_migration_plan.md). Прагмы opcode-disable
 // (CALLxH и др.) и flag iffloat сняты — id-таргет их не требует.
 #pragma flag enable subscope
 #pragma flag enable lo

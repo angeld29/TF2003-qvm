@@ -6,7 +6,7 @@
 //   - sendevent клиент→сервер (clcfte_qcrequest) — команды csqc_sendevent
 //     и csqc_sendevent6 (6 аргументов — терминатор);
 //   - cgamepacket сервер→клиент — эхо "echo" разбирается в CSQC_Parse_Event.
-// Детали: docs/tf2003_csqc_client_plan.md + docs/adr/0004-csqc-pr2.md.
+// Детали: docs/plans/tf2003_csqc_client_plan.md + docs/adr/0004-csqc-pr2.md.
 //
 // Примечание (PR1VM, Step 0): слоты флагов — явные глобалы, НЕ массивы fm_*[8]:
 // динамическая индексация массивов компилируется в GLOBALADDRESS/LOADA_F/
@@ -38,7 +38,7 @@ float g_ie_keys;	// IE_KEYDOWN/IE_KEYUP (0/1)
 // C6.1: сводная верификация builtins — эффект-пикер (видимые: звук/dlight/частицы/
 // te_*/beams) + smoke-статусы (невидимые: #459/#345/#346/#347/buf_*). Только под
 // cvar csqc_d2d 1 (см. CSQC_Fx_Do/CSQC_Fx_Smoke/Hud_DrawCSQC). Реестр «не проверено»
-// в docs/ezquake_csqc_client_roadmap.md §C6 закрывается этим шагом.
+// в docs/plans/ezquake_csqc_client_roadmap.md §C6 закрывается этим шагом.
 const float CSQC_FXMAX = 33;
 float g_fx_sel;		// текущий индекс эффекта (0..31)
 float g_fx_fire;	// срабатываний LMB с момента включения d2d
@@ -632,7 +632,7 @@ void() CSQC_Input_Frame = {
 };
 
 // C6.1: имя эффекта каталога по индексу (для HUD-строки fx#). Полный набор
-// эффектов ezquake CSQC (реестр docs/ezquake_csqc_client_roadmap.md §C6): звук/
+// эффектов ezquake CSQC (реестр docs/plans/ezquake_csqc_client_roadmap.md §C6): звук/
 // dlight/частицы/te_* #405-#430 (кроме не-зарегистрированных #426/#433 и
 // #431 te_beam — требует progs/beam.mdl, которого в стенде нет).
 string CSQC_FxName(float idx) {
