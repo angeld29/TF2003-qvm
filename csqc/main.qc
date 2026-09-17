@@ -80,6 +80,12 @@ float g_e_upd;			// число авторитетных обновлений
 float g_e_err;			// |предыдущий прогноз - пере-прогноз| при обновлении
 float g_e_tele;			// телепорт-снапы (>64)
 float g_e_dents;		// вызовов на не-локальные (delta) сущности
+// C5-E Ф1 (no-op revision): view_angles / project-unproject / listener.
+vector g_f1_va;			// view_angles (движок публикует каждый кадр)
+vector g_f1_proj;		// project(vieworg)
+vector g_f1_pred;		// предсказанный view-origin (VF_ORIGIN override)
+float g_f1_rt;			// |unproject(project(w)) - w| (round-trip)
+float g_f1_lis;			// SetListener вызван (кадр активен)
 float(float isnew) CSQC_PlayerPred;
 void Pred_Run(entity ent, float endframe);
 void Pred_UpdateLocal();
@@ -104,7 +110,8 @@ float DbgLevel() {
 	return cvar("csqc_dbg");
 }
 float DbgAt(float lvl) {
-	return cvar("csqc_dbg") >= lvl;
+	// Экраны строго раздельные: уровень = точное совпадение (не >=).
+	return cvar("csqc_dbg") == lvl;
 }
 
 // 2D-маркеры флагов (payload сервера: entnum, skin=team, frame=carried,
@@ -409,6 +416,11 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_e_tele = 0;
 	g_e_dents = 0;
 	g_e_predorg = '0 0 0';
+	g_f1_rt = 0;
+	g_f1_lis = 0;
+	g_f1_va = '0 0 0';
+	g_f1_proj = '0 0 0';
+	g_f1_pred = '0 0 0';
 	deltalisten("progs/player.mdl", CSQC_PlayerPred, RSES_NOLERP | RSES_NOROTATE);
 };
 
@@ -454,6 +466,35 @@ void(float width, float height, float menushown) CSQC_UpdateView = {
 	// C5-E: каждый кадр — догнать предсказание до clientcommandframe.
 	Pred_UpdateLocal();
 
+	// C5-E Ф1 (экран 9): view_angles / project-unproject / listener.
+	// Точка для project — ПЕРЕД камерой (проекция самой камеры вырождена: clip-w≈0,
+	// FTE без guard даёт NaN). Сырые значения — диагностика (без маскировки).
+	if (cvar("csqc_dbg") == 9) {
+		local vector w, s, u, sd;
+		g_f1_va = view_angles;
+		makevectors(view_angles);
+		w = getproperty(VF_ORIGIN) + v_forward * 64;
+		s = project(w);
+		g_f1_proj = s;
+		// FTE-конвенция: project даёт NDC-z (−1..1), unproject ждёт normalized (0..1).
+		sd_x = s_x; sd_y = s_y; sd_z = (s_z + 1) / 2;
+		u = unproject(sd);
+		g_f1_rt = vlen(u - w);
+		SetListener(getproperty(VF_ORIGIN), v_forward, v_right, v_up);
+		g_f1_lis = 1;
+		// #303 prediction-view (FTE-паттерн prediction.qc): камера от предсказанной
+		// позиции локального игрока + viewheight. Значение двигается от input.
+		g_f1_pred = '0 0 0';
+		if (g_pp_valid == 1 && g_pp_ent != world) {
+			local vector po;
+			po = g_pp_ent.origin;
+			po_z = po_z + getstatf(STAT_VIEWHEIGHT);
+			setproperty(VF_ORIGIN, po);
+			setproperty(VF_ANGLES, view_angles);
+			g_f1_pred = po;
+		}
+	}
+
 	Hud_Draw();
 };
 
@@ -482,7 +523,7 @@ void() CSQC_Shutdown = {
 // impulse) — модуль может читать кнопки/импульсы и (позже, для меню) менять
 // их. Сейчас — только канарейка под csqc_dbg (экран 3); usercmd не изменяем.
 void() CSQC_Input_Frame = {
-	if (DbgAt(1) == 0)
+	if (DbgAt(3) == 0)		// канарейка отображается на экране 3
 		return;
 	g_if_btns = input_buttons;
 	g_if_imp = input_impulse;
@@ -1257,6 +1298,10 @@ float(float isnew) CSQC_PlayerPred = {
 	local vector o;
 	if (self.entnum != player_localentnum) {
 		g_e_dents = g_e_dents + 1;	// не-локальные (delta) сущности
+		// listen-only: рендер игроков оставляем движку. drawmask=0 скрывает CSQC-копию
+		// (FTE addentities: drawmask & mask -> skip), return 0 — движок рисует игрока
+		// один раз (нет дублей/«призраков»). На ezq drawmask/возврат не используются.
+		self.drawmask = 0;
 		return 0;
 	}
 	if (g_pp_valid != 1 || isnew == 1) {
@@ -1277,6 +1322,7 @@ float(float isnew) CSQC_PlayerPred = {
 	}
 	g_e_predorg = self.origin;
 	g_e_upd = g_e_upd + 1;
+	self.drawmask = 0;	// listen-only: рендер игрока — движковый (см. выше)
 	return 0;
 };
 
@@ -1421,7 +1467,8 @@ void Hud_DrawCSQC() {
 	// (T1..T12/2D); 5 — Entity-рефлексия (#496-500); 6 — CSQC stat wire
 	// 78/79 + бит-целостность #331/#332 (int/float/string/vector/entity);
 	// 7 — C5-B канарейка-механика #347 runstandardplayerphysics;
-	// 8 — C5-E предикция локального игрока (deltalisten #371 + #345/#347).
+	// 8 — C5-E предикция локального игрока (deltalisten #371 + #345/#347);
+	// 9 — C5-E Ф1 (view_angles / project-unproject / listener).
 	// Каждый экран рисуется от верхнего якоря y=470 (там, где картинки), строк на
 	// экран <= 10. ECHO/FLAGS выше — не debug.
 	D = cvar("csqc_dbg");
@@ -1905,5 +1952,27 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("E dents %g vext %g %g", g_e_dents, g_pp_ent.velocity_x, g_pp_ent.velocity_z),
 			[12, 12], '1 1 1', 1, 0);
+	}
+
+	// --- экран 9: C5-E Ф1 (view_angles / project-unproject / listener) ---
+	// Ожидание: va ≈ углы вида (ненулевые), rt ≈ 0 (round-trip), proj — экранные
+	// координаты, lis 1 (SetListener активен).
+	if (D == 9) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("F1 va %g %g %g", g_f1_va_x, g_f1_va_y, g_f1_va_z),
+			[12, 12], (g_f1_va_x != 0 || g_f1_va_y != 0) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("F1 proj %g %g %g", g_f1_proj_x, g_f1_proj_y, g_f1_proj_z),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("F1 pred %g %g %g", g_f1_pred_x, g_f1_pred_y, g_f1_pred_z),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("F1 rt %g lis %g", g_f1_rt, g_f1_lis),
+			[12, 12], (g_f1_rt < 1 && g_f1_lis == 1) ? '0 1 0' : '1 1 0', 1, 0);
 	}
 }
