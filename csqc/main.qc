@@ -63,6 +63,9 @@ float g_c5b_land;	// FL_ONGROUND после посадки — 0/1
 float g_c5b_sink;	// дрейф z на земле (|z_idle - z_land|; ~0 = не проваливается)
 float g_c5b_move;	// горизонтальное смещение на входе (>0 = input_* читаются)
 float g_c5b_stop;	// горизонтальная скорость после обнуления входа (затухание)
+// round-trip entity-соглашения #459/#512: num_for_edict(edict_num(slot)) == slot
+// (int-биты vs float — ловит регресс entity-аргументов, см. ADR 0019).
+float g_c5b_rt;
 float g_dbg_prev;	// предыдущий csqc_dbg (консоль-смоук T1/T2 при включении экрана 4)
 float g_t5_iss;		// T5: isserver() (считается на включение экрана 4)
 float g_t5_slot;	// T5: num_for_edict(spawn-сущности) — слот
@@ -1198,11 +1201,16 @@ float CSQC_C5B_Run() {
 	e = spawn();
 	if (e == world)
 		return 1;
-	// #347 принимает entity. ВНИМАНИЕ (live-находка C5-B): передача *локальной*
-	// entity-переменной в #347 приходит в движок как 0 (для #512/#309/#2 та же
-	// локальная e работает; байткод идентичен). Обход — кэш слота и вызов через
-	// edict_num(slot). Задокументировано как отклонение (parity-audit C1.4/ADR 0019).
+	// #347 принимает entity. Квирк C5-B (передача *локальной* entity приходила как 0)
+	// разобран: причина — float-чтение entity в клиентских builtins движка, а не VM.
+	// Теперь entity — единые int-биты (ezq #347/#428-431/#459), вызов идёт напрямую с `e`.
+	// eslot нужен только для round-trip канарейки #459/#512 ниже.
 	eslot = num_for_edict(e);
+	// round-trip: edict_num(eslot) обязан вернуть ту же entity (int-биты), тогда
+	// num_for_edict снова даст eslot. На старом float-соглашении не сходится.
+	g_c5b_rt = (num_for_edict(edict_num(eslot)) == eslot) ? 1 : 0;
+	if (g_c5b_rt != 1)
+		bad = bad + 1;
 
 	// Якорь — view origin игрока (без подъёма): у стоящего игрока энт сразу
 	// садится на его пол (проверка solid/world), не зависит от ямы под +64.
@@ -1225,7 +1233,7 @@ float CSQC_C5B_Run() {
 	z0 = e.origin_z;
 	zmin = z0;
 	for (i = 0; i < 8; i = i + 1) {
-		runstandardplayerphysics(edict_num(eslot));
+		runstandardplayerphysics(e);
 		if (e.origin_z < zmin)
 			zmin = e.origin_z;
 	}
@@ -1237,7 +1245,7 @@ float CSQC_C5B_Run() {
 	// Фаза 2: простой на земле (5 шагов) — не проваливаемся (мир в solid-наборе).
 	zland = e.origin_z;
 	for (i = 0; i < 5; i = i + 1)
-		runstandardplayerphysics(edict_num(eslot));
+		runstandardplayerphysics(e);
 	zidle = e.origin_z;
 	g_c5b_sink = fabs(zidle - zland);
 	if (g_c5b_sink > 4)
@@ -1246,7 +1254,7 @@ float CSQC_C5B_Run() {
 	// Фаза 3: движение вперёд (10 шагов) — input_* читаются (скорость/смещение).
 	o0 = e.origin;
 	for (i = 0; i < 10; i = i + 1)
-		runstandardplayerphysics(edict_num(eslot));
+		runstandardplayerphysics(e);
 	o = e.origin;
 	g_c5b_move = sqrt((o_x - o0_x) * (o_x - o0_x) + (o_y - o0_y) * (o_y - o0_y));
 	sp_move = sqrt(e.velocity_x * e.velocity_x + e.velocity_y * e.velocity_y);
@@ -1256,7 +1264,7 @@ float CSQC_C5B_Run() {
 	// Фаза 4: остановка (вход 0, 20 шагов) — скорость затухает.
 	input_movevalues = '0 0 0';
 	for (i = 0; i < 20; i = i + 1)
-		runstandardplayerphysics(edict_num(eslot));
+		runstandardplayerphysics(e);
 	sp_stop = sqrt(e.velocity_x * e.velocity_x + e.velocity_y * e.velocity_y);
 	g_c5b_stop = sp_stop;
 	if (sp_stop >= sp_move)
@@ -1264,8 +1272,8 @@ float CSQC_C5B_Run() {
 
 	remove(e);
 	g_c5b_bad = bad;
-	dprint(sprintf("C5B347 bad %g fall %g land %g sink %g move %g stop %g\n",
-		bad, g_c5b_fall, g_c5b_land, g_c5b_sink, g_c5b_move, g_c5b_stop));
+	dprint(sprintf("C5B347 bad %g rt %g fall %g land %g sink %g move %g stop %g\n",
+		bad, g_c5b_rt, g_c5b_fall, g_c5b_land, g_c5b_sink, g_c5b_move, g_c5b_stop));
 	return bad;
 }
 
@@ -1765,17 +1773,17 @@ void Hud_DrawCSQC() {
 	}
 
 	// --- экран 7: C5-B канарейка-механика #347 ---
-	// Ожидание: bad 0, fall>0, land1, sink~0, move>0, stop<move.
+	// Ожидание: bad 0, rt 1, fall>0, land1, sink~0, move>0, stop<move.
 	if (D == 7) {
 		yy = 470;
 		drawstring([60, yy, 0],
-			sprintf("C5B347 bad %g fall %g land %g sink %g",
-				g_c5b_bad, g_c5b_fall, g_c5b_land, g_c5b_sink),
+			sprintf("C5B347 bad %g rt %g fall %g land %g",
+				g_c5b_bad, g_c5b_rt, g_c5b_fall, g_c5b_land),
 			[12, 12], (g_c5b_bad == 0) ? '0 1 0' : '1 0 0', 1, 0);
 		yy = yy + 18;
 		drawstring([60, yy, 0],
-			sprintf("move %g stop %g  (need move>1 or v>10, stop<v)",
-				g_c5b_move, g_c5b_stop),
+			sprintf("sink %g move %g stop %g",
+				g_c5b_sink, g_c5b_move, g_c5b_stop),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }
