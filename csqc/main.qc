@@ -6,7 +6,7 @@
 //   - sendevent клиент→сервер (clcfte_qcrequest) — команды csqc_sendevent
 //     и csqc_sendevent6 (6 аргументов — терминатор);
 //   - cgamepacket сервер→клиент — эхо "echo" разбирается в CSQC_Parse_Event.
-// Детали: docs/tf2003_csqc_client_plan.md + docs/ezquake_csqc_pr2.md.
+// Детали: docs/tf2003_csqc_client_plan.md + docs/adr/0004-csqc-pr2.md.
 //
 // Примечание (PR1VM, Step 0): слоты флагов — явные глобалы, НЕ массивы fm_*[8]:
 // динамическая индексация массивов компилируется в GLOBALADDRESS/LOADA_F/
@@ -135,7 +135,7 @@ float DbgAt(float lvl) {
 }
 
 // 2D-маркеры флагов (payload сервера: entnum, skin=team, frame=carried,
-// flagf-маркер hi-бита, [таймер]). Детали: docs/ezquake_csqc_pr2.md.
+// flagf-маркер hi-бита, [таймер]). Детали: docs/adr/0004-csqc-pr2.md.
 const float CSQC_MAXFLAGS = 8;
 // flagf-бит: в payload есть таймер — доставлен hi-бит 40 сервера (зеркало
 // GCSQC_FLAGF_T40 в include/g_csqc.h).

@@ -78,7 +78,7 @@
 #define GCSQC_EV_INTEGER   8
 
 //--- Коды аргументов sendevent (экспорт GAME_QCREQUEST; движок и мод обязаны
-//    совпадать — docs/ezquake_csqc_pr2.md §5.2). Экспорт передаёт только
+//    совпадать — docs/adr/0004-csqc-pr2.md §5.2). Экспорт передаёт только
 //    argcount (0..GCSQC_QCREQ_MAXARGS); имя события движок кладёт в cmd-argv
 //    одним сырым аргументом (без токенизации) — читается trap_CmdArgv(0);
 //    значения аргументов движок отдаёт трапом qcrequestarg(idx, buf, size):

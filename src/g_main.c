@@ -273,7 +273,7 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
             }
 
         case GAME_QCREQUEST:
-            // sendevent (клиент→сервер), контракт docs/ezquake_csqc_pr2.md §5.2.
+            // sendevent (клиент→сервер), контракт docs/adr/0004-csqc-pr2.md §5.2.
             // self=client; arg0=argcount. Имя события — trap_CmdArgv(0) (сырой
             // argv, без токенизации), значения аргументов — qcrequestarg-трап.
             self = PROG_TO_EDICT( g_globalvars.self );

@@ -25,7 +25,7 @@
 #include "g_local.h"
 
 // Механизм G_Map_Extension: регистрация расширений по имени, отслеживание
-// доступности и guarded-обёртки. Детали в include/g_ext.h и docs/g_ext_plan.md.
+// доступности и guarded-обёртки. Детали в include/g_ext.h и docs/adr/0005-g-map-extension.md.
 
 typedef struct
 {

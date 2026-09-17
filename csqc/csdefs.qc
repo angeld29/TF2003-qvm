@@ -704,7 +704,7 @@ float(string modelname, optional float queryonly) getmodelindex = #200; /*
 		Acts as an alternative to precache_model(foo);setmodel(bar, foo); return bar.modelindex;
 		If queryonly is set and the model was not previously precached, the builtin will return 0 without needlessly precaching the model. */
 
-// v6 no-op (ADR 0020): multiprogs variant-обмен — типов нет в v6 (см. docs/adr/0020).
+// v6 no-op (ADR 0020): multiprogs variant-обмен — типов нет в v6 (см. docs/adr/0020-csqc-v6-classic-capability.md).
 //__variant(float prnum, string funcname, ...) externcall = #201; /* Part of FTE_MULTIPROGS
 //		Directly call a function in a different/same progs by its name.
 //		prnum=0 is the 'default' or 'main' progs.
