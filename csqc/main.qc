@@ -86,6 +86,21 @@ vector g_f1_proj;		// project(vieworg)
 vector g_f1_pred;		// предсказанный view-origin (VF_ORIGIN override)
 float g_f1_rt;			// |unproject(project(w)) - w| (round-trip)
 float g_f1_lis;			// SetListener вызван (кадр активен)
+// C5-E Ф2 (#504 getentity, экран csqc_dbg 10): чтение интерп. состояния
+// engine-сущностей по серверному номеру. Канарейка на локальном игроке
+// (player_localentnum) + инварианты.
+float g_ge_bad;			// агрегат жёстких инвариантов (0 = ok)
+float g_ge_done;		// console dprint канарейки выполнен (однократно)
+float g_ge_act;			// getentity(local, GE_ACTIVE) — 1
+float g_ge_model;		// getentity(local, GE_MODELINDEX) — >0
+float g_ge_max;			// getentity(0, GE_MAXENTS) — >0
+float g_ge_inv;			// getentity(0, GE_ACTIVE) — 0 (невалидный номер)
+float g_ge_pants;		// getentity(local, GE_PANTSCOLOR) — 0..15
+float g_ge_shirt;		// getentity(local, GE_SHIRTCOLOR) — 0..15
+vector g_ge_org;		// getentity(local, GE_ORIGIN) — интерп. origin
+vector g_ge_mn;			// getentity(local, GE_MINS)
+vector g_ge_mx;			// getentity(local, GE_MAXS)
+float g_ge_dorg;		// |GE_ORIGIN - мост g_pp_ent.origin| (информативно)
 float(float isnew) CSQC_PlayerPred;
 void Pred_Run(entity ent, float endframe);
 void Pred_UpdateLocal();
@@ -421,6 +436,18 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_f1_va = '0 0 0';
 	g_f1_proj = '0 0 0';
 	g_f1_pred = '0 0 0';
+	g_ge_bad = 0;
+	g_ge_done = 0;
+	g_ge_act = 0;
+	g_ge_model = 0;
+	g_ge_max = 0;
+	g_ge_inv = -1;
+	g_ge_pants = -1;
+	g_ge_shirt = -1;
+	g_ge_org = '0 0 0';
+	g_ge_mn = '0 0 0';
+	g_ge_mx = '0 0 0';
+	g_ge_dorg = 0;
 	deltalisten("progs/player.mdl", CSQC_PlayerPred, RSES_NOLERP | RSES_NOROTATE);
 };
 
@@ -453,6 +480,19 @@ void() CSQC_WorldLoaded = {
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
+	// C5-E Ф2: сброс канарейки getentity (player_localentnum будет опубликован).
+	g_ge_bad = 0;
+	g_ge_done = 0;
+	g_ge_act = 0;
+	g_ge_model = 0;
+	g_ge_max = 0;
+	g_ge_inv = -1;
+	g_ge_pants = -1;
+	g_ge_shirt = -1;
+	g_ge_org = '0 0 0';
+	g_ge_mn = '0 0 0';
+	g_ge_mx = '0 0 0';
+	g_ge_dorg = 0;
 };
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -1436,6 +1476,7 @@ void Hud_DrawCSQC() {
 	local entity vme;	// VM-остаток: spawn для findfloat-канарейки
 	local float cx, cy;	// 2D-доп: правый верхний угол от размера экрана
 	local float bad;	// экран 6: агрегат стат-канарейки (CSQC_StatWire_Bad)
+	local float le;		// экран 10: player_localentnum для #504 getentity
 
 	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
 	// всегда; строки флагов — по слотам ниже.
@@ -1468,7 +1509,8 @@ void Hud_DrawCSQC() {
 	// 78/79 + бит-целостность #331/#332 (int/float/string/vector/entity);
 	// 7 — C5-B канарейка-механика #347 runstandardplayerphysics;
 	// 8 — C5-E предикция локального игрока (deltalisten #371 + #345/#347);
-	// 9 — C5-E Ф1 (view_angles / project-unproject / listener).
+	// 9 — C5-E Ф1 (view_angles / project-unproject / listener);
+	// 10 — C5-E Ф2 (#504 getentity).
 	// Каждый экран рисуется от верхнего якоря y=470 (там, где картинки), строк на
 	// экран <= 10. ECHO/FLAGS выше — не debug.
 	D = cvar("csqc_dbg");
@@ -1484,6 +1526,9 @@ void Hud_DrawCSQC() {
 		setcursormode(0);
 		g_sm_run = 0;
 	}
+	// Экран 10: одноразовый console-dprint — сброс вне экрана (печать при входе).
+	if (D != 10)
+		g_ge_done = 0;
 
 	// Экран 4 (L2-тривиалы): при включении — значения и в консоль (dprint),
 	// чтобы сверять их по qconsole.log (визуальные строки — ниже в D==4).
@@ -1974,5 +2019,63 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("F1 rt %g lis %g", g_f1_rt, g_f1_lis),
 			[12, 12], (g_f1_rt < 1 && g_f1_lis == 1) ? '0 1 0' : '1 1 0', 1, 0);
+	}
+
+	// --- экран 10: C5-E Ф2 (#504 getentity) ---
+	// Ожидание: bad 0 (act 1, model>0, maxents>0, origin ненулевой, hull z<0/max>0,
+	// невалидные номера -> 0); org — интерп. origin игрока; dorg — расхождение с
+	// мостом C5-E (lerp vs no-lerp, информативно); col — цвета 0..15.
+	if (D == 10) {
+		le = player_localentnum;
+		g_ge_act = getentity(le, GE_ACTIVE);
+		g_ge_model = getentity(le, GE_MODELINDEX);
+		g_ge_max = getentity(0, GE_MAXENTS);
+		g_ge_org = getentity(le, GE_ORIGIN);
+		g_ge_mn = getentity(le, GE_MINS);
+		g_ge_mx = getentity(le, GE_MAXS);
+		g_ge_pants = getentity(le, GE_PANTSCOLOR);
+		g_ge_shirt = getentity(le, GE_SHIRTCOLOR);
+		g_ge_inv = getentity(0, GE_ACTIVE);
+		g_ge_bad = 0;
+		g_ge_bad = g_ge_bad + (g_ge_act != 1);
+		g_ge_bad = g_ge_bad + (g_ge_model <= 0);
+		g_ge_bad = g_ge_bad + (g_ge_max <= 0);
+		g_ge_bad = g_ge_bad + (vlen(g_ge_org) <= 0);
+		g_ge_bad = g_ge_bad + (g_ge_mn_z >= 0);
+		g_ge_bad = g_ge_bad + (g_ge_mx_z <= 0);
+		g_ge_bad = g_ge_bad + (g_ge_inv != 0);
+		g_ge_dorg = 0;
+		if (g_pp_valid == 1 && g_pp_ent != world)
+			g_ge_dorg = vlen(g_ge_org - g_pp_ent.origin);
+		if (g_ge_done == 0) {
+			g_ge_done = 1;
+			dprint(sprintf("GE504 bad %g act %g mdl %g mx %g inv %g\n",
+				g_ge_bad, g_ge_act, g_ge_model, g_ge_max, g_ge_inv));
+		}
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("GE bad %g act %g mdl %g mx %g",
+				g_ge_bad, g_ge_act, g_ge_model, g_ge_max),
+			[12, 12], (g_ge_bad == 0) ? '0 1 0' : '1 0 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("GE org %g %g %g", g_ge_org_x, g_ge_org_y, g_ge_org_z),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("GE min %g %g %g", g_ge_mn_x, g_ge_mn_y, g_ge_mn_z),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("GE max %g %g %g", g_ge_mx_x, g_ge_mx_y, g_ge_mx_z),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("GE col p%g s%g inv %g", g_ge_pants, g_ge_shirt, g_ge_inv),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("GE dorg %g", g_ge_dorg),
+			[12, 12], '1 1 1', 1, 0);
 	}
 }

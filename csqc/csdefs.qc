@@ -232,6 +232,29 @@ const float GE_MINS = 12;	/* Valid for getentity. Guesses the entity's .min vect
 const float GE_MAXS = 13;	/* Valid for getentity. Guesses the entity's .max vector. */
 const float GE_ABSMIN = 14;	/* Valid for getentity. Guesses the entity's .absmin vector. */
 const float GE_ABSMAX = 15;	/* Valid for getentity. Guesses the entity's .absmax vector. */
+/* Полный набор GE_* (FTE pr_common.h:1016-1055) для #504 getentity. ezq-клиент
+   реализует не все: поля без источника в ezq-состоянии возвращают FTE-дефолт
+   (см. docs/ezquake_csqc_client_parity_audit.md, Ф2). */
+const float GE_LIGHT = 16;	/* всегда 0 (ezq: нет сэмпла света) */
+const float GE_MODELINDEX = 200;	/* ezq: реализовано (.modelindex) */
+const float GE_MODELINDEX2 = 201;	/* ezq: нет аналога -> 0 */
+const float GE_EFFECTS = 202;	/* ezq: реализовано (.effects) */
+const float GE_FRAME = 203;	/* ezq: реализовано (.frame) */
+const float GE_ANGLES = 204;	/* ezq: цель (.angles), без angle-lerp (откл.) */
+const float GE_FATNESS = 205;	/* ezq: нет аналога -> 0 */
+const float GE_DRAWFLAGS = 206;	/* ezq: нет аналога -> 0 */
+const float GE_ABSLIGHT = 207;	/* ezq: нет аналога -> 0 */
+const float GE_GLOWMOD = 208;	/* ezq: нет аналога -> '1 1 1' */
+const float GE_GLOWSIZE = 209;	/* ezq: нет аналога -> 0 */
+const float GE_GLOWCOLOUR = 210;	/* ezq: нет аналога -> 0 */
+const float GE_RTSTYLE = 211;	/* ezq: нет аналога -> 0 */
+const float GE_RTPFLAGS = 212;	/* ezq: нет аналога -> 0 */
+const float GE_RTCOLOUR = 213;	/* ezq: нет аналога -> '1 1 1' */
+const float GE_RTRADIUS = 214;	/* ezq: нет аналога -> 0 */
+const float GE_TAGENTITY = 215;	/* ezq: нет аналога -> 0 */
+const float GE_TAGINDEX = 216;	/* ezq: нет аналога -> 0 */
+const float GE_GRAVITYDIR = 217;	/* ezq: нет аналога -> 0 */
+const float GE_TRAILEFFECTNUM = 218;	/* ezq: нет аналога -> 0 */
 const float CONTENT_EMPTY = -1;
 const float CONTENT_SOLID = -2;
 const float CONTENT_WATER = -3;
