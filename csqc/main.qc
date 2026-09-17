@@ -105,6 +105,7 @@ float g_ge_dorg;		// |GE_ORIGIN - мост g_pp_ent.origin| (информати�
 // lightning) рисуется через CSQC render path на экране csqc_dbg 11
 // (#302/#301 arena + renderscene); без dbg — простой renderscene.
 entity g_r_e;
+float g_r_midx;			// Ф3: #200 getmodelindex("progs/tf_flag.mdl")
 float(float isnew) CSQC_PlayerPred;
 void Pred_Run(entity ent, float endframe);
 void Pred_UpdateLocal();
@@ -433,6 +434,7 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	pp_seq = 0;
 	pp_frame = 0;
 	g_r_e = world;
+	g_r_midx = -1;
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -485,6 +487,7 @@ void() CSQC_WorldLoaded = {
 	g_pp_valid = 0;
 	g_pp_ent = world;
 	g_r_e = world;	// Ф3: арена очищена — тест-энтити пересоздаётся
+	g_r_midx = -1;
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -527,6 +530,7 @@ void CSQC_RenderTest() {
 		g_r_e.drawmask = 4;
 		addentities(4);
 	}
+	g_r_midx = getmodelindex("progs/tf_flag.mdl");	// Ф3: #200 (реестр моделей)
 }
 
 // Список уровней csqc_dbg с описаниями (команда csqc_dbg_list).
@@ -543,7 +547,7 @@ void CSQC_DbgList() {
 	print("  8 - C5-E local player prediction (deltalisten #371)\n");
 	print("  9 - C5-E F1 view_angles/project-unproject/listener\n");
 	print(" 10 - C5-E F2 #504 getentity canary\n");
-	print(" 11 - F3 renderscene: draw progs/tf_flag.mdl (Y+90, z-24) in front\n");
+	print(" 11 - F3 renderscene: progs/tf_flag.mdl (Y+90, z-24) + #200 midx\n");
 }
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -1567,7 +1571,7 @@ void Hud_DrawCSQC() {
 	// 7 — C5-B канарейка-механика #347 runstandardplayerphysics;
 	// 8 — C5-E предикция локального игрока (deltalisten #371 + #345/#347);
 	// 9 — C5-E Ф1 (view_angles / project-unproject / listener);
-	// 10 — C5-E Ф2 (#504 getentity).
+	// 10 — C5-E Ф2 (#504 getentity); 11 — Ф3 renderscene (mod-отрисовка флага).
 	// Каждый экран рисуется от верхнего якоря y=470 (там, где картинки), строк на
 	// экран <= 10. ECHO/FLAGS выше — не debug.
 	D = cvar("csqc_dbg");
@@ -2134,5 +2138,15 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("GE dorg %g", g_ge_dorg),
 			[12, 12], '1 1 1', 1, 0);
+	}
+
+	// --- экран 11: Ф3 renderscene / mod-отрисовка ---
+	// Ожидание: впереди флаг (progs/tf_flag.mdl, Y+90, z-24), виден на FTE и ezq;
+	// midx — #200 getmodelindex (ezq: индекс CSQC-реестра >0; FTE: precache-индекс).
+	if (D == 11) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("F3 flag mdl, midx %g", g_r_midx),
+			[12, 12], (g_r_midx != 0) ? '0 1 0' : '1 1 0', 1, 0);
 	}
 }
