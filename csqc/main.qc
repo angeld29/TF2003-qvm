@@ -66,6 +66,23 @@ float g_c5b_stop;	// горизонтальная скорость после о
 // round-trip entity-соглашения #459/#512: num_for_edict(edict_num(slot)) == slot
 // (int-биты vs float — ловит регресс entity-аргументов, см. ADR 0019).
 float g_c5b_rt;
+// C5-E: предикция локального игрока (вариант «а» — движковый мост
+// player_state→edict, deltalisten #371). Модуль получает авторитетное состояние
+// в CSQC_PlayerPred, предсказывает от servercommandframe к clientcommandframe.
+entity g_pp_ent;		// локальная сущность игрока (мост движка)
+float g_pp_valid;		// 1 — сущность получена
+vector pp_org, pp_vel;	// авторитетное состояние на pp_seq
+float pp_pmflags;
+float pp_seq;			// servercommandframe авторитетного состояния
+float pp_frame;			// текущий проигрываемый кадр
+vector g_e_predorg;		// последний прогноз (для оценки ошибки)
+float g_e_upd;			// число авторитетных обновлений
+float g_e_err;			// |предыдущий прогноз - пере-прогноз| при обновлении
+float g_e_tele;			// телепорт-снапы (>64)
+float g_e_dents;		// вызовов на не-локальные (delta) сущности
+float(float isnew) CSQC_PlayerPred;
+void Pred_Run(entity ent, float endframe);
+void Pred_UpdateLocal();
 float g_dbg_prev;	// предыдущий csqc_dbg (консоль-смоук T1/T2 при включении экрана 4)
 float g_t5_iss;		// T5: isserver() (считается на включение экрана 4)
 float g_t5_slot;	// T5: num_for_edict(spawn-сущности) — слот
@@ -379,6 +396,20 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	// Шаг 2: модульный debug-уровень (0..3); движковых debug-cvars нет — экраны
 	// читают csqc_dbg (см. DbgLevel/DbgAt).
 	registercvar("csqc_dbg", "0");
+	// C5-E: слушатель сущностей (FTE-паритет): движок зовёт CSQC_PlayerPred при
+	// обновлении сущностей с зарегистрированной моделью. Регистрируем модель
+	// игрока (FTE-канон csqctest/entrypoints.qc:237) — колбэк сам фильтрует
+	// локального игрока; чужие игроки идут в g_e_dents (deltalisten #371).
+	g_pp_valid = 0;
+	g_pp_ent = world;
+	pp_seq = 0;
+	pp_frame = 0;
+	g_e_upd = 0;
+	g_e_err = 0;
+	g_e_tele = 0;
+	g_e_dents = 0;
+	g_e_predorg = '0 0 0';
+	deltalisten("progs/player.mdl", CSQC_PlayerPred, RSES_NOLERP | RSES_NOROTATE);
 };
 
 void() CSQC_WorldLoaded = {
@@ -404,6 +435,12 @@ void() CSQC_WorldLoaded = {
 	g_sm346 = 0;
 	g_sm347 = 0;
 	g_sm_buf = 0;
+	// C5-E: новая карта — сущность игрока придёт заново (мост движка).
+	g_pp_valid = 0;
+	g_pp_ent = world;
+	g_e_upd = 0;
+	g_e_err = 0;
+	g_e_tele = 0;
 };
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -413,6 +450,9 @@ void(float width, float height, float menushown) CSQC_UpdateView = {
 	setproperty(VF_DRAWENGINESBAR, 1);
 	addentities(MASK_ENGINE | MASK_VIEWMODEL);
 	renderscene();
+
+	// C5-E: каждый кадр — догнать предсказание до clientcommandframe.
+	Pred_UpdateLocal();
 
 	Hud_Draw();
 };
@@ -1181,6 +1221,65 @@ float CSQC_StatWire_Bad() {
 	return b;
 }
 
+// C5-E: предикция локального игрока (вариант «а»). CSQC_PlayerPred — колбэк
+// deltalisten (#371): движок отдаёт авторитетное (no-lerp) состояние сущности
+// игрока (self/.entnum, PARM0=isnew); мост реализован в ezquake (csqc_client).
+// Модуль сохраняет базу на servercommandframe и проигрывает input_*-кадры
+// (getinputstate + runstandardplayerphysics) до clientcommandframe — как
+// FTE csqctest/prediction.qc. Ошибка = |прошлый прогноз - пере-прогноз|;
+// >64 — телепорт-snap.
+void Pred_Run(entity ent, float endframe) {
+	if (servercommandframe >= pp_seq + 63) {
+		// троттлинг (как FTE): не отставать больше кольца истории кадров
+		pp_frame = servercommandframe - 63;
+		return;
+	}
+	ent.origin = pp_org;
+	ent.velocity = pp_vel;
+	ent.pmove_flags = pp_pmflags;
+	pp_frame = pp_seq + 1;
+	while (pp_frame <= endframe) {
+		if (!getinputstate(pp_frame))
+			break;
+		runstandardplayerphysics(ent);
+		pp_frame = pp_frame + 1;
+	}
+}
+
+void Pred_UpdateLocal() {
+	if (g_pp_valid != 1 || g_pp_ent == world)
+		return;
+	Pred_Run(g_pp_ent, clientcommandframe);
+	g_e_predorg = g_pp_ent.origin;
+}
+
+float(float isnew) CSQC_PlayerPred = {
+	local vector o;
+	if (self.entnum != player_localentnum) {
+		g_e_dents = g_e_dents + 1;	// не-локальные (delta) сущности
+		return 0;
+	}
+	if (g_pp_valid != 1 || isnew == 1) {
+		g_pp_ent = self;
+		g_pp_valid = 1;
+		g_e_predorg = self.origin;
+	}
+	o = g_e_predorg;			// прошлый прогноз
+	pp_org = self.origin;		// авторитетное состояние (мост движка)
+	pp_vel = self.velocity;
+	pp_pmflags = self.pmove_flags;
+	pp_seq = servercommandframe;
+	Pred_Run(self, clientcommandframe);
+	g_e_err = vlen(o - self.origin);	// коррекция при ресинке
+	if (g_e_err > 64) {
+		g_e_tele = g_e_tele + 1;
+		g_e_err = 0;			// телепорт — мгновенный snap
+	}
+	g_e_predorg = self.origin;
+	g_e_upd = g_e_upd + 1;
+	return 0;
+};
+
 // C5-B: канарейка-механика #347 (csqc_dbg 7). Арена-энт ставится в view origin
 // игрока (стоящий игрок -> энт сразу на его полу), синтетический вход input_*
 // (forward=300, msec=50, angles = view angles игрока), серия #347:
@@ -1321,7 +1420,8 @@ void Hud_DrawCSQC() {
 	// 2 — текст «до ie»; 3 — остальное (по группам); 4 — сводные L2-смоки
 	// (T1..T12/2D); 5 — Entity-рефлексия (#496-500); 6 — CSQC stat wire
 	// 78/79 + бит-целостность #331/#332 (int/float/string/vector/entity);
-	// 7 — C5-B канарейка-механика #347 runstandardplayerphysics.
+	// 7 — C5-B канарейка-механика #347 runstandardplayerphysics;
+	// 8 — C5-E предикция локального игрока (deltalisten #371 + #345/#347).
 	// Каждый экран рисуется от верхнего якоря y=470 (там, где картинки), строк на
 	// экран <= 10. ECHO/FLAGS выше — не debug.
 	D = cvar("csqc_dbg");
@@ -1784,6 +1884,26 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("sink %g move %g stop %g",
 				g_c5b_sink, g_c5b_move, g_c5b_stop),
+			[12, 12], '1 1 1', 1, 0);
+	}
+
+	// --- экран 8: C5-E предикция локального игрока ---
+	// Ожидание: upd>0 (мост отдаёт состояние), err мала (сходимость), tele —
+	// снапы при телепортах; pred-origin двигается при ходьбе.
+	if (D == 8) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("E pred %g %g %g",
+				g_pp_ent.origin_x, g_pp_ent.origin_y, g_pp_ent.origin_z),
+			[12, 12], (g_e_upd > 0) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("E upd %g seq %g err %g tele %g",
+				g_e_upd, pp_seq, g_e_err, g_e_tele),
+			[12, 12], (g_e_upd > 0 && g_e_err < 32) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("E dents %g vext %g %g", g_e_dents, g_pp_ent.velocity_x, g_pp_ent.velocity_z),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }

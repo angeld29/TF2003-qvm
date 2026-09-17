@@ -276,6 +276,10 @@ const float FL_FINDABLE_NONSOLID = 16384;	/* Allows this entity to be found with
    PMF_LADDER в ezq недостижим (в pmove нет onladder) — константа для совместимости. */
 const float PMF_JUMP_HELD = 1;
 const float PMF_LADDER = 2;
+/* deltalisten (#371) flags: FTE pr_csqc.c:5478. NOLERP/NOROTATE — no-lerp
+   состояние сущности (важно для предсказываемых игроков). */
+const float RSES_NOLERP = 1;
+const float RSES_NOROTATE = 2;
 const float MOVE_NORMAL = 0;
 const float MOVE_NOMONSTERS = 1;	/* The trace will ignore all non-solid_bsp entities. */
 const float MOVE_MISSILE = 2;	/* The trace will use a bbox size of +/- 15 against entities with FL_MONSTER set. */
