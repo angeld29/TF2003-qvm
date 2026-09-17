@@ -101,6 +101,10 @@ vector g_ge_org;		// getentity(local, GE_ORIGIN) — интерп. origin
 vector g_ge_mn;			// getentity(local, GE_MINS)
 vector g_ge_mx;			// getentity(local, GE_MAXS)
 float g_ge_dorg;		// |GE_ORIGIN - мост g_pp_ent.origin| (информативно)
+// Ф3 (renderscene takeover): mod-side отрисовка. Тест-энтити (модель оружия
+// lightning) рисуется через CSQC render path на экране csqc_dbg 11
+// (#302/#301 arena + renderscene); без dbg — простой renderscene.
+entity g_r_e;
 float(float isnew) CSQC_PlayerPred;
 void Pred_Run(entity ent, float endframe);
 void Pred_UpdateLocal();
@@ -415,6 +419,8 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	registercommand("csqc_sendevent6");
 	// P1c фатальный probe (objerror) — отдельной командой, не в общем смоуке.
 	registercommand("csqc_objerror");
+	// Ф3: просмотр списка уровней csqc_dbg с описаниями.
+	registercommand("csqc_dbg_list");
 	// Шаг 2: модульный debug-уровень (0..3); движковых debug-cvars нет — экраны
 	// читают csqc_dbg (см. DbgLevel/DbgAt).
 	registercvar("csqc_dbg", "0");
@@ -426,6 +432,7 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_pp_ent = world;
 	pp_seq = 0;
 	pp_frame = 0;
+	g_r_e = world;
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -477,6 +484,7 @@ void() CSQC_WorldLoaded = {
 	// C5-E: новая карта — сущность игрока придёт заново (мост движка).
 	g_pp_valid = 0;
 	g_pp_ent = world;
+	g_r_e = world;	// Ф3: арена очищена — тест-энтити пересоздаётся
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -495,12 +503,57 @@ void() CSQC_WorldLoaded = {
 	g_ge_dorg = 0;
 };
 
+// Ф3 (renderscene takeover): mod-side отрисовка тест-модели флага.
+// Спавн один раз (арена), позиция — vieworg + v_forward*64 с опусканием по Z
+// на 24, абсолютные углы '0 90 0' (поворот на 90° вокруг Y), drawmask=4;
+// addentities(4) добавляет arena-эдикт в сцену (#301), renderscene() рисует
+// (#304). Работает на FTE (нативные builtins) и ezq (takeover).
+void CSQC_RenderTest() {
+	local vector v;
+	makevectors(getproperty(VF_ANGLES));
+	v = getproperty(VF_ORIGIN) + v_forward * 64;
+	v_z = v_z - 24;
+	if (g_r_e == world) {
+		g_r_e = spawn();
+		if (g_r_e != world) {
+			precache_model("progs/tf_flag.mdl");
+			setmodel(g_r_e, "progs/tf_flag.mdl");
+			setsize(g_r_e, '-16 -16 -16', '16 16 16');
+		}
+	}
+	if (g_r_e != world) {
+		setorigin(g_r_e, v);
+		g_r_e.angles = '0 90 0';
+		g_r_e.drawmask = 4;
+		addentities(4);
+	}
+}
+
+// Список уровней csqc_dbg с описаниями (команда csqc_dbg_list).
+void CSQC_DbgList() {
+	print("csqc_dbg levels:\n");
+	print("  0 - off (no debug)\n");
+	print("  1 - 2D graphics + cursor (LayerD)\n");
+	print("  2 - pre-IE text (keys/mouse/playerkey/property)\n");
+	print("  3 - input/fx picker/smokes/C5-A window\n");
+	print("  4 - L2 trivial smokes (math/string/cvar/2D/fonts)\n");
+	print("  5 - entity field reflection (#496-500) + stubs\n");
+	print("  6 - CSQC stat wire 78/79 + bit integrity\n");
+	print("  7 - C5-B #347 runstandardplayerphysics canary\n");
+	print("  8 - C5-E local player prediction (deltalisten #371)\n");
+	print("  9 - C5-E F1 view_angles/project-unproject/listener\n");
+	print(" 10 - C5-E F2 #504 getentity canary\n");
+	print(" 11 - F3 renderscene: draw progs/tf_flag.mdl (Y+90, z-24) in front\n");
+}
+
 void(float width, float height, float menushown) CSQC_UpdateView = {
 	clearscene();
 	setproperty(VF_DRAWWORLD, 1);
 	setproperty(VF_DRAWCROSSHAIR, 1);
 	setproperty(VF_DRAWENGINESBAR, 1);
 	addentities(MASK_ENGINE | MASK_VIEWMODEL);
+	if (DbgAt(11))
+		CSQC_RenderTest();	// Ф3: arena-эдикт через mod-render path (#301)/#302
 	renderscene();
 
 	// C5-E: каждый кадр — догнать предсказание до clientcommandframe.
@@ -550,6 +603,10 @@ float(string cmd) CSQC_ConsoleCommand = {
 	}
 	if (argv(0) == "csqc_objerror") {
 		ObjErrorProbe();
+		return 1;
+	}
+	if (argv(0) == "csqc_dbg_list") {
+		CSQC_DbgList();
 		return 1;
 	}
 	return 0;
