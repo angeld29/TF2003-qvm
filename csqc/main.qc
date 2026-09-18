@@ -106,6 +106,14 @@ float g_ge_dorg;		// |GE_ORIGIN - мост g_pp_ent.origin| (информати�
 // (#302/#301 arena + renderscene); без dbg — простой renderscene.
 entity g_r_e;
 float g_r_midx;			// Ф3: #200 getmodelindex("progs/tf_flag.mdl")
+// C4 Этап 1 (#301/#302 predraw+renderflags): две arena-тест-сущности — с .predraw,
+// возвращающим PREDRAW_AUTOADD (должна рисоваться) и PREDRAW_NEXT (пропускается);
+// счётчики pred/skip и значение .renderflags (RF_NOSHADOW) для дисплея.
+entity g_c4_e1;
+entity g_c4_e2;
+float g_c4_pred;
+float g_c4_skip;
+float g_c4_rf;
 float(float isnew) CSQC_PlayerPred;
 void Pred_Run(entity ent, float endframe);
 void Pred_UpdateLocal();
@@ -435,6 +443,11 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	pp_frame = 0;
 	g_r_e = world;
 	g_r_midx = -1;
+	g_c4_e1 = world;
+	g_c4_e2 = world;
+	g_c4_pred = 0;
+	g_c4_skip = 0;
+	g_c4_rf = 0;
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -488,6 +501,8 @@ void() CSQC_WorldLoaded = {
 	g_pp_ent = world;
 	g_r_e = world;	// Ф3: арена очищена — тест-энтити пересоздаётся
 	g_r_midx = -1;
+	g_c4_e1 = world;	// C4 Э1: арена очищена — тест-энты пересоздаются
+	g_c4_e2 = world;
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -533,6 +548,58 @@ void CSQC_RenderTest() {
 	g_r_midx = getmodelindex("progs/tf_flag.mdl");	// Ф3: #200 (реестр моделей)
 }
 
+// C4 Этап 1: .predraw-канарейки. Возврат PREDRAW_AUTOADD (0) — движок добавляет
+// сущность сам; PREDRAW_NEXT (1) — пропускает (не рисуется). Движковый #301/#302
+// должен вызвать predraw до добавления и учесть возврат (FTE pr_csqc.c:1450-1457).
+float() CSQC_C4PredAdd = {
+	g_c4_pred = g_c4_pred + 1;
+	return PREDRAW_AUTOADD;
+};
+float() CSQC_C4PredNext = {
+	g_c4_skip = g_c4_skip + 1;
+	return PREDRAW_NEXT;
+};
+
+// C4 Этап 1 (csqc_dbg 12): две arena-сущности флага — e1 (predraw=AUTOADD, видна,
+// .renderflags=RF_NOSHADOW) и e2 (predraw=NEXT, не добавляется). drawmask=8
+// (отдельный бит), addentities(8). Работает на FTE (нативные builtins) и ezq.
+void CSQC_C4Test() {
+	local vector v;
+	makevectors(getproperty(VF_ANGLES));
+	v = getproperty(VF_ORIGIN) + v_forward * 96;
+	if (g_c4_e1 == world || g_c4_e2 == world)
+		precache_model("progs/tf_flag.mdl");
+	if (g_c4_e1 == world) {
+		g_c4_e1 = spawn();
+		if (g_c4_e1 != world) {
+			setmodel(g_c4_e1, "progs/tf_flag.mdl");
+			setsize(g_c4_e1, '-16 -16 -16', '16 16 16');
+		}
+	}
+	if (g_c4_e2 == world) {
+		g_c4_e2 = spawn();
+		if (g_c4_e2 != world) {
+			setmodel(g_c4_e2, "progs/tf_flag.mdl");
+			setsize(g_c4_e2, '-16 -16 -16', '16 16 16');
+		}
+	}
+	if (g_c4_e1 != world) {
+		setorigin(g_c4_e1, v - v_right * 32);
+		g_c4_e1.angles = '0 90 0';
+		g_c4_e1.drawmask = 8;
+		g_c4_e1.predraw = CSQC_C4PredAdd;
+		g_c4_e1.renderflags = RF_NOSHADOW;
+		g_c4_rf = g_c4_e1.renderflags;
+	}
+	if (g_c4_e2 != world) {
+		setorigin(g_c4_e2, v + v_right * 32);
+		g_c4_e2.angles = '0 90 0';
+		g_c4_e2.drawmask = 8;
+		g_c4_e2.predraw = CSQC_C4PredNext;
+	}
+	addentities(8);
+}
+
 // Список уровней csqc_dbg с описаниями (команда csqc_dbg_list).
 void CSQC_DbgList() {
 	print("csqc_dbg levels:\n");
@@ -548,6 +615,7 @@ void CSQC_DbgList() {
 	print("  9 - C5-E F1 view_angles/project-unproject/listener\n");
 	print(" 10 - C5-E F2 #504 getentity canary\n");
 	print(" 11 - F3 renderscene: progs/tf_flag.mdl (Y+90, z-24) + #200 midx\n");
+	print(" 12 - C4 Э1: #301/#302 predraw (AUTOADD/NEXT) + renderflags\n");
 }
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -558,6 +626,8 @@ void(float width, float height, float menushown) CSQC_UpdateView = {
 	addentities(MASK_ENGINE | MASK_VIEWMODEL);
 	if (DbgAt(11))
 		CSQC_RenderTest();	// Ф3: arena-эдикт через mod-render path (#301)/#302
+	if (DbgAt(12))
+		CSQC_C4Test();		// C4 Э1: predraw (AUTOADD/NEXT) + renderflags
 	renderscene();
 
 	// C5-E: каждый кадр — догнать предсказание до clientcommandframe.
@@ -1571,7 +1641,8 @@ void Hud_DrawCSQC() {
 	// 7 — C5-B канарейка-механика #347 runstandardplayerphysics;
 	// 8 — C5-E предикция локального игрока (deltalisten #371 + #345/#347);
 	// 9 — C5-E Ф1 (view_angles / project-unproject / listener);
-	// 10 — C5-E Ф2 (#504 getentity); 11 — Ф3 renderscene (mod-отрисовка флага).
+	// 10 — C5-E Ф2 (#504 getentity); 11 — Ф3 renderscene (mod-отрисовка флага);
+	// 12 — C4 Этап 1 (#301/#302 predraw + renderflags).
 	// Каждый экран рисуется от верхнего якоря y=470 (там, где картинки), строк на
 	// экран <= 10. ECHO/FLAGS выше — не debug.
 	D = cvar("csqc_dbg");
@@ -2148,5 +2219,15 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("F3 flag mdl, midx %g", g_r_midx),
 			[12, 12], (g_r_midx != 0) ? '0 1 0' : '1 1 0', 1, 0);
+	}
+
+	// --- экран 12: C4 Этап 1 (#301/#302 predraw + renderflags) ---
+	// Ожидание: pred > 0 (predraw вызван движком), skip > 0 (возврат PREDRAW_NEXT
+	// учтён), rf = 32 (RF_NOSHADOW); e1 виден, e2 — нет. Зелёный при pred>0 && skip>0.
+	if (D == 12) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("C4 Э1 pred %g skip %g rf %g", g_c4_pred, g_c4_skip, g_c4_rf),
+			[12, 12], (g_c4_pred > 0 && g_c4_skip > 0) ? '0 1 0' : '1 1 0', 1, 0);
 	}
 }
