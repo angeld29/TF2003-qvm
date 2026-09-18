@@ -433,6 +433,8 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	// Шаг 2: модульный debug-уровень (0..3); движковых debug-cvars нет — экраны
 	// читают csqc_dbg (см. DbgLevel/DbgAt).
 	registercvar("csqc_dbg", "0");
+	// C4 Э2: тумблер MASK_VIEWMODEL для канарейки csqc_dbg 13 (default 1 — как было).
+	registercvar("csqc_vm", "1");
 	// C5-E: слушатель сущностей (FTE-паритет): движок зовёт CSQC_PlayerPred при
 	// обновлении сущностей с зарегистрированной моделью. Регистрируем модель
 	// игрока (FTE-канон csqctest/entrypoints.qc:237) — колбэк сам фильтрует
@@ -616,14 +618,20 @@ void CSQC_DbgList() {
 	print(" 10 - C5-E F2 #504 getentity canary\n");
 	print(" 11 - F3 renderscene: progs/tf_flag.mdl (Y+90, z-24) + #200 midx\n");
 	print(" 12 - C4 Э1: #301/#302 predraw (AUTOADD/NEXT) + renderflags\n");
+	print(" 13 - C4 Э2: #301 MASK_VIEWMODEL (тумблер csqc_vm)\n");
 }
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
+	local float am;
 	clearscene();
 	setproperty(VF_DRAWWORLD, 1);
 	setproperty(VF_DRAWCROSSHAIR, 1);
 	setproperty(VF_DRAWENGINESBAR, 1);
-	addentities(MASK_ENGINE | MASK_VIEWMODEL);
+	// C4 Э2: MASK_VIEWMODEL запрашиваем при csqc_vm!=0 (канарейка csqc_dbg 13).
+	am = MASK_ENGINE;
+	if (cvar("csqc_vm") != 0)
+		am = am | MASK_VIEWMODEL;
+	addentities(am);
 	if (DbgAt(11))
 		CSQC_RenderTest();	// Ф3: arena-эдикт через mod-render path (#301)/#302
 	if (DbgAt(12))
@@ -1642,7 +1650,7 @@ void Hud_DrawCSQC() {
 	// 8 — C5-E предикция локального игрока (deltalisten #371 + #345/#347);
 	// 9 — C5-E Ф1 (view_angles / project-unproject / listener);
 	// 10 — C5-E Ф2 (#504 getentity); 11 — Ф3 renderscene (mod-отрисовка флага);
-	// 12 — C4 Этап 1 (#301/#302 predraw + renderflags).
+	// 12 — C4 Этап 1 (#301/#302 predraw + renderflags); 13 — C4 Этап 2 (#301 MASK_VIEWMODEL).
 	// Каждый экран рисуется от верхнего якоря y=470 (там, где картинки), строк на
 	// экран <= 10. ECHO/FLAGS выше — не debug.
 	D = cvar("csqc_dbg");
@@ -2229,5 +2237,14 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("C4 Э1 pred %g skip %g rf %g", g_c4_pred, g_c4_skip, g_c4_rf),
 			[12, 12], (g_c4_pred > 0 && g_c4_skip > 0) ? '0 1 0' : '1 1 0', 1, 0);
+	}
+
+	// --- экран 13: C4 Э2 (#301 MASK_VIEWMODEL) ---
+	// Ожидание: csqc_vm 1 — вьюмодель (пушка) видна; csqc_vm 0 — скрыта (паритет FTE).
+	if (D == 13) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("C4 Э2 vm %g (csqc_vm 0/1)", cvar("csqc_vm")),
+			[12, 12], (cvar("csqc_vm") != 0) ? '0 1 0' : '1 1 0', 1, 0);
 	}
 }
