@@ -18,7 +18,7 @@ Available options:
 #pragma warning enable F301 /*non-utf-8 strings*/
 #pragma warning enable F302 /*uninitialised locals*/
 #pragma target id
-// Классика QW v6 (docs/plans/ezquake_csqc_v6_migration_plan.md): disable-прагмы CALLxH/
+// Классика QW v6 (docs/archive/ezquake_csqc_v6_migration_plan.md): disable-прагмы CALLxH/
 // STOREF_F/RAND0 и флаг iffloat не нужны — id-таргет не эмитит ext-опкоды.
 #ifndef CSQC
 #define CSQC

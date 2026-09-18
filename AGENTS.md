@@ -73,7 +73,7 @@ Load the file(s) listed for your task type before editing code:
   (ezquake-клиент; читать перед использованием в csprogs). Граница классической (v6) сборки модуля
   и классификация CSQC-builtins (что нереализуемо в v6) — `docs/adr/0020-csqc-v6-classic-capability.md`.
   План перевода `csprogs.dat` на классику v6 (`#pragma target id`) и снятия v7-функционала
-  загрузчика — `docs/ezquake_csqc_v6_migration_plan.md` (читать перед правками сборки модуля).
+  загрузчика — `docs/archive/ezquake_csqc_v6_migration_plan.md` (читать перед правками сборки модуля).
 - **Server run / verification**: `docs/adr/0011-mvdsv-build-run.md` (mvdsv launch, `sv_progtype`,
   CSQC PR1/PR2 gate), `docs/adr/0014-qwtf-testbench.md` (`qwtf/` bench, scenarios).
 
