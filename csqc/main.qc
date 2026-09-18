@@ -114,7 +114,14 @@ entity g_c4_e2;
 float g_c4_pred;
 float g_c4_skip;
 float g_c4_rf;
+// C4 Этап 3 (MASK_DELTA): delta-callback'и возвращают 1 (+ drawmask=MASK_DELTA) —
+// движок не рисует сущность, рисует CSQC. Счётчики owned (player/backpack) и
+// флаг регистрации backpack-слушателя (deltalisten).
+float g_c4_owned_pl;
+float g_c4_owned_bp;
+float g_c4_bp_reg;
 float(float isnew) CSQC_PlayerPred;
+float(float isnew) CSQC_BackpackPred;	// C4 Э3: backpack delta-callback
 void Pred_Run(entity ent, float endframe);
 void Pred_UpdateLocal();
 float g_dbg_prev;	// предыдущий csqc_dbg (консоль-смоук T1/T2 при включении экрана 4)
@@ -435,6 +442,11 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	registercvar("csqc_dbg", "0");
 	// C4 Э2: тумблер MASK_VIEWMODEL для канарейки csqc_dbg 13 (default 1 — как было).
 	registercvar("csqc_vm", "1");
+	// C4 Э3 (MASK_DELTA): persistent-тумблер — модуль сам рисует delta-сущности
+	// (player/backpack) и просит движок их не рисовать (return 1). Default 0
+	// (listen-only, движковый рендер). ВНИМАНИЕ: CSQC render-слой неполон
+	// (видимость/анимация/скины/смерть) — см. docs/plans/ezquake_csqc_client_render_layer.md.
+	registercvar("csqc_delta", "0");
 	// C5-E: слушатель сущностей (FTE-паритет): движок зовёт CSQC_PlayerPred при
 	// обновлении сущностей с зарегистрированной моделью. Регистрируем модель
 	// игрока (FTE-канон csqctest/entrypoints.qc:237) — колбэк сам фильтрует
@@ -450,6 +462,9 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_c4_pred = 0;
 	g_c4_skip = 0;
 	g_c4_rf = 0;
+	g_c4_owned_pl = 0;
+	g_c4_owned_bp = 0;
+	g_c4_bp_reg = 0;
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -472,6 +487,7 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_ge_mn = '0 0 0';
 	g_ge_mx = '0 0 0';
 	g_ge_dorg = 0;
+	precache_model("progs/player.mdl");
 	deltalisten("progs/player.mdl", CSQC_PlayerPred, RSES_NOLERP | RSES_NOROTATE);
 };
 
@@ -505,6 +521,9 @@ void() CSQC_WorldLoaded = {
 	g_r_midx = -1;
 	g_c4_e1 = world;	// C4 Э1: арена очищена — тест-энты пересоздаются
 	g_c4_e2 = world;
+	g_c4_owned_pl = 0;	// C4 Э3: счётчики; backpack-слушатель перерегистрируется
+	g_c4_owned_bp = 0;
+	g_c4_bp_reg = 0;
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -619,6 +638,7 @@ void CSQC_DbgList() {
 	print(" 11 - F3 renderscene: progs/tf_flag.mdl (Y+90, z-24) + #200 midx\n");
 	print(" 12 - C4 Э1: #301/#302 predraw (AUTOADD/NEXT) + renderflags\n");
 	print(" 13 - C4 Э2: #301 MASK_VIEWMODEL (тумблер csqc_vm)\n");
+	print(" 14 - C4 Э3: MASK_DELTA status (тумблер csqc_delta)\n");
 }
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -1473,13 +1493,33 @@ void Pred_UpdateLocal() {
 	g_e_predorg = g_pp_ent.origin;
 }
 
+float(float isnew) CSQC_BackpackPred = {
+	// C4 Этап 3: дельта-сущность backpack (packet entity). При csqc_delta!=0 модуль
+	// рисует её сам (setmodel + drawmask=MASK_DELTA) и возвращает 1 → движок не
+	// рисует дубль (FTE-семантика: возврат delta-callback !=0). Иначе — listen-only.
+	if (cvar("csqc_delta") == 0) {
+		self.drawmask = 0;
+		return 0;
+	}
+	setmodel(self, "progs/backpack.mdl");
+	self.drawmask = MASK_DELTA;
+	g_c4_owned_bp = g_c4_owned_bp + 1;
+	return 1;
+};
+
 float(float isnew) CSQC_PlayerPred = {
 	local vector o;
 	if (self.entnum != player_localentnum) {
 		g_e_dents = g_e_dents + 1;	// не-локальные (delta) сущности
-		// listen-only: рендер игроков оставляем движку. drawmask=0 скрывает CSQC-копию
-		// (FTE addentities: drawmask & mask -> skip), return 0 — движок рисует игрока
-		// один раз (нет дублей/«призраков»). На ezq drawmask/возврат не используются.
+		// C4 Этап 3 (csqc_delta!=0): удалённого игрока рисует CSQC (setmodel +
+		// drawmask=MASK_DELTA), возврат 1 → движок не рисует дубль. Иначе listen-only:
+		// drawmask=0 + return 0 — движок рисует игрока один раз (нет дублей/«призраков»).
+		if (cvar("csqc_delta") != 0) {
+			setmodel(self, "progs/player.mdl");
+			self.drawmask = MASK_DELTA;
+			g_c4_owned_pl = g_c4_owned_pl + 1;
+			return 1;
+		}
 		self.drawmask = 0;
 		return 0;
 	}
@@ -1650,7 +1690,8 @@ void Hud_DrawCSQC() {
 	// 8 — C5-E предикция локального игрока (deltalisten #371 + #345/#347);
 	// 9 — C5-E Ф1 (view_angles / project-unproject / listener);
 	// 10 — C5-E Ф2 (#504 getentity); 11 — Ф3 renderscene (mod-отрисовка флага);
-	// 12 — C4 Этап 1 (#301/#302 predraw + renderflags); 13 — C4 Этап 2 (#301 MASK_VIEWMODEL).
+	// 12 — C4 Этап 1 (#301/#302 predraw + renderflags); 13 — C4 Этап 2 (#301 MASK_VIEWMODEL);
+	// 14 — C4 Этап 3 (MASK_DELTA status; тумблер csqc_delta).
 	// Каждый экран рисуется от верхнего якоря y=470 (там, где картинки), строк на
 	// экран <= 10. ECHO/FLAGS выше — не debug.
 	D = cvar("csqc_dbg");
@@ -1665,6 +1706,13 @@ void Hud_DrawCSQC() {
 	if (D == 0) {
 		setcursormode(0);
 		g_sm_run = 0;
+	}
+	// C4 Э3: при включении csqc_delta — precache + регистрация backpack-слушателя
+	// (deltalisten пер-модельный; см. CSQC_BackpackPred). Экран 14 — статус.
+	if (cvar("csqc_delta") != 0 && g_c4_bp_reg == 0) {
+		precache_model("progs/backpack.mdl");
+		deltalisten("progs/backpack.mdl", CSQC_BackpackPred, RSES_NOLERP | RSES_NOROTATE);
+		g_c4_bp_reg = 1;
 	}
 	// Экран 10: одноразовый console-dprint — сброс вне экрана (печать при входе).
 	if (D != 10)
@@ -2246,5 +2294,16 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("C4 Э2 vm %g (csqc_vm 0/1)", cvar("csqc_vm")),
 			[12, 12], (cvar("csqc_vm") != 0) ? '0 1 0' : '1 1 0', 1, 0);
+	}
+
+	// --- экран 14: C4 Э3 (MASK_DELTA) — статус ---
+	// Persistent-тумблер csqc_delta (default 0). При 1 модуль рисует delta-сущности
+	// (player/backpack) сам, движок их не рисует (return 1). CSQC render-слой неполон
+	// (видимость/анимация/скины/смерть) — см. docs/plans/ezquake_csqc_client_render_layer.md.
+	if (D == 14) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("C4 Э3 delta %g owned pl %g bp %g", cvar("csqc_delta"), g_c4_owned_pl, g_c4_owned_bp),
+			[12, 12], (cvar("csqc_delta") != 0) ? '0 1 0' : '1 1 0', 1, 0);
 	}
 }

@@ -427,6 +427,7 @@ const float FILE_READNL = 4;	/* Like FILE_READ, except newlines are not special.
 const float FILE_MMAP_READ = 5;	/* The file will be loaded into memory. fgets returns a pointer to the first byte (and will always return the same value for this file). Cast this to your datatype. */
 const float FILE_MMAP_RW = 6;	/* Like FILE_MMAP_READ, except any changes to the data will be written back to disk once the file is closed. */
 const float MASK_ENGINE = 1;	/* Valid as an argument for addentities. If specified, all non-csqc entities will be added to the scene. */
+const float MASK_DELTA = 1;	/* Alias of MASK_ENGINE: engine + delta/predicted entities (FTE pr_common.h:901). */
 const float MASK_VIEWMODEL = 2;	/* Valid as an argument for addentities. If specified, the regular engine viewmodel will be added to the scene. */
 const float PREDRAW_AUTOADD = 0;	/* Valid as a return value from the predraw function. Returning this will cause the engine to automatically invoke addentity(self) for you. */
 const float PREDRAW_NEXT = 1;	/* Valid as a return value from the predraw function. Returning this will simply move on to the next entity without the autoadd behaviour, so can be used for particle/invisible/special entites, or entities that were explicitly drawn with addentity. */
