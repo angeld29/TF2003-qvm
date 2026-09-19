@@ -51,6 +51,14 @@ float g_sm345;		// getinputstate(input_sequence) — 0/1
 float g_sm346;		// setsensitivityscaler(1) — 1 (void, вызвано)
 float g_sm347;		// runstandardplayerphysics(edict_num(0)) — 1 (не краш)
 float g_sm_buf;		// buf-цепочка #460..469 — число успешных шагов
+// Self-test harness (план .opencode/plans/csqc-pr1vm-engine-selftest.md): единая
+// команда не-визуальных проверок (csqc_selftest) с ассертами и финальным
+// [CSQC-TEST] SUMMARY (парсится из qconsole.log). Новые тесты — через ST_*.
+float g_st_pass;	// пройдено
+float g_st_fail;	// упало ([CSQC-TEST] FAIL <name> exp[..] got[..])
+float g_st_skip;	// пропущено (неприменимо; [CSQC-TEST] SKIP <name> (<why>))
+float g_st_group;	// текущая группа: 0=all, 1=core, 2=pred, 3=net
+float g_st_auto_done;	// автопрогон выполнен на текущей карте (0/1)
 // C5-A (предикция EXT_CSQC_1): окно модуля — live под csqc_dbg 3.
 float g_c5_sc;		// servercommandframe (ack сервера; движок пишет каждый кадр)
 float g_c5_cc;		// clientcommandframe (следующий отправляемый кадр)
@@ -124,6 +132,7 @@ float(float isnew) CSQC_PlayerPred;
 float(float isnew) CSQC_BackpackPred;	// C4 Э3: backpack delta-callback
 void Pred_Run(entity ent, float endframe);
 void Pred_UpdateLocal();
+void CSQC_SelfTest(float grp);	// self-test harness (определение — после CSQC_Fx_Smoke)
 float g_dbg_prev;	// предыдущий csqc_dbg (консоль-смоук T1/T2 при включении экрана 4)
 float g_t5_iss;		// T5: isserver() (считается на включение экрана 4)
 float g_t5_slot;	// T5: num_for_edict(spawn-сущности) — слот
@@ -415,6 +424,12 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_sm346 = 0;
 	g_sm347 = 0;
 	g_sm_buf = 0;
+	// Self-test harness: чистое состояние на старте модуля.
+	g_st_pass = 0;
+	g_st_fail = 0;
+	g_st_skip = 0;
+	g_st_group = 0;
+	g_st_auto_done = 0;
 	g_dbg_prev = 0;
 	g_t5_iss = 0;
 	g_t5_slot = 0;
@@ -437,6 +452,8 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	registercommand("csqc_objerror");
 	// Ф3: просмотр списка уровней csqc_dbg с описаниями.
 	registercommand("csqc_dbg_list");
+	// Self-test harness: прогон не-визуальных проверок (ассерты + [CSQC-TEST] SUMMARY).
+	registercommand("csqc_selftest");
 	// Шаг 2: модульный debug-уровень (0..3); движковых debug-cvars нет — экраны
 	// читают csqc_dbg (см. DbgLevel/DbgAt).
 	registercvar("csqc_dbg", "0");
@@ -447,6 +464,8 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	// (listen-only, движковый рендер). ВНИМАНИЕ: CSQC render-слой неполон
 	// (видимость/анимация/скины/смерть) — см. docs/plans/ezquake_csqc_client_render_layer.md.
 	registercvar("csqc_delta", "0");
+	// Self-test harness: авто-прогон один раз на карту по спавну (player_localentnum).
+	registercvar("csqc_selftest_auto", "1");
 	// C5-E: слушатель сущностей (FTE-паритет): движок зовёт CSQC_PlayerPred при
 	// обновлении сущностей с зарегистрированной моделью. Регистрируем модель
 	// игрока (FTE-канон csqctest/entrypoints.qc:237) — колбэк сам фильтрует
@@ -514,6 +533,8 @@ void() CSQC_WorldLoaded = {
 	g_sm346 = 0;
 	g_sm347 = 0;
 	g_sm_buf = 0;
+	// Self-test harness: новая карта — автопрогон снова (по спавну).
+	g_st_auto_done = 0;
 	// C5-E: новая карта — сущность игрока придёт заново (мост движка).
 	g_pp_valid = 0;
 	g_pp_ent = world;
@@ -709,6 +730,16 @@ float(string cmd) CSQC_ConsoleCommand = {
 	}
 	if (argv(0) == "csqc_dbg_list") {
 		CSQC_DbgList();
+		return 1;
+	}
+	// Self-test harness: csqc_selftest [core|pred|net] (по умолчанию все группы).
+	if (argv(0) == "csqc_selftest") {
+		local float grp;
+		grp = 0;
+		if (argv(1) == "core") grp = 1;
+		else if (argv(1) == "pred") grp = 2;
+		else if (argv(1) == "net") grp = 3;
+		CSQC_SelfTest(grp);
 		return 1;
 	}
 	return 0;
@@ -1206,6 +1237,80 @@ void CSQC_Fx_Smoke() {
 	CSQC_Fx_Trace7();
 }
 
+// ============================================================================
+// Self-test harness (план .opencode/plans/csqc-pr1vm-engine-selftest.md).
+// Единая команда не-визуальных проверок: ассерты + финальный [CSQC-TEST] SUMMARY
+// (парсится из qconsole.log). Новые тесты добавляются в CSQC_SelfTest через ST_*.
+// ============================================================================
+void ST_Reset(float grp) {
+	g_st_pass = 0;
+	g_st_fail = 0;
+	g_st_skip = 0;
+	g_st_group = grp;
+}
+
+void ST_Ok() {
+	g_st_pass = g_st_pass + 1;
+}
+
+void ST_Fail(string name, string exp, string got) {
+	g_st_fail = g_st_fail + 1;
+	dprint(sprintf("[CSQC-TEST] FAIL %s exp[%s] got[%s]\n", name, exp, got));
+}
+
+void ST_EqF(string name, float exp, float got) {
+	if (exp == got)
+		ST_Ok();
+	else
+		ST_Fail(name, ftos(exp), ftos(got));
+}
+
+void ST_EqS(string name, string exp, string got) {
+	if (exp == got)
+		ST_Ok();
+	else
+		ST_Fail(name, exp, got);
+}
+
+void ST_True(string name, float cond) {
+	if (cond != 0)
+		ST_Ok();
+	else
+		ST_Fail(name, "1", "0");
+}
+
+void ST_Skip(string name, string why) {
+	g_st_skip = g_st_skip + 1;
+	dprint(sprintf("[CSQC-TEST] SKIP %s (%s)\n", name, why));
+}
+
+void ST_Summary() {
+	dprint(sprintf("[CSQC-TEST] SUMMARY group=%g pass=%g fail=%g skip=%g\n",
+		g_st_group, g_st_pass, g_st_fail, g_st_skip));
+}
+
+// CSQC_SelfTest — батарея не-визуальных проверок. grp: 0=all, 1=core, 2=pred, 3=net.
+// Фаза 0: core = smoke 459/345/346/347/buf (CSQC_Fx_Smoke заполняет g_sm*).
+// #345 в игре до первого usercmd может быть 0 — тогда SKIP, не FAIL.
+void CSQC_SelfTest(float grp) {
+	ST_Reset(grp);
+
+	// --- core: детерминированные/in-game smoke ---
+	if (grp == 0 || grp == 1) {
+		CSQC_Fx_Smoke();
+		ST_EqF("459 edict_num(1)", 1, g_sm459);
+		if (input_sequence == 0)
+			ST_Skip("345 getinputstate", "input_sequence==0 (no usercmd yet)");
+		else
+			ST_EqF("345 getinputstate", 1, g_sm345);
+		ST_EqF("346 setsensitivityscaler", 1, g_sm346);
+		ST_EqF("347 runstandardplayerphysics", 1, g_sm347);
+		ST_EqF("460-469 buf chain", 7, g_sm_buf);
+	}
+
+	ST_Summary();
+}
+
 // C1.2: события ввода от движка (csdefs.qc:159; типы IE_* 0..6). Счётчики —
 // канарейка C1.2; возврат 0 (события не блокируем) кроме C6.1-пикера под
 // csqc_d2d 1: MOUSE1 -> эффект, MOUSE2 -> следующий (handled 1 — управление/
@@ -1656,6 +1761,13 @@ void Hud_DrawCSQC() {
 	local float cx, cy;	// 2D-доп: правый верхний угол от размера экрана
 	local float bad;	// экран 6: агрегат стат-канарейки (CSQC_StatWire_Bad)
 	local float le;		// экран 10: player_localentnum для #504 getentity
+
+	// Self-test harness: автопрогон один раз на карту, когда игрок в игре и
+	// заспавнен (player_localentnum != 0) — часть тестов требует in-game сущности.
+	if (g_st_auto_done == 0 && cvar("csqc_selftest_auto") != 0 && player_localentnum != 0) {
+		g_st_auto_done = 1;
+		CSQC_SelfTest(0);
+	}
 
 	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
 	// всегда; строки флагов — по слотам ниже.
