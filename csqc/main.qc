@@ -1809,11 +1809,17 @@ void Hud_DrawCSQC() {
 	local float bad;	// экран 6: агрегат стат-канарейки (CSQC_StatWire_Bad)
 	local float le;		// экран 10: player_localentnum для #504 getentity
 
-	// Self-test harness: автопрогон один раз на карту, когда игрок в игре и
-	// заспавнен (player_localentnum != 0) — часть тестов требует in-game сущности.
-	if (g_st_auto_done == 0 && cvar("csqc_selftest_auto") != 0 && player_localentnum != 0) {
-		g_st_auto_done = 1;
-		CSQC_SelfTest(0);
+	// Self-test harness: автопрогон по спавну. В TF после коннекта игрок —
+	// спектатор (player_localentnum != 0 указывает на наблюдаемого), своя сущность
+	// появляется только после выбора команды/класса. Признак спавна с классом —
+	// серверный стат playerclass (>0); при 0 (спектатор/выбор класса) re-arm.
+	if (getstati(STAT_CLASS_TF) > 0) {
+		if (g_st_auto_done == 0 && cvar("csqc_selftest_auto") != 0) {
+			g_st_auto_done = 1;
+			CSQC_SelfTest(0);
+		}
+	} else {
+		g_st_auto_done = 0;	// не заспавнен — прогон на следующем спавне
 	}
 
 	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
