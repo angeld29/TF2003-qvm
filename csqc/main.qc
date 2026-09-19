@@ -59,6 +59,7 @@ float g_st_fail;	// упало ([CSQC-TEST] FAIL <name> exp[..] got[..])
 float g_st_skip;	// пропущено (неприменимо; [CSQC-TEST] SKIP <name> (<why>))
 float g_st_group;	// текущая группа: 0=all, 1=core, 2=pred, 3=net
 float g_st_auto_done;	// автопрогон выполнен на текущей карте (0/1)
+float g_st_fx_req;	// 2c: запрос отдельного fx no-crash прогона (csqc_fxcheck); сбрасывается на draw-кадре
 // C5-A (предикция EXT_CSQC_1): окно модуля — live под csqc_dbg 3.
 float g_c5_sc;		// servercommandframe (ack сервера; движок пишет каждый кадр)
 float g_c5_cc;		// clientcommandframe (следующий отправляемый кадр)
@@ -430,6 +431,7 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_st_skip = 0;
 	g_st_group = 0;
 	g_st_auto_done = 0;
+	g_st_fx_req = 0;
 	g_dbg_prev = 0;
 	g_t5_iss = 0;
 	g_t5_slot = 0;
@@ -454,6 +456,7 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	registercommand("csqc_dbg_list");
 	// Self-test harness: прогон не-визуальных проверок (ассерты + [CSQC-TEST] SUMMARY).
 	registercommand("csqc_selftest");
+	registercommand("csqc_fxcheck");	// 2c: отдельный no-crash прогон void-эффектов
 	// Шаг 2: модульный debug-уровень (0..3); движковых debug-cvars нет — экраны
 	// читают csqc_dbg (см. DbgLevel/DbgAt).
 	registercvar("csqc_dbg", "0");
@@ -535,6 +538,7 @@ void() CSQC_WorldLoaded = {
 	g_sm_buf = 0;
 	// Self-test harness: новая карта — автопрогон снова (по спавну).
 	g_st_auto_done = 0;
+	g_st_fx_req = 0;
 	// C5-E: новая карта — сущность игрока придёт заново (мост движка).
 	g_pp_valid = 0;
 	g_pp_ent = world;
@@ -741,6 +745,13 @@ float(string cmd) CSQC_ConsoleCommand = {
 		else if (argv(1) == "net") grp = 3;
 		else if (argv(1) == "l2") grp = 4;
 		CSQC_SelfTest(grp);
+		return 1;
+	}
+	// 2c: отдельный no-crash прогон void-эффектов; выполняется на draw-кадре
+	// (R_BeginPolygon/EndPolygon требуют draw-контекста), см. Hud_DrawCSQC.
+	if (argv(0) == "csqc_fxcheck") {
+		g_st_fx_req = 1;
+		print("csqc_fxcheck: scheduled (runs on next draw)\n");
 		return 1;
 	}
 	return 0;
@@ -1535,6 +1546,54 @@ void CSQC_SelftestL2b2() {
 }
 
 // ============================================================================
+// Phase 2c (self-test group l2): vectorvectors #432 — единственный QC-наблюдаемый
+// из effects/render (остальные 2c — void визуальные сайд-эффекты).
+// FTE pr_bgcmd.c:6559; ezq — nop-заглушка (csqc_builtins.c:5018) → FAIL.
+// ============================================================================
+void CSQC_SelftestL2c() {
+	makevectors('0 0 0');
+	vectorvectors('0 1 0');
+	ST_NearV("2c vectorvectors v_forward", '0 1 0', v_forward, 0.01);
+	makevectors(getproperty(VF_ANGLES));	// восстановить базис вида
+}
+
+// ============================================================================
+// Phase 2c (отдельный прогон, команда csqc_fxcheck): void-эффекты/рендер —
+// no-crash battery с валидными параметрами. Запускается на draw-кадре (см.
+// Hud_DrawCSQC), т.к. R_*Polygon требуют draw-контекста. te_flamejet #457 НЕ
+// входит (на FTE это message-parser, pr_csqc.c:5129, а не эмиттер; csdefs
+// void() неточна) — вынесено в план (backlog); SKIP не эмитим.
+// ============================================================================
+void CSQC_SelftestFx() {
+	ST_Reset(5);
+
+	effect('0 0 0', "progs/player.mdl", 0, 0, 0);
+	ST_True("2c fx effect no crash", 1);
+	particle2('0 0 0', '-8 -8 -8', '8 8 8', 0, 0, 8);
+	ST_True("2c fx particle2 no crash", 1);
+	particle3('0 0 0', '8 8 8', 0, 0, 8);
+	ST_True("2c fx particle3 no crash", 1);
+	particle4('0 0 0', 64, 0, 0, 8);
+	ST_True("2c fx particle4 no crash", 1);
+	te_lightningblood('0 0 0');
+	ST_True("2c fx te_lightningblood no crash", 1);
+	te_bloodqw('0 0 0', 1);
+	ST_True("2c fx te_bloodqw no crash", 1);
+	te_teleport('0 0 0');
+	ST_True("2c fx te_teleport no crash", 1);
+	boxparticles(0, world, '0 0 0', '0 0 0', '0 0 0', '0 0 0', 1, 0);
+	ST_True("2c fx boxparticles no crash", 1);
+	R_BeginPolygon("gfx/ttl_main.lmp", 4);
+	R_PolygonVertex('0 0 0', '0 0 0', '1 1 1', 1);
+	R_PolygonVertex('8 0 0', '1 0 0', '1 1 1', 1);
+	R_PolygonVertex('0 8 0', '0 1 0', '1 1 1', 1);
+	R_EndPolygon();
+	ST_True("2c fx R_polygon no crash", 1);
+
+	ST_Summary();
+}
+
+// ============================================================================
 // Phase 1d (self-test core): 2D pic cache + T5 (isserver/num_for_edict/wasfreed)
 // + T9 (findfloat) + P1d (spawn/nextent/find/findradius) + P1e (side-effects).
 // Evidence: ezq csqc_builtins.c iscachedpic:887, freepic:921, drawgetimagesize:898,
@@ -1806,6 +1865,9 @@ void CSQC_SelfTest(float grp) {
 
 		// 2b-2: entity/find/reflection/tags.
 		CSQC_SelftestL2b2();
+
+		// 2c: vectorvectors (единственный QC-наблюдаемый; остальное — csqc_fxcheck).
+		CSQC_SelftestL2c();
 	}
 
 	ST_Summary();
@@ -2273,6 +2335,13 @@ void Hud_DrawCSQC() {
 		}
 	} else {
 		g_st_auto_done = 0;	// не заспавнен — прогон на следующем спавне
+	}
+
+	// 2c: отдельный no-crash прогон void-эффектов (csqc_fxcheck) — на draw-кадре
+	// (R_BeginPolygon/R_EndPolygon требуют draw-контекста).
+	if (g_st_fx_req != 0) {
+		g_st_fx_req = 0;
+		CSQC_SelftestFx();
 	}
 
 	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
