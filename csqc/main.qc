@@ -1370,6 +1370,122 @@ void CSQC_SelftestL2b1() {
 	makevectors(getproperty(VF_ANGLES));	// восстановить базис вида
 }
 
+// ============================================================================
+// Phase 1d (self-test core): 2D pic cache + T5 (isserver/num_for_edict/wasfreed)
+// + T9 (findfloat) + P1d (spawn/nextent/find/findradius) + P1e (side-effects).
+// Evidence: ezq csqc_builtins.c iscachedpic:887, freepic:921, drawgetimagesize:898,
+// isserver:4606, wasfreed:4615, num_for_edict:4626, findfloat:4504, find:3321,
+// nextent:3301, findradius:3353; FTE pr_bgcmd.c findfloat:1667, findradius:4070.
+// findfloat returns the FIRST match (not necessarily our spawn) -> scan; FTE
+// findradius skips SOLID_NOT -> spawn with solid=SOLID_BBOX.
+// ============================================================================
+void CSQC_SelftestD() {
+	local vector mp;
+	local float isc0, isc1, nu, nf, nfind, fnd, guard;
+	local entity e, ce, vme, pe0, pe1, pe2, pe3, pe4;
+
+	// --- 2D: pic cache (precache -> iscachedpic -> size -> freepic no-op) ---
+	// FTE-эталон: имя резолвится ТОЛЬКО с явным расширением — "gfx/ttl_main.lmp"
+	// -> 214x24, без расширения -> 0. ezq резолвит иначе (bare -> 214x24,
+	// .lmp -> 96x24) — L2-расхождение ezq, кандидат на правку (план/parity-audit).
+	ST_True("1d 2D precache_pic", strlen(precache_pic("gfx/ttl_main.lmp")) > 0);
+	isc0 = iscachedpic("gfx/ttl_main.lmp");
+	ST_EqF("1d 2D iscachedpic after precache", 1, isc0);
+	mp = drawgetimagesize("gfx/ttl_main.lmp");
+	ST_EqF("1d 2D drawgetimagesize(lmp) x", 214, mp_x);
+	ST_EqF("1d 2D drawgetimagesize(lmp) y", 24, mp_y);
+	mp = drawgetimagesize("gfx/ttl_main");
+	ST_EqF("1d 2D drawgetimagesize(bare) x", 0, mp_x);
+	ST_EqF("1d 2D drawgetimagesize(bare) y", 0, mp_y);
+	freepic("gfx/ttl_main.lmp");
+	isc1 = iscachedpic("gfx/ttl_main.lmp");
+	ST_EqF("1d 2D iscachedpic after freepic", 1, isc1);
+
+	// --- T5: isserver / num_for_edict / wasfreed ---
+	ST_EqF("1d T5 isserver 0", 0, isserver());
+	e = spawn();
+	if (e != world) {
+		ST_True("1d T5 num_for_edict>0", num_for_edict(e) > 0);
+		ST_EqF("1d T5 wasfreed before remove", 0, wasfreed(e));
+		remove(e);
+		ST_EqF("1d T5 wasfreed after remove", 1, wasfreed(e));
+	} else {
+		ST_Skip("1d T5 num_for_edict>0", "spawn failed");
+		ST_Skip("1d T5 wasfreed before remove", "spawn failed");
+		ST_Skip("1d T5 wasfreed after remove", "spawn failed");
+	}
+
+	// --- T9: findfloat — скан от world; должен найти свой spawn (vme) ---
+	vme = spawn();
+	if (vme != world) {
+		vme.solid = SOLID_BBOX;
+		fnd = 0;
+		guard = 0;
+		ce = world;
+		while (guard < 1024) {
+			guard = guard + 1;
+			ce = findfloat(ce, solid, SOLID_BBOX);
+			if (ce == world)
+				break;
+			if (ce.solid != SOLID_BBOX)
+				break;
+			if (ce == vme)
+				fnd = 1;
+		}
+		ST_True("1d T9 findfloat finds spawn", fnd);
+		remove(vme);
+	} else {
+		ST_Skip("1d T9 findfloat finds spawn", "spawn failed");
+	}
+
+	// --- P1d: 5 spawn (solid bbox) -> count -> nextent -> find -> findradius ---
+	nu = 0;
+	pe0 = spawn();
+	if (pe0 != world) { nu = nu + 1; setorigin(pe0, '16 16 16'); setmodel(pe0, "progs/tf_flag.mdl"); setsize(pe0, '-8 -8 -8', '8 8 8'); pe0.solid = SOLID_BBOX; }
+	pe1 = spawn();
+	if (pe1 != world) { nu = nu + 1; setorigin(pe1, '16 48 16'); setmodel(pe1, "progs/tf_flag.mdl"); setsize(pe1, '-8 -8 -8', '8 8 8'); pe1.solid = SOLID_BBOX; }
+	pe2 = spawn();
+	if (pe2 != world) { nu = nu + 1; setorigin(pe2, '16 80 16'); setmodel(pe2, "progs/tf_flag.mdl"); setsize(pe2, '-8 -8 -8', '8 8 8'); pe2.solid = SOLID_BBOX; }
+	pe3 = spawn();
+	if (pe3 != world) { nu = nu + 1; setorigin(pe3, '16 112 16'); setmodel(pe3, "progs/tf_flag.mdl"); setsize(pe3, '-8 -8 -8', '8 8 8'); pe3.solid = SOLID_BBOX; }
+	pe4 = spawn();
+	if (pe4 != world) { nu = nu + 1; setorigin(pe4, '16 144 16'); setmodel(pe4, "progs/tf_flag.mdl"); setsize(pe4, '-8 -8 -8', '8 8 8'); pe4.solid = SOLID_BBOX; }
+	ST_EqF("1d P1d spawn x5", 5, nu);
+	nf = 0;
+	ce = world;
+	while (1) {
+		ce = nextent(ce);
+		if (ce == world)
+			break;
+		nf = nf + 1;
+	}
+	ST_True("1d P1d nextent>0", nf > 0);
+	nfind = 0;
+	ce = world;
+	while (1) {
+		ce = find(ce, model, "progs/tf_flag.mdl");
+		if (ce == world)
+			break;
+		nfind = nfind + 1;
+	}
+	ST_True("1d P1d find(tf_flag)>=5", nfind >= 5);
+	ST_True("1d P1d findradius found", findradius('16 16 16', 300) != world);
+	if (pe0 != world) remove(pe0);
+	if (pe1 != world) remove(pe1);
+	if (pe2 != world) remove(pe2);
+	if (pe3 != world) remove(pe3);
+	if (pe4 != world) remove(pe4);
+
+	// --- P1e: precache/particle/lightstyle/ambientsound — side-effect, no-crash ---
+	precache_model("progs/tf_flag.mdl");
+	precache_sound("weapons/railgun.wav");
+	precache_file("maps/bastion.bsp");
+	particle('0 0 0', '0 1 0', 73, 8);
+	lightstyle(1, "a");
+	ambientsound('0 0 0', "weapons/detpack.wav", 0.15, 0);
+	ST_True("1d P1e subsystems no crash", 1);
+}
+
 // CSQC_SelfTest — батарея не-визуальных проверок. grp: 0=all, 1=core, 2=pred, 3=net.
 // Фаза 0: core = smoke 459/345/346/347/buf (CSQC_Fx_Smoke заполняет g_sm*).
 // #345 в игре до первого usercmd может быть 0 — тогда SKIP, не FAIL.
@@ -1491,6 +1607,9 @@ void CSQC_SelfTest(float grp) {
 		rv = getbindmaps();
 		ST_NearV("T8 getbindmaps 0 0 0", '0 0 0', rv, 0.001);
 		ST_True("T8 getkeybind noncrash", strlen(getkeybind(k)) >= 0);
+
+		// --- Фаза 1d: 2D-кэш / T5 / T9 / P1d / P1e (без трасс) ---
+		CSQC_SelftestD();
 	}
 
 	// --- Фаза 2 (group l2): FTE-implemented builtins, нормальные параметры ---
