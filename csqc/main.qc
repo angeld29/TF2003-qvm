@@ -739,6 +739,7 @@ float(string cmd) CSQC_ConsoleCommand = {
 		if (argv(1) == "core") grp = 1;
 		else if (argv(1) == "pred") grp = 2;
 		else if (argv(1) == "net") grp = 3;
+		else if (argv(1) == "l2") grp = 4;
 		CSQC_SelfTest(grp);
 		return 1;
 	}
@@ -1314,6 +1315,7 @@ void ST_Summary() {
 void CSQC_SelfTest(float grp) {
 	local float k;
 	local vector rv;
+	local float h;	// l2: hash-таблица
 
 	ST_Reset(grp);
 
@@ -1428,6 +1430,32 @@ void CSQC_SelfTest(float grp) {
 		rv = getbindmaps();
 		ST_NearV("T8 getbindmaps 0 0 0", '0 0 0', rv, 0.001);
 		ST_True("T8 getkeybind noncrash", strlen(getkeybind(k)) >= 0);
+	}
+
+	// --- Фаза 2 (group l2): FTE-implemented builtins, нормальные параметры ---
+	// Ожидания = поведение FTE (эталон); ezq обязан совпасть (многие — L2-гэпы).
+	if (grp == 0 || grp == 4) {
+		// 2a: strings/digest/whichpack
+		// instr: FTE PF_instr возвращает подстроку-остаток (RETURN_SSTRING), а
+		// csdefs объявляет float instr (#206) — тип несовместим → исключён.
+		ST_EqF("2a strlennocol(abc)", 3, strlennocol("abc"));
+		ST_EqS("2a strdecolorize(abc)", "abc", strdecolorize("abc"));
+		// digest_hex: FTE требует имя хеша в ВЕРХНЕМ регистре (pr_bgcmd.c:5794).
+		ST_EqS("2a digest_hex(MD5,abc)", "900150983cd24fb0d6963f7d28e17f72", digest_hex("MD5", "abc"));
+		// URI-группа (uri_escape/uri_unescape/uri_get) — отключена (uri_get требует
+		// callback/сеть; решение 2026-09-19).
+		ST_EqS("2a whichpack(player.mdl)", "", whichpack("progs/player.mdl", 0));
+		ST_EqS("2a strconv(0,0,0,abc)", "abc", strconv(0, 0, 0, "abc"));
+		// 2a: hash-таблица
+		h = hash_createtab(64, 0);
+		ST_True("2a hash_createtab>0", h > 0);
+		hash_add(h, "k", 0, 0);
+		ST_EqS("2a hash_getkey(tab,0)", "k", hash_getkey(h, 0));
+		hash_delete(h, "k");
+		hash_destroytab(h);
+		hash_getcb();
+		// search: FTE arg1 = флаги QCSEARCH_* (не caseinsensitive), FS-зависимо;
+		// корректные флаги/капчур — отдельным шагом (временно исключено).
 	}
 
 	ST_Summary();
@@ -1891,7 +1919,7 @@ void Hud_DrawCSQC() {
 	if (getstati(STAT_CLASS_TF) > 0) {
 		if (g_st_auto_done == 0 && cvar("csqc_selftest_auto") != 0) {
 			g_st_auto_done = 1;
-			CSQC_SelfTest(0);
+			CSQC_SelfTest(1);	// авто — только core (l2/all — вручную, ~95 FTE-L2)
 		}
 	} else {
 		g_st_auto_done = 0;	// не заспавнен — прогон на следующем спавне
