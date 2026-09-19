@@ -59,7 +59,7 @@ float g_st_fail;	// упало ([CSQC-TEST] FAIL <name> exp[..] got[..])
 float g_st_skip;	// пропущено (неприменимо; [CSQC-TEST] SKIP <name> (<why>))
 float g_st_group;	// текущая группа: 0=all, 1=core, 2=pred, 3=net
 float g_st_auto_done;	// автопрогон выполнен на текущей карте (0/1)
-float g_st_fx_req;	// 2c: запрос отдельного fx no-crash прогона (csqc_fxcheck); сбрасывается на draw-кадре
+float g_st_ncrash_req;	// запрос no-crash прогона void-builtins (csqc_nocrash); сбрасывается на draw-кадре
 // C5-A (предикция EXT_CSQC_1): окно модуля — live под csqc_dbg 3.
 float g_c5_sc;		// servercommandframe (ack сервера; движок пишет каждый кадр)
 float g_c5_cc;		// clientcommandframe (следующий отправляемый кадр)
@@ -431,7 +431,7 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_st_skip = 0;
 	g_st_group = 0;
 	g_st_auto_done = 0;
-	g_st_fx_req = 0;
+	g_st_ncrash_req = 0;
 	g_dbg_prev = 0;
 	g_t5_iss = 0;
 	g_t5_slot = 0;
@@ -456,7 +456,7 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	registercommand("csqc_dbg_list");
 	// Self-test harness: прогон не-визуальных проверок (ассерты + [CSQC-TEST] SUMMARY).
 	registercommand("csqc_selftest");
-	registercommand("csqc_fxcheck");	// 2c: отдельный no-crash прогон void-эффектов
+	registercommand("csqc_nocrash");	// отдельный no-crash прогон void-builtins (2c/2d)
 	// Шаг 2: модульный debug-уровень (0..3); движковых debug-cvars нет — экраны
 	// читают csqc_dbg (см. DbgLevel/DbgAt).
 	registercvar("csqc_dbg", "0");
@@ -538,7 +538,7 @@ void() CSQC_WorldLoaded = {
 	g_sm_buf = 0;
 	// Self-test harness: новая карта — автопрогон снова (по спавну).
 	g_st_auto_done = 0;
-	g_st_fx_req = 0;
+	g_st_ncrash_req = 0;
 	// C5-E: новая карта — сущность игрока придёт заново (мост движка).
 	g_pp_valid = 0;
 	g_pp_ent = world;
@@ -749,9 +749,9 @@ float(string cmd) CSQC_ConsoleCommand = {
 	}
 	// 2c: отдельный no-crash прогон void-эффектов; выполняется на draw-кадре
 	// (R_BeginPolygon/EndPolygon требуют draw-контекста), см. Hud_DrawCSQC.
-	if (argv(0) == "csqc_fxcheck") {
-		g_st_fx_req = 1;
-		print("csqc_fxcheck: scheduled (runs on next draw)\n");
+	if (argv(0) == "csqc_nocrash") {
+		g_st_ncrash_req = 1;
+		print("csqc_nocrash: scheduled (runs on next draw)\n");
 		return 1;
 	}
 	return 0;
@@ -1558,15 +1558,63 @@ void CSQC_SelftestL2c() {
 }
 
 // ============================================================================
-// Phase 2c (отдельный прогон, команда csqc_fxcheck): void-эффекты/рендер —
-// no-crash battery с валидными параметрами. Запускается на draw-кадре (см.
-// Hud_DrawCSQC), т.к. R_*Polygon требуют draw-контекста. te_flamejet #457 НЕ
-// входит (на FTE это message-parser, pr_csqc.c:5129, а не эмиттер; csdefs
-// void() неточна) — вынесено в план (backlog); SKIP не эмитим.
+// Phase 2d (self-test group l2): buf/hostcache/net — функциональные тесты.
+// FTE: buf_cvarlist pr_bgcmd.c:5588, bufstr_find :5661, netaddress_resolve :6128,
+// getgamedirinfo pr_clcmd.c:1192, getextresponse. ezq — заглушки
+// (csqc_builtins.c:5028,5091-5096,5113-5116) → L2-FAIL. Capture-тесты
+// (@CAP@) — значения снимаются из FTE-лога и подставляются.
 // ============================================================================
-void CSQC_SelftestFx() {
+void CSQC_SelftestL2d() {
+	local float b;
+	local string s;
+
+	// netaddress_resolve #625 (FTE резолвит; ezq nop-str → "")
+	s = netaddress_resolve("localhost", 27503);
+	ST_EqS("2d netaddress_resolve(localhost)", "127.0.0.1:27503", s);
+
+	// getextresponse #624 — нет внешнего ответа → ""
+	ST_EqS("2d getextresponse", "", getextresponse());
+
+	// buf_cvarlist #517 — заполняет список cvar'ов (маска "" → все)
+	b = buf_create();
+	if (b > 0) {
+		buf_cvarlist(b, "", "");
+		ST_True("2d buf_cvarlist size>0", buf_getsize(b) > 0);
+		buf_del(b);
+	} else {
+		ST_Skip("2d buf_cvarlist size>0", "buf_create failed");
+	}
+
+	// bufstr_find #537 — точный поиск строки в буфере
+	b = buf_create();
+	if (b > 0) {
+		bufstr_add(b, "alpha", 0);
+		bufstr_add(b, "beta", 0);
+		bufstr_add(b, "gamma", 0);
+		ST_EqF("2d bufstr_find exact", 1, bufstr_find(b, "beta", MATCH_EXACT));
+		ST_EqF("2d bufstr_find miss", -1, bufstr_find(b, "zzz", MATCH_EXACT));
+		buf_del(b);
+	} else {
+		ST_Skip("2d bufstr_find exact", "buf_create failed");
+		ST_Skip("2d bufstr_find miss", "buf_create failed");
+	}
+
+	// getgamedirinfo #626 (diridx=-1 — текущий мод, propidx=GGDI_GAMEDIR)
+	ST_EqS("2d getgamedirinfo(gamedir)", "fortress", getgamedirinfo(-1, GGDI_GAMEDIR));
+}
+
+// ============================================================================
+// No-crash battery (отдельный прогон, команда csqc_nocrash): void-builtins
+// 2c (effects/render) + 2d (physics/hostcache/loadfromdata) с валидными
+// параметрами — «не крашит». Запускается на draw-кадре (см. Hud_DrawCSQC),
+// т.к. R_*Polygon требуют draw-контекста. Исключены в backlog: te_flamejet
+// #457 (message-parser, pr_csqc.c:5129), sendpacket #242, CL_RotateMoves #638,
+// V_CalcRefdef #640 (csdefs/FTE mismatch, опасны); SKIP не эмитим.
+// ============================================================================
+void CSQC_SelftestNoCrash() {
 	ST_Reset(5);
 
+	// 2c: effects/render (void)
 	effect('0 0 0', "progs/player.mdl", 0, 0, 0);
 	ST_True("2c fx effect no crash", 1);
 	particle2('0 0 0', '-8 -8 -8', '8 8 8', 0, 0, 8);
@@ -1589,6 +1637,42 @@ void CSQC_SelftestFx() {
 	R_PolygonVertex('0 8 0', '0 1 0', '1 1 1', 1);
 	R_EndPolygon();
 	ST_True("2c fx R_polygon no crash", 1);
+
+	// 2d: physics / loadfromdata (void)
+	physics_enable(world, 0);
+	ST_True("2d physics_enable no crash", 1);
+	physics_addforce(world, '0 0 0', '0 0 0');
+	ST_True("2d physics_addforce no crash", 1);
+	physics_addtorque(world, '0 0 0');
+	ST_True("2d physics_addtorque no crash", 1);
+	loadfromdata("");
+	ST_True("2d loadfromdata no crash", 1);
+
+	// 2d: hostcache (setters/getters) + net (void)
+	resethostcachemasks();
+	ST_True("2d resethostcachemasks no crash", 1);
+	sethostcachemaskstring(0, 0, "", 0);
+	ST_True("2d sethostcachemaskstring no crash", 1);
+	sethostcachemasknumber(0, 0, 0, 0);
+	ST_True("2d sethostcachemasknumber no crash", 1);
+	resorthostcache();
+	ST_True("2d resorthostcache no crash", 1);
+	sethostcachesort(0, 0);
+	ST_True("2d sethostcachesort no crash", 1);
+	refreshhostcache();
+	ST_True("2d refreshhostcache no crash", 1);
+	addwantedhostcachekey("");
+	ST_True("2d addwantedhostcachekey no crash", 1);
+	gethostcachevalue(0);
+	ST_True("2d gethostcachevalue no crash", 1);
+	gethostcachestring(0, 0);
+	ST_True("2d gethostcachestring no crash", 1);
+	gethostcachenumber(0, 0);
+	ST_True("2d gethostcachenumber no crash", 1);
+	gethostcacheindexforkey("");
+	ST_True("2d gethostcacheindexforkey no crash", 1);
+	getextresponse();
+	ST_True("2d getextresponse no crash", 1);
 
 	ST_Summary();
 }
@@ -1866,8 +1950,11 @@ void CSQC_SelfTest(float grp) {
 		// 2b-2: entity/find/reflection/tags.
 		CSQC_SelftestL2b2();
 
-		// 2c: vectorvectors (единственный QC-наблюдаемый; остальное — csqc_fxcheck).
+		// 2c: vectorvectors (единственный QC-наблюдаемый; остальное — csqc_nocrash).
 		CSQC_SelftestL2c();
+
+		// 2d: buf/hostcache/net — функциональные.
+		CSQC_SelftestL2d();
 	}
 
 	ST_Summary();
@@ -2044,12 +2131,12 @@ void CSQC_Stub_Check() {
 	stmp = uri_unescape("");
 	if (stmp != "") { dprint(sprintf("STUB bad #%d %s !=empty\n",511,"uri_unescape")); bad = bad + 1; } else oks = oks + 1;
 	if (uri_get("",0,"","") != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",513,"uri_get")); bad = bad + 1; } else okf = okf + 1;
-	buf_cvarlist(0);
+	buf_cvarlist(0, "", "");
 	loadfromdata("");
 	loadfromfile("");
 	if (buf_loadfile("",0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",535,"buf_loadfile")); bad = bad + 1; } else okf = okf + 1;
 	if (buf_writefile(0,0,0,0) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",536,"buf_writefile")); bad = bad + 1; } else okf = okf + 1;
-	if (bufstr_find() != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",537,"bufstr_find")); bad = bad + 1; } else okf = okf + 1;
+	if (bufstr_find(0, "", MATCH_AUTO) != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",537,"bufstr_find")); bad = bad + 1; } else okf = okf + 1;
 	physics_enable(world,0);
 	physics_addforce(world,'0 0 0','0 0 0');
 	physics_addtorque(world,'0 0 0');
@@ -2071,7 +2158,7 @@ void CSQC_Stub_Check() {
 	if (stmp != "") { dprint(sprintf("STUB bad #%d %s !=empty\n",624,"getextresponse")); bad = bad + 1; } else oks = oks + 1;
 	stmp = netaddress_resolve("",0);
 	if (stmp != "") { dprint(sprintf("STUB bad #%d %s !=empty\n",625,"netaddress_resolve")); bad = bad + 1; } else oks = oks + 1;
-	stmp = getgamedirinfo();
+	stmp = getgamedirinfo(-1, GGDI_GAMEDIR);
 	if (stmp != "") { dprint(sprintf("STUB bad #%d %s !=empty\n",626,"getgamedirinfo")); bad = bad + 1; } else oks = oks + 1;
 	if (CL_RotateMoves() != 0) { dprint(sprintf("STUB bad #%d %s !=0\n",638,"CL_RotateMoves")); bad = bad + 1; } else okf = okf + 1;
 	stmp = digest_hex("","");
@@ -2337,11 +2424,11 @@ void Hud_DrawCSQC() {
 		g_st_auto_done = 0;	// не заспавнен — прогон на следующем спавне
 	}
 
-	// 2c: отдельный no-crash прогон void-эффектов (csqc_fxcheck) — на draw-кадре
+	// No-crash прогон void-builtins (csqc_nocrash) — на draw-кадре
 	// (R_BeginPolygon/R_EndPolygon требуют draw-контекста).
-	if (g_st_fx_req != 0) {
-		g_st_fx_req = 0;
-		CSQC_SelftestFx();
+	if (g_st_ncrash_req != 0) {
+		g_st_ncrash_req = 0;
+		CSQC_SelftestNoCrash();
 	}
 
 	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
