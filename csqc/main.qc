@@ -89,6 +89,19 @@ float g_e_upd;			// число авторитетных обновлений
 float g_e_err;			// |предыдущий прогноз - пере-прогноз| при обновлении
 float g_e_tele;			// телепорт-снапы (>64)
 float g_e_dents;		// вызовов на не-локальные (delta) сущности
+// Phase 4 (A): armed-тест предикции с инъекцией движения (csqc_selftest pred).
+float g_pred_phase;		// 0 idle, 1 drive (инъекция input_movevalues), 2 settle (ждём ack)
+float g_pred_frames;		// кадров инъекции сделано
+float g_pred_wait;		// кадров settle сделано
+float g_pred_start_sc;		// servercommandframe на арминге
+float g_pred_start_upd;		// g_e_upd на арминге
+float g_pred_start_tele;	// g_e_tele на арминге
+float g_pred_maxerr;		// max g_e_err за окно
+vector g_pred_o0;		// origin игрока на арминге
+float g_pred_c5b;		// C5-B #347 bad, снят на арминге (до движения)
+const float PRED_DRIVE_FRAMES = 40;
+const float PRED_SETTLE_FRAMES = 15;
+const float PRED_MAXERR_T = 8;	// порог max g_e_err за окно (уточняется capture FTE)
 // C5-E Ф1 (no-op revision): view_angles / project-unproject / listener.
 vector g_f1_va;			// view_angles (движок публикует каждый кадр)
 vector g_f1_proj;		// project(vieworg)
@@ -135,6 +148,8 @@ void Pred_Run(entity ent, float endframe);
 void Pred_UpdateLocal();
 void CSQC_SelfTest(float grp);	// self-test harness (определение — после CSQC_Fx_Smoke)
 float CSQC_StatWire_Bad();	// Phase 3 (SW78/79), используется в CSQC_SelftestEnt
+float CSQC_C5B_Run();		// Phase 4 (C5-B #347), используется в CSQC_SelftestPred
+void PredArm();			// Phase 4: арминг armed-теста предикции (движение)
 float g_dbg_prev;	// предыдущий csqc_dbg (консоль-смоук T1/T2 при включении экрана 4)
 float g_t5_iss;		// T5: isserver() (считается на включение экрана 4)
 float g_t5_slot;	// T5: num_for_edict(spawn-сущности) — слот
@@ -492,6 +507,7 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_e_err = 0;
 	g_e_tele = 0;
 	g_e_dents = 0;
+	g_pred_phase = 0;
 	g_e_predorg = '0 0 0';
 	g_f1_rt = 0;
 	g_f1_lis = 0;
@@ -553,6 +569,7 @@ void() CSQC_WorldLoaded = {
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
+	g_pred_phase = 0;
 	// C5-E Ф2: сброс канарейки getentity (player_localentnum будет опубликован).
 	g_ge_bad = 0;
 	g_ge_done = 0;
@@ -745,6 +762,7 @@ float(string cmd) CSQC_ConsoleCommand = {
 		else if (argv(1) == "ent") grp = 2;
 		else if (argv(1) == "l2") grp = 3;
 		else if (argv(1) == "gaps") grp = 4;
+		else if (argv(1) == "pred") grp = 7;
 		else if (argv(1) == "all") grp = 6;
 		CSQC_SelfTest(grp);
 		return 1;
@@ -767,6 +785,18 @@ void() CSQC_Shutdown = {
 // impulse) — модуль может читать кнопки/импульсы и (позже, для меню) менять
 // их. Сейчас — только канарейка под csqc_dbg (экран 3); usercmd не изменяем.
 void() CSQC_Input_Frame = {
+	// Phase 4 pred-тест: инъекция движения вперёд (input_movevalues) N кадров,
+	// чтобы предикция реально работала под серверными коррекциями. Значения —
+	// только на время drive; далее движок перезапишет input_* из cmd.
+	if (g_pred_phase == 1) {
+		input_movevalues = '300 0 0';
+		input_buttons = 0;
+		input_impulse = 0;
+		g_pred_frames = g_pred_frames + 1;
+		if (g_pred_frames >= PRED_DRIVE_FRAMES)
+			g_pred_phase = 2;
+	}
+
 	if (DbgAt(3) == 0)		// канарейка отображается на экране 3
 		return;
 	g_if_btns = input_buttons;
@@ -2104,8 +2134,60 @@ void CSQC_SelftestEnt() {
 	ST_EqF("3 GE504 invalid=0", 0, getentity(0, GE_ACTIVE));
 }
 
+// Phase 4: connection/prediction (группа `pred`) — C5-A окно, C5-B #347, C5-E мост.
+// Полноценный тест предикции требует движения: arm-тест (PredArm) N кадров форсит
+// input_movevalues вперёд (CSQC_Input_Frame), затем на settle считает точность
+// (max g_e_err), телепорт-снапы и прирост обновлений. Тест длится много кадров;
+// запускается ТОЛЬКО `csqc_selftest pred` (двигает игрока), не в default/all.
+void PredArm() {
+	g_pred_phase = 1;
+	g_pred_frames = 0;
+	g_pred_wait = 0;
+	g_pred_start_sc = servercommandframe;
+	g_pred_start_upd = g_e_upd;
+	g_pred_start_tele = g_e_tele;
+	g_pred_maxerr = 0;
+	if (g_pp_valid == 1 && g_pp_ent != world)
+		g_pred_o0 = g_pp_ent.origin;
+	else
+		g_pred_o0 = getproperty(VF_ORIGIN);
+	// C5-B прогоняем СЕЙЧАС (до движения) — канарейка требует ровного пола впереди.
+	g_pred_c5b = CSQC_C5B_Run();
+	print("csqc_selftest pred: armed (driving movement; summary after settle)\n");
+}
+
+// Финальные ассерты armed-теста (вызывается из Hud_DrawCSQC после settle).
+void CSQC_SelftestPred() {
+	ST_Reset(7);
+
+	// --- C5-A: окно предикции ---
+	ST_True("4 C5-A server<client", servercommandframe < clientcommandframe);
+	ST_EqF("4 C5-A getinputstate(input_sequence)", 1, getinputstate(input_sequence));
+
+	// --- C5-B: канарейка-механика #347 (снята на арминге, до движения) ---
+	ST_EqF("4 C5-B #347 bad", 0, g_pred_c5b);
+
+	// --- C5-E: предикция в движении ---
+	if (g_pp_valid == 1 && g_pp_ent != world) {
+		ST_EqF("4 C5-E local player valid", 1, g_pp_valid);
+		ST_True("4 C5-E updates during drive", (g_e_upd - g_pred_start_upd) >= (PRED_DRIVE_FRAMES / 2));
+		ST_EqF("4 C5-E no teleport snaps", g_pred_start_tele, g_e_tele);
+		ST_True("4 C5-E net frames", (servercommandframe - g_pred_start_sc) >= PRED_DRIVE_FRAMES);
+		ST_True("4 C5-E player moved", vlen(g_pp_ent.origin - g_pred_o0) >= 64);
+		// Точность: max-ошибка прогноза за окно (порог — capture FTE).
+		print(sprintf("[PRED] maxerr=%g tele=%g upd=%g moved=%g\n",
+			g_pred_maxerr, g_e_tele - g_pred_start_tele, g_e_upd - g_pred_start_upd,
+			vlen(g_pp_ent.origin - g_pred_o0)));
+		ST_True("4 C5-E maxerr<=T", g_pred_maxerr <= PRED_MAXERR_T);
+	} else {
+		ST_Skip("4 C5-E local player", "no local player entity (deltalisten #371)");
+	}
+
+	ST_Summary();
+}
+
 // CSQC_SelfTest — оркестратор групп.
-// grp: 0=default (parity: core+ent+l2), 1=core, 2=ent, 3=l2, 4=gaps (ezq-unimplemented), 6=all.
+// grp: 0=default (parity: core+ent+l2), 1=core, 2=ent, 3=l2, 4=gaps (ezq-unimplemented), 6=all, 7=pred.
 void CSQC_SelfTest(float grp) {
 	ST_Reset(grp);
 
@@ -2121,6 +2203,9 @@ void CSQC_SelfTest(float grp) {
 		CSQC_SelftestCore(0);
 	} else if (grp == 2) {	// ent (Phase 3)
 		CSQC_SelftestEnt();
+	} else if (grp == 7) {	// pred (Phase 4) — armed: двигает игрока, сводка после settle
+		PredArm();
+		return;
 	} else if (grp == 3) {	// l2 (parity)
 		CSQC_SelftestL2a(0);
 		CSQC_SelftestL2b1(0);
@@ -2134,7 +2219,7 @@ void CSQC_SelfTest(float grp) {
 		CSQC_SelftestL2b2(1);
 		CSQC_SelftestL2c(1);
 		CSQC_SelftestL2d(1);
-	} else if (grp == 6) {	// all (parity + gaps)
+	} else if (grp == 6) {	// all (parity + gaps; pred — отдельно, armed)
 		CSQC_SelftestCore(2);
 		CSQC_SelftestEnt();
 		CSQC_SelftestL2a(2);
@@ -2572,7 +2657,9 @@ float CSQC_C5B_Run() {
 		runstandardplayerphysics(e);
 	sp_stop = sqrt(e.velocity_x * e.velocity_x + e.velocity_y * e.velocity_y);
 	g_c5b_stop = sp_stop;
-	if (sp_stop >= sp_move)
+	// Затухание проверяем только если было движение (sp_move>10); при sp_move==0
+	// (движение не отражено в .velocity) check неприменим — иначе ложный bad.
+	if (sp_move > 10 && sp_stop >= sp_move)
 		bad = bad + 1;
 
 	remove(e);
@@ -2616,6 +2703,20 @@ void Hud_DrawCSQC() {
 	if (g_st_ncrash_req != 0) {
 		g_st_ncrash_req = 0;
 		CSQC_SelftestNoCrash();
+	}
+
+	// Phase 4 pred-тест (armed): копим max g_e_err за окно; по завершении settle —
+	// финальные ассерты + SUMMARY.
+	if (g_pred_phase != 0) {
+		if (g_e_err > g_pred_maxerr)
+			g_pred_maxerr = g_e_err;
+		if (g_pred_phase == 2) {
+			g_pred_wait = g_pred_wait + 1;
+			if (g_pred_wait >= PRED_SETTLE_FRAMES) {
+				g_pred_phase = 0;
+				CSQC_SelftestPred();
+			}
+		}
 	}
 
 	// Блок флагов — ниже всех строк hud.qc (после канарейки). Метка видна
