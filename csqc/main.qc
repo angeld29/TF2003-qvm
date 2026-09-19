@@ -1125,8 +1125,9 @@ void CSQC_Fx_Smoke() {
 	// буфера делит по \n/;, см. cmd.c Cbuf_ExecuteEx), а для чистоты вывода.
 	localcmd("\necho csqc-p1c localcmd\n");
 
-	// P1b: строки/конверсии smoke (консоль). Ожидания: v "'1.0 2.0 3.0'",
-	// l 3, f 1.5, sub "ell", stov 1 2 3, cv "\"0\"", z "zoned" (ring; unzone no-op).
+	// P1b: строки/конверсии smoke (консоль). Ожидания: v "'1.000000 2.000000 3.000000'"
+	// (vtos = %f, паритет ezq/FTE), l 3, f 1.5, sub "ell", stov 1 2 3,
+	// cv "\"0\"", z "zoned" (ring; unzone no-op).
 	dprint(sprintf("P1B v %s l %g f %g sub %s\n",
 		vtos('1 2 3'), strlen("abc"), stof("1.5"), substring("hello", 1, 3)));
 	mv = stov("1 2 3");
@@ -1259,7 +1260,7 @@ void ST_Ok() {
 
 void ST_Fail(string name, string exp, string got) {
 	g_st_fail = g_st_fail + 1;
-	dprint(sprintf("[CSQC-TEST] FAIL %s exp[%s] got[%s]\n", name, exp, got));
+	print(sprintf("[CSQC-TEST] FAIL %s exp[%s] got[%s]\n", name, exp, got));
 }
 
 void ST_EqF(string name, float exp, float got) {
@@ -1301,11 +1302,13 @@ void ST_NearV(string name, vector exp, vector got, float eps) {
 
 void ST_Skip(string name, string why) {
 	g_st_skip = g_st_skip + 1;
-	dprint(sprintf("[CSQC-TEST] SKIP %s (%s)\n", name, why));
+	print(sprintf("[CSQC-TEST] SKIP %s (%s)\n", name, why));
 }
 
 void ST_Summary() {
-	dprint(sprintf("[CSQC-TEST] SUMMARY group=%g pass=%g fail=%g skip=%g\n",
+	// Вывод — через print (#339, Con_Printf): на FTE dprint (#25) = Con_DPrintf
+	// (developer-gated) и в лог не попадает; на ezq #339 тоже Con_Printf.
+	print(sprintf("[CSQC-TEST] SUMMARY group=%g pass=%g fail=%g skip=%g\n",
 		g_st_group, g_st_pass, g_st_fail, g_st_skip));
 }
 
@@ -1325,7 +1328,13 @@ void CSQC_SelfTest(float grp) {
 			ST_EqF("345 getinputstate", 1, g_sm345);
 		ST_EqF("346 setsensitivityscaler", 1, g_sm346);
 		ST_EqF("347 runstandardplayerphysics", 1, g_sm347);
-		ST_EqF("460-469 buf chain", 7, g_sm_buf);
+		// buf-семантика engine-specific: ezq (C2.2) — сдвиг+count после free (7);
+		// FTE — дырочная модель (free оставляет NULL-дыру, getsize не падает → 6;
+		// R6 parity-audit, трек T3). На FTE — SKIP с причиной.
+		if (g_st_engine == 0)
+			ST_EqF("460-469 buf chain", 7, g_sm_buf);
+		else
+			ST_Skip("460-469 buf chain", "FTE hole model (R6) - ezq semantics target");
 
 		// --- Фаза 1a: математика/типы (детерминированная, движок-независимая) ---
 		ST_NearF("T1 asin(1)", 1.570796, asin(1), 0.0001);
@@ -1353,6 +1362,38 @@ void CSQC_SelfTest(float grp) {
 		ST_NearF("P1a sin(1)", 0.841471, sin(1), 0.0001);
 		ST_NearF("P1a cos(0)", 1, cos(0), 0.0001);
 		ST_NearF("P1a sqrt(16)", 4, sqrt(16), 0.0001);
+
+		// --- Фаза 1b: строки/конверсии ---
+		// vtos = "'%f %f %f'" (6 знаков) — паритет ezq/FTE (ezq csqc_vtos,
+		// FTE PF_vtos). Старый комментарий у P1b ('1.0 2.0 3.0') был неверным.
+		ST_EqS("P1b vtos(1 2 3)", "'1.000000 2.000000 3.000000'", vtos('1 2 3'));
+		ST_EqF("P1b strlen(abc)", 3, strlen("abc"));
+		ST_NearF("P1b stof(1.5)", 1.5, stof("1.5"), 0.0001);
+		ST_EqS("P1b substring(hello,1,3)", "ell", substring("hello", 1, 3));
+		ST_NearV("P1b stov(1 2 3)", '1 2 3', stov("1 2 3"), 0.0001);
+		ST_EqS("P1b strzone", "zoned", strzone("zoned"));
+		ST_EqS("T2 itos(-7)", "-7", itos(-7));
+		ST_EqS("T2 itos(stoi(42))", "42", itos(stoi("42")));
+		ST_EqS("T2 htos(42)", "0000002a", htos(42));
+		ST_EqS("T2 htos(stoh(ff))", "000000ff", htos(stoh("ff")));
+		ST_EqF("T4 str2chr(abc,1)", 98, str2chr("abc", 1));
+		ST_EqF("T4 str2chr(abc,-1)", 99, str2chr("abc", -1));
+		ST_EqF("T4 str2chr(abc,5)", 0, str2chr("abc", 5));
+		ST_EqS("T4 chr2str(ABC)", "ABC", chr2str(65, 66, 67));
+		ST_EqS("T4 strpad(6,ab)", "ab    ", strpad(6, "ab"));
+		ST_EqS("T4 strpad(-6,ab)", "    ab", strpad(-6, "ab"));
+		ST_True("T4 strncmp(abc,abd)<0", strncmp("abc", "abd") < 0);
+		ST_EqF("T4 strcasecmp(AbC,abc)", 0, strcasecmp("AbC", "abc"));
+		ST_EqF("T4 strncasecmp(Abc,abb,2)", 0, strncasecmp("Abc", "abb", 2));
+		ST_EqS("T4 strtolower(AbC)", "abc", strtolower("AbC"));
+		ST_EqS("T4 strtoupper(aBc)", "ABC", strtoupper("aBc"));
+		ST_EqS("T4 strreplace(a->X,banana)", "bXnXnX", strreplace("a", "X", "banana"));
+		ST_EqS("T4 strireplace(A->X,banana)", "bXnXnX", strireplace("A", "X", "banana"));
+		ST_EqS("T4 infoget(infoadd)", "v", infoget(infoadd("", "k", "v"), "k"));
+		ST_EqF("T7 tokenize_console(aa bb cc)", 3, tokenize_console("aa bb cc"));
+		ST_EqS("T7 argv(1)", "bb", argv(1));
+		ST_EqF("T7 tokenizebyseparator(a;b;;c)", 4, tokenizebyseparator("a;b;;c", ";"));
+		ST_Skip("T7 argescape", "format engine-specific (fix on live)");
 	}
 
 	ST_Summary();
