@@ -51,7 +51,7 @@ float g_sm345;		// getinputstate(input_sequence) — 0/1
 float g_sm346;		// setsensitivityscaler(1) — 1 (void, вызвано)
 float g_sm347;		// runstandardplayerphysics(edict_num(0)) — 1 (не краш)
 float g_sm_buf;		// buf-цепочка #460..469 — число успешных шагов
-// Self-test harness (план .opencode/plans/csqc-pr1vm-engine-selftest.md): единая
+// Self-test harness (план docs/archive/csqc-pr1vm-engine-selftest.md): единая
 // команда не-визуальных проверок (csqc_selftest) с ассертами и финальным
 // [CSQC-TEST] SUMMARY (парсится из qconsole.log). Новые тесты — через ST_*.
 float g_st_pass;	// пройдено
@@ -1283,7 +1283,7 @@ void CSQC_Fx_Smoke() {
 }
 
 // ============================================================================
-// Self-test harness (план .opencode/plans/csqc-pr1vm-engine-selftest.md).
+// Self-test harness (план docs/archive/csqc-pr1vm-engine-selftest.md).
 // Единая команда не-визуальных проверок: ассерты + финальный [CSQC-TEST] SUMMARY
 // (парсится из qconsole.log). Новые тесты добавляются в CSQC_SelfTest через ST_*.
 // ============================================================================
