@@ -59,7 +59,6 @@ float g_st_fail;	// упало ([CSQC-TEST] FAIL <name> exp[..] got[..])
 float g_st_skip;	// пропущено (неприменимо; [CSQC-TEST] SKIP <name> (<why>))
 float g_st_group;	// текущая группа: 0=all, 1=core, 2=pred, 3=net
 float g_st_auto_done;	// автопрогон выполнен на текущей карте (0/1)
-float g_st_engine;	// движок модуля: 0=ezquake, 1=FTE (engine-specific ожидания)
 // C5-A (предикция EXT_CSQC_1): окно модуля — live под csqc_dbg 3.
 float g_c5_sc;		// servercommandframe (ack сервера; движок пишет каждый кадр)
 float g_c5_cc;		// clientcommandframe (следующий отправляемый кадр)
@@ -431,9 +430,6 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_st_skip = 0;
 	g_st_group = 0;
 	g_st_auto_done = 0;
-	// Engine-specific ожидания harness: ezq шлёт "ezquake-orig" (csqc_client.c),
-	// FTE — FULLENGINENAME ("FTE QW").
-	g_st_engine = (enginename == "ezquake-orig") ? 0 : 1;
 	g_dbg_prev = 0;
 	g_t5_iss = 0;
 	g_t5_slot = 0;
@@ -1316,6 +1312,9 @@ void ST_Summary() {
 // Фаза 0: core = smoke 459/345/346/347/buf (CSQC_Fx_Smoke заполняет g_sm*).
 // #345 в игре до первого usercmd может быть 0 — тогда SKIP, не FAIL.
 void CSQC_SelfTest(float grp) {
+	local float k;
+	local vector rv;
+
 	ST_Reset(grp);
 
 	// --- core: детерминированные/in-game smoke ---
@@ -1328,13 +1327,10 @@ void CSQC_SelfTest(float grp) {
 			ST_EqF("345 getinputstate", 1, g_sm345);
 		ST_EqF("346 setsensitivityscaler", 1, g_sm346);
 		ST_EqF("347 runstandardplayerphysics", 1, g_sm347);
-		// buf-семантика engine-specific: ezq (C2.2) — сдвиг+count после free (7);
-		// FTE — дырочная модель (free оставляет NULL-дыру, getsize не падает → 6;
-		// R6 parity-audit, трек T3). На FTE — SKIP с причиной.
-		if (g_st_engine == 0)
-			ST_EqF("460-469 buf chain", 7, g_sm_buf);
-		else
-			ST_Skip("460-469 buf chain", "FTE hole model (R6) - ezq semantics target");
+		// FTE-оракул: дырочная модель buf (free оставляет NULL-дыру, getsize не
+		// падает → 6). ezq сейчас 7 (сдвиг+count, R6 parity-audit) → FAIL до
+		// приведения ezq к FTE (трек T3).
+		ST_EqF("460-469 buf chain", 6, g_sm_buf);
 
 		// --- Фаза 1a: математика/типы (детерминированная, движок-независимая) ---
 		ST_NearF("T1 asin(1)", 1.570796, asin(1), 0.0001);
@@ -1393,7 +1389,45 @@ void CSQC_SelfTest(float grp) {
 		ST_EqF("T7 tokenize_console(aa bb cc)", 3, tokenize_console("aa bb cc"));
 		ST_EqS("T7 argv(1)", "bb", argv(1));
 		ST_EqF("T7 tokenizebyseparator(a;b;;c)", 4, tokenizebyseparator("a;b;;c", ";"));
-		ST_Skip("T7 argescape", "format engine-specific (fix on live)");
+		// argescape("a b c") = "\"a b c\"" (FTE COM_QuotedString и ezq дают
+		// одинаково; 34 = '"').
+		ST_EqS("T7 argescape(a b c)",
+			strcat(strcat(chr2str(34), "a b c"), chr2str(34)),
+			argescape("a b c"));
+
+		// --- Фаза 1c: cvar/console/introspection ---
+		registercvar("csqc_p1c", "1");
+		cvar_set("csqc_p1c", "7");
+		ST_EqF("P1c cvar_set/cvar", 7, cvar("csqc_p1c"));
+		// FTE-оракул: общий DP-extension (обе поддержка: FTE QSG_Extensions,
+		// ezq csqc_checkextension) = 1; несуществующий = 0. Имя "FTE_CSQC" FTE
+		// не регистрирует (pr_bgcmd.c QSG_Extensions) — не используем.
+		ST_EqF("P1c checkextension(DP_QC_MINMAXBOUND)", 1, checkextension("DP_QC_MINMAXBOUND"));
+		ST_EqF("P1c checkextension(NOSUCH_EXT)", 0, checkextension("NOSUCH_EXT"));
+		ST_True("T3 cvar_type(csqc_dbg)!=0", cvar_type("csqc_dbg") != 0);
+		// FTE-оракул: module-cvar (#93) без сохранённого default → ""; ezq даёт
+		// "0" → FAIL (расхождение, кандидат на правку ezq).
+		ST_EqS("T3 cvar_defstring(csqc_dbg)", "", cvar_defstring("csqc_dbg"));
+		ST_EqS("T3 cvar_description(csqc_dbg)", "", cvar_description("csqc_dbg"));
+		ST_EqF("T12 checkcommand(status)", 1, checkcommand("status"));
+		ST_EqF("T12 checkcommand(developer)", 3, checkcommand("developer"));
+		ST_EqF("T12 isfunction(Hud_DrawCSQC)", 1, isfunction("Hud_DrawCSQC"));
+		ST_EqF("T12 isfunction(zzz_none)", 0, isfunction("zzz_none"));
+		ST_EqF("T7 strftime(1) len", 8, strlen(strftime(1, "%H:%M:%S")));
+		ST_EqF("T7 strftime(0) len", 8, strlen(strftime(0, "%H:%M:%S")));
+		k = stringtokeynum_menu("ESCAPE");
+		ST_EqS("T8 keynum round-trip", "ESCAPE", keynumtostring_omgwtf(k));
+		// Config/env-зависимые — инвариант (не точное значение). getresolution:
+		// FTE mode 0 = видео-режим (M_Vid_GetMode, pr_clcmd.c:789), ezq =
+		// текущее окно (mode игнорируется) — точное значение не паритетно;
+		// проверяем невырожденность (x>0 && y>0).
+		rv = getresolution(0);
+		ST_True("T8 getresolution x>0", rv_x > 0);
+		ST_True("T8 getresolution y>0", rv_y > 0);
+		ST_True("T8 getmousetarget 1..2", getmousetarget() >= 1 && getmousetarget() <= 2);
+		rv = getbindmaps();
+		ST_NearV("T8 getbindmaps 0 0 0", '0 0 0', rv, 0.001);
+		ST_True("T8 getkeybind noncrash", strlen(getkeybind(k)) >= 0);
 	}
 
 	ST_Summary();
