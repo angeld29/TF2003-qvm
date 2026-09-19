@@ -1309,6 +1309,67 @@ void ST_Summary() {
 		g_st_group, g_st_pass, g_st_fail, g_st_skip));
 }
 
+// ============================================================================
+// Phase 2b-1 (self-test group l2): model index / animation / resource /
+// rotatevectors. Эталон — поведение FTE (оракул); ezq-заглушки (#334/#276/#277/
+// #284/#285/#237/#238/#286/#235/#236) дают FAIL — это L2-гэпы, фиксируются в
+// docs/ezquake_csqc_client_parity_audit.md. Capture-тесты: ожидание -999/@CAP@
+// временное — значение снимается из FTE-лога и подставляется (см. план).
+// ============================================================================
+void CSQC_SelftestL2b1() {
+	local float idx, idx2;
+	local entity e;
+	local string nm;
+
+	// #200 getmodelindex + #334 modelnameforindex (round-trip).
+	idx = getmodelindex("progs/player.mdl", 0);
+	ST_True("2b1 getmodelindex(player)>0", idx != 0);
+	ST_EqS("2b1 modelnameforindex round-trip", "progs/player.mdl", modelnameforindex(idx));
+
+	// #333 setmodelindex: запись .modelindex читается обратно (паритет движков).
+	e = spawn();
+	if (e != world) {
+		idx2 = getmodelindex("progs/tf_flag.mdl", 0);
+		setmodelindex(e, idx2);
+		ST_EqF("2b1 setmodelindex round-trip", idx2, e.modelindex);
+		remove(e);
+	} else {
+		ST_Skip("2b1 setmodelindex round-trip", "spawn failed");
+	}
+
+	// #284 frametoname / #276 frameforname: FTE "axrun1" → 0 (round-trip).
+	nm = frametoname(idx, 0);
+	ST_EqS("2b1 frametoname(idx,0)", "axrun1", nm);
+	ST_EqF("2b1 frameforname round-trip", 0, frameforname(idx, nm));
+	// #277 frameduration: на FTE группа 0 даёт 1.#INF (rate==0) — проверяем
+	// ненулевость (ezq-заглушка = 0 → FAIL).
+	ST_True("2b1 frameduration(idx,0)!=0", frameduration(idx, 0) != 0);
+
+	// #285 skintoname: у bench-моделей именованных скинов нет (FTE "") — паритет;
+	// #237 skinforname: несуществующее имя → -1 на FTE (ezq-заглушка = 0 → FAIL).
+	ST_EqS("2b1 skintoname(idx,0)", "", skintoname(idx, 0));
+	ST_EqF("2b1 skinforname(missing)", -1, skinforname(idx, "zzz_none_2b"));
+
+	// #286 resourcestatus (RESTYPE_MODEL=0, query-only tryload=0): player известен
+	// (FTE LOADED=4), missing — NOTKNOWN=0 (ezq-заглушка 0: player FAIL, missing PASS).
+	ST_True("2b1 resourcestatus(player)>=1", resourcestatus(0, 0, "progs/player.mdl") >= 1);
+	ST_EqF("2b1 resourcestatus(missing)", 0, resourcestatus(0, 0, "progs/none_2b.mdl"));
+
+	// #238 shaderforname: FTE отдаёт handle (>0; id нестабилен — проверяем !=0);
+	// ezq-заглушка 0 → FAIL.
+	ST_True("2b1 shaderforname(ttl_main)!=0", shaderforname("gfx/ttl_main", "") != 0);
+
+	// #235/#236 rotatevectors*: базис makevectors('0 0 0'), поворот даёт v_forward
+	// '0 1 0' на FTE; ezq no-op оставляет '1 0 0' → FAIL.
+	makevectors('0 0 0');
+	rotatevectorsbyangle('0 90 0');
+	ST_NearV("2b1 rotatevectorsbyangle", '0 1 0', v_forward, 0.01);
+	makevectors('0 0 0');
+	rotatevectorsbyvectors('0 1 0', '-1 0 0', '0 0 1');
+	ST_NearV("2b1 rotatevectorsbyvectors", '0 1 0', v_forward, 0.01);
+	makevectors(getproperty(VF_ANGLES));	// восстановить базис вида
+}
+
 // CSQC_SelfTest — батарея не-визуальных проверок. grp: 0=all, 1=core, 2=pred, 3=net.
 // Фаза 0: core = smoke 459/345/346/347/buf (CSQC_Fx_Smoke заполняет g_sm*).
 // #345 в игре до первого usercmd может быть 0 — тогда SKIP, не FAIL.
@@ -1456,6 +1517,9 @@ void CSQC_SelfTest(float grp) {
 		hash_getcb();
 		// search: FTE arg1 = флаги QCSEARCH_* (не caseinsensitive), FS-зависимо;
 		// корректные флаги/капчур — отдельным шагом (временно исключено).
+
+		// 2b-1: model index / animation / resource / rotatevectors.
+		CSQC_SelftestL2b1();
 	}
 
 	ST_Summary();
