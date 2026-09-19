@@ -59,6 +59,7 @@ float g_st_fail;	// упало ([CSQC-TEST] FAIL <name> exp[..] got[..])
 float g_st_skip;	// пропущено (неприменимо; [CSQC-TEST] SKIP <name> (<why>))
 float g_st_group;	// текущая группа: 0=all, 1=core, 2=pred, 3=net
 float g_st_auto_done;	// автопрогон выполнен на текущей карте (0/1)
+float g_st_engine;	// движок модуля: 0=ezquake, 1=FTE (engine-specific ожидания)
 // C5-A (предикция EXT_CSQC_1): окно модуля — live под csqc_dbg 3.
 float g_c5_sc;		// servercommandframe (ack сервера; движок пишет каждый кадр)
 float g_c5_cc;		// clientcommandframe (следующий отправляемый кадр)
@@ -430,6 +431,9 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_st_skip = 0;
 	g_st_group = 0;
 	g_st_auto_done = 0;
+	// Engine-specific ожидания harness: ezq шлёт "ezquake-orig" (csqc_client.c),
+	// FTE — FULLENGINENAME ("FTE QW").
+	g_st_engine = (enginename == "ezquake-orig") ? 0 : 1;
 	g_dbg_prev = 0;
 	g_t5_iss = 0;
 	g_t5_slot = 0;
@@ -1279,6 +1283,22 @@ void ST_True(string name, float cond) {
 		ST_Fail(name, "1", "0");
 }
 
+// ST_NearF — сравнение float с допуском (математика). QC fabs доступен.
+void ST_NearF(string name, float exp, float got, float eps) {
+	if (fabs(exp - got) <= eps)
+		ST_Ok();
+	else
+		ST_Fail(name, ftos(exp), ftos(got));
+}
+
+// ST_NearV — покомпонентное сравнение вектора с допуском.
+void ST_NearV(string name, vector exp, vector got, float eps) {
+	if (fabs(exp_x - got_x) <= eps && fabs(exp_y - got_y) <= eps && fabs(exp_z - got_z) <= eps)
+		ST_Ok();
+	else
+		ST_Fail(name, vtos(exp), vtos(got));
+}
+
 void ST_Skip(string name, string why) {
 	g_st_skip = g_st_skip + 1;
 	dprint(sprintf("[CSQC-TEST] SKIP %s (%s)\n", name, why));
@@ -1306,6 +1326,33 @@ void CSQC_SelfTest(float grp) {
 		ST_EqF("346 setsensitivityscaler", 1, g_sm346);
 		ST_EqF("347 runstandardplayerphysics", 1, g_sm347);
 		ST_EqF("460-469 buf chain", 7, g_sm_buf);
+
+		// --- Фаза 1a: математика/типы (детерминированная, движок-независимая) ---
+		ST_NearF("T1 asin(1)", 1.570796, asin(1), 0.0001);
+		ST_NearF("T1 acos(0)", 1.570796, acos(0), 0.0001);
+		ST_NearF("T1 atan(1)", 0.785398, atan(1), 0.0001);
+		ST_NearF("T1 atan2(1,1)", 0.785398, atan2(1, 1), 0.0001);
+		ST_NearF("T1 tan(0)", 0, tan(0), 0.000001);
+		ST_NearF("T1 log(e)", 1, log(2.718282), 0.001);
+		ST_NearF("T1 anglemod(450)", 90, anglemod(450), 0.001);
+		ST_EqF("T1 mod(7,3)", 1, mod(7, 3));
+		ST_EqF("T1 bitshift(3,2)", 12, bitshift(3, 2));
+		ST_EqF("T1 bitshift(1,-1)", 0, bitshift(1, -1));
+		ST_EqF("T1 crc16(0,ABC)", 62728, crc16(0, "ABC"));
+		ST_EqF("T1 crc16(1,ABC)", 20810, crc16(1, "ABC"));
+		ST_NearV("P1a normalize(0 3 4)", '0 0.6 0.8', normalize('0 3 4'), 0.0001);
+		ST_NearF("P1a vlen(0 3 4)", 5, vlen('0 3 4'), 0.0001);
+		ST_NearF("P1a vectoyaw(0 1 0)", 90, vectoyaw('0 1 0'), 0.001);
+		ST_NearF("P1a rint(1.6)", 2, rint(1.6), 0.0001);
+		ST_NearF("P1a floor(1.6)", 1, floor(1.6), 0.0001);
+		ST_NearF("P1a ceil(1.6)", 2, ceil(1.6), 0.0001);
+		ST_NearF("P1a fabs(-3)", 3, fabs(-3), 0.0001);
+		ST_NearF("P1a pow(2,10)", 1024, pow(2, 10), 0.01);
+		ST_NearF("P1a bound(1,5,10)", 5, bound(1, 5, 10), 0.0001);
+		ST_NearF("P1a min(3,1,2)", 1, min(3, 1, 2), 0.0001);
+		ST_NearF("P1a sin(1)", 0.841471, sin(1), 0.0001);
+		ST_NearF("P1a cos(0)", 1, cos(0), 0.0001);
+		ST_NearF("P1a sqrt(16)", 4, sqrt(16), 0.0001);
 	}
 
 	ST_Summary();
