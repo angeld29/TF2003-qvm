@@ -1371,6 +1371,170 @@ void CSQC_SelftestL2b1() {
 }
 
 // ============================================================================
+// Phase 2b-2 (self-test group l2): entity/find/reflection/tags. FTE-оракул.
+// ezq: #400/#443/#613 — nop-заглушки, #402/403/449/450/451/452/244 — ret0/nop-vec
+// (L2-gaps, ожидаемые FAIL); #302/#496-500 — реализованы. Capture-тесты
+// (@CAP@/-999) — значения снимаются из FTE-лога и подставляются.
+// ============================================================================
+void CSQC_SelftestL2b2() {
+	local entity e1, e2, ea;
+	local float cnt, idx, i, nf;
+	local vector vi;
+	local string q, pes;
+
+	// --- #400 copyentity: memcpy полей in->out (тестовое поле — .frame) ---
+	e1 = spawn();
+	e2 = spawn();
+	if (e1 != world && e2 != world) {
+		e1.frame = 123;
+		e2.frame = 0;
+		copyentity(e1, e2);
+		ST_EqF("2b2 copyentity frame", 123, e2.frame);
+		remove(e1);
+		remove(e2);
+	} else {
+		ST_Skip("2b2 copyentity frame", "spawn failed");
+		if (e1 != world) remove(e1);
+		if (e2 != world) remove(e2);
+	}
+
+	// --- #402 findchain (classname) ---
+	e1 = spawn();
+	e2 = spawn();
+	if (e1 != world && e2 != world) {
+		e1.classname = "zz_b2c";
+		e2.classname = "zz_b2c";
+		cnt = 0;
+		ea = findchain(classname, "zz_b2c");
+		while (ea != world && cnt < 64) { cnt = cnt + 1; ea = ea.chain; }
+		ST_EqF("2b2 findchain count", 2, cnt);
+		remove(e1);
+		remove(e2);
+	} else {
+		ST_Skip("2b2 findchain count", "spawn failed");
+		if (e1 != world) remove(e1);
+		if (e2 != world) remove(e2);
+	}
+
+	// --- #403 findchainfloat (solid) ---
+	e1 = spawn();
+	e2 = spawn();
+	if (e1 != world && e2 != world) {
+		e1.solid = SOLID_BBOX;
+		e2.solid = SOLID_BBOX;
+		cnt = 0;
+		ea = findchainfloat(solid, SOLID_BBOX);
+		while (ea != world && cnt < 64) { cnt = cnt + 1; ea = ea.chain; }
+		ST_True("2b2 findchainfloat >=2", cnt >= 2);
+		remove(e1);
+		remove(e2);
+	} else {
+		ST_Skip("2b2 findchainfloat >=2", "spawn failed");
+		if (e1 != world) remove(e1);
+		if (e2 != world) remove(e2);
+	}
+
+	// --- #449 findflags / #450 findchainflags ---
+	e1 = spawn();
+	if (e1 != world) {
+		e1.flags = FL_FINDABLE_NONSOLID;
+		ST_True("2b2 findflags !=world", findflags(world, flags, FL_FINDABLE_NONSOLID) != world);
+		cnt = 0;
+		ea = findchainflags(flags, FL_FINDABLE_NONSOLID);
+		while (ea != world && cnt < 64) { cnt = cnt + 1; ea = ea.chain; }
+		ST_True("2b2 findchainflags >=1", cnt >= 1);
+		remove(e1);
+	} else {
+		ST_Skip("2b2 findflags !=world", "spawn failed");
+		ST_Skip("2b2 findchainflags >=1", "spawn failed");
+	}
+
+	// --- #443 setattachment: .tag_entity выставляется всегда ---
+	e1 = spawn();
+	e2 = spawn();
+	if (e1 != world && e2 != world) {
+		e2.tag_entity = world;
+		setattachment(e2, e1, "zz_tag");
+		ST_True("2b2 setattachment tag_entity", e2.tag_entity == e1);
+		remove(e1);
+		remove(e2);
+	} else {
+		ST_Skip("2b2 setattachment tag_entity", "spawn failed");
+		if (e1 != world) remove(e1);
+		if (e2 != world) remove(e2);
+	}
+
+	// --- #451 gettagindex: у world нет модели -> 0 ---
+	ST_EqF("2b2 gettagindex(world,zzz)", 0, gettagindex(world, "zzz"));
+
+	// --- #452 gettaginfo: нет тега -> identity-базис (0 0 0, FTE-эталон) ---
+	vi = gettaginfo(world, 0);
+	ST_NearV("2b2 gettaginfo(world,0)", '0 0 0', vi, 0.01);
+
+	// --- #244 rotatevectorsbytag: нет тега -> без изменений (0 0 0, FTE-эталон) ---
+	makevectors('0 0 0');
+	vi = rotatevectorsbytag(world, 0);
+	ST_NearV("2b2 rotatevectorsbytag(world,0)", '0 0 0', vi, 0.01);
+	makevectors(getproperty(VF_ANGLES));
+
+	// --- #613 parseentitydata: поля из строки в готовый edict (capture формата) ---
+	e1 = spawn();
+	if (e1 != world) {
+		e1.frame = 0;
+		q = chr2str(34);	// '"' (QuakeC не имеет escape в строках)
+		pes = strcat("{", q);
+		pes = strcat(pes, "frame");
+		pes = strcat(pes, q);
+		pes = strcat(pes, " ");
+		pes = strcat(pes, q);
+		pes = strcat(pes, "55");
+		pes = strcat(pes, q);
+		pes = strcat(pes, "}");
+		parseentitydata(e1, pes);
+		ST_EqF("2b2 parseentitydata frame", 55, e1.frame);
+		remove(e1);
+	} else {
+		ST_Skip("2b2 parseentitydata frame", "spawn failed");
+	}
+
+	// --- #302 addentity: no-crash smoke ---
+	e1 = spawn();
+	if (e1 != world) {
+		addentity(e1);
+		ST_True("2b2 addentity no crash", 1);
+		remove(e1);
+	} else {
+		ST_Skip("2b2 addentity no crash", "spawn failed");
+	}
+
+	// --- #496-500 рефлексия полей ---
+	nf = numentityfields();
+	ST_True("2b2 reflection numentityfields>0", nf > 0);
+	idx = -1;
+	for (i = 0; i < nf; i = i + 1) {
+		if (entityfieldname(i) == "frame")
+			idx = i;
+	}
+	ST_True("2b2 reflection frame idx", idx >= 0);
+	if (idx >= 0) {
+		e1 = spawn();
+		if (e1 != world) {
+			e1.frame = 77;
+			ST_EqS("2b2 getentityfieldstring(frame)", "77", getentityfieldstring(idx, e1));
+			putentityfieldstring(idx, e1, "123");
+			ST_EqF("2b2 putentityfieldstring frame", 123, e1.frame);
+			remove(e1);
+		} else {
+			ST_Skip("2b2 getentityfieldstring(frame)", "spawn failed");
+			ST_Skip("2b2 putentityfieldstring frame", "spawn failed");
+		}
+	} else {
+		ST_Skip("2b2 getentityfieldstring(frame)", "frame field not found");
+		ST_Skip("2b2 putentityfieldstring frame", "frame field not found");
+	}
+}
+
+// ============================================================================
 // Phase 1d (self-test core): 2D pic cache + T5 (isserver/num_for_edict/wasfreed)
 // + T9 (findfloat) + P1d (spawn/nextent/find/findradius) + P1e (side-effects).
 // Evidence: ezq csqc_builtins.c iscachedpic:887, freepic:921, drawgetimagesize:898,
@@ -1639,6 +1803,9 @@ void CSQC_SelfTest(float grp) {
 
 		// 2b-1: model index / animation / resource / rotatevectors.
 		CSQC_SelftestL2b1();
+
+		// 2b-2: entity/find/reflection/tags.
+		CSQC_SelftestL2b2();
 	}
 
 	ST_Summary();
