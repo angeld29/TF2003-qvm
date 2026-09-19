@@ -134,6 +134,7 @@ float(float isnew) CSQC_BackpackPred;	// C4 Э3: backpack delta-callback
 void Pred_Run(entity ent, float endframe);
 void Pred_UpdateLocal();
 void CSQC_SelfTest(float grp);	// self-test harness (определение — после CSQC_Fx_Smoke)
+float CSQC_StatWire_Bad();	// Phase 3 (SW78/79), используется в CSQC_SelftestEnt
 float g_dbg_prev;	// предыдущий csqc_dbg (консоль-смоук T1/T2 при включении экрана 4)
 float g_t5_iss;		// T5: isserver() (считается на включение экрана 4)
 float g_t5_slot;	// T5: num_for_edict(spawn-сущности) — слот
@@ -736,14 +737,15 @@ float(string cmd) CSQC_ConsoleCommand = {
 		CSQC_DbgList();
 		return 1;
 	}
-	// Self-test harness: csqc_selftest [core|pred|net] (по умолчанию все группы).
+	// Self-test harness: группы (без параметров — все паритетные; gaps — ezq-нереализованное).
 	if (argv(0) == "csqc_selftest") {
 		local float grp;
 		grp = 0;
 		if (argv(1) == "core") grp = 1;
-		else if (argv(1) == "pred") grp = 2;
-		else if (argv(1) == "net") grp = 3;
-		else if (argv(1) == "l2") grp = 4;
+		else if (argv(1) == "ent") grp = 2;
+		else if (argv(1) == "l2") grp = 3;
+		else if (argv(1) == "gaps") grp = 4;
+		else if (argv(1) == "all") grp = 6;
 		CSQC_SelfTest(grp);
 		return 1;
 	}
@@ -1327,58 +1329,61 @@ void ST_Summary() {
 // docs/ezquake_csqc_client_parity_audit.md. Capture-тесты: ожидание -999/@CAP@
 // временное — значение снимается из FTE-лога и подставляется (см. план).
 // ============================================================================
-void CSQC_SelftestL2b1() {
+void CSQC_SelftestL2b1(float mode) {
 	local float idx, idx2;
 	local entity e;
 	local string nm;
 
-	// #200 getmodelindex + #334 modelnameforindex (round-trip).
-	idx = getmodelindex("progs/player.mdl", 0);
-	ST_True("2b1 getmodelindex(player)>0", idx != 0);
-	ST_EqS("2b1 modelnameforindex round-trip", "progs/player.mdl", modelnameforindex(idx));
+	// --- parity (реализовано и в ezq, не заглушка) — mode != 1 ---
+	if (mode != 1) {
+		idx = getmodelindex("progs/player.mdl", 0);
+		ST_True("2b1 getmodelindex(player)>0", idx != 0);
 
-	// #333 setmodelindex: запись .modelindex читается обратно (паритет движков).
-	e = spawn();
-	if (e != world) {
-		idx2 = getmodelindex("progs/tf_flag.mdl", 0);
-		setmodelindex(e, idx2);
-		ST_EqF("2b1 setmodelindex round-trip", idx2, e.modelindex);
-		remove(e);
-	} else {
-		ST_Skip("2b1 setmodelindex round-trip", "spawn failed");
+		e = spawn();
+		if (e != world) {
+			idx2 = getmodelindex("progs/tf_flag.mdl", 0);
+			setmodelindex(e, idx2);
+			ST_EqF("2b1 setmodelindex round-trip", idx2, e.modelindex);
+			remove(e);
+		} else {
+			ST_Skip("2b1 setmodelindex round-trip", "spawn failed");
+		}
 	}
 
-	// #284 frametoname / #276 frameforname: FTE "axrun1" → 0 (round-trip).
-	nm = frametoname(idx, 0);
-	ST_EqS("2b1 frametoname(idx,0)", "axrun1", nm);
-	ST_EqF("2b1 frameforname round-trip", 0, frameforname(idx, nm));
-	// #277 frameduration: на FTE группа 0 даёт 1.#INF (rate==0) — проверяем
-	// ненулевость (ezq-заглушка = 0 → FAIL).
-	ST_True("2b1 frameduration(idx,0)!=0", frameduration(idx, 0) != 0);
+	// --- gaps (заглушки ezq) — mode != 0 ---
+	if (mode != 0) {
+		idx = getmodelindex("progs/player.mdl", 0);
 
-	// #285 skintoname: у bench-моделей именованных скинов нет (FTE "") — паритет;
-	// #237 skinforname: несуществующее имя → -1 на FTE (ezq-заглушка = 0 → FAIL).
-	ST_EqS("2b1 skintoname(idx,0)", "", skintoname(idx, 0));
-	ST_EqF("2b1 skinforname(missing)", -1, skinforname(idx, "zzz_none_2b"));
+		// #334 modelnameforindex.
+		ST_EqS("2b1 modelnameforindex round-trip", "progs/player.mdl", modelnameforindex(idx));
 
-	// #286 resourcestatus (RESTYPE_MODEL=0, query-only tryload=0): player известен
-	// (FTE LOADED=4), missing — NOTKNOWN=0 (ezq-заглушка 0: player FAIL, missing PASS).
-	ST_True("2b1 resourcestatus(player)>=1", resourcestatus(0, 0, "progs/player.mdl") >= 1);
-	ST_EqF("2b1 resourcestatus(missing)", 0, resourcestatus(0, 0, "progs/none_2b.mdl"));
+		// #284 frametoname: FTE "axrun1"; #276 frameforname (заглушка).
+		nm = frametoname(idx, 0);
+		ST_EqS("2b1 frametoname(idx,0)", "axrun1", nm);
+		ST_EqF("2b1 frameforname round-trip", 0, frameforname(idx, nm));
+		// #277 frameduration: на FTE группа 0 даёт 1.#INF (rate==0) — !=0.
+		ST_True("2b1 frameduration(idx,0)!=0", frameduration(idx, 0) != 0);
 
-	// #238 shaderforname: FTE отдаёт handle (>0; id нестабилен — проверяем !=0);
-	// ezq-заглушка 0 → FAIL.
-	ST_True("2b1 shaderforname(ttl_main)!=0", shaderforname("gfx/ttl_main", "") != 0);
+		// #285 skintoname / #237 skinforname (заглушки).
+		ST_EqS("2b1 skintoname(idx,0)", "", skintoname(idx, 0));
+		ST_EqF("2b1 skinforname(missing)", -1, skinforname(idx, "zzz_none_2b"));
 
-	// #235/#236 rotatevectors*: базис makevectors('0 0 0'), поворот даёт v_forward
-	// '0 1 0' на FTE; ezq no-op оставляет '1 0 0' → FAIL.
-	makevectors('0 0 0');
-	rotatevectorsbyangle('0 90 0');
-	ST_NearV("2b1 rotatevectorsbyangle", '0 1 0', v_forward, 0.01);
-	makevectors('0 0 0');
-	rotatevectorsbyvectors('0 1 0', '-1 0 0', '0 0 1');
-	ST_NearV("2b1 rotatevectorsbyvectors", '0 1 0', v_forward, 0.01);
-	makevectors(getproperty(VF_ANGLES));	// восстановить базис вида
+		// #286 resourcestatus (заглушка): player LOADED=4, missing NOTKNOWN=0.
+		ST_True("2b1 resourcestatus(player)>=1", resourcestatus(0, 0, "progs/player.mdl") >= 1);
+		ST_EqF("2b1 resourcestatus(missing)", 0, resourcestatus(0, 0, "progs/none_2b.mdl"));
+
+		// #238 shaderforname (заглушка).
+		ST_True("2b1 shaderforname(ttl_main)!=0", shaderforname("gfx/ttl_main", "") != 0);
+
+		// #235/#236 rotatevectors* (заглушки).
+		makevectors('0 0 0');
+		rotatevectorsbyangle('0 90 0');
+		ST_NearV("2b1 rotatevectorsbyangle", '0 1 0', v_forward, 0.01);
+		makevectors('0 0 0');
+		rotatevectorsbyvectors('0 1 0', '-1 0 0', '0 0 1');
+		ST_NearV("2b1 rotatevectorsbyvectors", '0 1 0', v_forward, 0.01);
+		makevectors(getproperty(VF_ANGLES));	// восстановить базис вида
+	}
 }
 
 // ============================================================================
@@ -1387,161 +1392,163 @@ void CSQC_SelftestL2b1() {
 // (L2-gaps, ожидаемые FAIL); #302/#496-500 — реализованы. Capture-тесты
 // (@CAP@/-999) — значения снимаются из FTE-лога и подставляются.
 // ============================================================================
-void CSQC_SelftestL2b2() {
+void CSQC_SelftestL2b2(float mode) {
 	local entity e1, e2, ea;
 	local float cnt, idx, i, nf;
 	local vector vi;
 	local string q, pes;
 
-	// --- #400 copyentity: memcpy полей in->out (тестовое поле — .frame) ---
-	e1 = spawn();
-	e2 = spawn();
-	if (e1 != world && e2 != world) {
-		e1.frame = 123;
-		e2.frame = 0;
-		copyentity(e1, e2);
-		ST_EqF("2b2 copyentity frame", 123, e2.frame);
-		remove(e1);
-		remove(e2);
-	} else {
-		ST_Skip("2b2 copyentity frame", "spawn failed");
-		if (e1 != world) remove(e1);
-		if (e2 != world) remove(e2);
-	}
-
-	// --- #402 findchain (classname) ---
-	e1 = spawn();
-	e2 = spawn();
-	if (e1 != world && e2 != world) {
-		e1.classname = "zz_b2c";
-		e2.classname = "zz_b2c";
-		cnt = 0;
-		ea = findchain(classname, "zz_b2c");
-		while (ea != world && cnt < 64) { cnt = cnt + 1; ea = ea.chain; }
-		ST_EqF("2b2 findchain count", 2, cnt);
-		remove(e1);
-		remove(e2);
-	} else {
-		ST_Skip("2b2 findchain count", "spawn failed");
-		if (e1 != world) remove(e1);
-		if (e2 != world) remove(e2);
-	}
-
-	// --- #403 findchainfloat (solid) ---
-	e1 = spawn();
-	e2 = spawn();
-	if (e1 != world && e2 != world) {
-		e1.solid = SOLID_BBOX;
-		e2.solid = SOLID_BBOX;
-		cnt = 0;
-		ea = findchainfloat(solid, SOLID_BBOX);
-		while (ea != world && cnt < 64) { cnt = cnt + 1; ea = ea.chain; }
-		ST_True("2b2 findchainfloat >=2", cnt >= 2);
-		remove(e1);
-		remove(e2);
-	} else {
-		ST_Skip("2b2 findchainfloat >=2", "spawn failed");
-		if (e1 != world) remove(e1);
-		if (e2 != world) remove(e2);
-	}
-
-	// --- #449 findflags / #450 findchainflags ---
-	e1 = spawn();
-	if (e1 != world) {
-		e1.flags = FL_FINDABLE_NONSOLID;
-		ST_True("2b2 findflags !=world", findflags(world, flags, FL_FINDABLE_NONSOLID) != world);
-		cnt = 0;
-		ea = findchainflags(flags, FL_FINDABLE_NONSOLID);
-		while (ea != world && cnt < 64) { cnt = cnt + 1; ea = ea.chain; }
-		ST_True("2b2 findchainflags >=1", cnt >= 1);
-		remove(e1);
-	} else {
-		ST_Skip("2b2 findflags !=world", "spawn failed");
-		ST_Skip("2b2 findchainflags >=1", "spawn failed");
-	}
-
-	// --- #443 setattachment: .tag_entity выставляется всегда ---
-	e1 = spawn();
-	e2 = spawn();
-	if (e1 != world && e2 != world) {
-		e2.tag_entity = world;
-		setattachment(e2, e1, "zz_tag");
-		ST_True("2b2 setattachment tag_entity", e2.tag_entity == e1);
-		remove(e1);
-		remove(e2);
-	} else {
-		ST_Skip("2b2 setattachment tag_entity", "spawn failed");
-		if (e1 != world) remove(e1);
-		if (e2 != world) remove(e2);
-	}
-
-	// --- #451 gettagindex: у world нет модели -> 0 ---
-	ST_EqF("2b2 gettagindex(world,zzz)", 0, gettagindex(world, "zzz"));
-
-	// --- #452 gettaginfo: нет тега -> identity-базис (0 0 0, FTE-эталон) ---
-	vi = gettaginfo(world, 0);
-	ST_NearV("2b2 gettaginfo(world,0)", '0 0 0', vi, 0.01);
-
-	// --- #244 rotatevectorsbytag: нет тега -> без изменений (0 0 0, FTE-эталон) ---
-	makevectors('0 0 0');
-	vi = rotatevectorsbytag(world, 0);
-	ST_NearV("2b2 rotatevectorsbytag(world,0)", '0 0 0', vi, 0.01);
-	makevectors(getproperty(VF_ANGLES));
-
-	// --- #613 parseentitydata: поля из строки в готовый edict (capture формата) ---
-	e1 = spawn();
-	if (e1 != world) {
-		e1.frame = 0;
-		q = chr2str(34);	// '"' (QuakeC не имеет escape в строках)
-		pes = strcat("{", q);
-		pes = strcat(pes, "frame");
-		pes = strcat(pes, q);
-		pes = strcat(pes, " ");
-		pes = strcat(pes, q);
-		pes = strcat(pes, "55");
-		pes = strcat(pes, q);
-		pes = strcat(pes, "}");
-		parseentitydata(e1, pes);
-		ST_EqF("2b2 parseentitydata frame", 55, e1.frame);
-		remove(e1);
-	} else {
-		ST_Skip("2b2 parseentitydata frame", "spawn failed");
-	}
-
-	// --- #302 addentity: no-crash smoke ---
-	e1 = spawn();
-	if (e1 != world) {
-		addentity(e1);
-		ST_True("2b2 addentity no crash", 1);
-		remove(e1);
-	} else {
-		ST_Skip("2b2 addentity no crash", "spawn failed");
-	}
-
-	// --- #496-500 рефлексия полей ---
-	nf = numentityfields();
-	ST_True("2b2 reflection numentityfields>0", nf > 0);
-	idx = -1;
-	for (i = 0; i < nf; i = i + 1) {
-		if (entityfieldname(i) == "frame")
-			idx = i;
-	}
-	ST_True("2b2 reflection frame idx", idx >= 0);
-	if (idx >= 0) {
+	// --- parity (реализовано и в ezq, не заглушка) — mode != 1 ---
+	if (mode != 1) {
+		// #302 addentity: no-crash smoke.
 		e1 = spawn();
 		if (e1 != world) {
-			e1.frame = 77;
-			ST_EqS("2b2 getentityfieldstring(frame)", "77", getentityfieldstring(idx, e1));
-			putentityfieldstring(idx, e1, "123");
-			ST_EqF("2b2 putentityfieldstring frame", 123, e1.frame);
+			addentity(e1);
+			ST_True("2b2 addentity no crash", 1);
 			remove(e1);
 		} else {
-			ST_Skip("2b2 getentityfieldstring(frame)", "spawn failed");
-			ST_Skip("2b2 putentityfieldstring frame", "spawn failed");
+			ST_Skip("2b2 addentity no crash", "spawn failed");
 		}
-	} else {
-		ST_Skip("2b2 getentityfieldstring(frame)", "frame field not found");
-		ST_Skip("2b2 putentityfieldstring frame", "frame field not found");
+
+		// --- #496-500 рефлексия полей ---
+		nf = numentityfields();
+		ST_True("2b2 reflection numentityfields>0", nf > 0);
+		idx = -1;
+		for (i = 0; i < nf; i = i + 1) {
+			if (entityfieldname(i) == "frame")
+				idx = i;
+		}
+		ST_True("2b2 reflection frame idx", idx >= 0);
+		if (idx >= 0) {
+			e1 = spawn();
+			if (e1 != world) {
+				e1.frame = 77;
+				ST_EqS("2b2 getentityfieldstring(frame)", "77", getentityfieldstring(idx, e1));
+				putentityfieldstring(idx, e1, "123");
+				ST_EqF("2b2 putentityfieldstring frame", 123, e1.frame);
+				remove(e1);
+			} else {
+				ST_Skip("2b2 getentityfieldstring(frame)", "spawn failed");
+				ST_Skip("2b2 putentityfieldstring frame", "spawn failed");
+			}
+		} else {
+			ST_Skip("2b2 getentityfieldstring(frame)", "frame field not found");
+			ST_Skip("2b2 putentityfieldstring frame", "frame field not found");
+		}
+	}
+
+	// --- gaps (заглушки ezq) — mode != 0 ---
+	if (mode != 0) {
+		// #451 gettagindex / #452 gettaginfo / #244 rotatevectorsbytag (заглушки).
+		ST_EqF("2b2 gettagindex(world,zzz)", 0, gettagindex(world, "zzz"));
+		vi = gettaginfo(world, 0);
+		ST_NearV("2b2 gettaginfo(world,0)", '0 0 0', vi, 0.01);
+		makevectors('0 0 0');
+		vi = rotatevectorsbytag(world, 0);
+		ST_NearV("2b2 rotatevectorsbytag(world,0)", '0 0 0', vi, 0.01);
+		makevectors(getproperty(VF_ANGLES));
+
+		// #400 copyentity: memcpy полей in->out (тестовое поле — .frame).
+		e1 = spawn();
+		e2 = spawn();
+		if (e1 != world && e2 != world) {
+			e1.frame = 123;
+			e2.frame = 0;
+			copyentity(e1, e2);
+			ST_EqF("2b2 copyentity frame", 123, e2.frame);
+			remove(e1);
+			remove(e2);
+		} else {
+			ST_Skip("2b2 copyentity frame", "spawn failed");
+			if (e1 != world) remove(e1);
+			if (e2 != world) remove(e2);
+		}
+
+		// #402 findchain (classname).
+		e1 = spawn();
+		e2 = spawn();
+		if (e1 != world && e2 != world) {
+			e1.classname = "zz_b2c";
+			e2.classname = "zz_b2c";
+			cnt = 0;
+			ea = findchain(classname, "zz_b2c");
+			while (ea != world && cnt < 64) { cnt = cnt + 1; ea = ea.chain; }
+			ST_EqF("2b2 findchain count", 2, cnt);
+			remove(e1);
+			remove(e2);
+		} else {
+			ST_Skip("2b2 findchain count", "spawn failed");
+			if (e1 != world) remove(e1);
+			if (e2 != world) remove(e2);
+		}
+
+		// #403 findchainfloat (solid).
+		e1 = spawn();
+		e2 = spawn();
+		if (e1 != world && e2 != world) {
+			e1.solid = SOLID_BBOX;
+			e2.solid = SOLID_BBOX;
+			cnt = 0;
+			ea = findchainfloat(solid, SOLID_BBOX);
+			while (ea != world && cnt < 64) { cnt = cnt + 1; ea = ea.chain; }
+			ST_True("2b2 findchainfloat >=2", cnt >= 2);
+			remove(e1);
+			remove(e2);
+		} else {
+			ST_Skip("2b2 findchainfloat >=2", "spawn failed");
+			if (e1 != world) remove(e1);
+			if (e2 != world) remove(e2);
+		}
+
+		// #449 findflags / #450 findchainflags.
+		e1 = spawn();
+		if (e1 != world) {
+			e1.flags = FL_FINDABLE_NONSOLID;
+			ST_True("2b2 findflags !=world", findflags(world, flags, FL_FINDABLE_NONSOLID) != world);
+			cnt = 0;
+			ea = findchainflags(flags, FL_FINDABLE_NONSOLID);
+			while (ea != world && cnt < 64) { cnt = cnt + 1; ea = ea.chain; }
+			ST_True("2b2 findchainflags >=1", cnt >= 1);
+			remove(e1);
+		} else {
+			ST_Skip("2b2 findflags !=world", "spawn failed");
+			ST_Skip("2b2 findchainflags >=1", "spawn failed");
+		}
+
+		// #443 setattachment: .tag_entity выставляется всегда.
+		e1 = spawn();
+		e2 = spawn();
+		if (e1 != world && e2 != world) {
+			e2.tag_entity = world;
+			setattachment(e2, e1, "zz_tag");
+			ST_True("2b2 setattachment tag_entity", e2.tag_entity == e1);
+			remove(e1);
+			remove(e2);
+		} else {
+			ST_Skip("2b2 setattachment tag_entity", "spawn failed");
+			if (e1 != world) remove(e1);
+			if (e2 != world) remove(e2);
+		}
+
+		// #613 parseentitydata: поля из строки в готовый edict.
+		e1 = spawn();
+		if (e1 != world) {
+			e1.frame = 0;
+			q = chr2str(34);	// '"' (QuakeC не имеет escape в строках)
+			pes = strcat("{", q);
+			pes = strcat(pes, "frame");
+			pes = strcat(pes, q);
+			pes = strcat(pes, " ");
+			pes = strcat(pes, q);
+			pes = strcat(pes, "55");
+			pes = strcat(pes, q);
+			pes = strcat(pes, "}");
+			parseentitydata(e1, pes);
+			ST_EqF("2b2 parseentitydata frame", 55, e1.frame);
+			remove(e1);
+		} else {
+			ST_Skip("2b2 parseentitydata frame", "spawn failed");
+		}
 	}
 }
 
@@ -1550,7 +1557,9 @@ void CSQC_SelftestL2b2() {
 // из effects/render (остальные 2c — void визуальные сайд-эффекты).
 // FTE pr_bgcmd.c:6559; ezq — nop-заглушка (csqc_builtins.c:5018) → FAIL.
 // ============================================================================
-void CSQC_SelftestL2c() {
+void CSQC_SelftestL2c(float mode) {
+	if (mode == 0)	// единственный тест 2c — gap (mode != 0)
+		return;
 	makevectors('0 0 0');
 	vectorvectors('0 1 0');
 	ST_NearV("2c vectorvectors v_forward", '0 1 0', v_forward, 0.01);
@@ -1564,43 +1573,46 @@ void CSQC_SelftestL2c() {
 // (csqc_builtins.c:5028,5091-5096,5113-5116) → L2-FAIL. Capture-тесты
 // (@CAP@) — значения снимаются из FTE-лога и подставляются.
 // ============================================================================
-void CSQC_SelftestL2d() {
+void CSQC_SelftestL2d(float mode) {
 	local float b;
 	local string s;
 
-	// netaddress_resolve #625 (FTE резолвит; ezq nop-str → "")
-	s = netaddress_resolve("localhost", 27503);
-	ST_EqS("2d netaddress_resolve(localhost)", "127.0.0.1:27503", s);
+	// --- gaps (заглушки ezq) — mode != 0 ---
+	if (mode != 0) {
+		// getextresponse #624 — нет внешнего ответа → ""
+		ST_EqS("2d getextresponse", "", getextresponse());
 
-	// getextresponse #624 — нет внешнего ответа → ""
-	ST_EqS("2d getextresponse", "", getextresponse());
+		// netaddress_resolve #625 (FTE резолвит; ezq nop-str → "")
+		s = netaddress_resolve("localhost", 27503);
+		ST_EqS("2d netaddress_resolve(localhost)", "127.0.0.1:27503", s);
 
-	// buf_cvarlist #517 — заполняет список cvar'ов (маска "" → все)
-	b = buf_create();
-	if (b > 0) {
-		buf_cvarlist(b, "", "");
-		ST_True("2d buf_cvarlist size>0", buf_getsize(b) > 0);
-		buf_del(b);
-	} else {
-		ST_Skip("2d buf_cvarlist size>0", "buf_create failed");
+		// buf_cvarlist #517 — заполняет список cvar'ов (маска "" → все)
+		b = buf_create();
+		if (b > 0) {
+			buf_cvarlist(b, "", "");
+			ST_True("2d buf_cvarlist size>0", buf_getsize(b) > 0);
+			buf_del(b);
+		} else {
+			ST_Skip("2d buf_cvarlist size>0", "buf_create failed");
+		}
+
+		// bufstr_find #537 — точный поиск строки в буфере
+		b = buf_create();
+		if (b > 0) {
+			bufstr_add(b, "alpha", 0);
+			bufstr_add(b, "beta", 0);
+			bufstr_add(b, "gamma", 0);
+			ST_EqF("2d bufstr_find exact", 1, bufstr_find(b, "beta", MATCH_EXACT));
+			ST_EqF("2d bufstr_find miss", -1, bufstr_find(b, "zzz", MATCH_EXACT));
+			buf_del(b);
+		} else {
+			ST_Skip("2d bufstr_find exact", "buf_create failed");
+			ST_Skip("2d bufstr_find miss", "buf_create failed");
+		}
+
+		// getgamedirinfo #626 (diridx=-1 — текущий мод, propidx=GGDI_GAMEDIR)
+		ST_EqS("2d getgamedirinfo(gamedir)", "fortress", getgamedirinfo(-1, GGDI_GAMEDIR));
 	}
-
-	// bufstr_find #537 — точный поиск строки в буфере
-	b = buf_create();
-	if (b > 0) {
-		bufstr_add(b, "alpha", 0);
-		bufstr_add(b, "beta", 0);
-		bufstr_add(b, "gamma", 0);
-		ST_EqF("2d bufstr_find exact", 1, bufstr_find(b, "beta", MATCH_EXACT));
-		ST_EqF("2d bufstr_find miss", -1, bufstr_find(b, "zzz", MATCH_EXACT));
-		buf_del(b);
-	} else {
-		ST_Skip("2d bufstr_find exact", "buf_create failed");
-		ST_Skip("2d bufstr_find miss", "buf_create failed");
-	}
-
-	// getgamedirinfo #626 (diridx=-1 — текущий мод, propidx=GGDI_GAMEDIR)
-	ST_EqS("2d getgamedirinfo(gamedir)", "fortress", getgamedirinfo(-1, GGDI_GAMEDIR));
 }
 
 // ============================================================================
@@ -1686,27 +1698,35 @@ void CSQC_SelftestNoCrash() {
 // findfloat returns the FIRST match (not necessarily our spawn) -> scan; FTE
 // findradius skips SOLID_NOT -> spawn with solid=SOLID_BBOX.
 // ============================================================================
-void CSQC_SelftestD() {
+void CSQC_SelftestD(float mode) {
 	local vector mp;
 	local float isc0, isc1, nu, nf, nfind, fnd, guard;
 	local entity e, ce, vme, pe0, pe1, pe2, pe3, pe4;
 
-	// --- 2D: pic cache (precache -> iscachedpic -> size -> freepic no-op) ---
-	// FTE-эталон: имя резолвится ТОЛЬКО с явным расширением — "gfx/ttl_main.lmp"
-	// -> 214x24, без расширения -> 0. ezq резолвит иначе (bare -> 214x24,
-	// .lmp -> 96x24) — L2-расхождение ezq, кандидат на правку (план/parity-audit).
-	ST_True("1d 2D precache_pic", strlen(precache_pic("gfx/ttl_main.lmp")) > 0);
-	isc0 = iscachedpic("gfx/ttl_main.lmp");
-	ST_EqF("1d 2D iscachedpic after precache", 1, isc0);
-	mp = drawgetimagesize("gfx/ttl_main.lmp");
-	ST_EqF("1d 2D drawgetimagesize(lmp) x", 214, mp_x);
-	ST_EqF("1d 2D drawgetimagesize(lmp) y", 24, mp_y);
-	mp = drawgetimagesize("gfx/ttl_main");
-	ST_EqF("1d 2D drawgetimagesize(bare) x", 0, mp_x);
-	ST_EqF("1d 2D drawgetimagesize(bare) y", 0, mp_y);
-	freepic("gfx/ttl_main.lmp");
-	isc1 = iscachedpic("gfx/ttl_main.lmp");
-	ST_EqF("1d 2D iscachedpic after freepic", 1, isc1);
+	// --- 2D (реализовано в ezq; значения drawgetimagesize могут расходиться —
+	// баг ezq-резолвинга, не gap) — mode != 1 ---
+	if (mode != 1) {
+		ST_True("1d 2D precache_pic", strlen(precache_pic("gfx/ttl_main.lmp")) > 0);
+		isc0 = iscachedpic("gfx/ttl_main.lmp");
+		ST_EqF("1d 2D iscachedpic after precache", 1, isc0);
+
+		// FTE-эталон: имя резолвится ТОЛЬКО с явным расширением — "gfx/ttl_main.lmp"
+		// -> 214x24, без расширения -> 0. ezq резолвит иначе (bare -> 214x24,
+		// .lmp -> 96x24) — расхождение ezq (не заглушка).
+		mp = drawgetimagesize("gfx/ttl_main.lmp");
+		ST_EqF("1d 2D drawgetimagesize(lmp) x", 214, mp_x);
+		ST_EqF("1d 2D drawgetimagesize(lmp) y", 24, mp_y);
+		mp = drawgetimagesize("gfx/ttl_main");
+		ST_EqF("1d 2D drawgetimagesize(bare) x", 0, mp_x);
+		ST_EqF("1d 2D drawgetimagesize(bare) y", 0, mp_y);
+
+		freepic("gfx/ttl_main.lmp");
+		isc1 = iscachedpic("gfx/ttl_main.lmp");
+		ST_EqF("1d 2D iscachedpic after freepic", 1, isc1);
+	}
+
+	// --- parity: T5 / T9 / P1d / P1e — mode != 1 ---
+	if (mode != 1) {
 
 	// --- T5: isserver / num_for_edict / wasfreed ---
 	ST_EqF("1d T5 isserver 0", 0, isserver());
@@ -1791,21 +1811,22 @@ void CSQC_SelftestD() {
 	lightstyle(1, "a");
 	ambientsound('0 0 0', "weapons/detpack.wav", 0.15, 0);
 	ST_True("1d P1e subsystems no crash", 1);
+
+	}	// конец parity-блока (mode != 1)
 }
 
 // CSQC_SelfTest — батарея не-визуальных проверок. grp: 0=all, 1=core, 2=pred, 3=net.
 // Фаза 0: core = smoke 459/345/346/347/buf (CSQC_Fx_Smoke заполняет g_sm*).
 // #345 в игре до первого usercmd может быть 0 — тогда SKIP, не FAIL.
-void CSQC_SelfTest(float grp) {
+// --- core (parity/gaps) — Фазы 0–1d ---
+void CSQC_SelftestCore(float mode) {
 	local float k;
 	local vector rv;
-	local float h;	// l2: hash-таблица
 
-	ST_Reset(grp);
+	CSQC_Fx_Smoke();	// заполняет g_sm* (нужно и parity, и gap buf)
 
-	// --- core: детерминированные/in-game smoke ---
-	if (grp == 0 || grp == 1) {
-		CSQC_Fx_Smoke();
+	// --- parity (mode != 1) ---
+	if (mode != 1) {
 		ST_EqF("459 edict_num(1)", 1, g_sm459);
 		if (input_sequence == 0)
 			ST_Skip("345 getinputstate", "input_sequence==0 (no usercmd yet)");
@@ -1813,9 +1834,7 @@ void CSQC_SelfTest(float grp) {
 			ST_EqF("345 getinputstate", 1, g_sm345);
 		ST_EqF("346 setsensitivityscaler", 1, g_sm346);
 		ST_EqF("347 runstandardplayerphysics", 1, g_sm347);
-		// FTE-оракул: дырочная модель buf (free оставляет NULL-дыру, getsize не
-		// падает → 6). ezq сейчас 7 (сдвиг+count, R6 parity-audit) → FAIL до
-		// приведения ezq к FTE (трек T3).
+		// Реализовано в ezq, но поведение иное (не заглушка): баг ezq (R6/T3), не gaps.
 		ST_EqF("460-469 buf chain", 6, g_sm_buf);
 
 		// --- Фаза 1a: математика/типы (детерминированная, движок-независимая) ---
@@ -1891,8 +1910,7 @@ void CSQC_SelfTest(float grp) {
 		ST_EqF("P1c checkextension(DP_QC_MINMAXBOUND)", 1, checkextension("DP_QC_MINMAXBOUND"));
 		ST_EqF("P1c checkextension(NOSUCH_EXT)", 0, checkextension("NOSUCH_EXT"));
 		ST_True("T3 cvar_type(csqc_dbg)!=0", cvar_type("csqc_dbg") != 0);
-		// FTE-оракул: module-cvar (#93) без сохранённого default → ""; ezq даёт
-		// "0" → FAIL (расхождение, кандидат на правку ezq).
+		// Реализовано в ezq (возврат "0" vs FTE ""): баг ezq, не gap.
 		ST_EqS("T3 cvar_defstring(csqc_dbg)", "", cvar_defstring("csqc_dbg"));
 		ST_EqS("T3 cvar_description(csqc_dbg)", "", cvar_description("csqc_dbg"));
 		ST_EqF("T12 checkcommand(status)", 1, checkcommand("status"));
@@ -1916,24 +1934,24 @@ void CSQC_SelfTest(float grp) {
 		ST_True("T8 getkeybind noncrash", strlen(getkeybind(k)) >= 0);
 
 		// --- Фаза 1d: 2D-кэш / T5 / T9 / P1d / P1e (без трасс) ---
-		CSQC_SelftestD();
+		CSQC_SelftestD(mode);
 	}
+}
 
-	// --- Фаза 2 (group l2): FTE-implemented builtins, нормальные параметры ---
-	// Ожидания = поведение FTE (эталон); ezq обязан совпасть (многие — L2-гэпы).
-	if (grp == 0 || grp == 4) {
-		// 2a: strings/digest/whichpack
+// --- 2a: строки/digest/hash ---
+void CSQC_SelftestL2a(float mode) {
+	local float h;	// hash-таблица
+
+	// --- gaps (заглушки ezq) — mode != 0 ---
+	if (mode != 0) {
 		// instr: FTE PF_instr возвращает подстроку-остаток (RETURN_SSTRING), а
 		// csdefs объявляет float instr (#206) — тип несовместим → исключён.
 		ST_EqF("2a strlennocol(abc)", 3, strlennocol("abc"));
 		ST_EqS("2a strdecolorize(abc)", "abc", strdecolorize("abc"));
 		// digest_hex: FTE требует имя хеша в ВЕРХНЕМ регистре (pr_bgcmd.c:5794).
 		ST_EqS("2a digest_hex(MD5,abc)", "900150983cd24fb0d6963f7d28e17f72", digest_hex("MD5", "abc"));
-		// URI-группа (uri_escape/uri_unescape/uri_get) — отключена (uri_get требует
-		// callback/сеть; решение 2026-09-19).
 		ST_EqS("2a whichpack(player.mdl)", "", whichpack("progs/player.mdl", 0));
 		ST_EqS("2a strconv(0,0,0,abc)", "abc", strconv(0, 0, 0, "abc"));
-		// 2a: hash-таблица
 		h = hash_createtab(64, 0);
 		ST_True("2a hash_createtab>0", h > 0);
 		hash_add(h, "k", 0, 0);
@@ -1941,20 +1959,189 @@ void CSQC_SelfTest(float grp) {
 		hash_delete(h, "k");
 		hash_destroytab(h);
 		hash_getcb();
-		// search: FTE arg1 = флаги QCSEARCH_* (не caseinsensitive), FS-зависимо;
-		// корректные флаги/капчур — отдельным шагом (временно исключено).
+	}
+}
 
-		// 2b-1: model index / animation / resource / rotatevectors.
-		CSQC_SelftestL2b1();
+// Phase 3: entity/trace/stat/render — FTE-оракул (паритет, реализовано обоими).
+// Миграция ad-hoc-проверок экранов 3/5/6/10 (C2E/C7/T13/SW78-79/GE504).
+void CSQC_SelftestEnt() {
+	local vector eye, above, tgt, mn, mx;
+	local entity ce, vme;
+	local float le, idx, nf, i;
 
-		// 2b-2: entity/find/reflection/tags.
-		CSQC_SelftestL2b2();
+	makevectors(getproperty(15));
+	eye = getproperty(11);
+	above = eye + '0 0 96';
+	tgt = eye + v_forward * 96;
 
-		// 2c: vectorvectors (единственный QC-наблюдаемый; остальное — csqc_nocrash).
-		CSQC_SelftestL2c();
+	// --- C2E: trace бьёт стену-forward с wall-сущностью ---
+	ce = spawn();
+	if (ce != world) {
+		setorigin(ce, tgt);
+		setsize(ce, '-8 -8 -8', '8 8 8');
+		ce.solid = SOLID_BBOX;
+		traceline(eye, eye + v_forward * 140, MOVE_NORMAL, world);
+		ST_True("3 C2E trace hits wall", trace_ent == ce);
+		remove(ce);
+	} else {
+		ST_Skip("3 C2E trace hits wall", "spawn failed");
+	}
 
-		// 2d: buf/hostcache/net — функциональные.
-		CSQC_SelftestL2d();
+	// --- C7: MOVE_* dispatch ---
+	ce = spawn();
+	if (ce != world) {
+		setorigin(ce, tgt);
+		setsize(ce, '-8 -8 -8', '8 8 8');
+		ce.solid = SOLID_BBOX;
+		traceline(eye, eye + v_forward * 140, MOVE_NORMAL, world);
+		ST_True("3 C7 NORMAL hits", trace_ent == ce);
+		traceline(eye, eye + v_forward * 140, MOVE_NOMONSTERS, world);
+		ST_True("3 C7 NOMONSTERS skip", trace_ent != ce);
+		remove(ce);
+	} else {
+		ST_Skip("3 C7 NORMAL hits", "spawn failed");
+		ST_Skip("3 C7 NOMONSTERS skip", "spawn failed");
+	}
+
+	ce = spawn();
+	if (ce != world) {
+		setorigin(ce, tgt);
+		setsize(ce, '-8 -8 -8', '8 8 8');
+		ce.solid = SOLID_NOT;
+		traceline(eye, eye + v_forward * 140, MOVE_NORMAL, world);
+		ST_True("3 C7 SOLID_NOT NORMAL skip", trace_ent != ce);
+		traceline(eye, eye + v_forward * 140, MOVE_EVERYTHING, world);
+		// FTE-эталон: MOVE_EVERYTHING не бьёт SOLID_NOT-сущность (ezq бьёт — расхождение).
+		ST_True("3 C7 SOLID_NOT EVERYTHING", trace_ent != ce);
+		remove(ce);
+	} else {
+		ST_Skip("3 C7 SOLID_NOT NORMAL skip", "spawn failed");
+		ST_Skip("3 C7 SOLID_NOT EVERYTHING", "spawn failed");
+	}
+
+	ce = spawn();
+	if (ce != world) {
+		setorigin(ce, tgt);
+		setsize(ce, '-8 -8 -8', '8 8 8');
+		ce.solid = SOLID_TRIGGER;
+		traceline(eye, eye + v_forward * 140, MOVE_TRIGGERS, world);
+		// FTE-эталон: MOVE_TRIGGERS не бьёт SOLID_TRIGGER-сущность (ezq бьёт — расхождение).
+		ST_True("3 C7 TRIGGER TRIGGERS", trace_ent != ce);
+		remove(ce);
+	} else {
+		ST_Skip("3 C7 TRIGGER TRIGGERS", "spawn failed");
+	}
+
+	ce = spawn();
+	if (ce != world) {
+		setorigin(ce, tgt);
+		setsize(ce, '-8 -8 -8', '8 8 8');
+		ce.solid = SOLID_BBOX;
+		ce.flags = FL_MONSTER;
+		traceline(eye, eye + v_forward * 140, MOVE_MISSILE, world);
+		ST_True("3 C7 MISSILE monster hits", trace_ent == ce);
+		remove(ce);
+	} else {
+		ST_Skip("3 C7 MISSILE monster hits", "spawn failed");
+	}
+
+	// forent-skip: трасса с forent=ce не бьёт саму ce.
+	ce = spawn();
+	if (ce != world) {
+		setorigin(ce, above + v_forward * 96);
+		setsize(ce, '-8 -8 -8', '8 8 8');
+		ce.solid = SOLID_BBOX;
+		traceline(above, above + v_forward * 140, MOVE_NORMAL, ce);
+		ST_True("3 C7 forent skip", trace_ent != ce);
+		remove(ce);
+	} else {
+		ST_Skip("3 C7 forent skip", "spawn failed");
+	}
+
+	// --- T13: entity-рефлексия #496-500 (solid/classname) ---
+	nf = numentityfields();
+	vme = spawn();
+	if (vme != world) {
+		vme.solid = SOLID_BBOX;
+		setorigin(vme, '1 2 3');
+		idx = -1;
+		for (i = 0; i < nf; i = i + 1)
+			if (entityfieldname(i) == "solid")
+				idx = i;
+		ST_True("3 T13 solid idx", idx >= 0);
+		if (idx >= 0)
+			ST_EqF("3 T13 solid value", SOLID_BBOX, stof(getentityfieldstring(idx, vme)));
+		idx = -1;
+		for (i = 0; i < nf; i = i + 1)
+			if (entityfieldname(i) == "classname")
+				idx = i;
+		if (idx >= 0) {
+			putentityfieldstring(idx, vme, "rf_set");
+			ST_True("3 T13 classname round-trip", getentityfieldstring(idx, vme) == "rf_set");
+		} else {
+			ST_Skip("3 T13 classname round-trip", "classname field not found");
+		}
+		remove(vme);
+	} else {
+		ST_Skip("3 T13 solid idx", "spawn failed");
+		ST_Skip("3 T13 solid value", "spawn failed");
+		ST_Skip("3 T13 classname round-trip", "spawn failed");
+	}
+
+	// --- SW78/79: stat wire (серверный тест-паттерн) ---
+	ST_EqF("3 SW78/79 bad", 0, CSQC_StatWire_Bad());
+
+	// --- GE504: getentity #504 ---
+	le = player_localentnum;
+	ST_EqF("3 GE504 active", 1, getentity(le, GE_ACTIVE));
+	ST_True("3 GE504 model>0", getentity(le, GE_MODELINDEX) > 0);
+	ST_True("3 GE504 maxents>0", getentity(0, GE_MAXENTS) > 0);
+	ST_True("3 GE504 origin>0", vlen(getentity(le, GE_ORIGIN)) > 0);
+	mn = getentity(le, GE_MINS);
+	mx = getentity(le, GE_MAXS);
+	ST_True("3 GE504 mins.z<0", mn_z < 0);
+	ST_True("3 GE504 maxs.z>0", mx_z > 0);
+	ST_EqF("3 GE504 invalid=0", 0, getentity(0, GE_ACTIVE));
+}
+
+// CSQC_SelfTest — оркестратор групп.
+// grp: 0=default (parity: core+ent+l2), 1=core, 2=ent, 3=l2, 4=gaps (ezq-unimplemented), 6=all.
+void CSQC_SelfTest(float grp) {
+	ST_Reset(grp);
+
+	if (grp == 0) {		// default — только паритет (без ezq-гэпов)
+		CSQC_SelftestCore(0);
+		CSQC_SelftestEnt();
+		CSQC_SelftestL2a(0);
+		CSQC_SelftestL2b1(0);
+		CSQC_SelftestL2b2(0);
+		CSQC_SelftestL2c(0);
+		CSQC_SelftestL2d(0);
+	} else if (grp == 1) {	// core
+		CSQC_SelftestCore(0);
+	} else if (grp == 2) {	// ent (Phase 3)
+		CSQC_SelftestEnt();
+	} else if (grp == 3) {	// l2 (parity)
+		CSQC_SelftestL2a(0);
+		CSQC_SelftestL2b1(0);
+		CSQC_SelftestL2b2(0);
+		CSQC_SelftestL2c(0);
+		CSQC_SelftestL2d(0);
+	} else if (grp == 4) {	// gaps — ezq-unimplemented
+		CSQC_SelftestCore(1);
+		CSQC_SelftestL2a(1);
+		CSQC_SelftestL2b1(1);
+		CSQC_SelftestL2b2(1);
+		CSQC_SelftestL2c(1);
+		CSQC_SelftestL2d(1);
+	} else if (grp == 6) {	// all (parity + gaps)
+		CSQC_SelftestCore(2);
+		CSQC_SelftestEnt();
+		CSQC_SelftestL2a(2);
+		CSQC_SelftestL2b1(2);
+		CSQC_SelftestL2b2(2);
+		CSQC_SelftestL2c(2);
+		CSQC_SelftestL2d(2);
 	}
 
 	ST_Summary();
