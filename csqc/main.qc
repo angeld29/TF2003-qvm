@@ -84,6 +84,10 @@ float g_c5b_stop;	// горизонтальная скорость после о
 // round-trip entity-соглашения #459/#512: num_for_edict(edict_num(slot)) == slot
 // (int-биты vs float — ловит регресс entity-аргументов, см. ADR 0019).
 float g_c5b_rt;
+// T2.3 (#347 gaps, accept+doc): PMF_LADDER после #347 должен быть 0 — в QW
+// ladder-физики нет ни в ezq-PM, ни в FTE (детект только Q2/Q3); страж
+// фиксирует текущий паритет (не менять без порта ladder в PM).
+float g_c5b_ladder;
 // C5-E: предикция локального игрока (вариант «а» — движковый мост
 // player_state→edict, deltalisten #371). Модуль получает авторитетное состояние
 // в CSQC_PlayerPred, предсказывает от servercommandframe к clientcommandframe.
@@ -2280,6 +2284,8 @@ void CSQC_SelftestPred() {
 
 	// --- C5-B: канарейка-механика #347 (снята на арминге, до движения) ---
 	ST_EqF("4 C5-B #347 bad", 0, g_pred_c5b);
+	// T2.3: #347-gaps accept+doc — PMF_LADDER не выставляется (QW без ladder-физики).
+	ST_EqF("4 T2.3 no PMF_LADDER", 0, g_c5b_ladder);
 
 	// --- C5-E: предикция в движении ---
 	if (g_pp_valid == 1 && g_pp_ent != world) {
@@ -2595,10 +2601,14 @@ float CSQC_C5B_Run() {
 	if (sp_move > 10 && sp_stop >= sp_move)
 		bad = bad + 1;
 
+	// T2.3: PMF_LADDER недостижим в QW (нет ladder-физики в PM) — страж паритета.
+	g_c5b_ladder = (e.pmove_flags & PMF_LADDER) ? 1 : 0;
+
 	remove(e);
 	g_c5b_bad = bad;
 	dprint(sprintf("C5B347 bad %g rt %g fall %g land %g sink %g move %g stop %g\n",
 		bad, g_c5b_rt, g_c5b_fall, g_c5b_land, g_c5b_sink, g_c5b_move, g_c5b_stop));
+	dprint(sprintf("C5B347 lad %g\n", g_c5b_ladder));
 	return bad;
 }
 
@@ -3188,9 +3198,9 @@ void Hud_DrawCSQC() {
 			[12, 12], (g_c5b_bad == 0) ? '0 1 0' : '1 0 0', 1, 0);
 		yy = yy + 18;
 		drawstring([60, yy, 0],
-			sprintf("sink %g move %g stop %g",
-				g_c5b_sink, g_c5b_move, g_c5b_stop),
-			[12, 12], '1 1 1', 1, 0);
+			sprintf("sink %g move %g stop %g lad %g",
+				g_c5b_sink, g_c5b_move, g_c5b_stop, g_c5b_ladder),
+			[12, 12], (g_c5b_ladder == 0) ? '1 1 1' : '1 0 0', 1, 0);
 	}
 
 	// --- экран 8: C5-E предикция локального игрока ---

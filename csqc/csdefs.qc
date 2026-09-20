@@ -296,7 +296,10 @@ const float FL_WATERJUMP = 2048;
 const float FL_JUMPRELEASED = 4096;
 const float FL_FINDABLE_NONSOLID = 16384;	/* Allows this entity to be found with findradius */
 /* pmove_flags (.pmove_flags): FTE fteqw/engine/common/pmove.h:36-37.
-   PMF_LADDER в ezq недостижим (в pmove нет onladder) — константа для совместимости. */
+   T2.3 (#347 gaps, accept+doc): PMF_LADDER в QW недостижим — ladder-детект в FTE
+   только Q2/Q3 (engine/common/pmove.c:1010-1052), в ezq-pmove ladder-физики нет;
+   skipent/.gravitydir требуют PM-core (вне #347); .waterlevel #347 не отдаёт
+   (пишет только SSQC runclientphys). Константы — для совместимости. */
 const float PMF_JUMP_HELD = 1;
 const float PMF_LADDER = 2;
 /* deltalisten (#371) flags: FTE pr_csqc.c:5478. NOLERP/NOROTATE — no-lerp
