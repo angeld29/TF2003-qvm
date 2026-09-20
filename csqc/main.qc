@@ -61,6 +61,9 @@ float g_st_group;	// текущая группа: 0=all, 1=core, 2=pred, 3=net
 float g_st_auto_done;	// автопрогон выполнен на текущей карте (0/1)
 float g_st_ncrash_req;	// запрос no-crash прогона void-builtins (csqc_nocrash); сбрасывается на draw-кадре
 float g_st_2d_req;	// запрос 2D-draw прогона (csqc_selftest 2d); на draw-кадре (валидный framebuffer)
+float g_st_vp_req;	// запрос canary VF_VIEWPORT (csqc_selftest vp); на draw-кадре (same-frame)
+vector g_st_vp_orig_size;	// исходный размер viewport (восстановление)
+vector g_st_vp_orig_min;	// исходная позиция viewport (восстановление)
 // C5-A (предикция EXT_CSQC_1): окно модуля — live под csqc_dbg 3.
 float g_c5_sc;		// servercommandframe (ack сервера; движок пишет каждый кадр)
 float g_c5_cc;		// clientcommandframe (следующий отправляемый кадр)
@@ -767,6 +770,11 @@ float(string cmd) CSQC_ConsoleCommand = {
 			print("csqc_selftest 2d: scheduled (runs on next draw)\n");
 			return 1;
 		}
+		if (argv(1) == "vp") {
+			g_st_vp_req = 1;
+			print("csqc_selftest vp: scheduled (runs on next draw)\n");
+			return 1;
+		}
 		grp = 0;
 		if (argv(1) == "core") grp = 1;
 		else if (argv(1) == "ent") grp = 2;
@@ -1466,6 +1474,10 @@ void CSQC_SelftestL2b2(float mode) {
 				ST_EqS("2b2 getentityfieldstring(frame)", "77", getentityfieldstring(idx, e1));
 				putentityfieldstring(idx, e1, "123");
 				ST_EqF("2b2 putentityfieldstring frame", 123, e1.frame);
+				// T3 Э5: #498 полный ddef_t.type (frame = ev_float = 2);
+				// FTE pr_bgcmd.c:7750 отдаёт type без маски (в нашем csprogs
+				// DEF_SAVEGLOBAL не выставлен, поэтому маска эффекта не даёт).
+				ST_EqF("2b2 entityfieldtype(frame)", 2, entityfieldtype(idx));
 				remove(e1);
 			} else {
 				ST_Skip("2b2 getentityfieldstring(frame)", "spawn failed");
@@ -1767,7 +1779,7 @@ void CSQC_Selftest2D() {
 // ============================================================================
 void CSQC_SelftestD(float mode) {
 	local vector mp;
-	local float isc0, isc1, nu, nf, nfind, fnd, guard;
+	local float isc0, isc1, nu, nf, nfind, fnd, guard, nn;
 	local entity e, ce, vme, pe0, pe1, pe2, pe3, pe4;
 
 	// --- 2D (реализовано в ezq; значения drawgetimagesize могут расходиться —
@@ -1832,6 +1844,20 @@ void CSQC_SelftestD(float mode) {
 		ST_Skip("1d T9 findfloat finds spawn", "spawn failed");
 	}
 
+	// --- T9b: findfloat int-биты (#98) — FTE сравнивает сырые 32 бита
+	// (pr_bgcmd.c:1672). NaN бит-равен себе, но NaN!=NaN по float: до Э5 ezq
+	// возвращал world, FTE/ezq-после — наш spawn. ---
+	vme = spawn();
+	if (vme != world) {
+		nn = sqrt(-1);		// NaN (одинаково FTE pr_bgcmd.c:6480 / ezq pr_cmds.c:2454)
+		vme.frame = nn;
+		ce = findfloat(world, frame, nn);
+		ST_True("1d T9b findfloat NaN bit-match", ce == vme);
+		remove(vme);
+	} else {
+		ST_Skip("1d T9b findfloat NaN bit-match", "spawn failed");
+	}
+
 	// --- P1d: 5 spawn (solid bbox) -> count -> nextent -> find -> findradius ---
 	nu = 0;
 	pe0 = spawn();
@@ -1887,8 +1913,8 @@ void CSQC_SelftestD(float mode) {
 // #345 в игре до первого usercmd может быть 0 — тогда SKIP, не FAIL.
 // --- core (parity/gaps) — Фазы 0–1d ---
 void CSQC_SelftestCore(float mode) {
-	local float k;
-	local vector rv;
+	local float k, noop_prop;
+	local vector rv, cur_org;
 
 	CSQC_Fx_Smoke();	// заполняет g_sm* (нужно и parity, и gap buf)
 
@@ -1939,6 +1965,11 @@ void CSQC_SelftestCore(float mode) {
 		ST_NearF("P1b stof(1.5)", 1.5, stof("1.5"), 0.0001);
 		ST_EqS("P1b substring(hello,1,3)", "ell", substring("hello", 1, 3));
 		ST_NearV("P1b stov(1 2 3)", '1 2 3', stov("1 2 3"), 0.0001);
+		// T3 Э5: stov с обрамляющими ' (FTE PF_stov `'`-stop) — паритет ezq/FTE.
+		ST_NearV("P1b stov('1 2 3')", '1 2 3', stov("'1 2 3'"), 0.0001);
+		// T3 Э5: ftos — целое "%d", дробное точно (FTE PF_ftos, pr_bgcmd.c:4645).
+		ST_EqS("P1b ftos(2)", "2", ftos(2));
+		ST_EqS("P1b ftos(1.5)", "1.5", ftos(1.5));
 		ST_EqS("P1b strzone", "zoned", strzone("zoned"));
 		ST_EqS("T2 itos(-7)", "-7", itos(-7));
 		ST_EqS("T2 itos(stoi(42))", "42", itos(stoi("42")));
@@ -2002,6 +2033,13 @@ void CSQC_SelftestCore(float mode) {
 		rv = getbindmaps();
 		ST_NearV("T8 getbindmaps 0 0 0", '0 0 0', rv, 0.001);
 		ST_True("T8 getkeybind noncrash", strlen(getkeybind(k)) >= 0);
+		// T3 Э5: #303 setproperty — FTE: 1 для распознанного VF_ (pr_csqc.c:2389),
+		// 0 для неизвестного (default:2691). Known — VF_ORIGIN текущим значением
+		// (no-op); unknown — через переменную (иначе fteqcc F333 на литерал).
+		cur_org = getproperty(VF_ORIGIN);
+		ST_EqF("T3 setproperty ret 1", 1, setproperty(VF_ORIGIN, cur_org));
+		noop_prop = 9999;
+		ST_EqF("T3 setproperty ret 0", 0, setproperty(noop_prop, 0));
 
 		// --- Фаза 1d: 2D-кэш / T5 / T9 / P1d / P1e (без трасс) ---
 		CSQC_SelftestD(mode);
@@ -2549,6 +2587,7 @@ void Hud_DrawCSQC() {
 	local float cx, cy;	// 2D-доп: правый верхний угол от размера экрана
 	local float bad;	// экран 6: агрегат стат-канарейки (CSQC_StatWire_Bad)
 	local float le;		// экран 10: player_localentnum для #504 getentity
+	local vector vp_sz, vp_mn;	// T3 Э5: canary VF_VIEWPORT (чтение)
 
 	// Self-test harness: автопрогон по спавну. В TF после коннекта игрок —
 	// спектатор (player_localentnum != 0 указывает на наблюдаемого), своя сущность
@@ -2577,6 +2616,21 @@ void Hud_DrawCSQC() {
 		ST_Reset(8);
 		CSQC_Selftest2D();
 		ST_Summary();
+	}
+
+	// T3 Э5: canary VF_VIEWPORT (`csqc_selftest vp`) — setproperty(view) применяется
+	// в ТОМ ЖЕ кадре (FTE-паритет; ezq-фикс — немедленный ApplyViewProps): set
+	// позиции+размера (2 вектора), чтение и восстановление — сразу.
+	if (g_st_vp_req != 0) {
+		g_st_vp_req = 0;
+		g_st_vp_orig_size = getproperty(VF_VIEWPORT);
+		g_st_vp_orig_min = getproperty(VF_MIN);
+		setproperty(VF_VIEWPORT, '10 20', '30 40');
+		vp_sz = getproperty(VF_VIEWPORT);
+		vp_mn = getproperty(VF_MIN);
+		print(sprintf("[CSQC-TEST] VFVP size %g %g min %g %g\n",
+			vp_sz_x, vp_sz_y, vp_mn_x, vp_mn_y));
+		setproperty(VF_VIEWPORT, g_st_vp_orig_min, g_st_vp_orig_size);	// восстановление
 	}
 
 	// Phase 4 pred-тест (armed): копим max g_e_err за окно; по завершении settle —
