@@ -88,6 +88,11 @@ float g_c5b_rt;
 // ladder-физики нет ни в ezq-PM, ни в FTE (детект только Q2/Q3); страж
 // фиксирует текущий паритет (не менять без порта ladder в PM).
 float g_c5b_ladder;
+// T2.4 (#504 getentity lerp): armed-проба — GE_ORIGIN/GE_ANGLES локального игрока.
+// Лерп-origin должен следовать за движением (измениться за drive), углы — конечны.
+vector g_t24_org0;	// GE_ORIGIN локального на арминге
+float g_t24_moved;	// |GE_ORIGIN(settle) - GE_ORIGIN(arm)| (>0)
+float g_t24_angbad;	// vlen(GE_ANGLES) неадекватен/NaN (0 = ok)
 // C5-E: предикция локального игрока (вариант «а» — движковый мост
 // player_state→edict, deltalisten #371). Модуль получает авторитетное состояние
 // в CSQC_PlayerPred, предсказывает от servercommandframe к clientcommandframe.
@@ -136,6 +141,13 @@ vector g_ge_org;		// getentity(local, GE_ORIGIN) — интерп. origin
 vector g_ge_mn;			// getentity(local, GE_MINS)
 vector g_ge_mx;			// getentity(local, GE_MAXS)
 float g_ge_dorg;		// |GE_ORIGIN - мост g_pp_ent.origin| (информативно)
+vector g_ge_ang;		// getentity(local, GE_ANGLES) — интерп. углы (T2.4)
+// T2.4 remote-probe (второй игрок): угол сети-игрока (remote-путь #504) для
+// сверки конвенции pitch ezq vs FTE (local у FTE модельный -view/3, remote — ?).
+float g_ge_rem;			// entnum второго игрока (0 = не найден)
+float g_ge_rem_mdl;		// его GE_MODELINDEX
+vector g_ge_rem_ang;	// его GE_ANGLES
+vector g_ge_rem_org;	// его GE_ORIGIN (для контроля)
 // Ф3 (renderscene takeover): mod-side отрисовка. Тест-энтити (модель оружия
 // lightning) рисуется через CSQC render path на экране csqc_dbg 11
 // (#302/#301 arena + renderscene); без dbg — простой renderscene.
@@ -540,6 +552,11 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_ge_mn = '0 0 0';
 	g_ge_mx = '0 0 0';
 	g_ge_dorg = 0;
+	g_ge_ang = '0 0 0';
+	g_ge_rem = 0;
+	g_ge_rem_mdl = 0;
+	g_ge_rem_ang = '0 0 0';
+	g_ge_rem_org = '0 0 0';
 	precache_model("progs/player.mdl");
 	deltalisten("progs/player.mdl", CSQC_PlayerPred, RSES_NOLERP | RSES_NOROTATE);
 };
@@ -598,6 +615,11 @@ void() CSQC_WorldLoaded = {
 	g_ge_mn = '0 0 0';
 	g_ge_mx = '0 0 0';
 	g_ge_dorg = 0;
+	g_ge_ang = '0 0 0';
+	g_ge_rem = 0;
+	g_ge_rem_mdl = 0;
+	g_ge_rem_ang = '0 0 0';
+	g_ge_rem_org = '0 0 0';
 };
 
 // Ф3 (renderscene takeover): mod-side отрисовка тест-модели флага.
@@ -2252,6 +2274,10 @@ void PredArm() {
 		g_pred_o0 = g_pp_ent.origin;
 	else
 		g_pred_o0 = getproperty(VF_ORIGIN);
+	// T2.4: захват лерп-origin локального игрока до движения (#504 GE_ORIGIN).
+	g_t24_org0 = getentity(player_localentnum, GE_ORIGIN);
+	g_t24_moved = 0;
+	g_t24_angbad = 0;
 	// C5-B прогоняем СЕЙЧАС (до движения) — канарейка требует ровного пола впереди.
 	g_pred_c5b = CSQC_C5B_Run();
 	print("csqc_selftest pred: armed (driving movement; summary after settle)\n");
@@ -2260,6 +2286,7 @@ void PredArm() {
 // Финальные ассерты armed-теста (вызывается из Hud_DrawCSQC после settle).
 void CSQC_SelftestPred() {
 	local float iseq0;	// input_sequence до проб #345 (пробы штампуют его сами)
+	local vector ang;
 	ST_Reset(7);
 
 	// --- C5-A: окно предикции ---
@@ -2294,6 +2321,12 @@ void CSQC_SelftestPred() {
 		ST_EqF("4 C5-E no teleport snaps", g_pred_start_tele, g_e_tele);
 		ST_True("4 C5-E net frames", (servercommandframe - g_pred_start_sc) >= PRED_DRIVE_FRAMES);
 		ST_True("4 C5-E player moved", vlen(g_pp_ent.origin - g_pred_o0) >= 64);
+		// T2.4 (#504 lerp): лерп-origin следует за движением; углы конечны.
+		g_t24_moved = vlen(getentity(player_localentnum, GE_ORIGIN) - g_t24_org0);
+		ang = getentity(player_localentnum, GE_ANGLES);
+		g_t24_angbad = (vlen(ang) < 100000) ? 0 : 1;
+		ST_True("4 T2.4 #504 lerp origin moved", g_t24_moved > 0);
+		ST_EqF("4 T2.4 #504 angles finite", 0, g_t24_angbad);
 		// Точность: max-ошибка прогноза за окно (порог — capture FTE).
 		print(sprintf("[PRED] maxerr=%g tele=%g upd=%g moved=%g\n",
 			g_pred_maxerr, g_e_tele - g_pred_start_tele, g_e_upd - g_pred_start_upd,
@@ -3250,6 +3283,7 @@ void Hud_DrawCSQC() {
 	// невалидные номера -> 0); org — интерп. origin игрока; dorg — расхождение с
 	// мостом C5-E (lerp vs no-lerp, информативно); col — цвета 0..15.
 	if (D == 10) {
+		local float ri;
 		le = player_localentnum;
 		g_ge_act = getentity(le, GE_ACTIVE);
 		g_ge_model = getentity(le, GE_MODELINDEX);
@@ -3257,6 +3291,7 @@ void Hud_DrawCSQC() {
 		g_ge_org = getentity(le, GE_ORIGIN);
 		g_ge_mn = getentity(le, GE_MINS);
 		g_ge_mx = getentity(le, GE_MAXS);
+		g_ge_ang = getentity(le, GE_ANGLES);
 		g_ge_pants = getentity(le, GE_PANTSCOLOR);
 		g_ge_shirt = getentity(le, GE_SHIRTCOLOR);
 		g_ge_inv = getentity(0, GE_ACTIVE);
@@ -3267,7 +3302,23 @@ void Hud_DrawCSQC() {
 		g_ge_bad = g_ge_bad + (vlen(g_ge_org) <= 0);
 		g_ge_bad = g_ge_bad + (g_ge_mn_z >= 0);
 		g_ge_bad = g_ge_bad + (g_ge_mx_z <= 0);
+		g_ge_bad = g_ge_bad + (vlen(g_ge_ang) >= 100000);
 		g_ge_bad = g_ge_bad + (g_ge_inv != 0);
+		// T2.4 remote-probe: второй игрок (слот-игрок 1..16, не локальный) —
+		// remote-путь #504 (сверка pitch-конвенции ezq vs FTE).
+		g_ge_rem = 0;
+		g_ge_rem_mdl = 0;
+		g_ge_rem_ang = '0 0 0';
+		g_ge_rem_org = '0 0 0';
+		for (ri = 1; ri <= 16 && ri < g_ge_max; ri = ri + 1) {
+			if (ri != le && getentity(ri, GE_ACTIVE) == 1 && getentity(ri, GE_MODELINDEX) > 0)
+				g_ge_rem = ri;
+		}
+		if (g_ge_rem != 0) {
+			g_ge_rem_mdl = getentity(g_ge_rem, GE_MODELINDEX);
+			g_ge_rem_ang = getentity(g_ge_rem, GE_ANGLES);
+			g_ge_rem_org = getentity(g_ge_rem, GE_ORIGIN);
+		}
 		g_ge_dorg = 0;
 		if (g_pp_valid == 1 && g_pp_ent != world)
 			g_ge_dorg = vlen(g_ge_org - g_pp_ent.origin);
@@ -3293,6 +3344,15 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("GE max %g %g %g", g_ge_mx_x, g_ge_mx_y, g_ge_mx_z),
 			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("GE ang %g %g %g", g_ge_ang_x, g_ge_ang_y, g_ge_ang_z),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("GE rem e%g m%g ang %g %g %g", g_ge_rem, g_ge_rem_mdl,
+				g_ge_rem_ang_x, g_ge_rem_ang_y, g_ge_rem_ang_z),
+			[12, 12], (g_ge_rem != 0) ? '0 1 0' : '1 1 0', 1, 0);
 		yy = yy + 18;
 		drawstring([60, yy, 0],
 			sprintf("GE col p%g s%g inv %g", g_ge_pants, g_ge_shirt, g_ge_inv),
