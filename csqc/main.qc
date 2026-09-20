@@ -2011,8 +2011,10 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqF("P1c checkextension(DP_QC_MINMAXBOUND)", 1, checkextension("DP_QC_MINMAXBOUND"));
 		ST_EqF("P1c checkextension(NOSUCH_EXT)", 0, checkextension("NOSUCH_EXT"));
 		ST_True("T3 cvar_type(csqc_dbg)!=0", cvar_type("csqc_dbg") != 0);
-		// Реализовано в ezq (возврат "0" vs FTE ""): баг ezq, не gap.
-		ST_EqS("T3 cvar_defstring(csqc_dbg)", "", cvar_defstring("csqc_dbg"));
+		// #482 cvar_defstring: из parity-теста УБРАН (T3 Э6). FTE отдаёт "" из-за
+		// quirk PF_registercvar (pr_bgcmd.c:2001 гейт `callargc>2`, а модуль зовёт
+		// registercvar(name,value) 2 аргами → value "") — не ezq-баг; ezq честно
+		// возвращает defaultvalue. См. parity-audit §D.2.
 		ST_EqS("T3 cvar_description(csqc_dbg)", "", cvar_description("csqc_dbg"));
 		ST_EqF("T12 checkcommand(status)", 1, checkcommand("status"));
 		ST_EqF("T12 checkcommand(developer)", 3, checkcommand("developer"));
