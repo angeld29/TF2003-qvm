@@ -60,6 +60,7 @@ float g_st_skip;	// пропущено (неприменимо; [CSQC-TEST] SKIP
 float g_st_group;	// текущая группа: 0=all, 1=core, 2=pred, 3=net
 float g_st_auto_done;	// автопрогон выполнен на текущей карте (0/1)
 float g_st_ncrash_req;	// запрос no-crash прогона void-builtins (csqc_nocrash); сбрасывается на draw-кадре
+float g_st_2d_req;	// запрос 2D-draw прогона (csqc_selftest 2d); на draw-кадре (валидный framebuffer)
 // C5-A (предикция EXT_CSQC_1): окно модуля — live под csqc_dbg 3.
 float g_c5_sc;		// servercommandframe (ack сервера; движок пишет каждый кадр)
 float g_c5_cc;		// clientcommandframe (следующий отправляемый кадр)
@@ -448,6 +449,7 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_st_group = 0;
 	g_st_auto_done = 0;
 	g_st_ncrash_req = 0;
+	g_st_2d_req = 0;
 	g_dbg_prev = 0;
 	g_t5_iss = 0;
 	g_t5_slot = 0;
@@ -556,6 +558,7 @@ void() CSQC_WorldLoaded = {
 	// Self-test harness: новая карта — автопрогон снова (по спавну).
 	g_st_auto_done = 0;
 	g_st_ncrash_req = 0;
+	g_st_2d_req = 0;
 	// C5-E: новая карта — сущность игрока придёт заново (мост движка).
 	g_pp_valid = 0;
 	g_pp_ent = world;
@@ -755,8 +758,15 @@ float(string cmd) CSQC_ConsoleCommand = {
 		return 1;
 	}
 	// Self-test harness: группы (без параметров — все паритетные; gaps — ezq-нереализованное).
+	// `2d` (draw-возвраты) выполняется на draw-кадре — см. Hud_DrawCSQC (валидный
+	// framebuffer у FTE); остальные — сразу.
 	if (argv(0) == "csqc_selftest") {
 		local float grp;
+		if (argv(1) == "2d") {
+			g_st_2d_req = 1;
+			print("csqc_selftest 2d: scheduled (runs on next draw)\n");
+			return 1;
+		}
 		grp = 0;
 		if (argv(1) == "core") grp = 1;
 		else if (argv(1) == "ent") grp = 2;
@@ -1720,6 +1730,31 @@ void CSQC_SelftestNoCrash() {
 }
 
 // ============================================================================
+// T3 Э2 (group 2d): возвраты 2D-draw builtins (FTE-паритет pr_menu.c:
+// drawfill :49, drawpic :610, drawsubpic :688, drawcharacter :980).
+// drawfill/drawsubpic = 1; drawpic = 1 (pic найден); drawcharacter = 1 (символ)
+// / -1 (null). Тест «missing pic» не берём: FTE из-за placeholder-шейдера
+// (R2D_SafeCachePic/R_RegisterPic) отдаёт 1 и на отсутствующей пикче, ezq — 0;
+// расхождение задокументировано (parity-audit §D.4). dual-сигнатуру #326 и
+// size.y из QC не позвать (прототип 6-арг) — вне harness.
+// ============================================================================
+void CSQC_Selftest2D() {
+	// Валидная pic — с расширением (FTE R2D_SafeCachePic не добавляет .lmp).
+	ST_EqF("2D drawpic(valid)", 1,
+		drawpic([0, 0, 0], "gfx/ttl_main.lmp", [96, 24, 0], '1 1 1', 1, 0));
+	ST_EqF("2D drawfill", 1,
+		drawfill([0, 0, 0], [16, 16, 0], '1 1 1', 1, 0));
+	ST_EqF("2D drawcharacter(A)", 1,
+		drawcharacter([0, 0, 0], 'A', [8, 8, 0], '1 1 1', 1, 0));
+	ST_EqF("2D drawcharacter(0)", -1,
+		drawcharacter([0, 0, 0], 0, [8, 8, 0], '1 1 1', 1, 0));
+	// #328 drawsubpic — csdefs `void` (как FTE-спека), возврат не наблюдаем из QC
+	// (движок всё равно пишет 1, FTE-паритет) — только no-crash.
+	drawsubpic([0, 0, 0], [64, 16, 0], "gfx/ttl_main.lmp", [0, 0, 0], [48, 16, 0], '1 1 1', 1, 0);
+	ST_True("2D drawsubpic no crash", 1);
+}
+
+// ============================================================================
 // Phase 1d (self-test core): 2D pic cache + T5 (isserver/num_for_edict/wasfreed)
 // + T9 (findfloat) + P1d (spawn/nextent/find/findradius) + P1e (side-effects).
 // Evidence: ezq csqc_builtins.c iscachedpic:887, freepic:921, drawgetimagesize:898,
@@ -2194,7 +2229,7 @@ void CSQC_SelftestPred() {
 void CSQC_SelfTest(float grp) {
 	ST_Reset(grp);
 
-	if (grp == 0) {		// default — только паритет (без ezq-гэпов)
+	if (grp == 0) {		// default — только паритет (без ezq-гэпов); 2d — отдельно, draw-кадр
 		CSQC_SelftestCore(0);
 		CSQC_SelftestEnt();
 		CSQC_SelftestL2a(0);
@@ -2222,7 +2257,7 @@ void CSQC_SelfTest(float grp) {
 		CSQC_SelftestL2b2(1);
 		CSQC_SelftestL2c(1);
 		CSQC_SelftestL2d(1);
-	} else if (grp == 6) {	// all (parity + gaps; pred — отдельно, armed)
+	} else if (grp == 6) {	// all (parity + gaps; pred — отдельно, armed; 2d — draw-кадр)
 		CSQC_SelftestCore(2);
 		CSQC_SelftestEnt();
 		CSQC_SelftestL2a(2);
@@ -2525,6 +2560,15 @@ void Hud_DrawCSQC() {
 	if (g_st_ncrash_req != 0) {
 		g_st_ncrash_req = 0;
 		CSQC_SelftestNoCrash();
+	}
+
+	// T3 Э2: 2D-draw возвраты (csqc_selftest 2d) — на draw-кадре (валидный
+	// framebuffer: у FTE вне его draw* недоступны, ср. csqc_nocrash).
+	if (g_st_2d_req != 0) {
+		g_st_2d_req = 0;
+		ST_Reset(8);
+		CSQC_Selftest2D();
+		ST_Summary();
 	}
 
 	// Phase 4 pred-тест (armed): копим max g_e_err за окно; по завершении settle —
