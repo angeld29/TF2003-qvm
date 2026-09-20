@@ -117,6 +117,14 @@ float g_pred_start_tele;	// g_e_tele на арминге
 float g_pred_maxerr;		// max g_e_err за окно
 vector g_pred_o0;		// origin игрока на арминге
 float g_pred_c5b;		// C5-B #347 bad, снят на арминге (до движения)
+// T2.5: FTE-сглаживание ошибки предикции (pmove_error/ERRORTIME; FTE csqctest
+// prediction.qc:12,91-119,220-221). Накопление — в CSQC_PlayerPred; затухающая
+// линейная поправка применяется к canary-view #303 VF_ORIGIN (csqc_dbg 9, slide
+// view, а не snap). Сброс — cvar csqc_noerror!=0 / Init.
+vector g_pmove_error;		// накопленная ошибка предикции (slide view)
+float g_pmove_errortime;	// время, до которого поправка активна
+float g_pred_smerr;		// vlen(g_pmove_error) — для csqc_dbg 8
+const float CSQC_ERRORTIME = 20;	// FTE csqctest ERRORTIME (затухание ~0.05s)
 const float PRED_DRIVE_FRAMES = 40;
 const float PRED_SETTLE_FRAMES = 15;
 const float PRED_MAXERR_T = 8;	// порог max g_e_err за окно (уточняется capture FTE)
@@ -509,6 +517,8 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	// (listen-only, движковый рендер). ВНИМАНИЕ: CSQC render-слой неполон
 	// (видимость/анимация/скины/смерть) — см. docs/plans/ezquake_csqc_client_render_layer.md.
 	registercvar("csqc_delta", "0");
+	// T2.5: тумблер FTE-сглаживания предикции (1 = выключить; FTE cg_noerror).
+	registercvar("csqc_noerror", "0");
 	// Self-test harness: авто-прогон один раз на карту по спавну (player_localentnum).
 	registercvar("csqc_selftest_auto", "1");
 	// C5-E: слушатель сущностей (FTE-паритет): движок зовёт CSQC_PlayerPred при
@@ -533,6 +543,9 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_e_err = 0;
 	g_e_tele = 0;
 	g_e_dents = 0;
+	g_pmove_error = '0 0 0';
+	g_pmove_errortime = 0;
+	g_pred_smerr = 0;
 	g_pred_phase = 0;
 	g_e_predorg = '0 0 0';
 	g_f1_rt = 0;
@@ -712,7 +725,7 @@ void CSQC_DbgList() {
 	print("  5 - entity field reflection (#496-500) + stubs\n");
 	print("  6 - CSQC stat wire 78/79 + bit integrity\n");
 	print("  7 - C5-B #347 runstandardplayerphysics canary\n");
-	print("  8 - C5-E local player prediction (deltalisten #371)\n");
+	print("  8 - C5-E local player prediction (deltalisten #371) + T2.5 perr\n");
 	print("  9 - C5-E F1 view_angles/project-unproject/listener\n");
 	print(" 10 - C5-E F2 #504 getentity canary\n");
 	print(" 11 - F3 renderscene: progs/tf_flag.mdl (Y+90, z-24) + #200 midx\n");
@@ -767,6 +780,10 @@ void(float width, float height, float menushown) CSQC_UpdateView = {
 			local vector po;
 			po = g_pp_ent.origin;
 			po_z = po_z + getstatf(STAT_VIEWHEIGHT);
+			// T2.5: FTE-сглаживание (prediction.qc:220-221) — сдвигаем canary-view
+			// к скорректированной позиции линейно за ERRORTIME (slide, не snap).
+			if (cvar("csqc_noerror") == 0 && g_pmove_errortime - time > 0)
+				po = po + (g_pmove_errortime - time) * CSQC_ERRORTIME * g_pmove_error;
 			setproperty(VF_ORIGIN, po);
 			setproperty(VF_ANGLES, view_angles);
 			g_f1_pred = po;
@@ -2328,10 +2345,13 @@ void CSQC_SelftestPred() {
 		ST_True("4 T2.4 #504 lerp origin moved", g_t24_moved > 0);
 		ST_EqF("4 T2.4 #504 angles finite", 0, g_t24_angbad);
 		// Точность: max-ошибка прогноза за окно (порог — capture FTE).
-		print(sprintf("[PRED] maxerr=%g tele=%g upd=%g moved=%g\n",
+		print(sprintf("[PRED] maxerr=%g tele=%g upd=%g moved=%g perr=%g\n",
 			g_pred_maxerr, g_e_tele - g_pred_start_tele, g_e_upd - g_pred_start_upd,
-			vlen(g_pp_ent.origin - g_pred_o0)));
+			vlen(g_pp_ent.origin - g_pred_o0), g_pred_smerr));
 		ST_True("4 C5-E maxerr<=T", g_pred_maxerr <= PRED_MAXERR_T);
+		// T2.5: сглаживание — pmove_error конечен (нет NaN/взрыва); значение —
+		// информативно (harness печатает perr через [PRED] ниже).
+		ST_True("4 T2.5 pmove_error finite", vlen(g_pmove_error) < 100000);
 	} else {
 		ST_Skip("4 C5-E local player", "no local player entity (deltalisten #371)");
 	}
@@ -2536,7 +2556,20 @@ float(float isnew) CSQC_PlayerPred = {
 	if (g_e_err > 64) {
 		g_e_tele = g_e_tele + 1;
 		g_e_err = 0;			// телепорт — мгновенный snap
+		g_pmove_error = '0 0 0';	// T2.5: телепорт — сброс сглаживания
+		g_pmove_errortime = time;
+	} else if (cvar("csqc_noerror") != 0) {
+		// T2.5: A/B — сглаживание выключено (FTE cg_noerror).
+		g_pmove_error = '0 0 0';
+		g_pmove_errortime = 0;
+	} else {
+		// T2.5: FTE-накопление ошибки (prediction.qc:114) — slide view, не snap.
+		g_pmove_error = (g_pmove_errortime - time) * CSQC_ERRORTIME * g_pmove_error + (o - self.origin);
+		if (vlen(g_pmove_error) < 1)
+			g_pmove_error = '0 0 0';
+		g_pmove_errortime = time + 1 / CSQC_ERRORTIME;
 	}
+	g_pred_smerr = vlen(g_pmove_error);
 	g_e_predorg = self.origin;
 	g_e_upd = g_e_upd + 1;
 	self.drawmask = 0;	// listen-only: рендер игрока — движковый (см. выше)
@@ -3238,7 +3271,8 @@ void Hud_DrawCSQC() {
 
 	// --- экран 8: C5-E предикция локального игрока ---
 	// Ожидание: upd>0 (мост отдаёт состояние), err мала (сходимость), tele —
-	// снапы при телепортах; pred-origin двигается при ходьбе.
+	// снапы при телепортах; pred-origin двигается при ходьбе. perr (T2.5) —
+	// |pmove_error| (накопленная ошибка сглаживания; 0 стоя, растёт в движении).
 	if (D == 8) {
 		yy = 470;
 		drawstring([60, yy, 0],
@@ -3252,7 +3286,7 @@ void Hud_DrawCSQC() {
 			[12, 12], (g_e_upd > 0 && g_e_err < 32) ? '0 1 0' : '1 1 0', 1, 0);
 		yy = yy + 18;
 		drawstring([60, yy, 0],
-			sprintf("E dents %g vext %g %g", g_e_dents, g_pp_ent.velocity_x, g_pp_ent.velocity_z),
+			sprintf("E dents %g vext %g %g perr %g", g_e_dents, g_pp_ent.velocity_x, g_pp_ent.velocity_z, g_pred_smerr),
 			[12, 12], '1 1 1', 1, 0);
 	}
 
