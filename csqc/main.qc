@@ -1603,6 +1603,8 @@ void CSQC_SelftestL2c(float mode) {
 	makevectors('0 0 0');
 	vectorvectors('0 1 0');
 	ST_NearV("2c vectorvectors v_forward", '0 1 0', v_forward, 0.01);
+	ST_NearV("2c vectorvectors v_right", '1 0 0', v_right, 0.01);
+	ST_NearV("2c vectorvectors v_up", '0 0 1', v_up, 0.01);
 	makevectors(getproperty(VF_ANGLES));	// восстановить базис вида
 }
 
@@ -2016,6 +2018,10 @@ void CSQC_SelftestL2a(float mode) {
 		// csdefs объявляет float instr (#206) — тип несовместим → исключён.
 		ST_EqF("2a strlennocol(abc)", 3, strlennocol("abc"));
 		ST_EqS("2a strdecolorize(abc)", "abc", strdecolorize("abc"));
+		// T3 Э3: ezq-разметка `&cRGB`/`&r` (FTE с ezcompat_markup=1 стрипает так же).
+		ST_EqF("2a strlennocol(&cF00ab)", 2, strlennocol("&cF00ab"));
+		ST_EqS("2a strdecolorize(&cF00ab)", "ab", strdecolorize("&cF00ab"));
+		ST_EqF("2a strlennocol(&rab)", 2, strlennocol("&rab"));
 		// digest_hex: FTE требует имя хеша в ВЕРХНЕМ регистре (pr_bgcmd.c:5794).
 		ST_EqS("2a digest_hex(MD5,abc)", "900150983cd24fb0d6963f7d28e17f72", digest_hex("MD5", "abc"));
 		ST_EqS("2a whichpack(player.mdl)", "", whichpack("progs/player.mdl", 0));
