@@ -770,8 +770,8 @@ string(float ccase, float redalpha, float redchars, string str, ...) strconv = #
 string(float pad, string str1, ...) strpad = #225; /* Part of FTE_STRINGS
 		Pads the string with spaces, to ensure its a specific length (so long as a fixed-width font is used, anyway). If pad is negative, the spaces are added on the left. If positive the padding is on the right. */
 
-string(infostring old, string key, string value) infoadd = #226; /* Part of FTE_STRINGS
-		Returns a new tempstring infostring with the named value changed (or added if it was previously unspecified). Key and value may not contain the \ character. */
+string(infostring old, string key, string value, ...) infoadd = #226; /* Part of FTE_STRINGS
+		Returns a new tempstring infostring with the named value changed (or added if it was previously unspecified). Key and value may not contain the \ character. Value is concatenated from all trailing args (FTE PF_VarString(2)). */
 
 string(infostring info, string key) infoget = #227; /* Part of FTE_STRINGS
 		Reads a named value from an infostring. The returned value is a tempstring */

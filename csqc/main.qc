@@ -1921,6 +1921,9 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqS("T4 strreplace(a->X,banana)", "bXnXnX", strreplace("a", "X", "banana"));
 		ST_EqS("T4 strireplace(A->X,banana)", "bXnXnX", strireplace("A", "X", "banana"));
 		ST_EqS("T4 infoget(infoadd)", "v", infoget(infoadd("", "k", "v"), "k"));
+		// #226 varargs: value конкатенируется из всех хвостовых аргументов
+		// (FTE PF_VarString(2), ezq — после T3 Э1). Оракул FTE: "a"+"b"="ab".
+		ST_EqS("T4 infoadd varargs", "ab", infoget(infoadd("", "k", "a", "b"), "k"));
 		ST_EqF("T7 tokenize_console(aa bb cc)", 3, tokenize_console("aa bb cc"));
 		ST_EqS("T7 argv(1)", "bb", argv(1));
 		ST_EqF("T7 tokenizebyseparator(a;b;;c)", 4, tokenizebyseparator("a;b;;c", ";"));
