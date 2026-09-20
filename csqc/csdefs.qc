@@ -728,7 +728,7 @@ float(string progsname) addprogs = #202; /* Part of FTE_MULTIPROGS
 //		prnum=-1 means current progs.
 //		prnum=-2 will scan through the active progs and will use the first it finds. */
 
-float(string input, string token) instr = #206; /* Part of FTE_MULTIPROGS
+string(string input, string token) instr = #206; /* Part of FTE_MULTIPROGS
 		Returns substring(input, strstrpos(input, token), -1), or the null string if token was not found in input. You're probably better off using strstrpos. */
 
 void(entity portal, float state) openportal = #207; /*

@@ -2014,8 +2014,10 @@ void CSQC_SelftestL2a(float mode) {
 
 	// --- gaps (заглушки ezq) — mode != 0 ---
 	if (mode != 0) {
-		// instr: FTE PF_instr возвращает подстроку-остаток (RETURN_SSTRING), а
-		// csdefs объявляет float instr (#206) — тип несовместим → исключён.
+		// instr (T3 Э4): FTE PF_instr возвращает подстроку-остаток с позиции вхождения
+		// (RETURN_SSTRING), либо "" если не найдено; csdefs приведён к string.
+		ST_EqS("2a instr(abc,b)", "bc", instr("abc", "b"));
+		ST_EqS("2a instr(abc,z)", "", instr("abc", "z"));
 		ST_EqF("2a strlennocol(abc)", 3, strlennocol("abc"));
 		ST_EqS("2a strdecolorize(abc)", "abc", strdecolorize("abc"));
 		// T3 Э3: ezq-разметка `&cRGB`/`&r` (FTE с ezcompat_markup=1 стрипает так же).
