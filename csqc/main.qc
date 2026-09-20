@@ -66,10 +66,14 @@ vector g_st_vp_orig_size;	// исходный размер viewport (восст�
 vector g_st_vp_orig_min;	// исходная позиция viewport (восстановление)
 // C5-A (предикция EXT_CSQC_1): окно модуля — live под csqc_dbg 3.
 float g_c5_sc;		// servercommandframe (ack сервера; движок пишет каждый кадр)
-float g_c5_cc;		// clientcommandframe (следующий отправляемый кадр)
+float g_c5_cc;		// clientcommandframe (последний собранный кадр; T2.2)
 float g_c5_iseq;	// input_sequence (последняя отправленная команда)
 float g_c5_345;		// getinputstate(input_sequence) — 0/1 (живой probe #345)
 float g_if_gs;		// T2.1: gamespeed (движок публикует; 1 — не paused)
+// T2.2 (живой pending-кадр #345): capture/ассерты. clientcommandframe = последний
+// собранный кадр (FTE cl.movesequence), поэтому getinputstate(cc) == 1.
+float g_t22_cc;		// getinputstate(clientcommandframe) — 0/1
+float g_t22_ccm1;	// getinputstate(clientcommandframe-1) — 0/1
 // C5-B (канарейка-механика #347, экран csqc_dbg 7): синтетический арена-энт.
 float g_c5b_bad;	// агрегат (число провалов) — цель 0
 float g_c5b_fall;	// падение: z_start - z_min (>0 = гравитация)
@@ -2251,11 +2255,23 @@ void PredArm() {
 
 // Финальные ассерты armed-теста (вызывается из Hud_DrawCSQC после settle).
 void CSQC_SelftestPred() {
+	local float iseq0;	// input_sequence до проб #345 (пробы штампуют его сами)
 	ST_Reset(7);
 
 	// --- C5-A: окно предикции ---
 	ST_True("4 C5-A server<client", servercommandframe < clientcommandframe);
 	ST_EqF("4 C5-A getinputstate(input_sequence)", 1, getinputstate(input_sequence));
+
+	// --- T2.2: живой pending-кадр #345 (ccframe = last-built, FTE movesequence) ---
+	// input_sequence снапшотим ДО проб: getinputstate() сам штампует input_sequence
+	// при попадании в кадр (см. C5-A), поэтому читать его после проб нельзя.
+	iseq0 = input_sequence;
+	g_t22_cc = getinputstate(clientcommandframe);
+	g_t22_ccm1 = getinputstate(clientcommandframe - 1);
+	print(sprintf("[PRED345] sc=%g cc=%g iseq=%g cc=%g ccm1=%g\n",
+		servercommandframe, clientcommandframe, iseq0, g_t22_cc, g_t22_ccm1));
+	ST_EqF("4 T2.2 getinputstate(clientcommandframe)", 1, g_t22_cc);
+	ST_EqF("4 T2.2 getinputstate(clientcommandframe-1)", 1, g_t22_ccm1);
 
 	// --- T2.1: Input_Frame globals (gamespeed / input_sequence) ---
 	ST_True("4 T2.1 gamespeed>0", g_if_gs > 0);
@@ -2947,13 +2963,18 @@ void Hud_DrawCSQC() {
 		// C5-A: окно предикции (движок ezq csqc_client PatchFrames). Ожидание live:
 		// sc < cc (есть необработанные кадры), iseq — последняя отправленная,
 		// #345(input_sequence) == 1; при движении cc растёт.
+		// T2.2: cc = последний собранный кадр (FTE movesequence) → getinputstate(cc)
+		// тоже == 1 (живой pending; ccm1 — предыдущий полный кадр).
 		g_c5_sc = servercommandframe;
 		g_c5_cc = clientcommandframe;
 		g_c5_iseq = input_sequence;
 		g_c5_345 = getinputstate(input_sequence);
+		g_t22_cc = getinputstate(g_c5_cc);		// T2.2: живой pending-кадр
+		g_t22_ccm1 = getinputstate(g_c5_cc - 1);
 		drawstring([60, yy, 0],
-			sprintf("c5 sc%g cc%g is%g 345:%g", g_c5_sc, g_c5_cc, g_c5_iseq, g_c5_345),
-			[12, 12], (g_c5_sc < g_c5_cc && g_c5_345 == 1) ? '0 1 0' : '1 0 0', 1, 0);
+			sprintf("c5 sc%g cc%g is%g 345:%g cc:%g ccm1:%g",
+				g_c5_sc, g_c5_cc, g_c5_iseq, g_c5_345, g_t22_cc, g_t22_ccm1),
+			[12, 12], (g_c5_sc < g_c5_cc && g_c5_345 == 1 && g_t22_cc == 1) ? '0 1 0' : '1 0 0', 1, 0);
 		yy = yy + 18;
 		drawstring([60, yy, 0], "LMB fx | RMB next", [12, 12], '1 1 1', 1, 0);
 		yy = yy + 18;
