@@ -69,6 +69,7 @@ float g_c5_sc;		// servercommandframe (ack сервера; движок пише
 float g_c5_cc;		// clientcommandframe (следующий отправляемый кадр)
 float g_c5_iseq;	// input_sequence (последняя отправленная команда)
 float g_c5_345;		// getinputstate(input_sequence) — 0/1 (живой probe #345)
+float g_if_gs;		// T2.1: gamespeed (движок публикует; 1 — не paused)
 // C5-B (канарейка-механика #347, экран csqc_dbg 7): синтетический арена-энт.
 float g_c5b_bad;	// агрегат (число провалов) — цель 0
 float g_c5b_fall;	// падение: z_start - z_min (>0 = гравитация)
@@ -710,6 +711,9 @@ void(float width, float height, float menushown) CSQC_UpdateView = {
 	// C5-E: каждый кадр — догнать предсказание до clientcommandframe.
 	Pred_UpdateLocal();
 
+	// T2.1: gamespeed, публикуемый движком перед CSQC_UpdateView (1 / 0 paused).
+	g_if_gs = gamespeed;
+
 	// C5-E Ф1 (экран 9): view_angles / project-unproject / listener.
 	// Точка для project — ПЕРЕД камерой (проекция самой камеры вырождена: clip-w≈0,
 	// FTE без guard даёт NaN). Сырые значения — диагностика (без маскировки).
@@ -803,6 +807,9 @@ void() CSQC_Shutdown = {
 // impulse) — модуль может читать кнопки/импульсы и (позже, для меню) менять
 // их. Сейчас — только канарейка под csqc_dbg (экран 3); usercmd не изменяем.
 void() CSQC_Input_Frame = {
+	// T2.1: захват глобалов, публикуемых движком (для pred-harness).
+	g_c5_cc = clientcommandframe;
+	g_c5_iseq = input_sequence;	// движок пишет seq текущего cmd (T2.1)
 	// Phase 4 pred-тест: инъекция движения вперёд (input_movevalues) N кадров,
 	// чтобы предикция реально работала под серверными коррекциями. Значения —
 	// только на время drive; далее движок перезапишет input_* из cmd.
@@ -2249,6 +2256,11 @@ void CSQC_SelftestPred() {
 	// --- C5-A: окно предикции ---
 	ST_True("4 C5-A server<client", servercommandframe < clientcommandframe);
 	ST_EqF("4 C5-A getinputstate(input_sequence)", 1, getinputstate(input_sequence));
+
+	// --- T2.1: Input_Frame globals (gamespeed / input_sequence) ---
+	ST_True("4 T2.1 gamespeed>0", g_if_gs > 0);
+	ST_True("4 T2.1 input_sequence>0", g_c5_iseq > 0);
+	ST_True("4 T2.1 input_sequence<=clientcommandframe", g_c5_iseq <= g_c5_cc);
 
 	// --- C5-B: канарейка-механика #347 (снята на арминге, до движения) ---
 	ST_EqF("4 C5-B #347 bad", 0, g_pred_c5b);
