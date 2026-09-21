@@ -134,7 +134,7 @@ const float PRED_SETTLE_FRAMES = 15;
 const float PRED_MAXERR_T = 8;
 // T2.6 (точность предикции maxerr): диагностика разводит три причины расхождения
 // ezq vs FTE — setup #347 / harness-каденс (drive считает вызовы CSQC_Input_Frame,
-// а не отправленные cmd) / PM-ядро. См. план .opencode/plans/csqc-pr1vm-engine-t2.md §T2.6.
+// а не отправленные cmd) / PM-ядро. См. план docs/archive/csqc-pr1vm-engine-t2.md §T2.6.
 float g_t26_iff;			// вызовов CSQC_Input_Frame за окно теста
 float g_t26_ifc;			// уникальных input_sequence (реально отправленных cmd)
 float g_t26_ifseq;			// последний input_sequence (детектор смены)
