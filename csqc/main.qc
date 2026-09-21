@@ -208,6 +208,12 @@ float g_c4_rf;
 float g_c4_owned_pl;
 float g_c4_owned_bp;
 float g_c4_bp_reg;
+// Этап 2 (.scale alias, csqc_dbg 16): две arena-сущности флага с .scale=2 и
+// .scale=0.5 — проверка чтения .scale движком и FTE-паритета трансформа.
+entity g_sc_e1;
+entity g_sc_e2;
+float g_sc_v1;
+float g_sc_v2;
 float(float isnew) CSQC_PlayerPred;
 float(float isnew) CSQC_BackpackPred;	// C4 Э3: backpack delta-callback
 void Pred_Run(entity ent, float endframe);
@@ -573,6 +579,10 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_c4_owned_pl = 0;
 	g_c4_owned_bp = 0;
 	g_c4_bp_reg = 0;
+	g_sc_e1 = world;
+	g_sc_e2 = world;
+	g_sc_v1 = 0;
+	g_sc_v2 = 0;
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -666,6 +676,10 @@ void() CSQC_WorldLoaded = {
 	g_c4_owned_pl = 0;	// C4 Э3: счётчики; backpack-слушатель перерегистрируется
 	g_c4_owned_bp = 0;
 	g_c4_bp_reg = 0;
+	g_sc_e1 = world;	// Этап 2: arena очищена — .scale-тест-энты пересоздаются
+	g_sc_e2 = world;
+	g_sc_v1 = 0;
+	g_sc_v2 = 0;
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -787,6 +801,43 @@ void CSQC_C4Test() {
 	addentities(8);
 }
 
+// Этап 2 (.scale alias, csqc_dbg 16): две arena-сущности флага — слева .scale=2
+// (вдвое больше), справа .scale=0.5 (вдвое меньше). drawmask=16, addentities(16).
+// Проверяет чтение .scale движком (csqc_add_one_entity) и FTE-паритет трансформа;
+// работает на FTE (нативные builtins) и ezq (takeover).
+void CSQC_ScaleTest() {
+	local vector v;
+	makevectors(getproperty(VF_ANGLES));
+	v = getproperty(VF_ORIGIN) + v_forward * 96;
+	if (g_sc_e1 == world || g_sc_e2 == world)
+		precache_model("progs/tf_flag.mdl");
+	if (g_sc_e1 == world) {
+		g_sc_e1 = spawn();
+		if (g_sc_e1 != world)
+			setmodel(g_sc_e1, "progs/tf_flag.mdl");
+	}
+	if (g_sc_e2 == world) {
+		g_sc_e2 = spawn();
+		if (g_sc_e2 != world)
+			setmodel(g_sc_e2, "progs/tf_flag.mdl");
+	}
+	if (g_sc_e1 != world) {
+		setorigin(g_sc_e1, v - v_right * 32);
+		g_sc_e1.angles = '0 90 0';
+		g_sc_e1.scale = 2;
+		g_sc_e1.drawmask = 16;
+		g_sc_v1 = g_sc_e1.scale;
+	}
+	if (g_sc_e2 != world) {
+		setorigin(g_sc_e2, v + v_right * 32);
+		g_sc_e2.angles = '0 90 0';
+		g_sc_e2.scale = 0.5;
+		g_sc_e2.drawmask = 16;
+		g_sc_v2 = g_sc_e2.scale;
+	}
+	addentities(16);
+}
+
 // Список уровней csqc_dbg с описаниями (команда csqc_dbg_list).
 void CSQC_DbgList() {
 	print("csqc_dbg levels:\n");
@@ -806,6 +857,7 @@ void CSQC_DbgList() {
 	print(" 13 - C4 Э2: #301 MASK_VIEWMODEL (тумблер csqc_vm)\n");
 	print(" 14 - C4 Э3: MASK_DELTA status (тумблер csqc_delta)\n");
 	print(" 15 - T2.6 prediction accuracy: cadence/window + #347 differential probe\n");
+	print(" 16 - Этап 2: .scale alias transform (flag scale 2 / 0.5)\n");
 }
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -823,6 +875,8 @@ void(float width, float height, float menushown) CSQC_UpdateView = {
 		CSQC_RenderTest();	// Ф3: arena-эдикт через mod-render path (#301)/#302
 	if (DbgAt(12))
 		CSQC_C4Test();		// C4 Э1: predraw (AUTOADD/NEXT) + renderflags
+	if (DbgAt(16))
+		CSQC_ScaleTest();	// Этап 2: .scale alias transform (flag 2 / 0.5)
 	renderscene();
 
 	// C5-E: каждый кадр — догнать предсказание до clientcommandframe.
@@ -3664,5 +3718,15 @@ void Hud_DrawCSQC() {
 			sprintf("T2.6 probe fall %g d %g %g", g_t26_p1_start_z - g_t26_p1_end_z,
 				g_t26_p2_end_x - g_t26_p2_start_x, g_t26_p2_end_y - g_t26_p2_start_y),
 			[12, 12], (g_t26_p_bad == 0) ? '0 1 0' : '1 0 0', 1, 0);
+	}
+
+	// --- экран 16: Этап 2 (.scale alias transform) ---
+	// Ожидание: слева флаг вдвое больше (scale 2), справа вдвое меньше (scale 0.5);
+	// размеры ezq == FTE. Зелёный при v1==2 && v2==0.5.
+	if (D == 16) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("Э2 scale v1 %g v2 %g (2 / 0.5)", g_sc_v1, g_sc_v2),
+			[12, 12], (g_sc_v1 == 2 && g_sc_v2 == 0.5) ? '0 1 0' : '1 1 0', 1, 0);
 	}
 }
