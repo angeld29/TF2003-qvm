@@ -214,6 +214,11 @@ entity g_sc_e1;
 entity g_sc_e2;
 float g_sc_v1;
 float g_sc_v2;
+// Этап 3 (куллинг arena-эдиктов, csqc_dbg 17; ADR 0028): e1 — перед стеной
+// (виден), e2 — за стеной (движок не должен рисовать: PVS/leaf + bbox).
+entity g_cull_e1;
+entity g_cull_e2;
+float g_cull_frac;	// trace_fraction до стены (диагностика)
 float(float isnew) CSQC_PlayerPred;
 float(float isnew) CSQC_BackpackPred;	// C4 Э3: backpack delta-callback
 void Pred_Run(entity ent, float endframe);
@@ -583,6 +588,9 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_sc_e2 = world;
 	g_sc_v1 = 0;
 	g_sc_v2 = 0;
+	g_cull_e1 = world;
+	g_cull_e2 = world;
+	g_cull_frac = 0;
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -680,6 +688,9 @@ void() CSQC_WorldLoaded = {
 	g_sc_e2 = world;
 	g_sc_v1 = 0;
 	g_sc_v2 = 0;
+	g_cull_e1 = world;	// Этап 3: arena очищена — тест-энты куллинга пересоздаются
+	g_cull_e2 = world;
+	g_cull_frac = 0;
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -838,6 +849,45 @@ void CSQC_ScaleTest() {
 	addentities(16);
 }
 
+// Этап 3 (куллинг arena-эдиктов, csqc_dbg 17; ADR 0028): два флага впереди по
+// взгляду — e1 перед ближайшей стеной (виден), e2 за стеной (движок не должен
+// рисовать). Проверяет PVS/leaf + bbox-куллинг движка и FTE-паритет.
+// drawmask=32, addentities(32). Без стены в 4096 юнитов e2 уходит далеко за карту
+// (тоже вне PVS) — фолбэк деградированный, trace_fraction на экране.
+void CSQC_CullTest() {
+	local vector eye;
+	local float d;
+	makevectors(getproperty(VF_ANGLES));
+	eye = getproperty(VF_ORIGIN);
+	if (g_cull_e1 == world || g_cull_e2 == world)
+		precache_model("progs/tf_flag.mdl");
+	if (g_cull_e1 == world) {
+		g_cull_e1 = spawn();
+		if (g_cull_e1 != world)
+			setmodel(g_cull_e1, "progs/tf_flag.mdl");
+	}
+	if (g_cull_e2 == world) {
+		g_cull_e2 = spawn();
+		if (g_cull_e2 != world)
+			setmodel(g_cull_e2, "progs/tf_flag.mdl");
+	}
+	// Ближайшая BSP-стена впереди: между e1 и e2.
+	traceline(eye, eye + v_forward * 4096, MOVE_NOMONSTERS, world);
+	g_cull_frac = trace_fraction;
+	d = 4096 * trace_fraction;
+	if (g_cull_e1 != world) {
+		setorigin(g_cull_e1, eye + v_forward * 96);
+		g_cull_e1.angles = '0 90 0';
+		g_cull_e1.drawmask = 32;
+	}
+	if (g_cull_e2 != world) {
+		setorigin(g_cull_e2, eye + v_forward * (d + 72));
+		g_cull_e2.angles = '0 90 0';
+		g_cull_e2.drawmask = 32;
+	}
+	addentities(32);
+}
+
 // Список уровней csqc_dbg с описаниями (команда csqc_dbg_list).
 void CSQC_DbgList() {
 	print("csqc_dbg levels:\n");
@@ -858,6 +908,7 @@ void CSQC_DbgList() {
 	print(" 14 - C4 Э3: MASK_DELTA status (тумблер csqc_delta)\n");
 	print(" 15 - T2.6 prediction accuracy: cadence/window + #347 differential probe\n");
 	print(" 16 - Этап 2: .scale alias transform (flag scale 2 / 0.5)\n");
+	print(" 17 - Этап 3: PVS/bbox culling (flag behind wall hidden)\n");
 }
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -877,6 +928,8 @@ void(float width, float height, float menushown) CSQC_UpdateView = {
 		CSQC_C4Test();		// C4 Э1: predraw (AUTOADD/NEXT) + renderflags
 	if (DbgAt(16))
 		CSQC_ScaleTest();	// Этап 2: .scale alias transform (flag 2 / 0.5)
+	if (DbgAt(17))
+		CSQC_CullTest();	// Этап 3: PVS/bbox-куллинг (флаг за стеной скрыт)
 	renderscene();
 
 	// C5-E: каждый кадр — догнать предсказание до clientcommandframe.
@@ -3728,5 +3781,15 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("Э2 scale v1 %g v2 %g (2 / 0.5)", g_sc_v1, g_sc_v2),
 			[12, 12], (g_sc_v1 == 2 && g_sc_v2 == 0.5) ? '0 1 0' : '1 1 0', 1, 0);
+	}
+
+	// --- экран 17: Этап 3 (PVS/bbox-куллинг arena-эдиктов) ---
+	// Ожидание: e1 (перед стеной) виден, e2 (за стеной) не виден; ezq == FTE.
+	// frac < 1 — стена найдена (e2 реально за геометрией); 1 — фолбэк.
+	if (D == 17) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("Э3 cull wallfrac %g (e2 hidden)", g_cull_frac),
+			[12, 12], (g_cull_frac < 1) ? '0 1 0' : '1 1 0', 1, 0);
 	}
 }
