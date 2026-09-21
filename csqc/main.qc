@@ -855,12 +855,24 @@ void CSQC_C4Test() {
 // sprite (progs/s_light.spr) — с .scale=2 и .scale=0.5. drawmask=16, addentities(16).
 // Проверяет чтение .scale движком (csqc_add_one_entity) и FTE-паритет трансформа
 // alias/brush/sprite; работает на FTE (нативные builtins) и ezq (takeover).
+// rev.2: группы разведены по азимуту (alias 0°, sprite −35°, brush +35°) и дистанции
+// (160/200/300) + вертикальный развод — иначе крупный brush (scale 2) перекрывает
+// sprite/alias (все группы лежали на одном v_forward).
+// rev.3 (live): +yaw = влево. Флаги левее (25°), sprite чуть левее и выше (10°, +80),
+// brush правее и ниже sprite (−5°, −16); дистанции 192/224/320.
+// rev.4 (live): sprite и brush правее (−15° / −30°), brush ниже (−64).
 void CSQC_ScaleTest() {
-	local vector v;
-	local vector org;
-	makevectors(getproperty(VF_ANGLES));
+	local vector org, base;
+	local vector af, ar, lf, lr, rf, rr;
+	base = getproperty(VF_ANGLES);
 	org = getproperty(VF_ORIGIN);
-	v = org + v_forward * 96;
+	makevectors(base + '0 25 0');
+	af = v_forward; ar = v_right;		// +25° — alias (флаг, левее)
+	makevectors(base + '0 -15 0');
+	lf = v_forward; lr = v_right;		// −15° — sprite (правее, выше)
+	makevectors(base + '0 -30 0');
+	rf = v_forward; rr = v_right;		// −30° — brush (правее, ниже sprite)
+	makevectors(base);			// восстановить глобалы v_forward/v_right
 	if (g_sc_e1 == world || g_sc_e2 == world)
 		precache_model("progs/tf_flag.mdl");
 	if (g_sc_e1 == world) {
@@ -874,20 +886,20 @@ void CSQC_ScaleTest() {
 			setmodel(g_sc_e2, "progs/tf_flag.mdl");
 	}
 	if (g_sc_e1 != world) {
-		setorigin(g_sc_e1, v - v_right * 32);
+		setorigin(g_sc_e1, org + af * 192 - ar * 32);
 		g_sc_e1.angles = '0 90 0';
 		g_sc_e1.scale = 2;
 		g_sc_e1.drawmask = 16;
 		g_sc_v1 = g_sc_e1.scale;
 	}
 	if (g_sc_e2 != world) {
-		setorigin(g_sc_e2, v + v_right * 32);
+		setorigin(g_sc_e2, org + af * 192 + ar * 32);
 		g_sc_e2.angles = '0 90 0';
 		g_sc_e2.scale = 0.5;
 		g_sc_e2.drawmask = 16;
 		g_sc_v2 = g_sc_e2.scale;
 	}
-	// T4 Этап 1: brush-пара (maps/b_rock1.bsp) — дальше (крупная модель).
+	// T4 Этап 1: brush-пара (maps/b_rock1.bsp) — вправо-вперёд (крупная модель).
 	if (g_sc_be1 == world || g_sc_be2 == world)
 		precache_model("maps/b_rock1.bsp");
 	if (g_sc_be1 == world) {
@@ -901,18 +913,18 @@ void CSQC_ScaleTest() {
 			setmodel(g_sc_be2, "maps/b_rock1.bsp");
 	}
 	if (g_sc_be1 != world) {
-		setorigin(g_sc_be1, org + v_forward * 224 - v_right * 72);
+		setorigin(g_sc_be1, org + rf * 320 - rr * 88 - '0 0 64');
 		g_sc_be1.angles = '0 90 0';
 		g_sc_be1.scale = 2;
 		g_sc_be1.drawmask = 16;
 	}
 	if (g_sc_be2 != world) {
-		setorigin(g_sc_be2, org + v_forward * 224 + v_right * 72);
+		setorigin(g_sc_be2, org + rf * 320 + rr * 88 - '0 0 64');
 		g_sc_be2.angles = '0 90 0';
 		g_sc_be2.scale = 0.5;
 		g_sc_be2.drawmask = 16;
 	}
-	// T4 Этап 1: sprite-пара (progs/s_light.spr) — дальше.
+	// T4 Этап 1: sprite-пара (progs/s_light.spr) — влево-вперёд.
 	if (g_sc_se1 == world || g_sc_se2 == world)
 		precache_model("progs/s_light.spr");
 	if (g_sc_se1 == world) {
@@ -926,13 +938,13 @@ void CSQC_ScaleTest() {
 			setmodel(g_sc_se2, "progs/s_light.spr");
 	}
 	if (g_sc_se1 != world) {
-		setorigin(g_sc_se1, org + v_forward * 160 - v_right * 48);
+		setorigin(g_sc_se1, org + lf * 224 - lr * 44 + '0 0 80');
 		g_sc_se1.angles = '0 90 0';
 		g_sc_se1.scale = 2;
 		g_sc_se1.drawmask = 16;
 	}
 	if (g_sc_se2 != world) {
-		setorigin(g_sc_se2, org + v_forward * 160 + v_right * 48);
+		setorigin(g_sc_se2, org + lf * 224 + lr * 44 + '0 0 80');
 		g_sc_se2.angles = '0 90 0';
 		g_sc_se2.scale = 0.5;
 		g_sc_se2.drawmask = 16;
