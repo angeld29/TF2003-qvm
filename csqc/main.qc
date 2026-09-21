@@ -219,6 +219,15 @@ float g_sc_v2;
 entity g_cull_e1;
 entity g_cull_e2;
 float g_cull_frac;	// trace_fraction до стены (диагностика)
+// Этап 4a (player-поля, csqc_dbg 18): значения, записанные мостом движка в
+// CSQC-эдикт удалённого/локального игрока (.frame/.skin/.colormap/.effects).
+// Инвариант: .colormap == .entnum (номер игрока pnum+1, FTE pr_csqc.c:5627).
+float g_pf_ent;
+float g_pf_frame;
+float g_pf_skin;
+float g_pf_cmap;
+float g_pf_eff;
+float g_pf_n;
 float(float isnew) CSQC_PlayerPred;
 float(float isnew) CSQC_BackpackPred;	// C4 Э3: backpack delta-callback
 void Pred_Run(entity ent, float endframe);
@@ -591,6 +600,12 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_cull_e1 = world;
 	g_cull_e2 = world;
 	g_cull_frac = 0;
+	g_pf_ent = 0;	// Этап 4a: сброс канарейки player-полей
+	g_pf_frame = 0;
+	g_pf_skin = 0;
+	g_pf_cmap = 0;
+	g_pf_eff = 0;
+	g_pf_n = 0;
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -691,6 +706,12 @@ void() CSQC_WorldLoaded = {
 	g_cull_e1 = world;	// Этап 3: arena очищена — тест-энты куллинга пересоздаются
 	g_cull_e2 = world;
 	g_cull_frac = 0;
+	g_pf_ent = 0;	// Этап 4a: сброс канарейки player-полей
+	g_pf_frame = 0;
+	g_pf_skin = 0;
+	g_pf_cmap = 0;
+	g_pf_eff = 0;
+	g_pf_n = 0;
 	g_e_upd = 0;
 	g_e_err = 0;
 	g_e_tele = 0;
@@ -909,6 +930,7 @@ void CSQC_DbgList() {
 	print(" 15 - T2.6 prediction accuracy: cadence/window + #347 differential probe\n");
 	print(" 16 - Этап 2: .scale alias transform (flag scale 2 / 0.5)\n");
 	print(" 17 - Этап 3: PVS/bbox culling (flag behind wall hidden)\n");
+	print(" 18 - Этап 4a: player fields (frame/skin/colormap==entnum)\n");
 }
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -2198,6 +2220,13 @@ void CSQC_SelftestCore(float mode) {
 		// Реализовано в ezq, но поведение иное (не заглушка): баг ezq (R6/T3), не gaps.
 		ST_EqF("460-469 buf chain", 6, g_sm_buf);
 
+		// --- Этап 4a: player-поля моста (#371) ---
+		// self.colormap движок пишет как pnum+1 == self.entnum (FTE pr_csqc.c:5627).
+		if (g_pf_ent > 0)
+			ST_EqF("4a player colormap==entnum", g_pf_ent, g_pf_cmap);
+		else
+			ST_Skip("4a player colormap==entnum", "no player delta yet");
+
 		// --- Фаза 1a: математика/типы (детерминированная, движок-независимая) ---
 		ST_NearF("T1 asin(1)", 1.570796, asin(1), 0.0001);
 		ST_NearF("T1 acos(0)", 1.570796, acos(0), 0.0001);
@@ -2784,6 +2813,14 @@ float(float isnew) CSQC_PlayerPred = {
 		g_t26_lastsc = servercommandframe;
 		g_t26_sc_distinct = g_t26_sc_distinct + 1;
 	}
+	// Этап 4a (csqc_dbg 18): снять поля, записанные мостом движка (локальный и
+	// удалённые игроки — обе ветки). self.colormap = pnum+1 = self.entnum.
+	g_pf_ent = self.entnum;
+	g_pf_frame = self.frame;
+	g_pf_skin = self.skin;
+	g_pf_cmap = self.colormap;
+	g_pf_eff = self.effects;
+	g_pf_n = g_pf_n + 1;
 	if (self.entnum != player_localentnum) {
 		g_e_dents = g_e_dents + 1;	// не-локальные (delta) сущности
 		// C4 Этап 3 (csqc_delta!=0): удалённого игрока рисует CSQC (setmodel +
@@ -3791,5 +3828,19 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("Э3 cull wallfrac %g (e2 hidden)", g_cull_frac),
 			[12, 12], (g_cull_frac < 1) ? '0 1 0' : '1 1 0', 1, 0);
+	}
+
+	// --- экран 18: Этап 4a (player-поля моста: frame/skin/colormap/effects) ---
+	// Ожидание: .colormap == .entnum (номер игрока pnum+1); frame меняется при
+	// движении. Зелёный при cmap==ent (и ent>0).
+	if (D == 18) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("Э4a pf ent %g frm %g skin %g cmap %g", g_pf_ent, g_pf_frame, g_pf_skin, g_pf_cmap),
+			[12, 12], (g_pf_ent > 0 && g_pf_cmap == g_pf_ent) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("Э4a eff %g n %g", g_pf_eff, g_pf_n),
+			[12, 12], '1 1 1', 1, 0);
 	}
 }
