@@ -127,7 +127,32 @@ float g_pred_smerr;		// vlen(g_pmove_error) — для csqc_dbg 8
 const float CSQC_ERRORTIME = 20;	// FTE csqctest ERRORTIME (затухание ~0.05s)
 const float PRED_DRIVE_FRAMES = 40;
 const float PRED_SETTLE_FRAMES = 15;
-const float PRED_MAXERR_T = 8;	// порог max g_e_err за окно (уточняется capture FTE)
+// T2.6 (B3, accept+doc): порог — грубая sanity-граница, НЕ accuracy-критерий. Сырой
+// max g_e_err ≈ v·Δt между вызовами моста (#371), т.е. масштабируется каденсом
+// колбэка (ezq 4.25 / FTE 1.80: ezq колбэк реже, ≈57 vs 153). Сам #347 FTE-паритетен
+// (детерминированный зонд CSQC_T26_Run). 8 — запас над ezq-базой.
+const float PRED_MAXERR_T = 8;
+// T2.6 (точность предикции maxerr): диагностика разводит три причины расхождения
+// ezq vs FTE — setup #347 / harness-каденс (drive считает вызовы CSQC_Input_Frame,
+// а не отправленные cmd) / PM-ядро. См. план .opencode/plans/csqc-pr1vm-engine-t2.md §T2.6.
+float g_t26_iff;			// вызовов CSQC_Input_Frame за окно теста
+float g_t26_ifc;			// уникальных input_sequence (реально отправленных cmd)
+float g_t26_ifseq;			// последний input_sequence (детектор смены)
+float g_t26_sc;				// последний servercommandframe (в PlayerPred)
+float g_t26_cc;				// последний clientcommandframe (в PlayerPred)
+float g_t26_win;			// последнее окно cc-sc
+float g_t26_win_max;		// max окно cc-sc за тест
+float g_t26_sc_distinct;	// уникальных servercommandframe (реальных обновлений)
+float g_t26_lastsc;			// предыдущий servercommandframe
+// Детерминированный #347-дифф-зонд (in-world старт g_pred_o0, модуль идентичен на ezq/FTE):
+// P1 — падение без входа (PM-ядро/гравитация/чанкинг); P2 — ход вперёд с фикс. yaw
+// (вход/accel/квантование углов). Различие результата = PM-ядро/setup; совпадение —
+// каденс/replay-окно.
+vector g_t26_p1_start;		// старт P1 (g_pred_o0 + 32 по z)
+vector g_t26_p1_end;		// origin после K шагов P1
+vector g_t26_p2_start;		// старт P2 (g_pred_o0, пол игрока)
+vector g_t26_p2_end;		// origin после K шагов P2
+float g_t26_p_bad;			// инварианты зонда (0 = ok)
 // C5-E Ф1 (no-op revision): view_angles / project-unproject / listener.
 vector g_f1_va;			// view_angles (движок публикует каждый кадр)
 vector g_f1_proj;		// project(vieworg)
@@ -182,6 +207,7 @@ void Pred_UpdateLocal();
 void CSQC_SelfTest(float grp);	// self-test harness (определение — после CSQC_Fx_Smoke)
 float CSQC_StatWire_Bad();	// Phase 3 (SW78/79), используется в CSQC_SelftestEnt
 float CSQC_C5B_Run();		// Phase 4 (C5-B #347), используется в CSQC_SelftestPred
+float CSQC_T26_Run();		// T2.6: детерминированный #347-дифф-зонд, используется в PredArm
 void PredArm();			// Phase 4: арминг armed-теста предикции (движение)
 float g_dbg_prev;	// предыдущий csqc_dbg (консоль-смоук T1/T2 при включении экрана 4)
 float g_t5_iss;		// T5: isserver() (считается на включение экрана 4)
@@ -547,6 +573,20 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_pmove_errortime = 0;
 	g_pred_smerr = 0;
 	g_pred_phase = 0;
+	g_t26_iff = 0;
+	g_t26_ifc = 0;
+	g_t26_ifseq = -1;
+	g_t26_sc = 0;
+	g_t26_cc = 0;
+	g_t26_win = 0;
+	g_t26_win_max = 0;
+	g_t26_sc_distinct = 0;
+	g_t26_lastsc = -1;
+	g_t26_p1_start = '0 0 0';
+	g_t26_p1_end = '0 0 0';
+	g_t26_p2_start = '0 0 0';
+	g_t26_p2_end = '0 0 0';
+	g_t26_p_bad = 0;
 	g_e_predorg = '0 0 0';
 	g_f1_rt = 0;
 	g_f1_lis = 0;
@@ -616,6 +656,21 @@ void() CSQC_WorldLoaded = {
 	g_e_tele = 0;
 	g_pred_phase = 0;
 	// C5-E Ф2: сброс канарейки getentity (player_localentnum будет опубликован).
+	// T2.6: сброс диагностики/зонда на новой карте.
+	g_t26_iff = 0;
+	g_t26_ifc = 0;
+	g_t26_ifseq = -1;
+	g_t26_sc = 0;
+	g_t26_cc = 0;
+	g_t26_win = 0;
+	g_t26_win_max = 0;
+	g_t26_sc_distinct = 0;
+	g_t26_lastsc = -1;
+	g_t26_p1_start = '0 0 0';
+	g_t26_p1_end = '0 0 0';
+	g_t26_p2_start = '0 0 0';
+	g_t26_p2_end = '0 0 0';
+	g_t26_p_bad = 0;
 	g_ge_bad = 0;
 	g_ge_done = 0;
 	g_ge_act = 0;
@@ -732,6 +787,7 @@ void CSQC_DbgList() {
 	print(" 12 - C4 Э1: #301/#302 predraw (AUTOADD/NEXT) + renderflags\n");
 	print(" 13 - C4 Э2: #301 MASK_VIEWMODEL (тумблер csqc_vm)\n");
 	print(" 14 - C4 Э3: MASK_DELTA status (тумблер csqc_delta)\n");
+	print(" 15 - T2.6 prediction accuracy: cadence/window + #347 differential probe\n");
 }
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -857,6 +913,15 @@ void() CSQC_Input_Frame = {
 	// T2.1: захват глобалов, публикуемых движком (для pred-harness).
 	g_c5_cc = clientcommandframe;
 	g_c5_iseq = input_sequence;	// движок пишет seq текущего cmd (T2.1)
+	// T2.6: каденс-диагностика — drive считает вызовы Input_Frame, а движки могут
+	// звать его разное число раз. Считаем вызовы и уникальные input_sequence.
+	if (g_pred_phase != 0) {
+		g_t26_iff = g_t26_iff + 1;
+		if (input_sequence != g_t26_ifseq) {
+			g_t26_ifseq = input_sequence;
+			g_t26_ifc = g_t26_ifc + 1;
+		}
+	}
 	// Phase 4 pred-тест: инъекция движения вперёд (input_movevalues) N кадров,
 	// чтобы предикция реально работала под серверными коррекциями. Значения —
 	// только на время drive; далее движок перезапишет input_* из cmd.
@@ -2297,6 +2362,17 @@ void PredArm() {
 	g_t24_angbad = 0;
 	// C5-B прогоняем СЕЙЧАС (до движения) — канарейка требует ровного пола впереди.
 	g_pred_c5b = CSQC_C5B_Run();
+	// T2.6: сброс диагностики (per-run) + детерминированный #347-дифф-зонд.
+	g_t26_iff = 0;
+	g_t26_ifc = 0;
+	g_t26_ifseq = -1;
+	g_t26_sc = servercommandframe;
+	g_t26_cc = clientcommandframe;
+	g_t26_win = 0;
+	g_t26_win_max = 0;
+	g_t26_sc_distinct = 0;
+	g_t26_lastsc = -1;
+	g_t26_p_bad = CSQC_T26_Run();
 	print("csqc_selftest pred: armed (driving movement; summary after settle)\n");
 }
 
@@ -2352,6 +2428,20 @@ void CSQC_SelftestPred() {
 		// T2.5: сглаживание — pmove_error конечен (нет NaN/взрыва); значение —
 		// информативно (harness печатает perr через [PRED] ниже).
 		ST_True("4 T2.5 pmove_error finite", vlen(g_pmove_error) < 100000);
+		// T2.6: каденс/окно (#вызовов Input_Frame vs уникальных cmd; уникальных
+		// servercommandframe; max окно cc-sc) + детерминированный #347-дифф-зонд.
+		// Сравнение ezq vs FTE — по [T2.6]-строкам в qconsole.log.
+		print(sprintf("[T2.6] iff=%g ifc=%g sc=%g cc=%g\n",
+			g_t26_iff, g_t26_ifc, g_t26_sc, g_t26_cc));
+		print(sprintf("[T2.6] win=%g winmax=%g scd=%g updc=%g pbad=%g\n",
+			g_t26_win, g_t26_win_max, g_t26_sc_distinct,
+			g_e_upd - g_pred_start_upd, g_t26_p_bad));
+		print(sprintf("[T2.6probe] p1fall %g p2dx %g p2dy %g p2d %g\n",
+			g_t26_p1_start_z - g_t26_p1_end_z,
+			g_t26_p2_end_x - g_t26_p2_start_x,
+			g_t26_p2_end_y - g_t26_p2_start_y,
+			vlen(g_t26_p2_end - g_t26_p2_start)));
+		ST_True("4 T2.6 #347 probe ok", g_t26_p_bad == 0);
 	} else {
 		ST_Skip("4 C5-E local player", "no local player entity (deltalisten #371)");
 	}
@@ -2527,6 +2617,18 @@ float(float isnew) CSQC_BackpackPred = {
 
 float(float isnew) CSQC_PlayerPred = {
 	local vector o;
+	// T2.6: каденс/окно — фиксируем каждый вызов моста (sc/cc общие для всех
+	// сущностей). Считаем реальные обновления (уникальные servercommandframe) и max
+	// окно cc-sc; используется для развода «настройка #347 vs каденс vs PM-ядро».
+	g_t26_sc = servercommandframe;
+	g_t26_cc = clientcommandframe;
+	g_t26_win = g_t26_cc - g_t26_sc;
+	if (g_t26_win > g_t26_win_max)
+		g_t26_win_max = g_t26_win;
+	if (servercommandframe != g_t26_lastsc) {
+		g_t26_lastsc = servercommandframe;
+		g_t26_sc_distinct = g_t26_sc_distinct + 1;
+	}
 	if (self.entnum != player_localentnum) {
 		g_e_dents = g_e_dents + 1;	// не-локальные (delta) сущности
 		// C4 Этап 3 (csqc_delta!=0): удалённого игрока рисует CSQC (setmodel +
@@ -2675,6 +2777,65 @@ float CSQC_C5B_Run() {
 	dprint(sprintf("C5B347 bad %g rt %g fall %g land %g sink %g move %g stop %g\n",
 		bad, g_c5b_rt, g_c5b_fall, g_c5b_land, g_c5b_sink, g_c5b_move, g_c5b_stop));
 	dprint(sprintf("C5B347 lad %g\n", g_c5b_ladder));
+	return bad;
+}
+
+// T2.6: детерминированный #347-дифф-зонд. Модуль идентичен на ezq и FTE, поэтому
+// при равных стартах/входах различие результата #347 указывает на PM-ядро/setup
+// (в частности квантование углов: FTE ANGLE2SHORT, pr_csqc.c:4215-4217; ezq — сырые
+// float, csqc_client.c:3489-3490), а совпадение — на harness-каденс/replay-окно.
+// Старт — g_pred_o0 (авторитетная позиция игрока из моста; одинакова на обоих
+// движках), in-world (не константа в пустоте: ezq #347 вне мира не двигает сущность).
+// Пишем ОТНОСИТЕЛЬНЫЕ дельты (толерантно к позиции/геометрии).
+float CSQC_T26_Run() {
+	local entity e;
+	local float bad, i;
+
+	bad = 0;
+	e = spawn();
+	if (e == world)
+		return 1;
+
+	e.movetype = MOVETYPE_WALK;
+	e.mins = '-16 -16 -24';
+	e.maxs = '16 16 32';
+	e.velocity = '0 0 0';
+	e.flags = 0;
+	e.pmove_flags = 0;
+	input_timelength = 0.05;
+	input_buttons = 0;
+	input_impulse = 0;
+
+	// P1: падение WALK из точки на 32 над позицией игрока (in-world) — гравитация/
+	// PM-ядро/чанкинг msec. Дельта z (информативно; ассерт не зависит от геометрии).
+	g_t26_p1_start = g_pred_o0 + '0 0 32';
+	e.origin = g_t26_p1_start;
+	input_angles = '0 0 0';
+	input_movevalues = '0 0 0';
+	for (i = 0; i < 8; i = i + 1)
+		runstandardplayerphysics(e);
+	g_t26_p1_end = e.origin;
+
+	// P2: разгон WALK вперёд с фикс. yaw с пола игрока — реальный prediction-путь
+	// (вход/accel + квантование углов). Прямое сравнение ezq vs FTE.
+	g_t26_p2_start = g_pred_o0;
+	e.origin = g_t26_p2_start;
+	e.velocity = '0 0 0';
+	input_angles = '0 30 0';
+	input_movevalues = '300 0 0';
+	for (i = 0; i < 8; i = i + 1)
+		runstandardplayerphysics(e);
+	g_t26_p2_end = e.origin;
+
+	remove(e);
+
+	// Инвариант: реальное смещение WALK-вперёд (вход читается). Падение — инфо.
+	if (vlen(g_t26_p2_end - g_t26_p2_start) < 1)
+		bad = bad + 1;
+	g_t26_p_bad = bad;
+	dprint(sprintf("[T2.6] probe p1fall %g p2d %g\n",
+		g_t26_p1_start_z - g_t26_p1_end_z,
+		vlen(g_t26_p2_end - g_t26_p2_start)));
 	return bad;
 }
 
@@ -3435,5 +3596,25 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("C4 Э3 delta %g owned pl %g bp %g", cvar("csqc_delta"), g_c4_owned_pl, g_c4_owned_bp),
 			[12, 12], (cvar("csqc_delta") != 0) ? '0 1 0' : '1 1 0', 1, 0);
+	}
+
+	// --- экран 15: T2.6 (точность предикции: каденс/окно + #347-дифф-зонд) ---
+	// iff — вызовов CSQC_Input_Frame, ifc — уникальных seq; scd/upd — уникальных
+	// servercommandframe / вызовов моста; winmax — max cc-sc; probe fall — дельта P1,
+	// d — смещение P2 (разгон вперёд с yaw=30). Сравнение ezq vs FTE — по значениям.
+	if (D == 15) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("T2.6 iff %g ifc %g", g_t26_iff, g_t26_ifc),
+			[12, 12], (g_t26_ifc > 0 && g_t26_iff > g_t26_ifc) ? '1 1 0' : '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("T2.6 scd %g upd %g winmax %g", g_t26_sc_distinct, g_e_upd, g_t26_win_max),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("T2.6 probe fall %g d %g %g", g_t26_p1_start_z - g_t26_p1_end_z,
+				g_t26_p2_end_x - g_t26_p2_start_x, g_t26_p2_end_y - g_t26_p2_start_y),
+			[12, 12], (g_t26_p_bad == 0) ? '0 1 0' : '1 0 0', 1, 0);
 	}
 }
