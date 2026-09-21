@@ -162,7 +162,10 @@ noref float() CSQC_Parse_TempEntity;	/* Please don't use this. Use CSQC_Parse_Ev
 noref void(string cmdtext) GameCommand;
 var float physics_mode = 2;	/* 0: original csqc - physics are not run
 1: DP-compat. Thinks occur, but not true movetypes.
-2: movetypes occur just as they do in ssqc. */
+2: movetypes occur just as they do in ssqc.
+NOTE (T2.7, ezquake): движковый per-frame loop реализует StartFrame/thinks/EndFrame
+(и .think/.nextthink arena-эдиктов) для mode != 0; mode 2 movetypes/`customphysics`
+на ezq пока accept+doc (полный movetype — backlog plan). */
 float gamespeed;	/* Set by the engine, this is the value of the sv_gamespeed cvar */
 float numclientseats;	/* This is the number of splitscreen clients currently running on this client. */
 var vector drawfontscale = '1 1 0';	/* Specifies a scaler for all text rendering. There are other ways to implement this. */

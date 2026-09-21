@@ -153,6 +153,14 @@ vector g_t26_p1_end;		// origin после K шагов P1
 vector g_t26_p2_start;		// старт P2 (g_pred_o0, пол игрока)
 vector g_t26_p2_end;		// origin после K шагов P2
 float g_t26_p_bad;			// инварианты зонда (0 = ok)
+// T2.7 (R9 CSQC think/physics-loop): движковый per-frame цикл StartFrame → thinks →
+// EndFrame. Канарейка: счётчики вызовов + arena-эдит с .think/.nextthink (single-think
+// NQ-стиль). physics_mode=1 (thinks-only; movetypes на ezq — accept+doc).
+float g_t27_start;			// вызовов StartFrame
+float g_t27_end;			// вызовов EndFrame
+float g_t27_think;			// вызовов .think канареечного эдикта
+float g_t27_armed;			// эдит заспавнен (0/1)
+entity g_t27_e;				// канареечный arena-эдит
 // C5-E Ф1 (no-op revision): view_angles / project-unproject / listener.
 vector g_f1_va;			// view_angles (движок публикует каждый кадр)
 vector g_f1_proj;		// project(vieworg)
@@ -587,6 +595,13 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_t26_p2_start = '0 0 0';
 	g_t26_p2_end = '0 0 0';
 	g_t26_p_bad = 0;
+	// T2.7: think-loop — thinks-only (movetypes на ezq accept+doc); канарейка чистая.
+	physics_mode = 1;
+	g_t27_start = 0;
+	g_t27_end = 0;
+	g_t27_think = 0;
+	g_t27_armed = 0;
+	g_t27_e = world;
 	g_e_predorg = '0 0 0';
 	g_f1_rt = 0;
 	g_f1_lis = 0;
@@ -671,6 +686,9 @@ void() CSQC_WorldLoaded = {
 	g_t26_p2_start = '0 0 0';
 	g_t26_p2_end = '0 0 0';
 	g_t26_p_bad = 0;
+	// T2.7: новая карта — arena очищена, канареечный think-эдит пересоздастся.
+	g_t27_armed = 0;
+	g_t27_e = world;
 	g_ge_bad = 0;
 	g_ge_done = 0;
 	g_ge_act = 0;
@@ -904,6 +922,30 @@ float(string cmd) CSQC_ConsoleCommand = {
 
 void() CSQC_Shutdown = {
 };
+
+// T2.7 (R9): CSQC think-loop-канарейка. Движок в 3D-takeover зовёт каждый кадр
+// StartFrame → thinks (arena-эдиктов с .nextthink/.think) → EndFrame (FTE
+// CSQC_DrawView). Счётчики подтверждают вызовы; thinks-only (physics_mode=1).
+void CSQC_T27Think() {
+	g_t27_think = g_t27_think + 1;
+	self.nextthink = time + 0.05;	// перепланировать (single-think NQ-стиль)
+}
+
+void() StartFrame = {
+	g_t27_start = g_t27_start + 1;
+	if (g_t27_armed == 0) {
+		g_t27_armed = 1;
+		g_t27_e = spawn();
+		if (g_t27_e != world) {
+			g_t27_e.think = CSQC_T27Think;
+			g_t27_e.nextthink = time + 0.05;
+		}
+	}
+}
+
+void() EndFrame = {
+	g_t27_end = g_t27_end + 1;
+}
 
 // CSQC_Input_Frame (без предикции): движок (ezquake) вызывает перед отправкой
 // каждого usercmd и заполняет input_* (timelength/angles/movevalues/buttons/
@@ -2445,6 +2487,12 @@ void CSQC_SelftestPred() {
 	} else {
 		ST_Skip("4 C5-E local player", "no local player entity (deltalisten #371)");
 	}
+
+	// --- T2.7 (R9): CSQC think-loop (StartFrame/thinks/EndFrame; FTE CSQC_DrawView) ---
+	print(sprintf("[T2.7] sf=%g ef=%g think=%g\n", g_t27_start, g_t27_end, g_t27_think));
+	ST_True("4 T2.7 StartFrame called", g_t27_start > 0);
+	ST_True("4 T2.7 EndFrame called", g_t27_end > 0);
+	ST_True("4 T2.7 think called", g_t27_think > 0);
 
 	ST_Summary();
 }
