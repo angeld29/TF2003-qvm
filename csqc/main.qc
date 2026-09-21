@@ -228,6 +228,7 @@ float g_pf_skin;
 float g_pf_cmap;
 float g_pf_eff;
 float g_pf_n;
+// Этап 5 (сводная канарейка, csqc_dbg 19): одна сцена .scale+cull, delta/pf-статус.
 float(float isnew) CSQC_PlayerPred;
 float(float isnew) CSQC_BackpackPred;	// C4 Э3: backpack delta-callback
 void Pred_Run(entity ent, float endframe);
@@ -568,8 +569,8 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	registercvar("csqc_vm", "1");
 	// C4 Э3 (MASK_DELTA): persistent-тумблер — модуль сам рисует delta-сущности
 	// (player/backpack) и просит движок их не рисовать (return 1). Default 0
-	// (listen-only, движковый рендер). ВНИМАНИЕ: CSQC render-слой неполон
-	// (видимость/анимация/скины/смерть) — см. docs/plans/ezquake_csqc_client_render_layer.md.
+	// (listen-only, движковый рендер). Render-слой arena-эдиктов реализован
+	// (Этап 5; ADR 0028/0029) — сводка: docs/archive/ezquake_csqc_client_render_layer.md.
 	registercvar("csqc_delta", "0");
 	// T2.5: тумблер FTE-сглаживания предикции (1 = выключить; FTE cg_noerror).
 	registercvar("csqc_noerror", "0");
@@ -931,6 +932,7 @@ void CSQC_DbgList() {
 	print(" 16 - Этап 2: .scale alias transform (flag scale 2 / 0.5)\n");
 	print(" 17 - Этап 3: PVS/bbox culling (flag behind wall hidden)\n");
 	print(" 18 - Этап 4a: player fields (frame/skin/colormap==entnum)\n");
+	print(" 19 - Этап 5: render-layer summary (.scale+cull+delta+pf)\n");
 }
 
 void(float width, float height, float menushown) CSQC_UpdateView = {
@@ -952,6 +954,12 @@ void(float width, float height, float menushown) CSQC_UpdateView = {
 		CSQC_ScaleTest();	// Этап 2: .scale alias transform (flag 2 / 0.5)
 	if (DbgAt(17))
 		CSQC_CullTest();	// Этап 3: PVS/bbox-куллинг (флаг за стеной скрыт)
+	// Этап 5: сводная канарейка render-layer — одна сцена: .scale + куллинг
+	// (drawmask 16/32; addentities накапливает, не сбрасывает).
+	if (DbgAt(19)) {
+		CSQC_ScaleTest();
+		CSQC_CullTest();
+	}
 	renderscene();
 
 	// C5-E: каждый кадр — догнать предсказание до clientcommandframe.
@@ -2515,6 +2523,12 @@ void CSQC_SelftestEnt() {
 	ST_True("3 GE504 mins.z<0", mn_z < 0);
 	ST_True("3 GE504 maxs.z>0", mx_z > 0);
 	ST_EqF("3 GE504 invalid=0", 0, getentity(0, GE_ACTIVE));
+	// Этап 5: #504 player-поля игрока (FTE ps->frame/skinnum/effects/modelindex;
+	// ezq — из player_state, ADR 0029). Инварианты: неотрицательны, модель > 0.
+	ST_True("5 GE504 player model>0", getentity(le, GE_MODELINDEX) > 0);
+	ST_True("5 GE504 player frame>=0", getentity(le, GE_FRAME) >= 0);
+	ST_True("5 GE504 player skin>=0", getentity(le, GE_SKIN) >= 0);
+	ST_True("5 GE504 player effects>=0", getentity(le, GE_EFFECTS) >= 0);
 }
 
 // Phase 4: connection/prediction (группа `pred`) — C5-A окно, C5-B #347, C5-E мост.
@@ -3781,8 +3795,9 @@ void Hud_DrawCSQC() {
 
 	// --- экран 14: C4 Э3 (MASK_DELTA) — статус ---
 	// Persistent-тумблер csqc_delta (default 0). При 1 модуль рисует delta-сущности
-	// (player/backpack) сам, движок их не рисует (return 1). CSQC render-слой неполон
-	// (видимость/анимация/скины/смерть) — см. docs/plans/ezquake_csqc_client_render_layer.md.
+	// (player/backpack) сам, движок их не рисует (return 1). Render-слой arena-эдиктов
+	// (видимость/анимация/скины/смерть) реализован (Этап 5; ADR 0028/0029) — сводка:
+	// docs/archive/ezquake_csqc_client_render_layer.md.
 	if (D == 14) {
 		yy = 470;
 		drawstring([60, yy, 0],
@@ -3842,5 +3857,28 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("Э4a eff %g n %g", g_pf_eff, g_pf_n),
 			[12, 12], '1 1 1', 1, 0);
+	}
+
+	// --- экран 19: Этап 5 (сводная канарейка render-layer) ---
+	// Одна сцена: .scale (v1/v2), куллинг (wallfrac), delta-статус (csqc_delta,
+	// owned pl/bp) и player-поля моста (ent/frm/skin/cmap/eff). Зелёный ряд —
+	// scale 2/0.5, стена найдена (<1) и cmap==ent.
+	if (D == 19) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("Э5 scale v1 %g v2 %g", g_sc_v1, g_sc_v2),
+			[12, 12], (g_sc_v1 == 2 && g_sc_v2 == 0.5) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("Э5 cull wallfrac %g", g_cull_frac),
+			[12, 12], (g_cull_frac < 1) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("Э5 delta %g owned pl %g bp %g", cvar("csqc_delta"), g_c4_owned_pl, g_c4_owned_bp),
+			[12, 12], (cvar("csqc_delta") != 0) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("Э5 pf ent %g frm %g skin %g cmap %g eff %g", g_pf_ent, g_pf_frame, g_pf_skin, g_pf_cmap, g_pf_eff),
+			[12, 12], (g_pf_ent > 0 && g_pf_cmap == g_pf_ent) ? '0 1 0' : '1 1 0', 1, 0);
 	}
 }
