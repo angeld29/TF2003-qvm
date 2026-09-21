@@ -230,4 +230,9 @@ int  G_CSQC_Example_FlagSendEntity( int sendflags_lo, int sendflags_hi );
 void G_CSQC_Example_PlaceItem( gedict_t *ent );
 void G_CSQC_Example_Frame( void );   // per-frame; периодический дирт CSQC-сущностей (~1 c)
 
+// CSQC test support (server side) — g_csqc_test.c.
+// PRECONDITION: вызывать только из SP_worldspawn() (precache моделей, используемых
+// CSQC-модулем и не precache-нутых игрой безусловно). No-op, если cvar "g_csqc" выключен.
+void G_CSQC_Test_Precache( void );
+
 #endif

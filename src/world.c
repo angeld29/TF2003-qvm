@@ -310,6 +310,9 @@ void SP_worldspawn(  )
 	trap_precache_model( "progs/b_g_key.mdl" );
 
 	trap_precache_model( "progs/s_light.spr" );
+
+	// CSQC test-support: precache моделей CSQC-модуля (g_csqc_test.c).
+	G_CSQC_Test_Precache();
 //
 // Setup light animation tables. 'a' is total darkness, 'z' is maxbright.
 //

@@ -214,6 +214,16 @@ entity g_sc_e1;
 entity g_sc_e2;
 float g_sc_v1;
 float g_sc_v2;
+// T4 Этап 1 (.scale brush/sprite, csqc_dbg 16): пары brush (maps/b_rock1.bsp) и
+// sprite (progs/s_light.spr) с .scale=2/0.5 — цель-гейт движкового масштаба
+// brush/sprite (docs/plans/ezquake_csqc_client_scale_brush_sprite.md).
+entity g_sc_be1;
+entity g_sc_be2;
+entity g_sc_se1;
+entity g_sc_se2;
+// T4 Этап 1 (диагностика): getmodelindex моделей канарейки (0 = не резолвится/не грузится).
+float g_sc_midxb;
+float g_sc_midxs;
 // Этап 3 (куллинг arena-эдиктов, csqc_dbg 17; ADR 0028): e1 — перед стеной
 // (виден), e2 — за стеной (движок не должен рисовать: PVS/leaf + bbox).
 entity g_cull_e1;
@@ -704,6 +714,12 @@ void() CSQC_WorldLoaded = {
 	g_sc_e2 = world;
 	g_sc_v1 = 0;
 	g_sc_v2 = 0;
+	g_sc_be1 = world;	// T4 Этап 1: brush/sprite .scale-тест-энты пересоздаются
+	g_sc_be2 = world;
+	g_sc_se1 = world;
+	g_sc_se2 = world;
+	g_sc_midxb = 0;
+	g_sc_midxs = 0;
 	g_cull_e1 = world;	// Этап 3: arena очищена — тест-энты куллинга пересоздаются
 	g_cull_e2 = world;
 	g_cull_frac = 0;
@@ -834,14 +850,17 @@ void CSQC_C4Test() {
 	addentities(8);
 }
 
-// Этап 2 (.scale alias, csqc_dbg 16): две arena-сущности флага — слева .scale=2
-// (вдвое больше), справа .scale=0.5 (вдвое меньше). drawmask=16, addentities(16).
-// Проверяет чтение .scale движком (csqc_add_one_entity) и FTE-паритет трансформа;
-// работает на FTE (нативные builtins) и ezq (takeover).
+// Этап 2 (.scale alias, csqc_dbg 16) + T4 Этап 1 (.scale brush/sprite):
+// пары arena-сущностей — alias (progs/tf_flag.mdl), brush (maps/b_rock1.bsp),
+// sprite (progs/s_light.spr) — с .scale=2 и .scale=0.5. drawmask=16, addentities(16).
+// Проверяет чтение .scale движком (csqc_add_one_entity) и FTE-паритет трансформа
+// alias/brush/sprite; работает на FTE (нативные builtins) и ezq (takeover).
 void CSQC_ScaleTest() {
 	local vector v;
+	local vector org;
 	makevectors(getproperty(VF_ANGLES));
-	v = getproperty(VF_ORIGIN) + v_forward * 96;
+	org = getproperty(VF_ORIGIN);
+	v = org + v_forward * 96;
 	if (g_sc_e1 == world || g_sc_e2 == world)
 		precache_model("progs/tf_flag.mdl");
 	if (g_sc_e1 == world) {
@@ -868,6 +887,59 @@ void CSQC_ScaleTest() {
 		g_sc_e2.drawmask = 16;
 		g_sc_v2 = g_sc_e2.scale;
 	}
+	// T4 Этап 1: brush-пара (maps/b_rock1.bsp) — дальше (крупная модель).
+	if (g_sc_be1 == world || g_sc_be2 == world)
+		precache_model("maps/b_rock1.bsp");
+	if (g_sc_be1 == world) {
+		g_sc_be1 = spawn();
+		if (g_sc_be1 != world)
+			setmodel(g_sc_be1, "maps/b_rock1.bsp");
+	}
+	if (g_sc_be2 == world) {
+		g_sc_be2 = spawn();
+		if (g_sc_be2 != world)
+			setmodel(g_sc_be2, "maps/b_rock1.bsp");
+	}
+	if (g_sc_be1 != world) {
+		setorigin(g_sc_be1, org + v_forward * 224 - v_right * 72);
+		g_sc_be1.angles = '0 90 0';
+		g_sc_be1.scale = 2;
+		g_sc_be1.drawmask = 16;
+	}
+	if (g_sc_be2 != world) {
+		setorigin(g_sc_be2, org + v_forward * 224 + v_right * 72);
+		g_sc_be2.angles = '0 90 0';
+		g_sc_be2.scale = 0.5;
+		g_sc_be2.drawmask = 16;
+	}
+	// T4 Этап 1: sprite-пара (progs/s_light.spr) — дальше.
+	if (g_sc_se1 == world || g_sc_se2 == world)
+		precache_model("progs/s_light.spr");
+	if (g_sc_se1 == world) {
+		g_sc_se1 = spawn();
+		if (g_sc_se1 != world)
+			setmodel(g_sc_se1, "progs/s_light.spr");
+	}
+	if (g_sc_se2 == world) {
+		g_sc_se2 = spawn();
+		if (g_sc_se2 != world)
+			setmodel(g_sc_se2, "progs/s_light.spr");
+	}
+	if (g_sc_se1 != world) {
+		setorigin(g_sc_se1, org + v_forward * 160 - v_right * 48);
+		g_sc_se1.angles = '0 90 0';
+		g_sc_se1.scale = 2;
+		g_sc_se1.drawmask = 16;
+	}
+	if (g_sc_se2 != world) {
+		setorigin(g_sc_se2, org + v_forward * 160 + v_right * 48);
+		g_sc_se2.angles = '0 90 0';
+		g_sc_se2.scale = 0.5;
+		g_sc_se2.drawmask = 16;
+	}
+	// T4 Этап 1 (диагностика): резолв моделей канарейки в ezq/FTE (0 = не загружена).
+	g_sc_midxb = getmodelindex("maps/b_rock1.bsp");
+	g_sc_midxs = getmodelindex("progs/s_light.spr");
 	addentities(16);
 }
 
@@ -929,7 +1001,7 @@ void CSQC_DbgList() {
 	print(" 13 - C4 Э2: #301 MASK_VIEWMODEL (тумблер csqc_vm)\n");
 	print(" 14 - C4 Э3: MASK_DELTA status (тумблер csqc_delta)\n");
 	print(" 15 - T2.6 prediction accuracy: cadence/window + #347 differential probe\n");
-	print(" 16 - Этап 2: .scale alias transform (flag scale 2 / 0.5)\n");
+	print(" 16 - Этап 2 + T4.1: .scale alias/brush/sprite pairs (2 / 0.5)\n");
 	print(" 17 - Этап 3: PVS/bbox culling (flag behind wall hidden)\n");
 	print(" 18 - Этап 4a: player fields (frame/skin/colormap==entnum)\n");
 	print(" 19 - Этап 5: render-layer summary (.scale+cull+delta+pf)\n");
@@ -3825,14 +3897,22 @@ void Hud_DrawCSQC() {
 			[12, 12], (g_t26_p_bad == 0) ? '0 1 0' : '1 0 0', 1, 0);
 	}
 
-	// --- экран 16: Этап 2 (.scale alias transform) ---
-	// Ожидание: слева флаг вдвое больше (scale 2), справа вдвое меньше (scale 0.5);
-	// размеры ezq == FTE. Зелёный при v1==2 && v2==0.5.
+	// --- экран 16: Этап 2 + T4.1 (.scale alias/brush/sprite pairs) ---
+	// Ожидание: в каждой паре больший (scale 2) вдвое больше меньшего (0.5);
+	// alias/brush/sprite ezq == FTE. Зелёный при v1==2 && v2==0.5.
 	if (D == 16) {
 		yy = 470;
 		drawstring([60, yy, 0],
 			sprintf("Э2 scale v1 %g v2 %g (2 / 0.5)", g_sc_v1, g_sc_v2),
 			[12, 12], (g_sc_v1 == 2 && g_sc_v2 == 0.5) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			"T4.1 brush b_rock1 / sprite s_light pairs 2 / 0.5",
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("T4.1 midx brush %g sprite %g (0=no model)", g_sc_midxb, g_sc_midxs),
+			[12, 12], (g_sc_midxb > 0 && g_sc_midxs > 0) ? '0 1 0' : '1 0 0', 1, 0);
 	}
 
 	// --- экран 17: Этап 3 (PVS/bbox-куллинг arena-эдиктов) ---
