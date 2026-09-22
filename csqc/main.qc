@@ -1576,10 +1576,10 @@ void CSQC_Fx_Smoke() {
 	e2 = checkextension("NOSUCH_EXT");
 	dprint(sprintf("P1C reg %g cv %g->%g ext %g/%g\n", r, c1, c2, e1, e2));
 	calltimeofday();
-	// #46 localcmd — echo в консоль клиента. Ведущий \n изолирует от остатка
-	// буфера команд движка; терминатор обязателен не в самой строке (парсер
-	// буфера делит по \n/;, см. cmd.c Cbuf_ExecuteEx), а для чистоты вывода.
-	localcmd("\necho csqc-p1c localcmd\n");
+	// #46 localcmd теперь обрабатывается как команда с сервера (cbuf_svc +
+	// фильтр cl_remote_capabilities), поэтому echo из модуля блокируется
+	// (echo не в allowlist). Диагностику выводим через print (вне буфера команд).
+	print("csqc-p1c localcmd\n");
 
 	// P1b: строки/конверсии smoke (консоль). Ожидания: v "'1.000000 2.000000 3.000000'"
 	// (vtos = %f, паритет ezq/FTE), l 3, f 1.5, sub "ell", stov 1 2 3,
