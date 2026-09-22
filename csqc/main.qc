@@ -70,6 +70,7 @@ float g_c5_cc;		// clientcommandframe (последний собранный к�
 float g_c5_iseq;	// input_sequence (последняя отправленная команда)
 float g_c5_345;		// getinputstate(input_sequence) — 0/1 (живой probe #345)
 float g_if_gs;		// T2.1: gamespeed (движок публикует; 1 — не paused)
+float g_notmenu;	// B1: notmenu из CSQC_UpdateView (1 в игре, 0 в меню) — визуальная канарейка
 // T2.2 (живой pending-кадр #345): capture/ассерты. clientcommandframe = последний
 // собранный кадр (FTE cl.movesequence), поэтому getinputstate(cc) == 1.
 float g_t22_cc;		// getinputstate(clientcommandframe) — 0/1
@@ -1031,7 +1032,7 @@ void CSQC_VMFault_Recurse(void) {
 	CSQC_VMFault_Recurse();
 }
 
-void(float width, float height, float menushown) CSQC_UpdateView = {
+void(float width, float height, float notmenu) CSQC_UpdateView = {
 	local float am;
 	clearscene();
 	setproperty(VF_DRAWWORLD, 1);
@@ -1063,6 +1064,8 @@ void(float width, float height, float menushown) CSQC_UpdateView = {
 
 	// T2.1: gamespeed, публикуемый движком перед CSQC_UpdateView (1 / 0 paused).
 	g_if_gs = gamespeed;
+	// B1-канарейка: notmenu (движок, FTE-семантика) для визуальной проверки.
+	g_notmenu = notmenu;
 
 	// C5-E Ф1 (экран 9): view_angles / project-unproject / listener.
 	// Точка для project — ПЕРЕД камерой (проекция самой камеры вырождена: clip-w≈0,
@@ -2312,6 +2315,8 @@ void CSQC_SelftestD(float mode) {
 // --- core (parity/gaps) — Фазы 0–1d ---
 void CSQC_SelftestCore(float mode) {
 	local float k, noop_prop;
+	local float b18n;
+	local string sk;
 	local vector rv, cur_org;
 
 	CSQC_Fx_Smoke();	// заполняет g_sm* (нужно и parity, и gap buf)
@@ -2429,6 +2434,29 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqF("T7 strftime(0) len", 8, strlen(strftime(0, "%H:%M:%S")));
 		k = stringtokeynum_menu("ESCAPE");
 		ST_EqS("T8 keynum round-trip", "ESCAPE", keynumtostring_omgwtf(k));
+		// B6 (Э5): QC/DP-домен клавиш (эталон FTE pr_clcmd.c:14/:218).
+		ST_EqS("B6 keynumtostring(K_MOUSE1)", "MOUSE1", keynumtostring(K_MOUSE1));
+		ST_EqS("B6 keynumtostring(K_UPARROW)", "UPARROW", keynumtostring(K_UPARROW));
+		ST_EqF("B6 stringtokeynum(MOUSE1)", K_MOUSE1, stringtokeynum("MOUSE1"));
+		// B9: findkeysforcommand -> QC-коды в FTE-формате ` 'code'`.
+		sk = getkeybind(K_ESCAPE);
+		setkeybind(K_ESCAPE, "+b9probe");
+		ST_True("B9 findkeys QC format", strstrofs(findkeysforcommand("+b9probe"), " '27'") >= 0);
+		setkeybind(K_ESCAPE, sk);
+		// B18: registercommand без cap (FTE — unlimited).
+		k = 0;
+		while (k < 24) {
+			registercommand(sprintf("csqc_b18_%d", k));
+			k = k + 1;
+		}
+		k = 0;
+		b18n = 0;
+		while (k < 24) {
+			if (checkcommand(sprintf("csqc_b18_%d", k)) != 0)
+				b18n = b18n + 1;
+			k = k + 1;
+		}
+		ST_EqF("B18 registercommand >16", 24, b18n);
 		// Config/env-зависимые — инвариант (не точное значение). getresolution:
 		// FTE mode 0 = видео-режим (M_Vid_GetMode, pr_clcmd.c:789), ezq =
 		// текущее окно (mode игнорируется) — точное значение не паритетно;
@@ -3505,6 +3533,11 @@ void Hud_DrawCSQC() {
 		yy = yy + 18;
 		drawstring([60, yy, 0],
 			sprintf("ie a%g d%g k%g", g_ie_mabs, g_ie_mdelta, g_ie_keys),
+			[12, 12], '1 1 1', 1, 0);
+		yy = yy + 18;
+		// B1-канарейка (визуальная): notmenu=1 в игре, 0 при открытом меню.
+		drawstring([60, yy, 0],
+			sprintf("notmenu %g", g_notmenu),
 			[12, 12], '1 1 1', 1, 0);
 	}
 
