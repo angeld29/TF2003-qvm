@@ -1778,14 +1778,14 @@ void CSQC_SelftestL2b1(float mode) {
 		} else {
 			ST_Skip("2b1 setmodelindex round-trip", "spawn failed");
 		}
+
+		// #334 modelnameforindex (T3 Э3): обратный резолв индекса CSQC-реестра.
+		ST_EqS("2b1 modelnameforindex round-trip", "progs/player.mdl", modelnameforindex(idx));
 	}
 
 	// --- gaps (заглушки ezq) — mode != 0 ---
 	if (mode != 0) {
 		idx = getmodelindex("progs/player.mdl", 0);
-
-		// #334 modelnameforindex.
-		ST_EqS("2b1 modelnameforindex round-trip", "progs/player.mdl", modelnameforindex(idx));
 
 		// #284 frametoname: FTE "axrun1"; #276 frameforname (заглушка).
 		nm = frametoname(idx, 0);
@@ -1989,10 +1989,10 @@ void CSQC_SelftestL2b2(float mode) {
 // ============================================================================
 // Phase 2c (self-test group l2): vectorvectors #432 — единственный QC-наблюдаемый
 // из effects/render (остальные 2c — void визуальные сайд-эффекты).
-// FTE pr_bgcmd.c:6559; ezq — nop-заглушка (csqc_builtins.c:5018) → FAIL.
+// FTE pr_bgcmd.c:6559; реализовано в ezq (T3 Э3, csqc_builtins.c) → parity.
 // ============================================================================
 void CSQC_SelftestL2c(float mode) {
-	if (mode == 0)	// единственный тест 2c — gap (mode != 0)
+	if (mode == 1)	// parity-тест 2c (не gap) — в gaps пропускается
 		return;
 	makevectors('0 0 0');
 	vectorvectors('0 1 0');
@@ -2441,8 +2441,8 @@ void CSQC_SelftestCore(float mode) {
 void CSQC_SelftestL2a(float mode) {
 	local float h;	// hash-таблица
 
-	// --- gaps (заглушки ezq) — mode != 0 ---
-	if (mode != 0) {
+	// --- parity (реализовано и в ezq, не заглушка) — mode != 1 ---
+	if (mode != 1) {
 		// instr (T3 Э4): FTE PF_instr возвращает подстроку-остаток с позиции вхождения
 		// (RETURN_SSTRING), либо "" если не найдено; csdefs приведён к string.
 		ST_EqS("2a instr(abc,b)", "bc", instr("abc", "b"));
@@ -2453,6 +2453,29 @@ void CSQC_SelftestL2a(float mode) {
 		ST_EqF("2a strlennocol(&cF00ab)", 2, strlennocol("&cF00ab"));
 		ST_EqS("2a strdecolorize(&cF00ab)", "ab", strdecolorize("&cF00ab"));
 		ST_EqF("2a strlennocol(&rab)", 2, strlennocol("&rab"));
+		// T4: FTE-разметка `^` (colour/state; без links/charset/^U/^{). Эталон —
+		// PF_strlennocol/PF_strdecolorize (fteqw pr_bgcmd.c:5038/5054).
+		ST_EqF("2a strlennocol(^3ab)", 2, strlennocol("^3ab"));
+		ST_EqS("2a strdecolorize(^3ab)", "ab", strdecolorize("^3ab"));
+		ST_EqF("2a strlennocol(^x123ab)", 2, strlennocol("^x123ab"));
+		ST_EqS("2a strdecolorize(^x123ab)", "ab", strdecolorize("^x123ab"));
+		// ^x с не-hex: стрип только "^x".
+		ST_EqS("2a strdecolorize(^xZZab)", "ZZab", strdecolorize("^xZZab"));
+		// ^^ -> "^".
+		ST_EqF("2a strlennocol(a^^b)", 3, strlennocol("a^^b"));
+		ST_EqS("2a strdecolorize(a^^b)", "a^b", strdecolorize("a^^b"));
+		// висячий/неизвестный "^" — литерал.
+		ST_EqS("2a strdecolorize(ab^)", "ab^", strdecolorize("ab^"));
+		ST_EqS("2a strdecolorize(^gab)", "^gab", strdecolorize("^gab"));
+		// state-коды (^s push, ^r pop) — стрип.
+		ST_EqS("2a strdecolorize(^sX^rY)", "XY", strdecolorize("^sX^rY"));
+		// ^&XX extended FG/BG: валидный — стрип 4; невалидный — "^" литерал.
+		ST_EqS("2a strdecolorize(^&12ab)", "ab", strdecolorize("^&12ab"));
+		ST_EqS("2a strdecolorize(^&G0ab)", "^&G0ab", strdecolorize("^&G0ab"));
+	}
+
+	// --- gaps (заглушки ezq) — mode != 0 ---
+	if (mode != 0) {
 		// digest_hex: FTE требует имя хеша в ВЕРХНЕМ регистре (pr_bgcmd.c:5794).
 		ST_EqS("2a digest_hex(MD5,abc)", "900150983cd24fb0d6963f7d28e17f72", digest_hex("MD5", "abc"));
 		ST_EqS("2a whichpack(player.mdl)", "", whichpack("progs/player.mdl", 0));
