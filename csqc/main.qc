@@ -586,6 +586,11 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	registercvar("csqc_noerror", "0");
 	// Self-test harness: авто-прогон один раз на карту по спавну (player_localentnum).
 	registercvar("csqc_selftest_auto", "1");
+	// A1 (abort-stack клиентской VM): негативный тест-хук ОДНОРАЗОВОЙ командой
+	// (не cvar: модульные cvars переживают перезагрузку и мгновенно повторяли бы
+	// фаул). `csqc_vmfault` → глубокая рекурсия; движок обязан размотать
+	// клиентскую VM (errored) без краха/зависания.
+	registercommand("csqc_vmfault");
 	// C5-E: слушатель сущностей (FTE-паритет): движок зовёт CSQC_PlayerPred при
 	// обновлении сущностей с зарегистрированной моделью. Регистрируем модель
 	// игрока (FTE-канон csqctest/entrypoints.qc:237) — колбэк сам фильтрует
@@ -1019,6 +1024,13 @@ void CSQC_DbgList() {
 	print(" 19 - Этап 5: render-layer summary (.scale+cull+delta+pf)\n");
 }
 
+// A1 (abort-stack клиентской VM) — негативный тест-хук: бесконечная рекурсия
+// (движок ловит stack overflow клиентской VM). Под cvar csqc_vmfault==1.
+void CSQC_VMFault_Recurse(void);
+void CSQC_VMFault_Recurse(void) {
+	CSQC_VMFault_Recurse();
+}
+
 void(float width, float height, float menushown) CSQC_UpdateView = {
 	local float am;
 	clearscene();
@@ -1100,6 +1112,10 @@ float(string cmd) CSQC_ConsoleCommand = {
 	}
 	if (argv(0) == "csqc_objerror") {
 		ObjErrorProbe();
+		return 1;
+	}
+	if (argv(0) == "csqc_vmfault") {
+		CSQC_VMFault_Recurse();	// A1-негатив: обрыв клиентской VM
 		return 1;
 	}
 	if (argv(0) == "csqc_dbg_list") {
