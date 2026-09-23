@@ -1859,6 +1859,19 @@ void CSQC_SelftestL2b2(float mode) {
 			ST_Skip("2b2 addentity no crash", "spawn failed");
 		}
 
+		// B19 (Э6): #302 addentity ДО #301 addentities(mask&1) не затирается —
+		// merge без CL_ClearScene (FTE PF_R_AddEntityMask, pr_csqc.c:1391-1479).
+		// Полная проверка порядка — live/engine-probe; здесь smoke последовательности.
+		e1 = spawn();
+		if (e1 != world) {
+			addentity(e1);
+			addentities(1);
+			ST_True("B19 addentity+addentities smoke", 1);
+			remove(e1);
+		} else {
+			ST_Skip("B19 addentity+addentities smoke", "spawn failed");
+		}
+
 		// --- #496-500 рефлексия полей ---
 		nf = numentityfields();
 		ST_True("2b2 reflection numentityfields>0", nf > 0);
@@ -2190,15 +2203,16 @@ void CSQC_SelftestD(float mode) {
 		isc0 = iscachedpic("gfx/ttl_main.lmp");
 		ST_EqF("1d 2D iscachedpic after precache", 1, isc0);
 
-		// FTE-эталон: имя резолвится ТОЛЬКО с явным расширением — "gfx/ttl_main.lmp"
-		// -> 214x24, без расширения -> 0. ezq резолвит иначе (bare -> 214x24,
-		// .lmp -> 96x24) — расхождение ezq (не заглушка).
+		// FTE-эталон (live): имя резолвится extension-fallback'ом — "gfx/ttl_main.lmp"
+		// -> 214x24 и bare "gfx/ttl_main" -> 214x24 (FTE Image_GetTexture,
+		// parity-audit 2026-09-22, задача A). Ожидание фиксирует реальное поведение FTE
+		// (hard rule ADR 0023); ezq приведён к нему (CSQC_Client_PicSize).
 		mp = drawgetimagesize("gfx/ttl_main.lmp");
 		ST_EqF("1d 2D drawgetimagesize(lmp) x", 214, mp_x);
 		ST_EqF("1d 2D drawgetimagesize(lmp) y", 24, mp_y);
 		mp = drawgetimagesize("gfx/ttl_main");
-		ST_EqF("1d 2D drawgetimagesize(bare) x", 0, mp_x);
-		ST_EqF("1d 2D drawgetimagesize(bare) y", 0, mp_y);
+		ST_EqF("1d 2D drawgetimagesize(bare) x", 214, mp_x);
+		ST_EqF("1d 2D drawgetimagesize(bare) y", 24, mp_y);
 
 		freepic("gfx/ttl_main.lmp");
 		isc1 = iscachedpic("gfx/ttl_main.lmp");
@@ -2475,6 +2489,13 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqF("T3 setproperty ret 1", 1, setproperty(VF_ORIGIN, cur_org));
 		noop_prop = 9999;
 		ST_EqF("T3 setproperty ret 0", 0, setproperty(noop_prop, 0));
+		// B22 (Э6): set-флаги (FTE pr_csqc.c:2582-2594) распознаны => return 1.
+		// VF_PERSPECTIVE — accept+doc (распознан, изометрия не реализована).
+		ST_EqF("B22 setproperty VF_DRAWWORLD ret", 1, setproperty(VF_DRAWWORLD, 1));
+		ST_EqF("B22 setproperty VF_DRAWENGINESBAR ret", 1, setproperty(VF_DRAWENGINESBAR, 1));
+		ST_EqF("B22 setproperty VF_DRAWCROSSHAIR ret", 1, setproperty(VF_DRAWCROSSHAIR, 1));
+		ST_EqF("B22 setproperty VF_PERSPECTIVE ret", 1, setproperty(VF_PERSPECTIVE, 1));
+		clearscene();	// вернуть FTE-дефолты (sbar/crosshair off)
 
 		// --- Фаза 1d: 2D-кэш / T5 / T9 / P1d / P1e (без трасс) ---
 		CSQC_SelftestD(mode);
@@ -3487,9 +3508,29 @@ void Hud_DrawCSQC() {
 		drawstring([132, 576, 0], "subpic", [12, 12], '0 1 0', 1, 0);
 		drawcharacter([60, 606, 0], 'A', [12, 12], '0 1 1', 1, 0);
 		drawstring([78, 606, 0], "drawcharacter", [12, 12], '0 1 1', 1, 0);
+		// B15 (Э6): alpha применяется в тексте (FTE pr_menu.c:565/:1009/:1039).
+		// Левые — alpha=1, правые — alpha=0.5 (fade виден).
+		drawstring([60, 630, 0], "alpha 1.0", [12, 12], '1 1 1', 1, 0);
+		drawstring([170, 630, 0], "alpha 0.5", [12, 12], '1 1 1', 0.5, 0);
+		drawrawstring([60, 648, 0], "raw 1.0", [12, 12], '1 1 1', 1);
+		drawrawstring([170, 648, 0], "raw 0.5", [12, 12], '1 1 1', 0.5);
+		drawcharacter([60, 666, 0], 'A', [12, 12], '0 1 1', 1, 0);
+		drawcharacter([78, 666, 0], 'B', [12, 12], '0 1 1', 0.5, 0);
+		// B14 (Э6): getmousepos в vid.conwidth-единицах, на одном экране с курсором
+		// (при -conwidth 900 координаты <=900, не <=render-width 1280).
+		mp = getmousepos();
+		drawstring([60, 684, 0], sprintf("mouse %g %g", mp_x, mp_y), [12, 12], '0 1 1', 1, 0);
 	}
 	else {
 		setcursormode(0);
+	}
+
+	// B22 (Э6): VF_DRAWENGINESBAR=0 ставится после per-frame setproperty(=1) в
+	// CSQC_UpdateView (main.qc:1040) → движковый sbar/HUD скрыты (гейт cl_screen.c),
+	// прицел остаётся (модуль возвращает VF_DRAWCROSSHAIR=1).
+	if (D == 20) {
+		setproperty(VF_DRAWENGINESBAR, 0);
+		drawstring([60, 470, 0], "B22: engine sbar/HUD off", [12, 12], '1 1 0', 1, 0);
 	}
 
 	// --- экран 2: текст «до ie» (A4-A7, C1.2) ---
