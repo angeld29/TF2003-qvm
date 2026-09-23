@@ -2577,6 +2577,67 @@ void CSQC_SelftestCore(float mode) {
 		ST_True("B10 topcolor_rgb quoted", substring(getplayerkeyvalue(player_localnum, "topcolor_rgb"), 0, 1) == "'");
 		ST_True("B10 serverkey maxplayers nonempty", strlen(serverkey("maxplayers")) > 0);
 
+		// B12 (Э8.3): sprintf width/flags/precision (FTE PF_sprintf_internal,
+		// pr_bgcmd.c:7295). Неизвестная конверсия — verbatim; %o/%p/%S/length не поддержаны.
+		ST_EqS("B12 sprintf %5d", "   42", sprintf("%5d", 42));
+		ST_EqS("B12 sprintf %03d", "007", sprintf("%03d", 7));
+		ST_EqS("B12 sprintf %-3d", "7  ", sprintf("%-3d", 7));
+		ST_EqS("B12 sprintf %+d", "+7", sprintf("%+d", 7));
+		ST_EqS("B12 sprintf %x", "ff", sprintf("%x", 255));
+		ST_EqS("B12 sprintf %X", "FF", sprintf("%X", 255));
+		ST_EqS("B12 sprintf %c", "A", sprintf("%c", 65));
+		ST_EqS("B12 sprintf %.3f", "3.142", sprintf("%.3f", 3.14159));
+		ST_EqS("B12 sprintf %.2f", "1.50", sprintf("%.2f", 1.5));
+		ST_EqS("B12 sprintf %g", "1.5", sprintf("%g", 1.5));
+		ST_EqS("B12 sprintf %s", "hi", sprintf("%s", "hi"));
+		rv = '1 2 3';
+		ST_EqS("B12 sprintf %v", "1 2 3", sprintf("%v", rv));
+
+		// B13 (Э8.3): таблица-зеркало FTE (pr_bgcmd.c QSG_Extensions) — точные имена,
+		// вкл. '_' у _DP_TE_*; EXT_CSQC — спец-кейс (протокольный, check_pext_csqc).
+		// Осознанные ezq-исключения (FTE=1, ezq=0: FRIK_FILE/FTE_QC_INTCONV/
+		// _DP_TE_FLAMEJET/...) не ассертятся здесь (hard rule ADR 0023) — см. parity-audit §B13.
+		ST_EqF("B13 EXT_CSQC", 1, checkextension("EXT_CSQC"));
+		ST_EqF("B13 DP_QC_SINCOSSQRTPOW", 1, checkextension("DP_QC_SINCOSSQRTPOW"));
+		ST_EqF("B13 DP_QC_MINMAXBOUND", 1, checkextension("DP_QC_MINMAXBOUND"));
+		ST_EqF("B13 DP_QC_RANDOMVEC", 1, checkextension("DP_QC_RANDOMVEC"));
+		ST_EqF("B13 DP_REGISTERCVAR", 1, checkextension("DP_REGISTERCVAR"));
+		ST_EqF("B13 DP_QC_CVAR_STRING", 1, checkextension("DP_QC_CVAR_STRING"));
+		ST_EqF("B13 DP_QC_CVAR_DEFSTRING", 1, checkextension("DP_QC_CVAR_DEFSTRING"));
+		ST_EqF("B13 DP_QC_CVAR_TYPE", 1, checkextension("DP_QC_CVAR_TYPE"));
+		ST_EqF("B13 DP_QC_EDICT_NUM", 1, checkextension("DP_QC_EDICT_NUM"));
+		ST_EqF("B13 DP_QC_ETOS", 1, checkextension("DP_QC_ETOS"));
+		ST_EqF("B13 DP_QC_FINDFLOAT", 1, checkextension("DP_QC_FINDFLOAT"));
+		ST_EqF("B13 DP_QC_STRFTIME", 1, checkextension("DP_QC_STRFTIME"));
+		ST_EqF("B13 DP_QC_STRREPLACE", 1, checkextension("DP_QC_STRREPLACE"));
+		ST_EqF("B13 DP_QC_TOKENIZEBYSEPARATOR", 1, checkextension("DP_QC_TOKENIZEBYSEPARATOR"));
+		ST_EqF("B13 DP_QC_SPRINTF", 1, checkextension("DP_QC_SPRINTF"));
+		ST_EqF("B13 DP_QC_STRING_CASE_FUNCTIONS", 1, checkextension("DP_QC_STRING_CASE_FUNCTIONS"));
+		ST_EqF("B13 DP_QC_STRINGCOLORFUNCTIONS", 1, checkextension("DP_QC_STRINGCOLORFUNCTIONS"));
+		ST_EqF("B13 DP_QC_CRC16", 1, checkextension("DP_QC_CRC16"));
+		ST_EqF("B13 DP_QC_ASINACOSATANATAN2TAN", 1, checkextension("DP_QC_ASINACOSATANATAN2TAN"));
+		ST_EqF("B13 DP_QC_CHANGEPITCH", 1, checkextension("DP_QC_CHANGEPITCH"));
+		ST_EqF("B13 DP_QC_VECTORVECTORS", 1, checkextension("DP_QC_VECTORVECTORS"));
+		ST_EqF("B13 DP_QC_TRACEBOX", 1, checkextension("DP_QC_TRACEBOX"));
+		ST_EqF("B13 DP_QC_ENTITYDATA", 1, checkextension("DP_QC_ENTITYDATA"));
+		ST_EqF("B13 EXT_BITSHIFT", 1, checkextension("EXT_BITSHIFT"));
+		ST_EqF("B13 DP_TE_BLOOD", 1, checkextension("DP_TE_BLOOD"));
+		ST_EqF("B13 _DP_TE_BLOODSHOWER", 1, checkextension("_DP_TE_BLOODSHOWER"));
+		ST_EqF("B13 DP_TE_EXPLOSIONRGB", 1, checkextension("DP_TE_EXPLOSIONRGB"));
+		ST_EqF("B13 DP_TE_PARTICLECUBE", 1, checkextension("DP_TE_PARTICLECUBE"));
+		ST_EqF("B13 DP_TE_PARTICLERAIN", 1, checkextension("DP_TE_PARTICLERAIN"));
+		ST_EqF("B13 DP_TE_PARTICLESNOW", 1, checkextension("DP_TE_PARTICLESNOW"));
+		ST_EqF("B13 DP_TE_SPARK", 1, checkextension("DP_TE_SPARK"));
+		ST_EqF("B13 DP_TE_SMALLFLASH", 1, checkextension("DP_TE_SMALLFLASH"));
+		ST_EqF("B13 DP_TE_CUSTOMFLASH", 1, checkextension("DP_TE_CUSTOMFLASH"));
+		ST_EqF("B13 _DP_TE_QUADEFFECTS1", 1, checkextension("_DP_TE_QUADEFFECTS1"));
+		ST_EqF("B13 FTE_STRINGS", 1, checkextension("FTE_STRINGS"));
+		ST_EqF("B13 DP_TE_STANDARDEFFECTBUILTINS", 1, checkextension("DP_TE_STANDARDEFFECTBUILTINS"));
+		ST_EqF("B13 FTE_TE_STANDARDEFFECTBUILTINS", 1, checkextension("FTE_TE_STANDARDEFFECTBUILTINS"));
+		// Негативы — только имена, отсутствующие и у FTE (FTE_CSQC в QSG_Extensions нет).
+		ST_EqF("B13 NOSUCH_EXT", 0, checkextension("NOSUCH_EXT"));
+		ST_EqF("B13 FTE_CSQC", 0, checkextension("FTE_CSQC"));
+
 		// --- Фаза 1d: 2D-кэш / T5 / T9 / P1d / P1e (без трасс) ---
 		CSQC_SelftestD(mode);
 	}
@@ -2617,6 +2678,14 @@ void CSQC_SelftestL2a(float mode) {
 		// ^&XX extended FG/BG: валидный — стрип 4; невалидный — "^" литерал.
 		ST_EqS("2a strdecolorize(^&12ab)", "ab", strdecolorize("^&12ab"));
 		ST_EqS("2a strdecolorize(^&G0ab)", "^&G0ab", strdecolorize("^&G0ab"));
+		// strconv (Э8.3): порт FTE PF_strconv (pr_bgcmd.c:4510) — регистр/цвет.
+		ST_EqS("2a strconv identity", "abc", strconv(0, 0, 0, "abc"));
+		ST_EqS("2a strconv upper", "ABC", strconv(2, 0, 0, "abc"));
+		ST_EqS("2a strconv lower", "abc", strconv(1, 0, 0, "ABC"));
+		ST_EqF("2a strconv redalpha 2", 225, str2chr(strconv(0, 2, 0, "a"), 0));
+		ST_EqF("2a strconv rednum 2", 176, str2chr(strconv(0, 0, 2, "0"), 0));
+		ST_EqF("2a strconv alt5 even", 225, str2chr(strconv(0, 5, 0, "ab"), 0));
+		ST_EqF("2a strconv alt5 odd", 98, str2chr(strconv(0, 5, 0, "ab"), 1));
 	}
 
 	// --- gaps (заглушки ezq) — mode != 0 ---
@@ -2624,7 +2693,6 @@ void CSQC_SelftestL2a(float mode) {
 		// digest_hex: FTE требует имя хеша в ВЕРХНЕМ регистре (pr_bgcmd.c:5794).
 		ST_EqS("2a digest_hex(MD5,abc)", "900150983cd24fb0d6963f7d28e17f72", digest_hex("MD5", "abc"));
 		ST_EqS("2a whichpack(player.mdl)", "", whichpack("progs/player.mdl", 0));
-		ST_EqS("2a strconv(0,0,0,abc)", "abc", strconv(0, 0, 0, "abc"));
 		h = hash_createtab(64, 0);
 		ST_True("2a hash_createtab>0", h > 0);
 		hash_add(h, "k", 0, 0);
