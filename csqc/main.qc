@@ -677,6 +677,11 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_ge_rem_org = '0 0 0';
 	precache_model("progs/player.mdl");
 	deltalisten("progs/player.mdl", CSQC_PlayerPred, RSES_NOLERP | RSES_NOROTATE);
+	// B8 (Э7): sendevent ДО ca_active (CSQC_Init). С фиксом движок кладёт
+	// clcfte_qcrequest в netchan уже здесь (FTE pr_csqc.c:3801 `if (!cls.state)`);
+	// без фикса (ezq `cls.state != ca_active`) запрос молча терялся. Live-контроль —
+	// серверный лог `developer 1`: `GAME_QCREQUEST ... event "csqc_echo" argc=1`.
+	sendevent("csqc_echo", "f", 8);
 };
 
 void() CSQC_WorldLoaded = {
@@ -2496,6 +2501,16 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqF("B22 setproperty VF_DRAWCROSSHAIR ret", 1, setproperty(VF_DRAWCROSSHAIR, 1));
 		ST_EqF("B22 setproperty VF_PERSPECTIVE ret", 1, setproperty(VF_PERSPECTIVE, 1));
 		clearscene();	// вернуть FTE-дефолты (sbar/crosshair off)
+
+		// B4 (Э7): симулированные глобалы уровня FTE (pr_csqc.c:8818-8838).
+		// cltime — map-uptime (unfixed ezq = 0); frametime — bound(0,...,0.1);
+		// maxclients — число слотов (FTE cl.allocated_client_slots); player_localnum —
+		// 0-based индекс игрока; intermission — 0 в обычной игре.
+		ST_True("B4 cltime > 0", cltime > 0);
+		ST_True("B4 frametime in [0,0.1]", frametime >= 0 && frametime <= 0.1);
+		ST_True("B4 maxclients >= 1", maxclients >= 1);
+		ST_True("B4 player_localnum >= 0", player_localnum >= 0);
+		ST_EqF("B4 intermission 0", 0, intermission);
 
 		// --- Фаза 1d: 2D-кэш / T5 / T9 / P1d / P1e (без трасс) ---
 		CSQC_SelftestD(mode);
