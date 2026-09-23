@@ -2388,6 +2388,8 @@ void CSQC_SelftestCore(float mode) {
 	local float b18n;
 	local string sk;
 	local vector rv, cur_org;
+	local entity e_b20;
+	local float b20_idx;
 
 	CSQC_Fx_Smoke();	// заполняет g_sm* (нужно и parity, и gap buf)
 
@@ -2402,6 +2404,36 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqF("347 runstandardplayerphysics", 1, g_sm347);
 		// Реализовано в ezq, но поведение иное (не заглушка): баг ezq (R6/T3), не gaps.
 		ST_EqF("460-469 buf chain", 6, g_sm_buf);
+
+		// --- B20 (Э9): bbox из модели (setmodel/setmodelindex/setsize) ---
+		// FTE: csqc_setmodel копирует model->mins/maxs/size (pr_csqc.c:3129-3131),
+		// PF_cs_SetModelIndex -> csqc_setmodel (:3180-3186), PF_cs_SetSize .size (:2911).
+		precache_model("progs/tf_flag.mdl");
+		e_b20 = spawn();
+		if (e_b20 != world) {
+			setmodel(e_b20, "progs/tf_flag.mdl");
+			ST_True("B20 setmodel bbox nonzero",
+				e_b20.mins != '0 0 0' || e_b20.maxs != '0 0 0');
+			ST_NearV("B20 setmodel size==maxs-mins",
+				e_b20.maxs - e_b20.mins, e_b20.size, 0.0001);
+			b20_idx = getmodelindex("progs/tf_flag.mdl");
+			setmodelindex(e_b20, b20_idx);
+			ST_EqS("B20 setmodelindex .model",
+				modelnameforindex(b20_idx), e_b20.model);
+			ST_NearV("B20 setmodelindex size==maxs-mins",
+				e_b20.maxs - e_b20.mins, e_b20.size, 0.0001);
+			precache_model("maps/b_rock1.bsp");
+			setmodel(e_b20, "maps/b_rock1.bsp");
+			ST_True("B20 setmodel(brush) bbox nonzero",
+				e_b20.mins != '0 0 0' || e_b20.maxs != '0 0 0');
+			setsize(e_b20, '-8 -8 -8', '8 8 8');
+			ST_NearV("B20 setsize .size", '16 16 16', e_b20.size, 0.0001);
+			remove(e_b20);
+		} else {
+			ST_Skip("B20 setmodel bbox", "spawn failed");
+			ST_Skip("B20 setmodelindex .model", "spawn failed");
+			ST_Skip("B20 setsize .size", "spawn failed");
+		}
 
 		// --- Этап 4a: player-поля моста (#371) ---
 		// self.colormap движок пишет как pnum+1 == self.entnum (FTE pr_csqc.c:5627).
