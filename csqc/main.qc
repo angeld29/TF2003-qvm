@@ -2563,6 +2563,20 @@ void CSQC_SelftestCore(float mode) {
 		ST_True("B4 player_localnum >= 0", player_localnum >= 0);
 		ST_EqF("B4 intermission 0", 0, intermission);
 
+		// B7 (Э8.2): getstati отдаёт raw int-биты (FTE G_INT, pr_csqc.c:2812), не число;
+		// числовое значение — getstatf. При health>0 результаты обязаны различаться.
+		if (getstatf(STAT_HEALTH) > 0)
+			ST_True("B7 getstati raw-bits != getstatf", getstati(STAT_HEALTH) != getstatf(STAT_HEALTH));
+		else
+			ST_Skip("B7 getstati raw-bits != getstatf", "health==0");
+
+		// B10 (Э8.2): ключи getplayerkeyvalue (FTE pr_csqc.c:4344) / serverkey (pr_clcmd.c:1391).
+		// pnum — локальный игрок (player_localnum из B4).
+		ST_EqF("B10 viewentity", player_localnum + 1, stof(getplayerkeyvalue(player_localnum, "viewentity")));
+		ST_True("B10 pl nonempty", strlen(getplayerkeyvalue(player_localnum, "pl")) > 0);
+		ST_True("B10 topcolor_rgb quoted", substring(getplayerkeyvalue(player_localnum, "topcolor_rgb"), 0, 1) == "'");
+		ST_True("B10 serverkey maxplayers nonempty", strlen(serverkey("maxplayers")) > 0);
+
 		// --- Фаза 1d: 2D-кэш / T5 / T9 / P1d / P1e (без трасс) ---
 		CSQC_SelftestD(mode);
 	}
@@ -3001,7 +3015,7 @@ float CSQC_StatWire_Bad() {
 	b = b + (getstatf(51) != 12345.5);
 	b = b + (getstatf(52) != 1);
 	b = b + (getstatf(54) != 3);
-	b = b + (getstati(37) != 0);
+	b = b + (getstatf(37) != 0);
 	return b;
 }
 
@@ -3304,7 +3318,7 @@ void Hud_DrawCSQC() {
 	// спектатор (player_localentnum != 0 указывает на наблюдаемого), своя сущность
 	// появляется только после выбора команды/класса. Признак спавна с классом —
 	// серверный стат playerclass (>0); при 0 (спектатор/выбор класса) re-arm.
-	if (getstati(STAT_CLASS_TF) > 0) {
+	if (getstatf(STAT_CLASS_TF) > 0) {
 		if (g_st_auto_done == 0 && cvar("csqc_selftest_auto") != 0) {
 			g_st_auto_done = 1;
 			CSQC_SelfTest(1);	// авто — только core (l2/all — вручную, ~95 FTE-L2)
@@ -3549,7 +3563,7 @@ void Hud_DrawCSQC() {
 		bad = CSQC_StatWire_Bad();
 		dprint(sprintf("SW78/79 stat55 0x12345678 bad %g\n", bad));
 		dprint(sprintf("SW f51 %g s53 %s v %g/%g e37 %g\n",
-			getstatf(51), getstats(53), getstatf(52), getstatf(54), getstati(37)));
+			getstatf(51), getstats(53), getstatf(52), getstatf(54), getstatf(37)));
 	}
 
 	// Экран 7 (C5-B #347): одноразовый прогон канарейки-механики + консоль.
@@ -3871,7 +3885,7 @@ void Hud_DrawCSQC() {
 			[12, 12], '1 1 1', 1, 0);
 		yy = yy + 18;
 		drawstring([60, yy, 0],
-			sprintf("i ps50 %g tk %g g40 %g", getstatf(50), getstatf(40), getstati(40)),
+			sprintf("i ps50 %g tk %g g40 %g", getstatf(50), getstatf(40), getstatf(40)),
 			[12, 12], '1 1 1', 1, 0);
 		yy = yy + 18;
 		drawstring([60, yy, 0],
@@ -3880,7 +3894,7 @@ void Hud_DrawCSQC() {
 		yy = yy + 18;
 		drawstring([60, yy, 0],
 			sprintf("v %g/%g e37 %g i50 %g",
-				getstatf(52), getstatf(54), getstati(37), getstati(50)),
+				getstatf(52), getstatf(54), getstatf(37), getstatf(50)),
 			[12, 12], '1 1 1', 1, 0);
 	}
 

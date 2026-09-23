@@ -31,8 +31,8 @@ void Hud_Draw() {
 
 	// Активное оружие: точное имя из серверного кастомного стата
 	// STAT_WEAPON_TF (current_weapon, WEAP_* бит); фолбэк — на слот из STAT_ITEMS.
-	string wname = weapon_name(getstati(STAT_WEAPON_TF));
-	if (wname == "" || getstati(STAT_WEAPON_TF) == 0)
+	string wname = weapon_name(getstatf(STAT_WEAPON_TF));
+	if (wname == "" || getstatf(STAT_WEAPON_TF) == 0)
 		wname = weapon_slot_name(active_weapon_slot(items));
 	string ammo_name = ammo_type_name(items);
 	string armor_name = armor_type_name(items);
