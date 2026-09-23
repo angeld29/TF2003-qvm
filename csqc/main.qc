@@ -2310,11 +2310,62 @@ void CSQC_SelftestD(float mode) {
 	}
 	ST_True("1d P1d find(tf_flag)>=5", nfind >= 5);
 	ST_True("1d P1d findradius found", findradius('16 16 16', 300) != world);
+	// B3 (Э8): findradius — голова цепочки (FTE pr_bgcmd.c:4093), все совпадения
+	// доступны обходом .chain; до фикса ezq возвращал first (цепочка из 1 элемента).
+	// peX — SOLID_BBOX (FTE pr_bgcmd.c:4040), иначе фильтр их пропустит.
+	nf = 0;
+	ce = findradius('16 16 16', 300);
+	guard = 0;
+	while (ce != world && guard < 64) {
+		guard = guard + 1;
+		nf = nf + 1;
+		ce = ce.chain;
+	}
+	ST_True("B3 findradius chain>=5", nf >= 5);
 	if (pe0 != world) remove(pe0);
 	if (pe1 != world) remove(pe1);
 	if (pe2 != world) remove(pe2);
 	if (pe3 != world) remove(pe3);
 	if (pe4 != world) remove(pe4);
+
+	// B2/B11 (Э8): общая база — точка пола под игроком (трасса от eye вниз).
+	traceline(getproperty(11), getproperty(11) + '0 0 -1024', 0, world);
+	mp = trace_endpos;		// пол под eye
+
+	// B2: walkmove знак Y — FTE/сервер +sin (pr_csqc.c:5395-5398, pr_cmds.c:1474).
+	// ce СТАВИМ НА ПОЛ: FTE World_movestep в воздухе отказывает («walked off an edge»,
+	// sv_move.c:235-248). FL_ONGROUND — FTE-гейт (pr_csqc.c:5385). self=ce (см. C2-smoke).
+	ce = spawn();
+	if (ce != world) {
+		setorigin(ce, mp);
+		ce.flags = FL_ONGROUND;
+		self = ce;
+		fnd = walkmove(90, 16);
+		self = world;
+		ST_NearF("B2 walkmove(90) ret", 1, fnd, 0.001);
+		ST_NearF("B2 walkmove +y", mp_y + 16, ce.origin_y, 0.01);
+		remove(ce);
+	} else {
+		ST_Skip("B2 walkmove +y", "spawn failed");
+	}
+
+	// B11 (Э8): droptofloor — 512 + FL_ONGROUND/groundentity (FTE pr_csqc.c:5262-5274).
+	// ce на 300 над полом: 512 достаёт, 256 — нет (пин FTE-дистанции).
+	mp_z = mp_z + 300;
+	ce = spawn();
+	if (ce != world) {
+		setorigin(ce, mp);
+		ce.flags = 0;
+		self = ce;			// droptofloor читает self
+		fnd = droptofloor();
+		self = world;
+		ST_NearF("B11 droptofloor ret", 1, fnd, 0.001);
+		ST_True("B11 FL_ONGROUND", (ce.flags & FL_ONGROUND) != 0);
+		ST_True("B11 groundentity==world", ce.groundentity == world);
+		remove(ce);
+	} else {
+		ST_Skip("B11 droptofloor", "spawn failed");
+	}
 
 	// --- P1e: precache/particle/lightstyle/ambientsound — side-effect, no-crash ---
 	precache_model("progs/tf_flag.mdl");

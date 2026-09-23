@@ -95,6 +95,7 @@ vector pmove_org;
 .float flags;
 .float colormap;
 .entity owner;
+.entity groundentity;	/* B11: groundentity, выставляется droptofloor (FTE) */
 void end_sys_fields;
 
 .vector punchangle;
