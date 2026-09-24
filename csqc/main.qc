@@ -2205,15 +2205,36 @@ void CSQC_Selftest2D() {
 	// Оба дают ширину одного `^` — равенство (resolution-independent), поведение FTE.
 	ST_EqF("2D stringwidth ^^ literal", stringwidth("^", 1, [12, 12]),
 		stringwidth("^^", 1, [12, 12]));
+	// T4 strcolor-render (Этап 3): extended-коды, выразимые через &cRGB (FTE-оракул).
+	// ^&XY extended FG (Y игнор) — цветовые коды ширины не дают.
+	ST_EqF("2D stringwidth ^&XY == plain", sw0, stringwidth("^&12ab", 1, [12, 12]));
+	// state-коды в конце строки: ^b/^h/^m/^a — consume (флаги не рисуются).
+	ST_EqF("2D stringwidth ^b stripped", stringwidth("a", 1, [12, 12]),
+		stringwidth("a^b", 1, [12, 12]));
+	ST_EqF("2D stringwidth ^h stripped", stringwidth("a", 1, [12, 12]),
+		stringwidth("a^h", 1, [12, 12]));
+	ST_EqF("2D stringwidth ^m stripped", stringwidth("a", 1, [12, 12]),
+		stringwidth("a^m", 1, [12, 12]));
+	ST_EqF("2D stringwidth ^a stripped", stringwidth("a", 1, [12, 12]),
+		stringwidth("a^a", 1, [12, 12]));
+	// FTE: ^s push (default), ^1 цвет, ^r pop -> default; видимые символы aXY.
+	ST_EqF("2D stringwidth ^s^r stack", stringwidth("aXY", 1, [12, 12]),
+		stringwidth("a^s^1X^rY", 1, [12, 12]));
 }
 
-// T4 strcolor-render (Этап 2, gaps): state-коды (`^b/^h/^m/^a/^s/^r`) в ezq-рендере/`#327`
-// пока не транслируются (литерал) — FTE их стрипает (blink/charset/halfalpha/stack).
-// Задокументированное отклонение (Stage 3): тест фиксирует поведение FTE, на ezq — FAIL (gap).
+// T4 strcolor-render (Этап 3, gaps): оставшиеся accept+doc-отклонения рендера/`#327` —
+// links `^[..^]`, `^Uxxxx`, `^{xxxx}` (ADR 0030). Тесты фиксируют поведение FTE (hard rule
+// ADR 0023: не ослаблять под ezq); на ezq — FAIL (задокументированный gap).
 void CSQC_Selftest2DGaps() {
-	// FTE: `^b` (blink) не рисуется -> ширина = «a»; ezq — литерал `^b` -> шире.
-	ST_EqF("2Dgap stringwidth ^b stripped", stringwidth("a", 1, [12, 12]),
-		stringwidth("a^b", 1, [12, 12]));
+	// FTE `^[a^]b` -> видимый текст линка «ab»; ezq оставляет литерал -> шире.
+	ST_EqF("2Dgap link width", stringwidth("ab", 1, [12, 12]),
+		stringwidth("^[a^]b", 1, [12, 12]));
+	// FTE `^U0041` -> 'A'; ezq — литерал.
+	ST_EqF("2Dgap ^U unicode width", stringwidth("Ab", 1, [12, 12]),
+		stringwidth("^U0041b", 1, [12, 12]));
+	// FTE `^{41}` -> 'A'; ezq — литерал.
+	ST_EqF("2Dgap ^{} unicode width", stringwidth("Ab", 1, [12, 12]),
+		stringwidth("^{41}b", 1, [12, 12]));
 }
 
 // ============================================================================
@@ -3742,6 +3763,8 @@ void Hud_DrawCSQC() {
 		drawstring([300, 630, 0], "^1red ^2green ^3yellow ^7white", [12, 12], '1 1 1', 1, 0);
 		drawstring([300, 648, 0], "^4blue ^5cyan ^6magenta ^9grey", [12, 12], '1 1 1', 1, 0);
 		drawstring([300, 666, 0], "^x0F0rgb ^0blk ^7wht a^^b ^gunk", [12, 12], '1 1 1', 1, 0);
+		// T4 strcolor-render (Этап 3): ^&XY extended FG (BG-`-`), ^s/^r стек, consume ^b/^h.
+		drawstring([300, 684, 0], "^&C-extFG ^&F- ^s^1push^rrestore ^bblink ^hhalf", [12, 12], '1 1 1', 1, 0);
 	}
 	else {
 		setcursormode(0);
