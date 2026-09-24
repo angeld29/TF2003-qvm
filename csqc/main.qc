@@ -262,6 +262,10 @@ float g_2d_isz_y;	// 2D-доп: drawgetimagesize y
 float g_vm_fo;		// VM-остаток: findfloat(.solid==SOLID_BBOX) найденный слот/-1/-2
 float g_rf_n, g_rf_is, g_rf_ic, g_rf_io;	// рефлексия: num/idx solid/classname/origin
 float g_rf_v, g_rf_cls;	// рефлексия: solid-значение (stof), класс после put
+// Э1 (network callbacks): канарейка CSQC_Parse_Print/CenterPrint.
+float g_np_prints;	// число вызовов CSQC_Parse_Print
+float g_np_lastlvl;	// последний printlvl
+float g_np_cp;		// число вызовов CSQC_Parse_CenterPrint
 
 // Шаг 2 (ADR 0019-план): debug-уровень модуля живёт в модульном cvar csqc_dbg
 // (registercvar #93, создаётся в CSQC_Init; движковых debug-cvars нет).
@@ -498,6 +502,28 @@ void() CSQC_Parse_Event = {
 	}
 };
 
+// Э1 (network callbacks): CSQC_Parse_Print/CenterPrint. Тела обязательны для
+// FTE-паритета: наличие CSQC_Parse_Print => движок свой print не печатает,
+// поэтому модуль форвардит в #339 print (FTE pr_csqc.c:9306). CenterPrint —
+// модуль получает его всегда и рисует сам (#338 cprint), возвращая 1 => движок
+// не дублирует (FTE-семантика подавления, pr_csqc.c:9385, cl_screen.c:448).
+// cvar csqc_np_suppress=1 — канареечный тест: centerprint не рисуется (return 1
+// без cprint). Известное ограничение (принято): обработанное модулем сообщение
+// в re-trigger не попадает (триггеры на print/center из модуля не действуют).
+float(string msg) CSQC_Parse_CenterPrint = {
+	g_np_cp = g_np_cp + 1;
+	if (cvar("csqc_np_suppress") == 0)
+		cprint(msg);
+	return 1;
+};
+
+void(string printmsg, float printlvl) CSQC_Parse_Print = {
+	g_np_prints = g_np_prints + 1;
+	g_np_lastlvl = printlvl;
+	if (cvar("csqc_np_suppress") == 0)
+		print(printmsg);
+};
+
 // Тестовые команды консоли клиента: посылают sendevent на сервер.
 void SendEchoEvent() {
 	// float, vector, string
@@ -586,6 +612,9 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	registercvar("csqc_delta", "0");
 	// T2.5: тумблер FTE-сглаживания предикции (1 = выключить; FTE cg_noerror).
 	registercvar("csqc_noerror", "0");
+	// Э1 (network callbacks): 1 = проверить подавление (centerprint возвращает 1,
+	// print не форвардится); 0 (default) — форвард движкового вывода.
+	registercvar("csqc_np_suppress", "0");
 	// Self-test harness: авто-прогон один раз на карту по спавну (player_localentnum).
 	registercvar("csqc_selftest_auto", "1");
 	// A1 (abort-stack клиентской VM): негативный тест-хук ОДНОРАЗОВОЙ командой
@@ -1029,6 +1058,8 @@ void CSQC_DbgList() {
 	print(" 17 - Этап 3: PVS/bbox culling (flag behind wall hidden)\n");
 	print(" 18 - Этап 4a: player fields (frame/skin/colormap==entnum)\n");
 	print(" 19 - Этап 5: render-layer summary (.scale+cull+delta+pf)\n");
+	print(" 20 - B22: engine sbar/HUD off (VF_DRAWENGINESBAR=0)\n");
+	print(" 21 - Э1 network callbacks: CSQC_Parse_Print/CenterPrint counters\n");
 }
 
 // A1 (abort-stack клиентской VM) — негативный тест-хук: бесконечная рекурсия
@@ -4330,5 +4361,19 @@ void Hud_DrawCSQC() {
 		drawstring([60, yy, 0],
 			sprintf("Э5 pf ent %g frm %g skin %g cmap %g eff %g", g_pf_ent, g_pf_frame, g_pf_skin, g_pf_cmap, g_pf_eff),
 			[12, 12], (g_pf_ent > 0 && g_pf_cmap == g_pf_ent) ? '0 1 0' : '1 1 0', 1, 0);
+	}
+
+	// --- экран 21: Э1 (network callbacks) — счётчики CSQC_Parse_Print/CenterPrint ---
+	// Зелёный при получении хотя бы одного сетевого print/centerprint; suppress=0 —
+	// форвард движкового вывода, =1 — проверка подавления.
+	if (D == 21) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("Э1 print n %g lvl %g cp %g", g_np_prints, g_np_lastlvl, g_np_cp),
+			[12, 12], (g_np_cp > 0 || g_np_prints > 0) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("Э1 suppress %g (0=forward)", cvar("csqc_np_suppress")),
+			[12, 12], '1 1 1', 1, 0);
 	}
 }
