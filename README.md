@@ -65,6 +65,9 @@ These are hard rules for editing this codebase — read them before changing cod
 - `switch` statements sometimes produce unsafe code if you use run-on in `case` labels, i.e. each
   `case` label must have its own `break` statement **or** no lines of logic between the next
   `case` label.
+- A function parameter (or local) must not share a name with a global field (`.field`): it shadows
+  the field, so `self.field` inside the function fails to compile (`error: <name> is not a field`).
+  Example: a parameter named `entnum` breaks `self.entnum` → rename it.
 
 ### Mac VM endianness
 
