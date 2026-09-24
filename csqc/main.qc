@@ -61,6 +61,7 @@ float g_st_group;	// текущая группа: 0=all, 1=core, 2=pred, 3=net
 float g_st_auto_done;	// автопрогон выполнен на текущей карте (0/1)
 float g_st_ncrash_req;	// запрос no-crash прогона void-builtins (csqc_nocrash); сбрасывается на draw-кадре
 float g_st_2d_req;	// запрос 2D-draw прогона (csqc_selftest 2d); на draw-кадре (валидный framebuffer)
+float g_st_2dgaps_req;	// запрос 2D-draw gaps-прогона (csqc_selftest 2dgaps): state-коды (Stage 3)
 float g_st_vp_req;	// запрос canary VF_VIEWPORT (csqc_selftest vp); на draw-кадре (same-frame)
 vector g_st_vp_orig_size;	// исходный размер viewport (восстановление)
 vector g_st_vp_orig_min;	// исходная позиция viewport (восстановление)
@@ -1140,6 +1141,11 @@ float(string cmd) CSQC_ConsoleCommand = {
 			print("csqc_selftest 2d: scheduled (runs on next draw)\n");
 			return 1;
 		}
+		if (argv(1) == "2dgaps") {
+			g_st_2dgaps_req = 1;
+			print("csqc_selftest 2dgaps: scheduled (runs on next draw)\n");
+			return 1;
+		}
 		if (argv(1) == "vp") {
 			g_st_vp_req = 1;
 			print("csqc_selftest vp: scheduled (runs on next draw)\n");
@@ -2172,6 +2178,7 @@ void CSQC_SelftestNoCrash() {
 // size.y из QC не позвать (прототип 6-арг) — вне harness.
 // ============================================================================
 void CSQC_Selftest2D() {
+	local float sw0, sw1;
 	// Валидная pic — с расширением (FTE R2D_SafeCachePic не добавляет .lmp).
 	ST_EqF("2D drawpic(valid)", 1,
 		drawpic([0, 0, 0], "gfx/ttl_main.lmp", [96, 24, 0], '1 1 1', 1, 0));
@@ -2185,6 +2192,28 @@ void CSQC_Selftest2D() {
 	// (движок всё равно пишет 1, FTE-паритет) — только no-crash.
 	drawsubpic([0, 0, 0], [64, 16, 0], "gfx/ttl_main.lmp", [0, 0, 0], [48, 16, 0], '1 1 1', 1, 0);
 	ST_True("2D drawsubpic no crash", 1);
+	// T4 strcolor-render (Этап 2): ^-colour-разметка не считается шириной (FTE #327
+	// со снятым markup; ezq — трансляция ^->&cRGB в csqc_client.c). FTE-оракул.
+	sw0 = stringwidth("ab", 1, [12, 12]);
+	sw1 = stringwidth("^1ab", 1, [12, 12]);
+	ST_EqF("2D stringwidth ^1 == plain", sw0, sw1);
+	sw1 = stringwidth("^x0F0ab", 1, [12, 12]);
+	ST_EqF("2D stringwidth ^xRGB == plain", sw0, sw1);
+	sw1 = stringwidth("^dab", 1, [12, 12]);
+	ST_EqF("2D stringwidth ^d reset == plain", sw0, sw1);
+	// FTE: `^^` -> литерал `^`; висячий `^` (messedup, common.c:4523) -> тоже литерал `^`.
+	// Оба дают ширину одного `^` — равенство (resolution-independent), поведение FTE.
+	ST_EqF("2D stringwidth ^^ literal", stringwidth("^", 1, [12, 12]),
+		stringwidth("^^", 1, [12, 12]));
+}
+
+// T4 strcolor-render (Этап 2, gaps): state-коды (`^b/^h/^m/^a/^s/^r`) в ezq-рендере/`#327`
+// пока не транслируются (литерал) — FTE их стрипает (blink/charset/halfalpha/stack).
+// Задокументированное отклонение (Stage 3): тест фиксирует поведение FTE, на ezq — FAIL (gap).
+void CSQC_Selftest2DGaps() {
+	// FTE: `^b` (blink) не рисуется -> ширина = «a»; ezq — литерал `^b` -> шире.
+	ST_EqF("2Dgap stringwidth ^b stripped", stringwidth("a", 1, [12, 12]),
+		stringwidth("a^b", 1, [12, 12]));
 }
 
 // ============================================================================
@@ -3443,6 +3472,15 @@ void Hud_DrawCSQC() {
 		ST_Summary();
 	}
 
+	// T4 strcolor-render (Этап 2, gaps): 2D-draw state-коды (csqc_selftest 2dgaps) — на
+	// draw-кадре (шрифтовая метрика `stringwidth` как в `2d`).
+	if (g_st_2dgaps_req != 0) {
+		g_st_2dgaps_req = 0;
+		ST_Reset(9);
+		CSQC_Selftest2DGaps();
+		ST_Summary();
+	}
+
 	// T3 Э5: canary VF_VIEWPORT (`csqc_selftest vp`) — setproperty(view) применяется
 	// в ТОМ ЖЕ кадре (FTE-паритет; ezq-фикс — немедленный ApplyViewProps): set
 	// позиции+размера (2 вектора), чтение и восстановление — сразу.
@@ -3700,6 +3738,10 @@ void Hud_DrawCSQC() {
 		// (при -conwidth 900 координаты <=900, не <=render-width 1280).
 		mp = getmousepos();
 		drawstring([60, 684, 0], sprintf("mouse %g %g", mp_x, mp_y), [12, 12], '0 1 1', 1, 0);
+		// T4 strcolor-render (Этап 2): ^-colour-разметка -> цвета как FTE (визуально).
+		drawstring([300, 630, 0], "^1red ^2green ^3yellow ^7white", [12, 12], '1 1 1', 1, 0);
+		drawstring([300, 648, 0], "^4blue ^5cyan ^6magenta ^9grey", [12, 12], '1 1 1', 1, 0);
+		drawstring([300, 666, 0], "^x0F0rgb ^0blk ^7wht a^^b ^gunk", [12, 12], '1 1 1', 1, 0);
 	}
 	else {
 		setcursormode(0);
