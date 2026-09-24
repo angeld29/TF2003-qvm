@@ -266,6 +266,11 @@ float g_rf_v, g_rf_cls;	// рефлексия: solid-значение (stof), к
 float g_np_prints;	// число вызовов CSQC_Parse_Print
 float g_np_lastlvl;	// последний printlvl
 float g_np_cp;		// число вызовов CSQC_Parse_CenterPrint
+// Э2 (network callbacks): канарейка CSQC_Parse_Damage.
+float g_nd_calls;	// число вызовов CSQC_Parse_Damage
+float g_nd_save;	// последний save (dmg_save)
+float g_nd_take;	// последний take (dmg_take)
+vector g_nd_src;	// последний источник (inflictororg)
 
 // Шаг 2 (ADR 0019-план): debug-уровень модуля живёт в модульном cvar csqc_dbg
 // (registercvar #93, создаётся в CSQC_Init; движковых debug-cvars нет).
@@ -524,6 +529,18 @@ void(string printmsg, float printlvl) CSQC_Parse_Print = {
 		print(printmsg);
 };
 
+// Э2 (network callbacks): CSQC_Parse_Damage. Тело обязательно для FTE-паритета:
+// возврат != 0 => движок подавляет цветосдвиг/view-kick (FTE view.c:512-515,
+// pr_csqc.c:9287). Канарейка копит счётчик/последние save/take/источник;
+// cvar csqc_nd_suppress=1 — тест подавления.
+float(float save, float take, vector inflictororg) CSQC_Parse_Damage = {
+	g_nd_calls = g_nd_calls + 1;
+	g_nd_save = save;
+	g_nd_take = take;
+	g_nd_src = inflictororg;
+	return (cvar("csqc_nd_suppress") != 0);
+};
+
 // Тестовые команды консоли клиента: посылают sendevent на сервер.
 void SendEchoEvent() {
 	// float, vector, string
@@ -615,6 +632,9 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	// Э1 (network callbacks): 1 = проверить подавление (centerprint возвращает 1,
 	// print не форвардится); 0 (default) — форвард движкового вывода.
 	registercvar("csqc_np_suppress", "0");
+	// Э2 (network callbacks): 1 = проверить подавление эффектов урона (return 1);
+	// 0 (default) — движок применяет цветосдвиг/view-kick как раньше.
+	registercvar("csqc_nd_suppress", "0");
 	// Self-test harness: авто-прогон один раз на карту по спавну (player_localentnum).
 	registercvar("csqc_selftest_auto", "1");
 	// A1 (abort-stack клиентской VM): негативный тест-хук ОДНОРАЗОВОЙ командой
@@ -1060,6 +1080,7 @@ void CSQC_DbgList() {
 	print(" 19 - Этап 5: render-layer summary (.scale+cull+delta+pf)\n");
 	print(" 20 - B22: engine sbar/HUD off (VF_DRAWENGINESBAR=0)\n");
 	print(" 21 - Э1 network callbacks: CSQC_Parse_Print/CenterPrint counters\n");
+	print(" 22 - Э2 network callbacks: CSQC_Parse_Damage counters\n");
 }
 
 // A1 (abort-stack клиентской VM) — негативный тест-хук: бесконечная рекурсия
@@ -4374,6 +4395,20 @@ void Hud_DrawCSQC() {
 		yy = yy + 18;
 		drawstring([60, yy, 0],
 			sprintf("Э1 suppress %g (0=forward)", cvar("csqc_np_suppress")),
+			[12, 12], '1 1 1', 1, 0);
+	}
+
+	// --- экран 22: Э2 (network callbacks) — счётчик CSQC_Parse_Damage ---
+	// Зелёный при получении хотя бы одного урона; suppress=1 — проверка подавления
+	// (модуль возвращает 1 => движок не делает цветосдвиг/view-kick).
+	if (D == 22) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("Э2 dmg n %g save %g take %g", g_nd_calls, g_nd_save, g_nd_take),
+			[12, 12], (g_nd_calls > 0) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("Э2 src %s suppress %g", vtos(g_nd_src), cvar("csqc_nd_suppress")),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }
