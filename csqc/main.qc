@@ -271,6 +271,13 @@ float g_nd_calls;	// число вызовов CSQC_Parse_Damage
 float g_nd_save;	// последний save (dmg_save)
 float g_nd_take;	// последний take (dmg_take)
 vector g_nd_src;	// последний источник (inflictororg)
+// Э3 (network callbacks): канарейка CSQC_Event_Sound.
+float g_es_calls;	// число вызовов CSQC_Event_Sound
+float g_es_ent;		// последний entnum
+float g_es_chan;	// последний channel
+float g_es_vol;		// последняя громкость
+float g_es_self;	// self.entnum (0 = world)
+string g_es_name;	// последнее имя звука
 
 // Шаг 2 (ADR 0019-план): debug-уровень модуля живёт в модульном cvar csqc_dbg
 // (registercvar #93, создаётся в CSQC_Init; движковых debug-cvars нет).
@@ -541,6 +548,20 @@ float(float save, float take, vector inflictororg) CSQC_Parse_Damage = {
 	return (cvar("csqc_nd_suppress") != 0);
 };
 
+// Э3 (network callbacks): CSQC_Event_Sound. Тело обязательно для FTE-паритета:
+// возврат != 0 => движок звук не играет (FTE pr_csqc.c:9453, cl_parse.c:5336/5543).
+// Канарейка копит счётчик/последние name/ent/chan/vol/self; cvar csqc_es_suppress=1 —
+// тест подавления (глушит движковый звук).
+float(float sndentnum, float channel, string soundname, float vol, float attenuation, vector pos, float pitchmod, float flags) CSQC_Event_Sound = {
+	g_es_calls = g_es_calls + 1;
+	g_es_ent = sndentnum;
+	g_es_chan = channel;
+	g_es_name = soundname;
+	g_es_vol = vol;
+	g_es_self = (self != world) ? self.entnum : 0;
+	return (cvar("csqc_es_suppress") != 0);
+};
+
 // Тестовые команды консоли клиента: посылают sendevent на сервер.
 void SendEchoEvent() {
 	// float, vector, string
@@ -635,6 +656,9 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	// Э2 (network callbacks): 1 = проверить подавление эффектов урона (return 1);
 	// 0 (default) — движок применяет цветосдвиг/view-kick как раньше.
 	registercvar("csqc_nd_suppress", "0");
+	// Э3 (network callbacks): 1 = проверить подавление звука (return 1, движок не играет);
+	// 0 (default) — движок играет звук как раньше.
+	registercvar("csqc_es_suppress", "0");
 	// Self-test harness: авто-прогон один раз на карту по спавну (player_localentnum).
 	registercvar("csqc_selftest_auto", "1");
 	// A1 (abort-stack клиентской VM): негативный тест-хук ОДНОРАЗОВОЙ командой
@@ -1081,6 +1105,7 @@ void CSQC_DbgList() {
 	print(" 20 - B22: engine sbar/HUD off (VF_DRAWENGINESBAR=0)\n");
 	print(" 21 - Э1 network callbacks: CSQC_Parse_Print/CenterPrint counters\n");
 	print(" 22 - Э2 network callbacks: CSQC_Parse_Damage counters\n");
+	print(" 23 - Э3 network callbacks: CSQC_Event_Sound (name/ent/chan/self)\n");
 }
 
 // A1 (abort-stack клиентской VM) — негативный тест-хук: бесконечная рекурсия
@@ -4409,6 +4434,20 @@ void Hud_DrawCSQC() {
 		yy = yy + 18;
 		drawstring([60, yy, 0],
 			sprintf("Э2 src %s suppress %g", vtos(g_nd_src), cvar("csqc_nd_suppress")),
+			[12, 12], '1 1 1', 1, 0);
+	}
+
+	// --- экран 23: Э3 (network callbacks) — счётчик CSQC_Event_Sound ---
+	// Зелёный при получении хотя бы одного звука; self.entnum (0 = world);
+	// suppress=1 — проверка подавления (модуль возвращает 1 => движок не играет звук).
+	if (D == 23) {
+		yy = 470;
+		drawstring([60, yy, 0],
+			sprintf("Э3 snd n %g ent %g chan %g self %g", g_es_calls, g_es_ent, g_es_chan, g_es_self),
+			[12, 12], (g_es_calls > 0) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("Э3 %s vol %g suppress %g", g_es_name, g_es_vol, cvar("csqc_es_suppress")),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }

@@ -158,7 +158,7 @@ noref float(string cmd) CSQC_ConsoleCommand;	/* Called if the user uses any cons
 noref float(string text, string info) CSQC_ConsoleLink;	/* Called if the user clicks a ^[text\infokey\infovalue^] link. Use infoget to read/check each supported key. Return true if you wish the engine to not attempt to handle the link itself. */
 noref void(float isnew) CSQC_Ent_Update;
 noref void() CSQC_Ent_Remove;
-noref float(float entnum, float channel, string soundname, float vol, float attenuation, vector pos, float pitchmod) CSQC_Event_Sound;
+noref float(float entnum, float channel, string soundname, float vol, float attenuation, vector pos, float pitchmod, float flags) CSQC_Event_Sound;
 noref float(string resname, string restype) CSQC_LoadResource;	/* Called each time some resource is being loaded. CSQC can invoke various draw calls to provide a loading screen, until WorldLoaded is called. */
 noref float() CSQC_Parse_TempEntity;	/* Please don't use this. Use CSQC_Parse_Event and multicasts instead. */
 noref void(string cmdtext) GameCommand;
