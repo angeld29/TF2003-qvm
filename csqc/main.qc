@@ -278,6 +278,10 @@ float g_es_chan;	// последний channel
 float g_es_vol;		// последняя громкость
 float g_es_self;	// self.entnum (0 = world)
 string g_es_name;	// последнее имя звука
+// Э4 (network callbacks): канарейка CSQC_Parse_SetAngles.
+float g_sa_calls;	// число вызовов CSQC_Parse_SetAngles
+vector g_sa_ang;	// последние присланные углы
+float g_sa_isdelta;	// последний isdelta
 
 // Шаг 2 (ADR 0019-план): debug-уровень модуля живёт в модульном cvar csqc_dbg
 // (registercvar #93, создаётся в CSQC_Init; движковых debug-cvars нет).
@@ -562,6 +566,18 @@ float(float sndentnum, float channel, string soundname, float vol, float attenua
 	return (cvar("csqc_es_suppress") != 0);
 };
 
+// Э4 (network callbacks): CSQC_Parse_SetAngles. Тело обязательно для FTE-паритета:
+// возврат != 0 => движок присланный сервером угол не применяет (FTE pr_csqc.c:9400,
+// cl_parse.c:7527/7857/9816). Канарейка копит счётчик/углы; cvar csqc_sa_suppress=1 —
+// тест подавления (вид не снапится к серверному углу). Имя параметра ang (не angles):
+// иначе shadowing поля .angles (quirk Э3).
+float(vector ang, float isdelta) CSQC_Parse_SetAngles = {
+	g_sa_calls = g_sa_calls + 1;
+	g_sa_ang = ang;
+	g_sa_isdelta = isdelta;
+	return (cvar("csqc_sa_suppress") != 0);
+};
+
 // Тестовые команды консоли клиента: посылают sendevent на сервер.
 void SendEchoEvent() {
 	// float, vector, string
@@ -659,6 +675,7 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	// Э3 (network callbacks): 1 = проверить подавление звука (return 1, движок не играет);
 	// 0 (default) — движок играет звук как раньше.
 	registercvar("csqc_es_suppress", "0");
+	registercvar("csqc_sa_suppress", "0");
 	// Self-test harness: авто-прогон один раз на карту по спавну (player_localentnum).
 	registercvar("csqc_selftest_auto", "1");
 	// A1 (abort-stack клиентской VM): негативный тест-хук ОДНОРАЗОВОЙ командой
@@ -1106,6 +1123,7 @@ void CSQC_DbgList() {
 	print(" 21 - Э1 network callbacks: CSQC_Parse_Print/CenterPrint counters\n");
 	print(" 22 - Э2 network callbacks: CSQC_Parse_Damage counters\n");
 	print(" 23 - Э3 network callbacks: CSQC_Event_Sound (name/ent/chan/self)\n");
+	print(" 24 - Э4 network callbacks: CSQC_Parse_SetAngles (ang/isdelta)\n");
 }
 
 // A1 (abort-stack клиентской VM) — негативный тест-хук: бесконечная рекурсия
@@ -4448,6 +4466,20 @@ void Hud_DrawCSQC() {
 		yy = yy + 18;
 		drawstring([60, yy, 0],
 			sprintf("Э3 %s vol %g suppress %g", g_es_name, g_es_vol, cvar("csqc_es_suppress")),
+			[12, 12], '1 1 1', 1, 0);
+	}
+
+	// --- экран 24: Э4 (network callbacks) — счётчик CSQC_Parse_SetAngles ---
+	// Зелёный при получении хотя бы одной серверной установки угла; видны углы/isdelta;
+	// suppress=1 — проверка подавления (модуль возвращает 1 => движок угол не применяет).
+	if (D == 24) {
+		yy = 500;
+		drawstring([60, yy, 0],
+			sprintf("Э4 ang n %g d %g", g_sa_calls, g_sa_isdelta),
+			[12, 12], (g_sa_calls > 0) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("Э4 %s suppress %g", vtos(g_sa_ang), cvar("csqc_sa_suppress")),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }
