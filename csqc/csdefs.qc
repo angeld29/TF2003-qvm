@@ -1197,8 +1197,8 @@ float(string conname, float inevtype, float parama, float paramb, float paramc) 
 		Forwards input events to the named console. Mouse updates should be absolute only. */
 
 void(entity from, entity to) copyentity = #400; /* Part of DP_QC_COPYENTITY*/
-entity(.string field, string match) findchain = #402; /* Part of DP_QC_FINDCHAIN*/
-entity(.float fld, float match) findchainfloat = #403; /* Part of DP_QC_FINDCHAINFLOAT*/
+entity(.string field, string match, .entity chainfield) findchain = #402; /* Part of DP_QC_FINDCHAIN*/
+entity(.float fld, float match, .entity chainfield) findchainfloat = #403; /* Part of DP_QC_FINDCHAINFLOAT*/
 void(vector org, string modelname, float startframe, float endframe, float framerate) effect = #404; /* Part of DP_SV_EFFECT
 		Spawns a self-animating sprite */
 
@@ -1252,7 +1252,7 @@ string(searchhandle handle, float num) search_getfilename = #447; /* Part of DP_
 
 string(string cvarname) cvar_string = #448; /* Part of DP_QC_CVAR_STRING*/
 entity(entity start, .float fld, float match) findflags = #449; /* Part of DP_QC_FINDFLAGS*/
-entity(.float fld, float match) findchainflags = #450; /* Part of DP_QC_FINDCHAINFLAGS*/
+entity(.float fld, float match, .entity chainfield) findchainflags = #450; /* Part of DP_QC_FINDCHAINFLAGS*/
 float(entity ent, string tagname) gettagindex = #451; /* Part of DP_MD3_TAGSINFO*/
 vector(entity ent, float tagindex) gettaginfo = #452; /* Part of DP_MD3_TAGSINFO
 		Obtains the current worldspace position+orientation of the bone or tag from the given entity. The return value is the world coord, v_forward, v_right, v_up are also set according to the bone/tag's orientation. */

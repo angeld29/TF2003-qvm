@@ -2007,18 +2007,6 @@ void CSQC_SelftestL2b2(float mode) {
 			ST_Skip("2b2 getentityfieldstring(frame)", "frame field not found");
 			ST_Skip("2b2 putentityfieldstring frame", "frame field not found");
 		}
-	}
-
-	// --- gaps (заглушки ezq) — mode != 0 ---
-	if (mode != 0) {
-		// #451 gettagindex / #452 gettaginfo / #244 rotatevectorsbytag (заглушки).
-		ST_EqF("2b2 gettagindex(world,zzz)", 0, gettagindex(world, "zzz"));
-		vi = gettaginfo(world, 0);
-		ST_NearV("2b2 gettaginfo(world,0)", '0 0 0', vi, 0.01);
-		makevectors('0 0 0');
-		vi = rotatevectorsbytag(world, 0);
-		ST_NearV("2b2 rotatevectorsbytag(world,0)", '0 0 0', vi, 0.01);
-		makevectors(getproperty(VF_ANGLES));
 
 		// #400 copyentity: memcpy полей in->out (тестовое поле — .frame).
 		e1 = spawn();
@@ -2043,7 +2031,7 @@ void CSQC_SelftestL2b2(float mode) {
 			e1.classname = "zz_b2c";
 			e2.classname = "zz_b2c";
 			cnt = 0;
-			ea = findchain(classname, "zz_b2c");
+			ea = findchain(classname, "zz_b2c", chain);
 			while (ea != world && cnt < 64) { cnt = cnt + 1; ea = ea.chain; }
 			ST_EqF("2b2 findchain count", 2, cnt);
 			remove(e1);
@@ -2061,7 +2049,7 @@ void CSQC_SelftestL2b2(float mode) {
 			e1.solid = SOLID_BBOX;
 			e2.solid = SOLID_BBOX;
 			cnt = 0;
-			ea = findchainfloat(solid, SOLID_BBOX);
+			ea = findchainfloat(solid, SOLID_BBOX, chain);
 			while (ea != world && cnt < 64) { cnt = cnt + 1; ea = ea.chain; }
 			ST_True("2b2 findchainfloat >=2", cnt >= 2);
 			remove(e1);
@@ -2078,7 +2066,7 @@ void CSQC_SelftestL2b2(float mode) {
 			e1.flags = FL_FINDABLE_NONSOLID;
 			ST_True("2b2 findflags !=world", findflags(world, flags, FL_FINDABLE_NONSOLID) != world);
 			cnt = 0;
-			ea = findchainflags(flags, FL_FINDABLE_NONSOLID);
+			ea = findchainflags(flags, FL_FINDABLE_NONSOLID, chain);
 			while (ea != world && cnt < 64) { cnt = cnt + 1; ea = ea.chain; }
 			ST_True("2b2 findchainflags >=1", cnt >= 1);
 			remove(e1);
@@ -2086,6 +2074,18 @@ void CSQC_SelftestL2b2(float mode) {
 			ST_Skip("2b2 findflags !=world", "spawn failed");
 			ST_Skip("2b2 findchainflags >=1", "spawn failed");
 		}
+	}
+
+	// --- gaps (заглушки ezq) — mode != 0 ---
+	if (mode != 0) {
+		// #451 gettagindex / #452 gettaginfo / #244 rotatevectorsbytag (заглушки).
+		ST_EqF("2b2 gettagindex(world,zzz)", 0, gettagindex(world, "zzz"));
+		vi = gettaginfo(world, 0);
+		ST_NearV("2b2 gettaginfo(world,0)", '0 0 0', vi, 0.01);
+		makevectors('0 0 0');
+		vi = rotatevectorsbytag(world, 0);
+		ST_NearV("2b2 rotatevectorsbytag(world,0)", '0 0 0', vi, 0.01);
+		makevectors(getproperty(VF_ANGLES));
 
 		// #443 setattachment: .tag_entity выставляется всегда.
 		e1 = spawn();
