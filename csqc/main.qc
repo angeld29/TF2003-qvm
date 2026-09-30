@@ -2521,6 +2521,15 @@ void CSQC_SelftestD(float mode) {
 	ambientsound('0 0 0', "weapons/detpack.wav", 0.15, 0);
 	ST_True("1d P1e subsystems no crash", 1);
 
+	// --- P1f (R8 download-precache): precache_model MUST return the passed name (FTE
+	// PF_cs_PrecacheModel: G_INT(OFS_RETURN)=G_INT(OFS_PARM0), pr_csqc.c:3228); precache of
+	// a missing resource queues a download (FTE pr_csqc.c:3218) and MUST NOT crash. Side-effect:
+	// the missing model/sound below may trigger one download request (single-slot, cls.download). ---
+	ST_EqS("1f P1f precache_model ret", "progs/tf_flag.mdl", precache_model("progs/tf_flag.mdl"));
+	precache_model("progs/zz_dl_missing.mdl");
+	precache_sound("weapons/zz_dl_missing.wav");
+	ST_True("1f P1f missing precache no crash", 1);
+
 	}	// конец parity-блока (mode != 1)
 }
 
