@@ -2343,7 +2343,7 @@ void CSQC_Selftest2DGaps() {
 // ============================================================================
 void CSQC_SelftestD(float mode) {
 	local vector mp;
-	local float isc0, isc1, nu, nf, nfind, fnd, guard, nn;
+	local float isc0, isc1, nu, nf, nfind, fnd, guard, nn, midx1, midx2;
 	local entity e, ce, vme, pe0, pe1, pe2, pe3, pe4;
 
 	// --- 2D (реализовано в ezq; значения drawgetimagesize могут расходиться —
@@ -2529,6 +2529,14 @@ void CSQC_SelftestD(float mode) {
 	precache_model("progs/zz_dl_missing.mdl");
 	precache_sound("weapons/zz_dl_missing.wav");
 	ST_True("1f P1f missing precache no crash", 1);
+
+	// --- P1g (T4 precache_model re-trigger): a missing model is still registered in the
+	// CSQC registry with a stable (placeholder) index — getmodelindex(name,queryonly=1)
+	// returns the same non-zero index across calls (FTE PF_cs_PrecacheModel_Internal,
+	// pr_csqc.c:3215). Before the fix ezq returned 0 here (name not registered). ---
+	midx1 = getmodelindex("progs/zz_dl_missing.mdl", 1);
+	midx2 = getmodelindex("progs/zz_dl_missing.mdl", 1);
+	ST_True("1f P1g missing model stable index", midx1 != 0 && midx1 == midx2);
 
 	}	// конец parity-блока (mode != 1)
 }
