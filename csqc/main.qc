@@ -282,6 +282,9 @@ string g_es_name;	// последнее имя звука
 float g_sa_calls;	// число вызовов CSQC_Parse_SetAngles
 vector g_sa_ang;	// последние присланные углы
 float g_sa_isdelta;	// последний isdelta
+// Э5 (движковый колбэк): канарейка CSQC_RendererRestarted.
+float g_rr_calls;	// число вызовов CSQC_RendererRestarted
+string g_rr_desc;	// последнее описание рендерера
 
 // Шаг 2 (ADR 0019-план): debug-уровень модуля живёт в модульном cvar csqc_dbg
 // (registercvar #93, создаётся в CSQC_Init; движковых debug-cvars нет).
@@ -576,6 +579,14 @@ float(vector ang, float isdelta) CSQC_Parse_SetAngles = {
 	g_sa_ang = ang;
 	g_sa_isdelta = isdelta;
 	return (cvar("csqc_sa_suppress") != 0);
+};
+
+// Э5 (движковый колбэк): CSQC_RendererRestarted. Тело-канарейка: движок зовёт при
+// vid_restart/vid_reload и при загрузке модуля (FTE pr_csqc.c:8314, pr_common.h:1096).
+// Строка-описание рендерера; suppress-семантики нет (возврат void).
+void(string rrdesc) CSQC_RendererRestarted = {
+	g_rr_calls = g_rr_calls + 1;
+	g_rr_desc = rrdesc;
 };
 
 // Тестовые команды консоли клиента: посылают sendevent на сервер.
@@ -1124,6 +1135,7 @@ void CSQC_DbgList() {
 	print(" 22 - Э2 network callbacks: CSQC_Parse_Damage counters\n");
 	print(" 23 - Э3 network callbacks: CSQC_Event_Sound (name/ent/chan/self)\n");
 	print(" 24 - Э4 network callbacks: CSQC_Parse_SetAngles (ang/isdelta)\n");
+	print(" 25 - Э5: CSQC_RendererRestarted (renderer description)\n");
 }
 
 // A1 (abort-stack клиентской VM) — негативный тест-хук: бесконечная рекурсия
@@ -4497,6 +4509,20 @@ void Hud_DrawCSQC() {
 		yy = yy + 18;
 		drawstring([60, yy, 0],
 			sprintf("Э4 %s suppress %g", vtos(g_sa_ang), cvar("csqc_sa_suppress")),
+			[12, 12], '1 1 1', 1, 0);
+	}
+
+	// --- экран 25: Э5 (движковый колбэк) — счётчик CSQC_RendererRestarted ---
+	// Зелёный после первого вызова (vid_restart/vid_reload/загрузка модуля); видно
+	// строку-описание рендерера. Suppress-семантики нет (возврат void).
+	if (D == 25) {
+		yy = 500;
+		drawstring([60, yy, 0],
+			sprintf("Э5 rr n %g", g_rr_calls),
+			[12, 12], (g_rr_calls > 0) ? '0 1 0' : '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("Э5 desc %s", g_rr_desc),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }
