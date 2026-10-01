@@ -2629,6 +2629,22 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqF("T1 bitshift(1,-1)", 0, bitshift(1, -1));
 		ST_EqF("T1 crc16(0,ABC)", 62728, crc16(0, "ABC"));
 		ST_EqF("T1 crc16(1,ABC)", 20810, crc16(1, "ABC"));
+		// T5.4 (#639 digest_hex, openspec csqc-client-digest-hex): SHA1/MD4/CRC16 реализованы
+		// на ezq — паритет-блок в core. MD5-ассерт остаётся в gaps (FAIL на ezq — класс D, ADR 0040).
+		ST_EqS("T5.4 digest_hex(SHA1,abc)", "a9993e364706816aba3e25717850c26c9cd0d89d", digest_hex("SHA1", "abc"));
+		ST_EqS("T5.4 digest_hex(MD4,abc)", "a448017aaf21d8525fc10ae87aa6729d", digest_hex("MD4", "abc"));
+		ST_EqS("T5.4 digest_hex(CRC16,abc)", "4a51", digest_hex("CRC16", "abc"));
+		// varargs-конкатенация (FTE PF_VarString(prinst,1,...)) — против литерала-вектора SHA1("abc").
+		ST_EqS("T5.4 digest_hex varargs", "a9993e364706816aba3e25717850c26c9cd0d89d", digest_hex("SHA1", "a", "bc"));
+		// Реклама digest-ext: SHA1 — паритет (оба движка). SHA-2-имя ezq сознательно не
+		// рекламирует (класс D), FTE рекламирует (pr_bgcmd.c:8462) — ассерт сломал бы
+		// FTE-оракул fail=0, поэтому значение печатается в лог (ezq 0 / FTE 1).
+		ST_EqF("T5.4 checkextension(FTE_QC_DIGEST_SHA1)", 1, checkextension("FTE_QC_DIGEST_SHA1"));
+		// Строгость имени: lowercase/неизвестное — "" у обоих движков (точный strcmp,
+		// FTE pr_bgcmd.c:5808). SHA256 → "" только на ezq (класс D) — без ассерта.
+		ST_EqS("T5.4 digest_hex(sha1 lower)", "", digest_hex("sha1", "abc"));
+		ST_EqS("T5.4 digest_hex(NOPE)", "", digest_hex("NOPE", "abc"));
+		print(sprintf("[CSQC-TEST] INFO T5.4 digest-ext SHA512 advertised=%g (ezq 0, FTE 1)\n", checkextension("FTE_QC_DIGEST_SHA512")));
 		ST_NearV("P1a normalize(0 3 4)", '0 0.6 0.8', normalize('0 3 4'), 0.0001);
 		ST_NearF("P1a vlen(0 3 4)", 5, vlen('0 3 4'), 0.0001);
 		ST_NearF("P1a vectoyaw(0 1 0)", 90, vectoyaw('0 1 0'), 0.001);
@@ -2896,8 +2912,11 @@ void CSQC_SelftestL2a(float mode) {
 
 	// --- gaps (заглушки ezq) — mode != 0 ---
 	if (mode != 0) {
-		// digest_hex: FTE требует имя хеша в ВЕРХНЕМ регистре (pr_bgcmd.c:5794).
-		ST_EqS("2a digest_hex(MD5,abc)", "900150983cd24fb0d6963f7d28e17f72", digest_hex("MD5", "abc"));
+	// digest_hex: FTE требует имя хеша в ВЕРХНЕМ регистре (pr_bgcmd.c:5794).
+	// SHA1/MD4/CRC16 реализованы на ezq — паритет-ассерты перенесены в core (T5.4,
+	// openspec csqc-client-digest-hex); MD5 остаётся здесь: FAIL на ezq —
+	// задокументированное отклонение (ADR 0040, класс D).
+	ST_EqS("2a digest_hex(MD5,abc)", "900150983cd24fb0d6963f7d28e17f72", digest_hex("MD5", "abc"));
 		ST_EqS("2a whichpack(player.mdl)", "", whichpack("progs/player.mdl", 0));
 		h = hash_createtab(64, 0);
 		ST_True("2a hash_createtab>0", h > 0);
