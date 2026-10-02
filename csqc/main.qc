@@ -3117,6 +3117,17 @@ void PredArm() {
 void CSQC_SelftestPred() {
 	local float iseq0;	// input_sequence до проб #345 (пробы штампуют его сами)
 	local vector ang;
+	local float wf;		// T4.c: курсор обхода окна предикции
+	local float wbad;	// T4.c: пробелы #345 в окне
+	local vector dir0;	// T4.c: направление кадра до identity-поворота #638
+	local vector dir1;	// T4.c: направление кадра после identity-поворота
+	local vector ackang0;	// T4.c: углы подтверждённого кадра до #638
+	local vector ackang1;	// T4.c: углы подтверждённого кадра после #638
+	local float cc_y0;	// T4.c: yaw cc до реального #638-поворота
+	local float cc_y1;	// T4.c: yaw cc после реального #638-поворота
+	local float ccm1_y0;	// T4.c: yaw cc-1 до реального #638-поворота (диагностика)
+	local float ccm1_y1;	// T4.c: yaw cc-1 после реального #638-поворота (диагностика)
+	local float back_y;	// T4.c: yaw cc после обратного поворота
 	ST_Reset(7);
 
 	// --- C5-A: окно предикции ---
@@ -3133,6 +3144,70 @@ void CSQC_SelftestPred() {
 		servercommandframe, clientcommandframe, iseq0, g_t22_cc, g_t22_ccm1));
 	ST_EqF("4 T2.2 getinputstate(clientcommandframe)", 1, g_t22_cc);
 	ST_EqF("4 T2.2 getinputstate(clientcommandframe-1)", 1, g_t22_ccm1);
+
+	// --- T4.c: полное окно предикции (#345 по всему (sc,cc]) ---
+	if (clientcommandframe > servercommandframe) {
+		wbad = 0;
+		wf = servercommandframe + 1;
+		while (wf <= clientcommandframe) {
+			if (!getinputstate(wf))
+				wbad = wbad + 1;
+			wf = wf + 1;
+		}
+		ST_EqF("4 T4.c #345 full window no gaps", 0, wbad);
+	} else {
+		ST_Skip("4 T4.c #345 full window no gaps", "empty window");
+	}
+
+	// --- T4.c: #638 CL_RotateMoves — не-деструктивная канарейка ---
+	// identity-поворот ('0 0 0') не должен менять направление неподтверждённого
+	// кадра; подтверждённый кадр (#638 фильтр seq > servercommandframe) не
+	// трогается вовсе — сверяем сырые углы. Инвалидный seat — no-crash (возврат
+	// csdefs void, не читаем).
+	if (clientcommandframe > servercommandframe) {
+		getinputstate(servercommandframe);
+		ackang0 = input_angles;
+		CL_RotateMoves('0 0 0');
+		getinputstate(servercommandframe);
+		ackang1 = input_angles;
+		ST_True("4 T4.c #638 acked frame untouched",
+			fabs(ackang0_x - ackang1_x) < 0.01 && fabs(ackang0_y - ackang1_y) < 0.01 && fabs(ackang0_z - ackang1_z) < 0.01);
+
+		getinputstate(clientcommandframe);
+		makevectors(input_angles);
+		dir0 = v_forward;
+		CL_RotateMoves('0 0 0');
+		getinputstate(clientcommandframe);
+		makevectors(input_angles);
+		dir1 = v_forward;
+		ST_True("4 T4.c #638 identity preserves dir", vlen(dir0 - dir1) < 0.01);
+
+		CL_RotateMoves('0 0 0', -1);
+		ST_True("4 T4.c #638 invalid seat no crash", 1);
+
+		// --- T4.c: #638 реальный поворот — диагностический лог (без ассерта) ---
+		// FTE PF_cl_RotateMoves вращает только ОТПРАВЛЕННЫЕ cl.outframes
+		// (cmd_sequence > ackedmovesequence); clientcommandframe может быть ещё
+		// pending (не в outframes) и тогда не поворачивается — тайминг-зависимо
+		// (live 2026-10-02: FTE 21:14 повернул cc 90→59.9963, 21:38 — cc 90→90).
+		// ezq ring пишется на отправке → cc всегда в кольце и поворачивается
+		// (live: 90→60). Композиция (когда поворот происходит) паритетна:
+		// вход +30 → yaw −30, обратный восстанавливает. Ассерт не ставим — FTE
+		// может законно не менять cc (нестабильный оракул); см. ADR 0025.
+		getinputstate(clientcommandframe); cc_y0 = input_angles_y;
+		getinputstate(clientcommandframe - 1); ccm1_y0 = input_angles_y;
+		CL_RotateMoves('0 30 0');
+		getinputstate(clientcommandframe); cc_y1 = input_angles_y;
+		getinputstate(clientcommandframe - 1); ccm1_y1 = input_angles_y;
+		CL_RotateMoves('0 -30 0');	// вернуть журнал (направление)
+		getinputstate(clientcommandframe); back_y = input_angles_y;
+		print(sprintf("[T4C638] sc=%g cc=%g cc_y=%g->%g ccm1_y=%g->%g back_y=%g\n",
+			servercommandframe, clientcommandframe, cc_y0, cc_y1, ccm1_y0, ccm1_y1, back_y));
+	} else {
+		ST_Skip("4 T4.c #638 acked frame untouched", "empty window");
+		ST_Skip("4 T4.c #638 identity preserves dir", "empty window");
+		ST_Skip("4 T4.c #638 invalid seat no crash", "empty window");
+	}
 
 	// --- T2.1: Input_Frame globals (gamespeed / input_sequence) ---
 	ST_True("4 T2.1 gamespeed>0", g_if_gs > 0);
@@ -3321,8 +3396,12 @@ float CSQC_StatWire_Bad() {
 // >64 — телепорт-snap.
 void Pred_Run(entity ent, float endframe) {
 	if (servercommandframe >= pp_seq + 63) {
-		// троттлинг (как FTE): не отставать больше кольца истории кадров
-		pp_frame = servercommandframe - 63;
+		// троттлинг (как FTE): сдвигаем базу на границу кольца — FTE
+		// prediction.qc:132 `player_sequence = servercommandframe-63`. Сдвиг
+		// именно baseline (pp_seq), а не только курсора проигрывания, иначе
+		// следующий replay снова начнётся от старой pp_seq и уйдёт за кольцо 64
+		// (getinputstate даёт пробел). ent при этом не трогаем (как FTE).
+		pp_seq = servercommandframe - 63;
 		return;
 	}
 	ent.origin = pp_org;
