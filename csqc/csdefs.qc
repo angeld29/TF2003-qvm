@@ -56,6 +56,8 @@ float input_buttons;
 float input_impulse;
 float input_sequence;	/* Последняя отправленная команда; движок пишет при RecordInput (#345, C1.3). */
 void end_sys_globals;
+float trace_networkentity;	/* R11: ssqc-номер задетой сущности (0=мир/локальная); FTE fteextensions.qc:534 */
+float trace_endcontents;	/* R11: FTE-битмаска содержимого (мир — конверсия листа; сущность — best-effort); FTE fteextensions.qc:525 */
 float pmove_onground;
 vector pmove_vel;
 vector pmove_org;

@@ -1567,11 +1567,21 @@ void CSQC_Fx_Trace7() {
 		traceline(eye, eye + v_forward * 140, MOVE_NORMAL, world);
 		dprint(sprintf("C7 nrm frac %g wall %s\n", trace_fraction,
 			(trace_ent == ce) ? "yes" : "no"));
+		// R11: попадание в локальную bbox-сущность → networkentity=0 (нет ssqc-номера),
+		// endcontents=0 (нет surface-contents; FTE-паритет, ADR 0042).
+		// print (#339), не dprint: на FTE dprint=Con_DPrintf и в лог не попадает (ADR 0023).
+		print(sprintf("R11 ne local %g ec local %g\n",
+			trace_networkentity, trace_endcontents));
 		traceline(eye, eye + v_forward * 140, MOVE_NOMONSTERS, world);
 		dprint(sprintf("C7 nom frac %g wall %s world %s\n", trace_fraction,
 			(trace_ent == ce) ? "yes" : "no",
 			(trace_ent == world) ? "yes" : "no"));
 		remove(ce);
+		// R11: мир-трасса/промах после удаления сущности: networkentity=0;
+		// endcontents мира — конверсия Q1-листа (EMPTY→0, SOLID→1).
+		traceline(eye, eye + v_forward * 140, MOVE_NORMAL, world);
+		print(sprintf("R11 ne world %g ec world %g frac %g\n",
+			trace_networkentity, trace_endcontents, trace_fraction));
 	}
 
 	// --- SOLID_NOT: NORMAL мимо, EVERYTHING (32) бьёт даже несолидную ---
