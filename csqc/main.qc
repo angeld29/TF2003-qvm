@@ -3997,6 +3997,20 @@ void Hud_DrawCSQC() {
 		drawstring([300, 666, 0], "^x0F0rgb ^0blk ^7wht a^^b ^gunk", [12, 12], '1 1 1', 1, 0);
 		// T4 strcolor-render (Этап 3): ^&XY extended FG (BG-`-`), ^s/^r стек, consume ^b/^h.
 		drawstring([300, 684, 0], "^&C-extFG ^&F- ^s^1push^rrestore ^bblink ^hhalf", [12, 12], '1 1 1', 1, 0);
+		// drawfontscale (ezquake-csqc-drawfontscale, Вариант A accept+doc): ezq-шрифт
+		// uniform -> drawfontscale[0] масштабирует И ширину, И высоту (отклонение vs FTE,
+		// где высота идёт за [1]; parity-audit §D.2). '0 0 0' -> FTE-guard == 1.0 (текст
+		// виден). stringwidth ×[0] — метрика согласована с drawstring. Сброс в конце.
+		drawfontscale = '1 1 0';
+		tw = stringwidth("SCALE", 0, [12, 12]);
+		drawstring([300, 470, 0], sprintf("SCALE 1.0 w=%g", tw), [12, 12], '1 1 1', 1, 0);
+		drawfontscale = '2 1 0';
+		drawstring([300, 520, 0], "SCALE 2.0", [12, 12], '0 1 0', 1, 0);
+		tw = stringwidth("SCALE", 0, [12, 12]);
+		drawfontscale = '0 0 0';
+		drawstring([300, 585, 0], "SCALE guard", [12, 12], '1 1 0', 1, 0);
+		drawfontscale = '1 1 0';
+		drawstring([300, 610, 0], sprintf("w2x=%g", tw), [12, 12], '0 1 1', 1, 0);
 	}
 	else {
 		setcursormode(0);
