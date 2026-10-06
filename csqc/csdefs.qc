@@ -702,6 +702,11 @@ float(string extname) checkextension = #99; /*
 		Checks for an extension by its name (eg: checkextension("FRIK_FILE") says that its okay to go ahead and use strcat).
 		Use cvar("pr_checkextension") to see if this builtin exists. */
 
+float(float funcref) checkbuiltin = #0:checkbuiltin; /*
+		Name-mapped builtin (#0): returns whether the referenced function is a
+		registered, implemented builtin (stubs/unknown -> 0). FTE PF_checkbuiltin;
+		ezq resolves `#0` by name at csprogs load (ADR 0035). */
+
 float(float value) anglemod = #102;
 filestream(string filename, float mode, optional float mmapminsize) fopen = #110; /* Part of FRIK_FILE*/
 void(filestream fhandle) fclose = #111; /* Part of FRIK_FILE*/

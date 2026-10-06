@@ -2578,6 +2578,7 @@ void CSQC_SelftestCore(float mode) {
 	local vector rv, cur_org;
 	local entity e_b20;
 	local float b20_idx;
+	local entity e_cp, s_cp;
 
 	CSQC_Fx_Smoke();	// заполняет g_sm* (нужно и parity, и gap buf)
 
@@ -2874,8 +2875,42 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqF("B13 NOSUCH_EXT", 0, checkextension("NOSUCH_EXT"));
 		ST_EqF("B13 FTE_CSQC", 0, checkextension("FTE_CSQC"));
 
+		// --- ADR 0035: checkbuiltin (#0) — инвариант (реальные builtins -> 1) ---
+		// #99 checkextension и сам name-mapped #0 checkbuiltin реальны на обоих
+		// движках; #102 anglemod тоже. Не-builtin QC-функция -> 0.
+		ST_EqF("0 checkbuiltin(checkextension)", 1, checkbuiltin(checkextension));
+		ST_EqF("0 checkbuiltin(checkbuiltin)", 1, checkbuiltin(checkbuiltin));
+		ST_EqF("0 checkbuiltin(anglemod)", 1, checkbuiltin(anglemod));
+		ST_EqF("0 checkbuiltin(non-builtin)", 0, checkbuiltin(CSQC_Shutdown));
+
+		// --- ADR 0035: #63 changepitch реализован (не no-op) ---
+		// FTE/DP PF_changepitch работает на self (аргумент игнорируется), шаг
+		// ограничен .pitch_speed. current=0, ideal=40, speed=10 -> angles[0]=10.
+		e_cp = spawn();
+		if (e_cp != world) {
+			s_cp = self;
+			self = e_cp;
+			e_cp.angles = '0 0 0';
+			e_cp.idealpitch = 40;
+			e_cp.pitch_speed = 10;
+			changepitch(e_cp);
+			ST_NearF("0 #63 changepitch moves pitch", 10, e_cp.angles_x, 0.01);
+			self = s_cp;
+			remove(e_cp);
+		} else {
+			ST_Skip("0 #63 changepitch moves pitch", "spawn failed");
+		}
+
 		// --- Фаза 1d: 2D-кэш / T5 / T9 / P1d / P1e (без трасс) ---
 		CSQC_SelftestD(mode);
+	}
+
+	// --- gaps: ezq-заглушки, которые FTE реализует (потому не parity) — mode != 0 ---
+	if (mode != 0) {
+		ST_EqF("0 checkbuiltin(te_teleport)", 0, checkbuiltin(te_teleport));
+		ST_EqF("0 checkbuiltin(te_lightningblood)", 0, checkbuiltin(te_lightningblood));
+		ST_EqF("0 checkbuiltin(te_bloodqw)", 0, checkbuiltin(te_bloodqw));
+		ST_EqF("0 checkbuiltin(strunzone)", 0, checkbuiltin(strunzone));
 	}
 }
 
