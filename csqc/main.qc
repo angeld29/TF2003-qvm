@@ -783,7 +783,11 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	// clcfte_qcrequest в netchan уже здесь (FTE pr_csqc.c:3801 `if (!cls.state)`);
 	// без фикса (ezq `cls.state != ca_active`) запрос молча терялся. Live-контроль —
 	// серверный лог `developer 1`: `GAME_QCREQUEST ... event "csqc_echo" argc=1`.
-	sendevent("csqc_echo", "f", 8);
+	// Зонд шлём ТОЛЬКО на mvdsv: у fteqw Q1QVM-путь SV_ReadQCRequest пишет в NULL
+	// pr_globals → SIGSEGV на любой clcfte_qcrequest (серверный дефект FTE, ADR 0014).
+	// Движок определяем по serverinfo `*version` (mvdsv = "MVDSV ...").
+	if (strstrofs(serverkey("*version"), "MVDSV", 0) >= 0)
+		sendevent("csqc_echo", "f", 8);
 };
 
 void() CSQC_WorldLoaded = {

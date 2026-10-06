@@ -63,6 +63,10 @@ extern qboolean g_ext_available[G_EXTENSIONS_LAST - G_EXTENSIONS_FIRST];
 #define G_EXT_BASE_FIELD_OK (HAVEEXT(G_SETEXTFIELD) && HAVEEXT(G_GETEXTFIELD))
 #define G_EXT_BASE_OK       (G_EXT_BASE_PTR_OK || G_EXT_BASE_FIELD_OK)
 
+// Дискриминатор движка: Ptr-путь реализован только в mvdsv (fteqw — Field-путь).
+// Используется для per-engine развилок там, где поведение mvdsv/fteqw расходится.
+#define G_ENGINE_MVDSV      (G_EXT_BASE_PTR_OK)
+
 // Регистрация расширений; вызывается один раз при GAME_INIT.
 // Отсутствие помеченных критичными расширений (и отсутствие обоих базовых
 // путей) приводит к фатальной ошибке при запуске.
