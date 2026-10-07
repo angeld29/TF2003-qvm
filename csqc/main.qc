@@ -34,6 +34,9 @@ float g_if_cnt;
 float g_ie_mabs;	// IE_MOUSEABS (3)
 float g_ie_mdelta;	// IE_MOUSEDELTA (2)
 float g_ie_keys;	// IE_KEYDOWN/IE_KEYUP (0/1)
+float g_ie_held;	// WS9: число удерживаемых клавиш (канарейка незалипания)
+float g_ie_down[256];	// WS9: down-состояние по QC-keynum (idempotent)
+float g_ie_i;		// WS9: счётчик сброса массива
 
 // C6.1: сводная верификация builtins — эффект-пикер (видимые: звук/dlight/частицы/
 // te_*/beams) + smoke-статусы (невидимые: #459/#345/#346/#347/buf_*). Только под
@@ -622,6 +625,9 @@ void(float apiver, string enginename, float enginever) CSQC_Init = {
 	g_ie_mabs = 0;
 	g_ie_mdelta = 0;
 	g_ie_keys = 0;
+	g_ie_held = 0;
+	for (g_ie_i = 0; g_ie_i < 256; g_ie_i = g_ie_i + 1)
+		g_ie_down[g_ie_i] = 0;
 	// C6.1: состояние пикера/smoke чистое на старте модуля.
 	g_fx_sel = 0;
 	g_fx_fire = 0;
@@ -806,6 +812,9 @@ void() CSQC_WorldLoaded = {
 	g_ie_mabs = 0;
 	g_ie_mdelta = 0;
 	g_ie_keys = 0;
+	g_ie_held = 0;
+	for (g_ie_i = 0; g_ie_i < 256; g_ie_i = g_ie_i + 1)
+		g_ie_down[g_ie_i] = 0;
 	// C6.1: новая карта — smoke переиграется при включении csqc_d2d.
 	g_sm_run = 0;
 	g_sm459 = 0;
@@ -1140,6 +1149,7 @@ void CSQC_DbgList() {
 	print(" 23 - Э3 network callbacks: CSQC_Event_Sound (name/ent/chan/self)\n");
 	print(" 24 - Э4 network callbacks: CSQC_Parse_SetAngles (ang/isdelta)\n");
 	print(" 25 - Э5: CSQC_RendererRestarted (renderer description)\n");
+	print(" 26 - WS9: reserved-key/up-tracker canary (module swallows all keys)\n");
 }
 
 // A1 (abort-stack клиентской VM) — негативный тест-хук: бесконечная рекурсия
@@ -3502,8 +3512,33 @@ float CSQC_InputEvent(float evtype, float scanx, float chary, float devid) {
 		g_ie_mabs = g_ie_mabs + 1;		// IE_MOUSEABS
 	else if (evtype == 2)
 		g_ie_mdelta = g_ie_mdelta + 1;	// IE_MOUSEDELTA
-	else if (evtype == 0 || evtype == 1)
+	else if (evtype == 0 || evtype == 1) {
+		local float kk;
 		g_ie_keys = g_ie_keys + 1;		// IE_KEYDOWN/UP
+		// WS9: трекинг удерживаемых клавиш (idempotent по keynum) — канарейка
+		// незалипания: down ставит бит, up (даже вне игры, после фикса) снимает.
+		kk = scanx;
+		if (kk < 0) kk = 0;
+		if (kk > 255) kk = 255;
+		if (evtype == 0) {
+			if (g_ie_down[kk] == 0) {
+				g_ie_down[kk] = 1;
+				g_ie_held = g_ie_held + 1;
+			}
+		} else {
+			if (g_ie_down[kk] == 1) {
+				g_ie_down[kk] = 0;
+				g_ie_held = g_ie_held - 1;
+			}
+		}
+	}
+
+	// WS9-канарейка (экран 26): модуль «глотает» все клавиши (return 1). Проверка,
+	// что движок резервирует ` (backtick без Shift) и Esc — иначе консоль/меню были
+	// бы недоступны (лок-аут). Reserved-клавиши до модуля не доходят (g_ie_keys не
+	// растёт), обычная клавиша — доходит и глотается.
+	if (DbgAt(26) && (evtype == 0 || evtype == 1))
+		return 1;
 
 	// C6.1: эффект-пикер — потребляем MOUSE1/2 (return 1) ТОЛЬКО на экране 3
 	// (csqc_dbg 3), иначе клики уходят движку (атака/бинды работают в игре).
@@ -4813,6 +4848,23 @@ void Hud_DrawCSQC() {
 		yy = yy + 18;
 		drawstring([60, yy, 0],
 			sprintf("Э5 desc %s", g_rr_desc),
+			[12, 12], '1 1 1', 1, 0);
+	}
+
+	// --- экран 26: WS9 (ввод) — канарейка reserved-key/трекера up ---
+	// Модуль «глотает» все клавиши (CSQC_InputEvent -> 1). Если бы движок не
+	// резервировал ` (backtick без Shift) и Esc, они тоже уходили бы модулю и
+	// консоль/меню были бы недоступны (лок-аут). Консоль/меню открываются → резерв
+	// работает. k — счётчик доставленных keydown/up (обычная клавиша доставляется,
+	// reserved — нет).
+	if (D == 26) {
+		yy = 500;
+		drawstring([60, yy, 0],
+			"WS9: module swallows all keys (0 = no lockout)",
+			[12, 12], '1 1 0', 1, 0);
+		yy = yy + 18;
+		drawstring([60, yy, 0],
+			sprintf("WS9 ie k %g held %g", g_ie_keys, g_ie_held),
 			[12, 12], '1 1 1', 1, 0);
 	}
 }
