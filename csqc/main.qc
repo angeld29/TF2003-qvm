@@ -3455,6 +3455,61 @@ void CSQC_SelftestPred() {
 	ST_Summary();
 }
 
+// ============================================================================
+// WS8 (PR #1160 render/culling) — не-визуальные канарейки. Ожидания фиксируют
+// реальное поведение FTE (hard rule ADR 0023; FTE-прогон обязан быть fail=0).
+// Здесь только реально ассертящие тесты: #318 (повтор/идемпотентность) и #347
+// (msec<=0 -> без шага; дискриминирует снятый floor). #1 (кулинг по камере
+// модуля), #4 (фолбэк без stale arena), #5 (multiview раз/кадр) и #9 (исчерпание
+// пула строк) невыразимы не-визуально/из модуля — плейсхолдеров-SKIP нет (SKIP по
+// причине «неприменимо к тесту» нарушал бы ADR 0023); они закрываются live
+// (ezq == FTE; csqc_dbg 17/19, r_drawhud 0) + code/review и фиксируются в
+// docs/ezquake_csqc_client_parity_audit.md / ADR.
+// ============================================================================
+void CSQC_SelftestWS8() {
+	local entity e;
+	local vector mp, mp2, o0;
+	local float saved_tl;
+
+	// --- #318 (T5.2): повторный вызов -> те же размеры (идемпотентность). ---
+	mp = drawgetimagesize("gfx/ttl_main.lmp");
+	mp2 = drawgetimagesize("gfx/ttl_main.lmp");
+	ST_EqF("WS8 318 repeat x", mp_x, mp2_x);
+	ST_EqF("WS8 318 repeat y", mp_y, mp2_y);
+
+	// --- #347 (T6.1): msec<=0 -> шага физики нет (origin не меняется). ---
+	e = spawn();
+	if (e != world) {
+		e.movetype = MOVETYPE_WALK;
+		e.mins = '-16 -16 -24';
+		e.maxs = '16 16 32';
+		e.velocity = '0 0 0';
+		e.flags = 0;
+		e.pmove_flags = 0;
+		e.origin = getproperty(VF_ORIGIN);
+		input_angles = getproperty(VF_ANGLES);
+		input_movevalues = '0 0 0';
+		input_buttons = 0;
+		input_impulse = 0;
+		saved_tl = input_timelength;
+
+		o0 = e.origin;
+		input_timelength = 0;
+		runstandardplayerphysics(e);
+		ST_NearV("WS8 347 zero-input no move", o0, e.origin, 0.01);
+
+		input_timelength = -0.05;
+		runstandardplayerphysics(e);
+		ST_NearV("WS8 347 negative-input no move", o0, e.origin, 0.01);
+
+		input_timelength = saved_tl;
+		remove(e);
+	} else {
+		ST_Skip("WS8 347 zero-input no move", "spawn failed");
+		ST_Skip("WS8 347 negative-input no move", "spawn failed");
+	}
+}
+
 // CSQC_SelfTest — оркестратор групп.
 // grp: 0=default (parity: core+ent+l2), 1=core, 2=ent, 3=l2, 4=gaps (ezq-unimplemented), 6=all, 7=pred.
 void CSQC_SelfTest(float grp) {
@@ -3468,6 +3523,7 @@ void CSQC_SelfTest(float grp) {
 		CSQC_SelftestL2b2(0);
 		CSQC_SelftestL2c(0);
 		CSQC_SelftestL2d(0);
+		CSQC_SelftestWS8();
 	} else if (grp == 1) {	// core
 		CSQC_SelftestCore(0);
 	} else if (grp == 2) {	// ent (Phase 3)
@@ -3496,6 +3552,7 @@ void CSQC_SelfTest(float grp) {
 		CSQC_SelftestL2b2(2);
 		CSQC_SelftestL2c(2);
 		CSQC_SelftestL2d(2);
+		CSQC_SelftestWS8();
 	}
 
 	ST_Summary();
