@@ -2579,6 +2579,7 @@ void CSQC_SelftestCore(float mode) {
 	local entity e_b20;
 	local float b20_idx;
 	local entity e_cp, s_cp;
+	local string ws2_before, ws2_target;	// WS2-B: cvar-not-from-server canary
 
 	CSQC_Fx_Smoke();	// заполняет g_sm* (нужно и parity, и gap buf)
 
@@ -2722,6 +2723,27 @@ void CSQC_SelftestCore(float mode) {
 		registercvar("csqc_p1c", "1");
 		cvar_set("csqc_p1c", "7");
 		ST_EqF("P1c cvar_set/cvar", 7, cvar("csqc_p1c"));
+
+		// --- WS2-B (openspec csqc-client-pr1160-cvar-remote-guard) ---
+		// Per-cvar CVAR_NOTFROMSERVER: an untrusted source (downloaded csqc
+		// module) must not change a flagged cvar via cvar_set (#72), and
+		// cvar_type (#495) reports PRIVATE (bit 4). cl_download_csprogs is
+		// flagged in both engines (ezq cl_main.c:122, FTE cl_main.c:201);
+		// a plain module cvar (csqc_p1c, set above) stays writable (positive
+		// control). Capture-style: read-before vs read-after, no default dep.
+		ws2_before = cvar_string("cl_download_csprogs");
+		if (ws2_before == "") {
+			ST_Skip("WS2-B cvar_set(flagged) blocked", "cl_download_csprogs not registered");
+			ST_Skip("WS2-B cvar_type(flagged) PRIVATE", "cl_download_csprogs not registered");
+		} else {
+			if (ws2_before == "0")
+				ws2_target = "1";
+			else
+				ws2_target = "0";
+			cvar_set("cl_download_csprogs", ws2_target);
+			ST_EqS("WS2-B cvar_set(flagged) blocked", ws2_before, cvar_string("cl_download_csprogs"));
+			ST_True("WS2-B cvar_type(flagged) PRIVATE", (cvar_type("cl_download_csprogs") & 4) != 0);
+		}
 		// FTE-оракул: общий DP-extension (обе поддержка: FTE QSG_Extensions,
 		// ezq csqc_checkextension) = 1; несуществующий = 0. Имя "FTE_CSQC" FTE
 		// не регистрирует (pr_bgcmd.c QSG_Extensions) — не используем.
