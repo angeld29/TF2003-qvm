@@ -2286,6 +2286,17 @@ void CSQC_SelftestNoCrash() {
 	getextresponse();
 	ST_True("2d getextresponse no crash", 1);
 
+	// WS4 #11/#12: te_lightning1/2/3 (#428-430, entnum offset) + te_bloodshower
+	// (#406, explosionspeed из PARM2) — no-crash (void-builtins, draw-кадр).
+	te_lightning1(world, '0 0 0', '0 0 64');
+	ST_True("WS4 #11 te_lightning1 no crash", 1);
+	te_lightning2(world, '0 0 0', '0 0 64');
+	ST_True("WS4 #11 te_lightning2 no crash", 1);
+	te_lightning3(world, '0 0 0', '0 0 64');
+	ST_True("WS4 #11 te_lightning3 no crash", 1);
+	te_bloodshower('-8 -8 -8', '8 8 8', 200, 40);
+	ST_True("WS4 #12 te_bloodshower no crash", 1);
+
 	ST_Summary();
 }
 
@@ -2300,6 +2311,8 @@ void CSQC_SelftestNoCrash() {
 // ============================================================================
 void CSQC_Selftest2D() {
 	local float sw0, sw1;
+	local float ws4_sw2;			// WS4 #3 stringwidth 2-arg
+	local vector ws4_ps, ws4_vs;		// WS4 #10 VF_SCREENPSIZE/VSIZE
 	// Валидная pic — с расширением (FTE R2D_SafeCachePic не добавляет .lmp).
 	ST_EqF("2D drawpic(valid)", 1,
 		drawpic([0, 0, 0], "gfx/ttl_main.lmp", [96, 24, 0], '1 1 1', 1, 0));
@@ -2310,8 +2323,9 @@ void CSQC_Selftest2D() {
 	ST_EqF("2D drawcharacter(0)", -1,
 		drawcharacter([0, 0, 0], 0, [8, 8, 0], '1 1 1', 1, 0));
 	// #328 drawsubpic — csdefs `void` (как FTE-спека), возврат не наблюдаем из QC
-	// (движок всё равно пишет 1, FTE-паритет) — только no-crash.
-	drawsubpic([0, 0, 0], [64, 16, 0], "gfx/ttl_main.lmp", [0, 0, 0], [48, 16, 0], '1 1 1', 1, 0);
+	// (движок всё равно пишет 1, FTE-паритет) — только no-crash. srcpos/srcsize —
+	// нормированные (0..1) текстурные координаты (FTE-паритет, WS4 D6): [1,1] = вся картинка.
+	drawsubpic([0, 0, 0], [64, 16, 0], "gfx/ttl_main.lmp", [0, 0, 0], [1, 1, 0], '1 1 1', 1, 0);
 	ST_True("2D drawsubpic no crash", 1);
 	// T4 strcolor-render (Этап 2): ^-colour-разметка не считается шириной (FTE #327
 	// со снятым markup; ezq — трансляция ^->&cRGB в csqc_client.c). FTE-оракул.
@@ -2341,6 +2355,18 @@ void CSQC_Selftest2D() {
 	// FTE: ^s push (default), ^1 цвет, ^r pop -> default; видимые символы aXY.
 	ST_EqF("2D stringwidth ^s^r stack", stringwidth("aXY", 1, [12, 12]),
 		stringwidth("a^s^1X^rY", 1, [12, 12]));
+	// WS4 #3: 2-арг. вызов (#327) не читает отсутствующий size; метрика = /8 от
+	// size=8 (FTE pr_menu.c:599: size?size[0]:8, затем px/=8).
+	ws4_sw2 = stringwidth("ab", 1);
+	ST_NearF("WS4 #3 stringwidth 2-arg == 3-arg(size8)/8",
+		stringwidth("ab", 1, [8, 8]) / 8, ws4_sw2, 0.01);
+	// WS4 #10: VF_SCREENPSIZE (physical, glConfig.vid*) >= VF_SCREENVSIZE (virtual,
+	// vid.*); при r_conscale==1 равны, иначе PSIZE больше. Инвариант (config-зависимо).
+	ws4_ps = getproperty(VF_SCREENPSIZE);
+	ws4_vs = getproperty(VF_SCREENVSIZE);
+	ST_True("WS4 #10 PSIZE>=VSIZE x", ws4_ps_x >= ws4_vs_x);
+	ST_True("WS4 #10 PSIZE>=VSIZE y", ws4_ps_y >= ws4_vs_y);
+	ST_True("WS4 #10 PSIZE>0", ws4_ps_x > 0 && ws4_ps_y > 0);
 }
 
 // T4 strcolor-render (Этап 3, gaps): оставшиеся accept+doc-отклонения рендера/`#327` —
@@ -2580,6 +2606,9 @@ void CSQC_SelftestCore(float mode) {
 	local float b20_idx;
 	local entity e_cp, s_cp;
 	local string ws2_before, ws2_target;	// WS2-B: cvar-not-from-server canary
+	local vector v51;			// WS4 #1 vectoangles
+	local entity e_ws4, ea_ws4;		// WS4 #2 findflags/findchainflags
+	local float ws4_found;
 
 	CSQC_Fx_Smoke();	// заполняет g_sm* (нужно и parity, и gap buf)
 
@@ -2942,6 +2971,64 @@ void CSQC_SelftestCore(float mode) {
 		} else {
 			ST_Skip("0 #63 changepitch moves pitch", "spawn failed");
 		}
+
+		// --- WS4 (PR #1160): паритет семантики клиентских CSQC-builtins ---
+		// #51 vectoangles: FTE VectorAngles(..., true) -> r_meshpitch=-1 (инверсия pitch).
+		// Вверх [0,0,1] -> 90 (не 270), вниз [0,0,-1] -> 270 (оракул FTE).
+		v51 = vectoangles('0 0 1');
+		ST_NearF("WS4 #1 vectoangles up pitch", 90, v51_x, 0.01);
+		ST_NearF("WS4 #1 vectoangles up yaw", 0, v51_y, 0.01);
+		v51 = vectoangles('0 0 -1');
+		ST_NearF("WS4 #1 vectoangles down pitch", 270, v51_x, 0.01);
+		// #449/#450 числовой AND (FTE (int)field & (int)match), не биты float.
+		// 3&1=1 (положительный), 3&8=0 (нет ложного срабатывания битов 0x40400000&0x41000000).
+		e_ws4 = spawn();
+		if (e_ws4 != world) {
+			e_ws4.flags = 3;
+			ws4_found = 0;
+			ea_ws4 = findchainflags(flags, 1, chain);
+			while (ea_ws4 != world) {
+				if (ea_ws4 == e_ws4) ws4_found = 1;
+				ea_ws4 = ea_ws4.chain;
+			}
+			ST_EqF("WS4 #2 findchainflags numeric positive (3&1)", 1, ws4_found);
+			ws4_found = 0;
+			ea_ws4 = findchainflags(flags, 8, chain);
+			while (ea_ws4 != world) {
+				if (ea_ws4 == e_ws4) ws4_found = 1;
+				ea_ws4 = ea_ws4.chain;
+			}
+			ST_EqF("WS4 #2 findchainflags numeric (3&8==0)", 0, ws4_found);
+			remove(e_ws4);
+		} else {
+			ST_Skip("WS4 #2 findchainflags numeric positive (3&1)", "spawn failed");
+			ST_Skip("WS4 #2 findchainflags numeric (3&8==0)", "spawn failed");
+		}
+		// #116 substring: кламп по длине строки, без переполнения буфера.
+		ST_EqS("WS4 #4 substring mid", "ell", substring("hello", 1, 3));
+		ST_EqS("WS4 #4 substring big length", "abc", substring("abc", 0, 100000));
+		// #494 crc16: хэш по фактической конкатенации (без stale-длины/OOB).
+		ST_EqF("WS4 #5 crc16 concat", crc16(0, "abc"), crc16(0, "ab", "c"));
+		ST_EqF("WS4 #5 crc16 insens", crc16(1, "ABC"), crc16(1, "abc"));
+		// #335 particleeffectnum: FTE PF_cs_particleeffectnum возвращает -i для
+		// неизвестного/client-only имени (0 — только при полной таблице), серверные -> +i.
+		// ezq даёт -1 (знаковый паритет). Стенд server-known эффектов не даёт -> только знак.
+		ST_True("WS4 #9 particleeffectnum unknown<0",
+			particleeffectnum("ws4_no_such_effect") < 0);
+		// #7 sensitive-cvar read-guard (FTE CVAR_NOUNSAFEEXPAND-паритет).
+		ST_EqF("WS4 #7 cvar sensitive rcon_password", 0, cvar("rcon_password"));
+		ST_EqS("WS4 #7 cvar_string sensitive password", "", cvar_string("password"));
+		ST_EqS("WS4 #7 cvar_defstring sensitive rcon_password", "", cvar_defstring("rcon_password"));
+		ST_True("WS4 #7 cvar_type sensitive PRIVATE", (cvar_type("rcon_password") & 4) != 0);
+		// #7 non-sensitive cvar (fov, default 90 на обоих движках) не скрыт: строка
+		// читается, PRIVATE-бит не выставлен. (Модульный registercvar на FTE 2-арг.
+		// создаёт cvar с пустым value -> не годится как «читаемый».)
+		ST_True("WS4 #7 cvar_string ordinary readable", cvar_string("fov") != "");
+		ST_True("WS4 #7 cvar_type ordinary not PRIVATE", (cvar_type("fov") & 4) == 0);
+		// #13 argv_start/end_index: guards до разыменования vm (no-crash smoke).
+		tokenize("ws4 argv probe");
+		ST_True("WS4 #13 argv guards no crash",
+			argv_start_index(0) >= -1 && argv_end_index(0) >= -1);
 
 		// --- Фаза 1d: 2D-кэш / T5 / T9 / P1d / P1e (без трасс) ---
 		CSQC_SelftestD(mode);
