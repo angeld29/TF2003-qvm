@@ -2744,6 +2744,26 @@ void CSQC_SelftestCore(float mode) {
 			ST_EqS("WS2-B cvar_set(flagged) blocked", ws2_before, cvar_string("cl_download_csprogs"));
 			ST_True("WS2-B cvar_type(flagged) PRIVATE", (cvar_type("cl_download_csprogs") & 4) != 0);
 		}
+
+		// --- WS2-C (openspec csqc-client-pr1160-keybind-capabilities) ---
+		// ezq gates module setkeybind (#630) by the remote name-allowlist: a bind whose
+		// first token is a registered command outside the allowlist (e.g. quit) is
+		// rejected. Unknown tokens (server-side "+command") must still work - FTE has
+		// no name-allowlist at all (it restricts at exec level), so that part is a
+		// parity assertion; the "quit rejected" part is ezq-only and is SKIPped on FTE
+		// (hard rule ADR 0023: FTE run must stay fail=0). cl_remote_capabilities exists
+		// only in ezq -> engine probe.
+		sk = getkeybind(K_ESCAPE);
+		setkeybind(K_ESCAPE, "+ws2cprobe");
+		ST_EqS("WS2-C unknown-token bind works", "+ws2cprobe", getkeybind(K_ESCAPE));
+		if (cvar_string("cl_remote_capabilities") == "") {
+			ST_Skip("WS2-C setkeybind gate blocks cmd", "engine without name-allowlist (FTE)");
+		} else {
+			setkeybind(K_ESCAPE, "quit");
+			ST_EqS("WS2-C setkeybind gate blocks cmd", "+ws2cprobe", getkeybind(K_ESCAPE));
+		}
+		setkeybind(K_ESCAPE, sk);
+
 		// FTE-оракул: общий DP-extension (обе поддержка: FTE QSG_Extensions,
 		// ezq csqc_checkextension) = 1; несуществующий = 0. Имя "FTE_CSQC" FTE
 		// не регистрирует (pr_bgcmd.c QSG_Extensions) — не используем.
