@@ -229,6 +229,21 @@ entity g_sc_se2;
 // T4 Этап 1 (диагностика): getmodelindex моделей канарейки (0 = не резолвится/не грузится).
 float g_sc_midxb;
 float g_sc_midxs;
+// WS7 (PR #1160 entity lifecycle) harness-канарейки. (a) isnew-контракт:
+// g_st7_eu_n — число проверенных CSQC_Ent_Update, g_st7_eu_bad — нарушений
+// (первый update сущности != isnew 1 / повтор != 0); g_st7_eu_seen[] — уже
+// виденные entnum (линейный поиск, лимит 64). (e) frames: снятые в Ent_Update
+// servercommandframe/clientcommandframe. (f) catch-all: g_st7_cc_seen — модуль
+// получил нерегистрированную команду через cmd.c catch-all (D3).
+float g_st7_eu_n;
+float g_st7_eu_bad;
+float g_st7_eu_seen[64];
+float g_st7_eu_seenc;
+float g_st7_eu_sc;
+float g_st7_eu_cc;
+float g_st7_cc_seen;
+float g_st7_req;		// запрос scheduled canary (csqc_selftest console)
+float g_st7_armed;		// probe отправлен, ждём исполнения на след. кадре
 // Этап 3 (куллинг arena-эдиктов, csqc_dbg 17; ADR 0028): e1 — перед стеной
 // (виден), e2 — за стеной (движок не должен рисовать: PVS/leaf + bbox).
 entity g_cull_e1;
@@ -445,7 +460,7 @@ float FlagFreeSlot() {
 }
 
 void(float isnew) CSQC_Ent_Update = {
-	local float e, team, carried, t, flagf, idx, frn, fri;
+	local float e, team, carried, t, flagf, idx, frn, fri, si, sf;
 
 	// Параметры функции — нет; контекст сущности задаёт движок: self.entnum
 	// (ADR 0017 P2/D3). payload сервера G_CSQC_Example_FlagSendEntity (без
@@ -453,6 +468,24 @@ void(float isnew) CSQC_Ent_Update = {
 	// WriteShort(skin), WriteByte(frame), WriteByte(flagf)
 	// [GCSQC_FLAGF_T40 = дошёл hi-бит 40], и если flagf — WriteLong(time).
 	e = self.entnum;
+	// WS7 (a) isnew-контракт: первый update сетевой сущности — isnew==1, повтор —
+	// isnew==0 (D6 не даёт CSQC_Ent_Spawn затереть аргумент). Отслеживаем до 64
+	// entnum линейным поиском. WS7 (e): кадры предикции, снятые в parse-time (D5) —
+	// максимум по обновлениям (договор: sc<=cc, cc!=0 при активном потоке).
+	g_st7_eu_n = g_st7_eu_n + 1;
+	if (servercommandframe > g_st7_eu_sc) g_st7_eu_sc = servercommandframe;
+	if (clientcommandframe > g_st7_eu_cc) g_st7_eu_cc = clientcommandframe;
+	sf = -1;
+	for (si = 0; si < g_st7_eu_seenc; si = si + 1)
+		if (g_st7_eu_seen[si] == e)
+			sf = si;
+	if (sf >= 0) {
+		if (isnew != 0) g_st7_eu_bad = g_st7_eu_bad + 1;
+	} else if (g_st7_eu_seenc < 64) {
+		g_st7_eu_seen[g_st7_eu_seenc] = e;
+		g_st7_eu_seenc = g_st7_eu_seenc + 1;
+		if (isnew != 1) g_st7_eu_bad = g_st7_eu_bad + 1;
+	}
 	team = readshort();
 	carried = readbyte();
 	flagf = readbyte();
@@ -477,7 +510,7 @@ void(float isnew) CSQC_Ent_Update = {
 };
 
 void() CSQC_Ent_Remove = {
-	local float e, idx;
+	local float e, idx, i;
 
 	// Контекст сущности — движок (self.entnum); builtin-стрим не используется
 	// (ADR 0017 P2/D3).
@@ -485,6 +518,16 @@ void() CSQC_Ent_Remove = {
 	idx = FlagIdxByEnt(e);
 	if (idx >= 0)
 		FlagSlot_clear(idx);
+
+	// WS7 (a): снять entnum из isnew-трекинга — при переиспользовании номера
+	// (флаг снят и заспавнен заново; движок честно даёт isnew==1) иначе будет
+	// ложный FAIL «WS7 D6 isnew violations». Компактим swap-with-last.
+	for (i = 0; i < g_st7_eu_seenc; i = i + 1)
+		if (g_st7_eu_seen[i] == e) {
+			g_st7_eu_seen[i] = g_st7_eu_seen[g_st7_eu_seenc - 1];
+			g_st7_eu_seenc = g_st7_eu_seenc - 1;
+			break;
+		}
 };
 
 void() CSQC_Parse_Event = {
@@ -1232,6 +1275,13 @@ void(float width, float height, float notmenu) CSQC_UpdateView = {
 
 float(string cmd) CSQC_ConsoleCommand = {
 	tokenize(cmd);
+	// WS7 (f): catch-all probe — вызывается движком для НЕрегистрированной команды
+	// через cmd.c catch-all (D3); return 1 гасит «Unknown command». Имя нигде не
+	// регистрируется, поэтому сработать может только catch-all.
+	if (argv(0) == "csqc_st7_probe") {
+		g_st7_cc_seen = 1;
+		return 1;
+	}
 	if (argv(0) == "csqc_sendevent") {
 		SendEchoEvent();
 		return 1;
@@ -1270,6 +1320,11 @@ float(string cmd) CSQC_ConsoleCommand = {
 		if (argv(1) == "vp") {
 			g_st_vp_req = 1;
 			print("csqc_selftest vp: scheduled (runs on next draw)\n");
+			return 1;
+		}
+		if (argv(1) == "console") {
+			g_st7_req = 1;
+			print("csqc_selftest console: scheduled (runs on next draw)\n");
 			return 1;
 		}
 		grp = 0;
@@ -3062,10 +3117,13 @@ void CSQC_SelftestCore(float mode) {
 	}
 
 	// --- gaps: ezq-заглушки, которые FTE реализует (потому не parity) — mode != 0 ---
+	// Ожидание = FTE (hard rule ADR 0023): эти te_* зарегистрированы в FTE
+	// (checkbuiltin != 0). На ezq они не реализованы -> FAIL в gaps — это и есть
+	// фиксация ezq-gap (#426 te_teleport / #219 te_lightningblood / #239 te_bloodqw).
 	if (mode != 0) {
-		ST_EqF("0 checkbuiltin(te_teleport)", 0, checkbuiltin(te_teleport));
-		ST_EqF("0 checkbuiltin(te_lightningblood)", 0, checkbuiltin(te_lightningblood));
-		ST_EqF("0 checkbuiltin(te_bloodqw)", 0, checkbuiltin(te_bloodqw));
+		ST_True("te_teleport registered (FTE)", checkbuiltin(te_teleport) != 0);
+		ST_True("te_lightningblood registered (FTE)", checkbuiltin(te_lightningblood) != 0);
+		ST_True("te_bloodqw registered (FTE)", checkbuiltin(te_bloodqw) != 0);
 	}
 }
 
@@ -3526,6 +3584,26 @@ void CSQC_SelftestWS8() {
 	}
 }
 
+// ============================================================================
+// WS7 (PR #1160 entity lifecycle) harness-канарейки. (a) isnew-контракт и (e)
+// frames снимаются в CSQC_Ent_Update из реального сетевого потока svc76; (f)
+// catch-all — отдельным scheduled-прогоном `csqc_selftest console`.
+// Невыразимы в одном модуле (закрываются live+review, см. ADR 0023 §gap):
+// (b) модуль без CSQC_Init, (c) модуль без CSQC_WorldLoaded, (d) delta-сущность
+// с серверным .modelindex (нужен серверный эмиттер), spawn-путь (a) — нужен
+// модуль с CSQC_Ent_Spawn (в текущем модуле его нет).
+// ============================================================================
+void CSQC_SelftestWS7() {
+	if (g_st7_eu_n == 0) {
+		ST_Skip("WS7 D6 isnew first/repeat", "no network CSQC entities yet");
+		ST_Skip("WS7 D5 parse-time frames", "no network CSQC entities yet");
+		return;
+	}
+	ST_EqF("WS7 D6 isnew violations", 0, g_st7_eu_bad);
+	ST_True("WS7 D5 frames nonzero", (g_st7_eu_cc != 0));
+	ST_True("WS7 D5 frame order sc<=cc", (g_st7_eu_sc <= g_st7_eu_cc));
+}
+
 // CSQC_SelfTest — оркестратор групп.
 // grp: 0=default (parity: core+ent+l2), 1=core, 2=ent, 3=l2, 4=gaps (ezq-unimplemented), 6=all, 7=pred.
 void CSQC_SelfTest(float grp) {
@@ -3540,6 +3618,7 @@ void CSQC_SelfTest(float grp) {
 		CSQC_SelftestL2c(0);
 		CSQC_SelftestL2d(0);
 		CSQC_SelftestWS8();
+		CSQC_SelftestWS7();
 	} else if (grp == 1) {	// core
 		CSQC_SelftestCore(0);
 	} else if (grp == 2) {	// ent (Phase 3)
@@ -3569,6 +3648,7 @@ void CSQC_SelfTest(float grp) {
 		CSQC_SelftestL2c(2);
 		CSQC_SelftestL2d(2);
 		CSQC_SelftestWS8();
+		CSQC_SelftestWS7();
 	}
 
 	ST_Summary();
@@ -4023,6 +4103,23 @@ void Hud_DrawCSQC() {
 		print(sprintf("[CSQC-TEST] VFVP size %g %g min %g %g\n",
 			vp_sz_x, vp_sz_y, vp_mn_x, vp_mn_y));
 		setproperty(VF_VIEWPORT, g_st_vp_orig_min, g_st_vp_orig_size);	// восстановление
+	}
+
+	// WS7 D3 catch-all (`csqc_selftest console`) — двухфазный на draw-кадре:
+	// фаза 1 шлёт localcmd с НЕрегистрированной командой; фаза 2 (след. кадр)
+	// проверяет, что модуль получил её через cmd.c catch-all (D3).
+	if (g_st7_req != 0) {
+		if (g_st7_armed == 0) {
+			g_st7_armed = 1;
+			g_st7_cc_seen = 0;
+			localcmd("csqc_st7_probe");
+		} else {
+			g_st7_req = 0;
+			g_st7_armed = 0;
+			ST_Reset(10);	// отдельная группа (7 = pred) — не смешивать SUMMARY в логе
+			ST_True("WS7 D3 console catch-all routed", g_st7_cc_seen);
+			ST_Summary();
+		}
 	}
 
 	// Phase 4 pred-тест (armed): копим max g_e_err за окно; по завершении settle —
@@ -4730,7 +4827,8 @@ void Hud_DrawCSQC() {
 
 	// --- экран 11: Ф3 renderscene / mod-отрисовка ---
 	// Ожидание: впереди флаг (progs/tf_flag.mdl, Y+90, z-24), виден на FTE и ezq;
-	// midx — #200 getmodelindex (ezq: индекс CSQC-реестра >0; FTE: precache-индекс).
+	// midx — #200 getmodelindex (sign-split: >0 серверный precache, <0 csqc-only слот,
+	// 0 — нет модели; порядок csqc→server как FTE CS_FindModel).
 	if (D == 11) {
 		yy = 470;
 		drawstring([60, yy, 0],
@@ -4804,7 +4902,7 @@ void Hud_DrawCSQC() {
 		yy = yy + 18;
 		drawstring([60, yy, 0],
 			sprintf("T4.1 midx brush %g sprite %g (0=no model)", g_sc_midxb, g_sc_midxs),
-			[12, 12], (g_sc_midxb > 0 && g_sc_midxs > 0) ? '0 1 0' : '1 0 0', 1, 0);
+			[12, 12], (g_sc_midxb != 0 && g_sc_midxs != 0) ? '0 1 0' : '1 0 0', 1, 0);
 	}
 
 	// --- экран 17: Этап 3 (PVS/bbox-куллинг arena-эдиктов) ---
