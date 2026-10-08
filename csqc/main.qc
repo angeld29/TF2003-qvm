@@ -1728,7 +1728,7 @@ void CSQC_Fx_Smoke() {
 
 	// P1b: строки/конверсии smoke (консоль). Ожидания: v "'1.000000 2.000000 3.000000'"
 	// (vtos = %f, паритет ezq/FTE), l 3, f 1.5, sub "ell", stov 1 2 3,
-	// cv "\"0\"", z "zoned" (ring; unzone no-op).
+	// cv "\"0\"", z "zoned" (heap strzone; unzone frees).
 	dprint(sprintf("P1B v %s l %g f %g sub %s\n",
 		vtos('1 2 3'), strlen("abc"), stof("1.5"), substring("hello", 1, 3)));
 	mv = stov("1 2 3");
@@ -2611,6 +2611,7 @@ void CSQC_SelftestCore(float mode) {
 	local float k, noop_prop;
 	local float b18n;
 	local string sk;
+	local string strz;			// T3 Э6: strzone persistence canary
 	local vector rv, cur_org;
 	local entity e_b20;
 	local float b20_idx;
@@ -2728,6 +2729,22 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqS("P1b ftos(2)", "2", ftos(2));
 		ST_EqS("P1b ftos(1.5)", "1.5", ftos(1.5));
 		ST_EqS("P1b strzone", "zoned", strzone("zoned"));
+		// T3 Э6: strzone — строка переживает >64 последующих temp-строковых
+		// builtins (классическое кольцо затёрло бы; на FTE oracle сборка с QCGC,
+		// поэтому там строка держится GC — ассерт проверяет лишь содержимое).
+		// Variadic-конкатенация и освобождение слота strunzone — FTE-паритет.
+		strz = strzone("keepzoned");
+		for (k = 0; k < 70; k = k + 1)
+			noop_prop = strlen(strcat("aa", "bb")) + strlen(substring("hello", 0, 3));
+		ST_EqS("T3 strzone persists >64 temp strings", "keepzoned", strz);
+		strunzone(strz);
+		strz = strzone("a", "b", "c");
+		ST_EqS("T3 strzone variadic", "abc", strz);
+		strunzone(strz);
+		strz = strzone("reusezone");
+		ST_EqS("T3 strzone slot reuse after strunzone", "reusezone", strz);
+		strunzone(strz);
+		ST_EqF("T3 checkbuiltin(strunzone)", 1, checkbuiltin(strunzone));
 		ST_EqS("T2 itos(-7)", "-7", itos(-7));
 		ST_EqS("T2 itos(stoi(42))", "42", itos(stoi("42")));
 		ST_EqS("T2 htos(42)", "0000002a", htos(42));
@@ -3049,7 +3066,6 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqF("0 checkbuiltin(te_teleport)", 0, checkbuiltin(te_teleport));
 		ST_EqF("0 checkbuiltin(te_lightningblood)", 0, checkbuiltin(te_lightningblood));
 		ST_EqF("0 checkbuiltin(te_bloodqw)", 0, checkbuiltin(te_bloodqw));
-		ST_EqF("0 checkbuiltin(strunzone)", 0, checkbuiltin(strunzone));
 	}
 }
 
