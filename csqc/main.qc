@@ -2875,6 +2875,17 @@ void CSQC_SelftestCore(float mode) {
 		}
 		setkeybind(K_ESCAPE, sk);
 
+		// change csqc-client-setkeybind-scope: the gate accepts (a) a built-in +/- input
+		// verb and (b) the module's own registercommand'd name; both are parity (FTE has
+		// no name-allowlist and stores any bind). The "quit rejected" part stays ezq-only.
+		sk = getkeybind(K_ESCAPE);
+		setkeybind(K_ESCAPE, "+forward");
+		ST_EqS("scope setkeybind accepts input verb", "+forward", getkeybind(K_ESCAPE));
+		registercommand("+csqc_scope_probe");
+		setkeybind(K_ESCAPE, "+csqc_scope_probe");
+		ST_EqS("scope setkeybind accepts module command", "+csqc_scope_probe", getkeybind(K_ESCAPE));
+		setkeybind(K_ESCAPE, sk);
+
 		// FTE-оракул: общий DP-extension (обе поддержка: FTE QSG_Extensions,
 		// ezq csqc_checkextension) = 1; несуществующий = 0. Имя "FTE_CSQC" FTE
 		// не регистрирует (pr_bgcmd.c QSG_Extensions) — не используем.
