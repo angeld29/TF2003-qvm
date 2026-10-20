@@ -2824,6 +2824,8 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqF("T7 tokenize_console(aa bb cc)", 3, tokenize_console("aa bb cc"));
 		ST_EqS("T7 argv(1)", "bb", argv(1));
 		ST_EqF("T7 tokenizebyseparator(a;b;;c)", 4, tokenizebyseparator("a;b;;c", ";"));
+		// S18: argv must read the last tokenizer (#479), not a stale #441 context.
+		ST_EqS("T7 argv after tokenizebyseparator (S18)", "b", argv(1));
 		// argescape("a b c") = "\"a b c\"" (FTE COM_QuotedString и ezq дают
 		// одинаково; 34 = '"').
 		ST_EqS("T7 argescape(a b c)",
