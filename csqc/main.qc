@@ -2675,6 +2675,9 @@ void CSQC_SelftestCore(float mode) {
 	local vector v51;			// WS4 #1 vectoangles
 	local entity e_ws4, ea_ws4;		// WS4 #2 findflags/findchainflags
 	local float ws4_found;
+	local entity e_s36;			// S36: канарейка домена pitch у #347
+	local vector s36_in_angles, s36_in_move;
+	local float s36_in_tl, s36_in_buttons, s36_in_impulse;
 
 	CSQC_Fx_Smoke();	// заполняет g_sm* (нужно и parity, и gap buf)
 
@@ -2687,6 +2690,34 @@ void CSQC_SelftestCore(float mode) {
 			ST_EqF("345 getinputstate", 1, g_sm345);
 		ST_EqF("346 setsensitivityscaler", 1, g_sm346);
 		ST_EqF("347 runstandardplayerphysics", 1, g_sm347);
+		// S36 (ADR 0026/0029): player-эдикты несут model-space pitch. FTE-оракул:
+		// #347 пишет angles[0] = -input pitch/3 (r_meshpitch = -1).
+		e_s36 = spawn();
+		if (e_s36 != world) {
+			e_s36.origin = '0 0 0';
+			e_s36.velocity = '0 0 0';
+			e_s36.flags = FL_ONGROUND;
+			s36_in_angles = input_angles;
+			s36_in_move = input_movevalues;
+			s36_in_buttons = input_buttons;
+			s36_in_impulse = input_impulse;
+			s36_in_tl = input_timelength;
+			input_angles = '30 0 0';
+			input_movevalues = '0 0 0';
+			input_buttons = 0;
+			input_impulse = 0;
+			input_timelength = 0.05;
+			runstandardplayerphysics(e_s36);
+			ST_NearF("S36 #347 pitch == -p/3", -10, e_s36.angles_x, 0.001);
+			input_angles = s36_in_angles;
+			input_movevalues = s36_in_move;
+			input_buttons = s36_in_buttons;
+			input_impulse = s36_in_impulse;
+			input_timelength = s36_in_tl;
+			remove(e_s36);
+		} else {
+			ST_Skip("S36 #347 pitch == -p/3", "spawn failed");
+		}
 		// Реализовано в ezq, но поведение иное (не заглушка): баг ezq (R6/T3), не gaps.
 		ST_EqF("460-469 buf chain", 6, g_sm_buf);
 
