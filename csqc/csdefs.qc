@@ -707,6 +707,11 @@ float(float funcref) checkbuiltin = #0:checkbuiltin; /*
 		registered, implemented builtin (stubs/unknown -> 0). FTE PF_checkbuiltin;
 		ezq resolves `#0` by name at csprogs load (ADR 0035). */
 
+float() argc = #0:argc; /*
+		Name-mapped builtin (#0): number of tokens in the shared CSQC token store
+		(the last tokenize/tokenize_console/tokenizebyseparator call). FTE exposes
+		argc only by name (pr_csqc.c:7171). */
+
 float(float value) anglemod = #102;
 filestream(string filename, float mode, optional float mmapminsize) fopen = #110; /* Part of FRIK_FILE*/
 void(filestream fhandle) fclose = #111; /* Part of FRIK_FILE*/

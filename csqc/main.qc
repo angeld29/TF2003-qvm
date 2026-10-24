@@ -2857,6 +2857,27 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqF("T7 tokenizebyseparator(a;b;;c)", 4, tokenizebyseparator("a;b;;c", ";"));
 		// S18: argv must read the last tokenizer (#479), not a stale #441 context.
 		ST_EqS("T7 argv after tokenizebyseparator (S18)", "b", argv(1));
+		// S18: one shared token store — argv/argc/#515/#516 agree with the same
+		// tokenizer, and the FTE punctuation set leaves '+' inside a word.
+		ST_EqF("T7 tokenize(bind +attack x)", 3, tokenize("bind +attack x"));
+		ST_EqS("T7 argv(1) keeps +attack", "+attack", argv(1));
+		ST_EqF("T7 argv_start_index(1)", 5, argv_start_index(1));
+		ST_EqF("T7 argv_end_index(1) span", 12, argv_end_index(1));
+		ST_EqF("T7 argc after tokenize", 3, argc());
+		ST_EqF("T7 checkbuiltin(argc)", 1, checkbuiltin(argc));
+		ST_EqF("T7 tokenize(say hello, world)", 4, tokenize("say hello, world"));
+		ST_EqS("T7 argv(1) hello", "hello", argv(1));
+		ST_EqS("T7 argv(2) comma", ",", argv(2));
+		ST_EqS("T7 argv(3) world", "world", argv(3));
+		ST_EqF("T7 tokenize(aa bb)", 2, tokenize("aa bb"));
+		ST_EqS("T7 argv(-1)", "bb", argv(-1));
+		ST_EqS("T7 argv(5) out of range", "", argv(5));
+		ST_EqF("T7 argv_start_index(5)", -1, argv_start_index(5));
+		// Block comments: kept as text by #441 (qctokenize), dropped by #514.
+		ST_EqF("T7 tokenize(/*x*/b) keeps comment", 1, tokenize("/*x*/b"));
+		ST_EqS("T7 argv(0) after tokenize block comment", "/*x*/b", argv(0));
+		ST_EqF("T7 tokenize_console(/*x*/b)", 1, tokenize_console("/*x*/b"));
+		ST_EqS("T7 argv(0) after console block comment", "b", argv(0));
 		// argescape("a b c") = "\"a b c\"" (FTE COM_QuotedString и ezq дают
 		// одинаково; 34 = '"').
 		ST_EqS("T7 argescape(a b c)",
