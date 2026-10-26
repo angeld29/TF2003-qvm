@@ -2083,8 +2083,12 @@ void CSQC_SelftestL2b2(float mode) {
 			if (e1 != world) {
 				e1.frame = 77;
 				ST_EqS("2b2 getentityfieldstring(frame)", "77", getentityfieldstring(idx, e1));
-				putentityfieldstring(idx, e1, "123");
-				ST_EqF("2b2 putentityfieldstring frame", 123, e1.frame);
+				if (checkbuiltin(putentityfieldstring)) {
+					putentityfieldstring(idx, e1, "123");
+					ST_EqF("2b2 putentityfieldstring frame", 123, e1.frame);
+				} else {
+					ST_Skip("2b2 putentityfieldstring frame", "#500 not implemented");
+				}
 				// T3 Э5: #498 полный ddef_t.type (frame = ev_float = 2);
 				// FTE pr_bgcmd.c:7750 отдаёт type без маски (в нашем csprogs
 				// DEF_SAVEGLOBAL не выставлен, поэтому маска эффекта не даёт).
@@ -3074,7 +3078,10 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqF("B13 DP_QC_CHANGEPITCH", 1, checkextension("DP_QC_CHANGEPITCH"));
 		ST_EqF("B13 DP_QC_VECTORVECTORS", 1, checkextension("DP_QC_VECTORVECTORS"));
 		ST_EqF("B13 DP_QC_TRACEBOX", 1, checkextension("DP_QC_TRACEBOX"));
-		ST_EqF("B13 DP_QC_ENTITYDATA", 1, checkextension("DP_QC_ENTITYDATA"));
+		if (checkbuiltin(putentityfieldstring))
+			ST_EqF("B13 DP_QC_ENTITYDATA", 1, checkextension("DP_QC_ENTITYDATA"));
+		else
+			ST_Skip("B13 DP_QC_ENTITYDATA", "#500 not implemented");
 		ST_EqF("B13 EXT_BITSHIFT", 1, checkextension("EXT_BITSHIFT"));
 		ST_EqF("B13 DP_TE_BLOOD", 1, checkextension("DP_TE_BLOOD"));
 		ST_EqF("B13 _DP_TE_BLOODSHOWER", 1, checkextension("_DP_TE_BLOODSHOWER"));
@@ -3369,8 +3376,12 @@ void CSQC_SelftestEnt() {
 			if (entityfieldname(i) == "classname")
 				idx = i;
 		if (idx >= 0) {
-			putentityfieldstring(idx, vme, "rf_set");
-			ST_True("3 T13 classname round-trip", getentityfieldstring(idx, vme) == "rf_set");
+			if (checkbuiltin(putentityfieldstring)) {
+				putentityfieldstring(idx, vme, "rf_set");
+				ST_True("3 T13 classname round-trip", getentityfieldstring(idx, vme) == "rf_set");
+			} else {
+				ST_Skip("3 T13 classname round-trip", "#500 not implemented");
+			}
 		} else {
 			ST_Skip("3 T13 classname round-trip", "classname field not found");
 		}
@@ -4378,8 +4389,12 @@ void Hud_DrawCSQC() {
 			if (g_rf_is >= 0)
 				g_rf_v = stof(getentityfieldstring(g_rf_is, vme));
 			if (g_rf_ic >= 0) {
-				putentityfieldstring(g_rf_ic, vme, "rf_set");
-				g_rf_cls = (getentityfieldstring(g_rf_ic, vme) == "rf_set") ? 1 : 0;
+				if (checkbuiltin(putentityfieldstring)) {
+					putentityfieldstring(g_rf_ic, vme, "rf_set");
+					g_rf_cls = (getentityfieldstring(g_rf_ic, vme) == "rf_set") ? 1 : 0;
+				} else {
+					g_rf_cls = -1;
+				}
 			}
 			remove(vme);
 		}
