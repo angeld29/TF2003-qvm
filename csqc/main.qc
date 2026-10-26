@@ -3037,7 +3037,9 @@ void CSQC_SelftestCore(float mode) {
 		ST_True("B10 serverkey maxplayers nonempty", strlen(serverkey("maxplayers")) > 0);
 
 		// B12 (Э8.3): sprintf width/flags/precision (FTE PF_sprintf_internal,
-		// pr_bgcmd.c:7295). Неизвестная конверсия — verbatim; %o/%p/%S/length не поддержаны.
+		// pr_bgcmd.c:7295). Неизвестная конверсия обрывает формат; %o/%p/%S не
+		// поддержаны. Домен аргумента: h — float, l/L — raw int32, %i — raw int,
+		// %d и прочие — float (int-значения VM: функции/поля/entity — сырые int).
 		ST_EqS("B12 sprintf %5d", "   42", sprintf("%5d", 42));
 		ST_EqS("B12 sprintf %03d", "007", sprintf("%03d", 7));
 		ST_EqS("B12 sprintf %-3d", "7  ", sprintf("%-3d", 7));
@@ -3051,6 +3053,16 @@ void CSQC_SelftestCore(float mode) {
 		ST_EqS("B12 sprintf %s", "hi", sprintf("%s", "hi"));
 		rv = '1 2 3';
 		ST_EqS("B12 sprintf %v", "1 2 3", sprintf("%v", rv));
+		// FTE int-слоты: %i/%l* читают сырые int-биты, %d/%h* — float. Float-аргумент
+		// в %i/%ld/%lx передаётся намеренно (проверяем именно raw-int домен), поэтому
+		// предупреждение fteqcc F324 о типе аргумента здесь глушится.
+#pragma warning disable F324
+		ST_EqS("B12 sprintf %i raw-int", "1077936128", sprintf("%i", 3.0));
+		ST_EqS("B12 sprintf %d float", "3", sprintf("%d", 3.0));
+		ST_EqS("B12 sprintf %hi float", "3", sprintf("%hi", 3.0));
+		ST_EqS("B12 sprintf %ld raw-int", "1077936128", sprintf("%ld", 3.0));
+		ST_EqS("B12 sprintf %lx raw-hex", "40400000", sprintf("%lx", 3.0));
+#pragma warning enable F324
 
 		// B13 (Э8.3): таблица-зеркало FTE (pr_bgcmd.c QSG_Extensions) — точные имена,
 		// вкл. '_' у _DP_TE_*; EXT_CSQC — спец-кейс (протокольный, check_pext_csqc).
